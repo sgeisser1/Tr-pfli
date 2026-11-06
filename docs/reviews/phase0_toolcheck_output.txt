@@ -8,35 +8,37 @@
   [OK]    ccx -> /usr/bin/ccx
   [OK]    git -> /usr/bin/git
   [OK]    curl -> /usr/bin/curl
-  kicad-cli (WSL): 9.0.9
-  kicad-cli (Windows): 10.0.5
+  kicad-cli (WSL): 10.0.8
+  kicad-cli (Windows): 10.0.8
 == Optionale/fehlende Werkzeuge ==
-  [FEHLT] pdftoppm
-  [FEHLT] pdftotext
-  [FEHLT] zip
-  [FEHLT] node
-  [FEHLT] npm
-  [FEHLT] ElmerSolver
-  [FEHLT] ElmerGrid
+  [OK]    pdftoppm
+  [OK]    pdftotext
+  [OK]    zip
+  [OK]    node
+  [OK]    npm
+  [OK]    ElmerSolver
+  [OK]    ElmerGrid
   [FEHLT] pio
   [FEHLT] west
-  [OK]    python: numpy
-  [OK]    python: scipy
-  [OK]    python: matplotlib
-  [OK]    python: sympy
-  [OK]    python: requests
-  [OK]    python: yaml
-  [OK]    python: serial
-  [OK]    python: cryptography
-  [OK]    python: pcbnew
-  [FEHLT] python: gmsh
-  [FEHLT] python: skfem
-  [FEHLT] python: meshio
-  [FEHLT] python: pypdf
+  [OK]    python (/home/sgeisser/git/Tr-pfli/.venv/bin/python): numpy
+  [OK]    python (/home/sgeisser/git/Tr-pfli/.venv/bin/python): scipy
+  [OK]    python (/home/sgeisser/git/Tr-pfli/.venv/bin/python): matplotlib
+  [OK]    python (/home/sgeisser/git/Tr-pfli/.venv/bin/python): sympy
+  [OK]    python (/home/sgeisser/git/Tr-pfli/.venv/bin/python): requests
+  [OK]    python (/home/sgeisser/git/Tr-pfli/.venv/bin/python): yaml
+  [OK]    python (/home/sgeisser/git/Tr-pfli/.venv/bin/python): serial
+  [OK]    python (/home/sgeisser/git/Tr-pfli/.venv/bin/python): cryptography
+  [OK]    python (/home/sgeisser/git/Tr-pfli/.venv/bin/python): pcbnew
+  [OK]    python (/home/sgeisser/git/Tr-pfli/.venv/bin/python): gmsh
+  [OK]    python (/home/sgeisser/git/Tr-pfli/.venv/bin/python): skfem
+  [OK]    python (/home/sgeisser/git/Tr-pfli/.venv/bin/python): meshio
+  [OK]    python (/home/sgeisser/git/Tr-pfli/.venv/bin/python): pypdf
 == Funktionstest KiCad (Board erzeugen, DRC, Gerber, STEP) ==
-  [OK]    DRC (KiCad 9)
+  [OK]    DRC (kicad-cli WSL)
   [OK]    Gerber-Export
   [OK]    STEP-Export
-  [OK]    DRC (KiCad 10)
+  [OK]    DRC (kicad-cli Windows)
 == Funktionstest ngspice (RC-Puffer, erwartet vmin ~2.870 V) ==
   vmin                =  2.870293e+00 at=  4.001100e-03
+== Funktionstest Elmer (Plattenkondensator, erwartet W = 1.992E-10 J/m) ==
+  StatElecSolver_post: Total Electric Energy:   1.992E-10

@@ -1,0 +1,39 @@
+Header
+  Mesh DB "." "box"
+End
+Simulation
+  Coordinate System = Cartesian 2D
+  Simulation Type = Steady State
+  Steady State Max Iterations = 1
+  Output Intervals = 0
+End
+Constants
+  Permittivity Of Vacuum = 8.8542e-12
+End
+Body 1
+  Equation = 1
+  Material = 1
+End
+Equation 1
+  Active Solvers(1) = 1
+End
+Solver 1
+  Equation = Stat Elec Solver
+  Procedure = "StatElecSolve" "StatElecSolver"
+  Variable = Potential
+  Calculate Capacitance Matrix = False
+  Calculate Electric Energy = True
+  Linear System Solver = Direct
+  Linear System Direct Method = UMFPack
+End
+Material 1
+  Relative Permittivity = 4.5
+End
+Boundary Condition 1
+  Target Boundaries = 1
+  Potential = 0
+End
+Boundary Condition 2
+  Target Boundaries = 3
+  Potential = 1
+End

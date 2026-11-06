@@ -45,13 +45,19 @@ Energiequelle und Gehäusematerial). JLC **Basic Parts** bevorzugen.
 ## Arbeitsumgebung (Stand Phase 0, siehe docs/reviews/phase0_toolcheck.md)
 - Alles läuft in **WSL2 Ubuntu 24.04** (Linux), auch die MCP-Server FreeCAD 0.21.2 und
   Blender 4.0.2. Windows-Laufwerk unter `/mnt/c`.
-- KiCad: WSL hat KiCad **9.0.9** inkl. Python-Modul `pcbnew`; Windows hat KiCad **10.0.5**
-  (`/mnt/c/Users/steph/AppData/Local/Programs/KiCad/10.0/bin/kicad-cli.exe`, Pfade per
-  `wslpath -w` übergeben). Formatfrage siehe DECISIONS.md.
+- KiCad **10.0.8** in WSL (inkl. Python-Modul `pcbnew`, SWIG, bis KiCad 11 verfügbar) und unter
+  Windows (`/mnt/c/Users/steph/AppData/Local/Programs/KiCad/10.0/bin/kicad-cli.exe`, Pfade per
+  `wslpath -w`). Projekt bleibt bis Release auf KiCad 10 (D-002).
+- Python-Pakete in der Projektumgebung: **`.venv/bin/python`** (gmsh, meshio, scikit-fem, pypdf;
+  sieht auch die Systempakete inkl. `pcbnew`). Skripte mit `.venv/bin/python` ausführen.
+- Feldsimulation: Elmer 26.2 **immer über `scripts/elmer.sh`** starten (setzt
+  `HWLOC_COMPONENTS=-gl`, sonst hängt OpenMPI in WSL). 2D-Studien mit scikit-fem + gmsh.
+- PDF lesen: poppler-utils installiert (Read-Tool mit `pages`, `pdftotext`).
 - FEM: FreeCAD-FEM mit CalculiX (`ccx`) und gmsh funktionieren.
 - SPICE: `ngspice -b` (Version 42).
 - Blender: Cycles nur CPU, **ohne OpenImageDenoise** → `scene.cycles.use_denoising = False`,
   dafür mehr Samples. Keine Asset-Bibliotheken/Generatoren: Szene per Skript aufbauen.
+- Noch nicht installiert: Firmware-Toolchain (folgt nach Konzeptwahl).
 - `sudo` ist passwortgeschützt: **nichts installieren** ohne Freigabe des Auftraggebers.
 - Reproduzierbarkeit: Generatoren und Berechnungen als Skript unter `scripts/` bzw. im
   jeweiligen Fachordner; Ergebnisse müssen per Skript neu erzeugbar sein.

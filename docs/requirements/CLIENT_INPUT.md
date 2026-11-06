@@ -14,3 +14,11 @@ Ergänzt die ursprüngliche Projektbeschreibung. Gilt als Grundlage für Phase 1
 | 8 | Energie | Laden alle paar Monate ok; **Batterie (nicht aufladbar): max. 1 Wechsel pro Jahr** | Laufzeitziel Primärzelle ≥ 12 Monate realistisch (nicht nur optimistisch). Akku ≥ 2–3 Monate. |
 | 9 | Drucker | Vermutlich **Bambu Lab P1S mit AMS** (zu bestätigen) | Geschlossener Bauraum → ASA druckbar; mehrfarbiges Logo per AMS möglich. |
 | 10 | Werkstatt | Gut ausgerüstet, **kein Programmieradapter, keine 100 CHF für Messgeräte** | Programmierweg ohne teuren Adapter vorsehen (z. B. Chip mit USB/UART-Bootloader oder sehr günstiger Adapter < 10 CHF). Energiemessung mit Werkstattmitteln planen (Shunt + Oszilloskop/Multimeter-Mittelung). |
+
+## Präzisierungen (2026-11-06, nach Phase 0)
+- **Manuelle Aktualisierung:** Ziel ca. 1 min; **wenn das energetisch zu teuer ist, sind auch einige
+  Minuten akzeptabel.** → In Phase 1/2 als Muss ≤ 5 min, Wunsch ≤ 1 min festlegen und die Energie
+  beider Werte ausweisen.
+- **Firmen-WLAN:** Die Firma sieht eigene Geräte im WLAN evtl. nicht gern, **möglich ist es aber
+  durchaus.** → Gateway im Firmen-WLAN ist zulässig; Lösungen mit möglichst wenig Eingriff ins
+  Firmennetz bevorzugen und Alternativen (z. B. ohne WLAN-Gateway) im Konzept mitbewerten.

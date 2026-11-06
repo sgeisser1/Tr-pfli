@@ -30,3 +30,13 @@ Umgebung: WSL2 Ubuntu 24.04, Ryzen 7 3700X (16 Threads), 54 GB RAM, 945 GB frei.
 - Nebenbefund FEM-Test: Ein 1.6 mm FR4-Streifen 20 mm breit erreicht bei 10 N seitlicher Last
   am Ende eines 100 mm Hebels ~117 MPa (FR4-Biegefestigkeit typisch 300–400 MPa, ANNAHME bis
   Materialdatenblatt vorliegt). Relevant für Sondenbreite, Dicke und die Einsteckanleitung.
+
+## Nachtrag nach Installation (2026-11-06)
+`scripts/install_tools.sh` wurde vom Auftraggeber ausgeführt, Windows-KiCad auf 10.0.8 aktualisiert.
+- KiCad 10.0.8 in WSL und Windows, `pcbnew` 10.0.8 ✅
+- poppler (PDF lesen) ✅, zip ✅, Node/npm ✅, `.venv` mit gmsh 4.15.2, scikit-fem 12.0.2, meshio, pypdf ✅
+- **Elmer 26.2:** hing zunächst endlos. Ursache per `strace`: der OpenMPI-Hilfsprozess `orted` fragt
+  über das hwloc-Plugin `gl` X11-Displays ab und blockiert bei `connect(127.0.0.1:6001)`.
+  Lösung: `HWLOC_COMPONENTS=-gl` → Wrapper `scripts/elmer.sh`. Selbsttest Plattenkondensator
+  (`simulation/field/selftest/`): Elmer 1.992E-10 J/m, Handrechnung ½·ε₀·4.5·(10/1)·1² = 1.992E-10 J/m ✅
+- Firmware-Toolchain (pio/west) bewusst noch offen bis Konzeptwahl.

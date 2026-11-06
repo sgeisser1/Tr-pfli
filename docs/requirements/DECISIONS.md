@@ -45,4 +45,6 @@ Format: Nr. · Datum · Entscheid · Alternativen · Begründung · Quelle · St
 - **Alternativen:** openEMS (für Elektrostatik bei niedriger Frequenz unnötig komplex, in Ubuntu
   24.04 nicht paketiert); FEMM (nur Windows/2D, schlecht skriptbar in WSL); FreeCAD-FEM mit
   Elmer (nutzt denselben Solver, bietet aber keinen Mehrwert gegenüber Skript).
-- **Status:** wartet auf Freigabe des Auftraggebers
+- **Entscheid:** Elmer 26.2 (PPA) installiert und verifiziert, Aufruf nur über `scripts/elmer.sh`;
+  2D-Parameterstudien mit scikit-fem + gmsh in `.venv`.
+- **Status:** entschieden (2026-11-06)
