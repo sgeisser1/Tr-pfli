@@ -103,12 +103,13 @@ def messkette():
 
 
 def tmp1075():
-    """RT W-2/k-4: TMP1075 + I2C-Pull-ups an einem GPIO (0 uA im Schlaf)."""
-    return [J("C2870250", 1, 9, "Temp TMP1075", leadless=True), J("C25900", 2, 2, "R 4.7k I2C-Pull-up")]
+    """RT W-2/k-4: TMP1075 + I2C-Pull-ups an einem GPIO (0 uA im Schlaf).
+    v0.3 (E2): TMP1075DGKR VSSOP-8 statt DSGR (WSON) -> nicht leadless, keine Roentgengebuehr."""
+    return [J("C2864807", 1, 8, "Temp TMP1075 VSSOP-8"), J("C25900", 2, 2, "R 4.7k I2C-Pull-up")]
 
 
-def ui_prog(lines=4):
-    """S2-K01: keine VPROG-Leitung, keine Messbruecke, kein nRST-Pad; Pads RX, TX, SWDIO, SWDCK je 2 x 100 kOhm."""
+def ui_prog(lines=2):
+    """S2-K01: keine VPROG-Leitung, keine Messbruecke, kein nRST-Pad. v0.3 (E3): nur Pads RX, TX je 2 x 100 kOhm."""
     return [
         J("C2286", 1, 2, "LED rot"), J("C25117", 1, 2, "R 470R LED"),
         J("C318884", 1, 4, "Taster"),
@@ -128,13 +129,13 @@ def housing(grams):
 BOM_A = merge(cc2340_core() + messkette() + tmp1075() + [
     J("C964809", 1, 2, "Halter CR2450"),
     J("C15127", 1, 3, "P-FET Verpolschutz"),
-    J("C15008", 4, 2, "C 100uF Puffer (REQ-ENE-06 pess.)"),
+    J("C15008", 2, 2, "C 100uF Puffer (E1: 2 bestueckt + 2 DNM)"),
 ] + ui_prog() + [LOK("Zelle Renata CR2450N", CR2450N_CHF)] + housing(15))
 
 BOM_A32 = merge(cc2340_core() + messkette() + tmp1075() + [
     J("C5213768", 1, 3, "Halter CR2032 Keystone 3034 (Minuspol = ENIG-Pad)"),
     J("C15127", 1, 3, "P-FET Verpolschutz"),
-    J("C15008", 4, 2, "C 100uF Puffer (REQ-ENE-06 pess.)"),
+    J("C15008", 2, 2, "C 100uF Puffer (E1: 2 bestueckt + 2 DNM)"),
 ] + ui_prog() + [LOK("Zelle Panasonic CR2032", CR2032_PANA_CHF)] + housing(11))
 
 BOM_A2 = merge(BOM_A + [LOK("Epoxid-Tauchbeschichtung Sonde 2 L (ANNAHME)", EPOXY_2L_CHF)])
@@ -186,8 +187,8 @@ CONCEPTS = {
 }
 
 SCEN = {
-    "Prototyp 5 PCB / 2 bestueckt": dict(pcb_qty=5, pcba_qty=2, sensors=2),
     "Prototyp 5 PCB / 5 bestueckt": dict(pcb_qty=5, pcba_qty=5, sensors=5),
+    "Prototyp 5 PCB / 2 bestueckt": dict(pcb_qty=5, pcba_qty=2, sensors=2),
     "Serie 20 PCB / 16 bestueckt / 15 Sensoren": dict(pcb_qty=20, pcba_qty=16, sensors=15),
 }
 

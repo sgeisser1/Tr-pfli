@@ -31,16 +31,26 @@ DAY = eb.DAY
 #    (nach Dauerpruefung S.55: 25 bzw. 12.5 MOhm*uF -> nur als Hinweis)
 # ---------------------------------------------------------------------------------------------
 SAMSUNG_RC = 100.0
+# v0.3 (E1, Projektleiter nach Pruefrunde 2): Abschaltung 2.4 V unter Last an der Zellklemme (statt 2.0 V),
+# damit der DCDC unter Last aktiv bleibt (VDDS >= 2.2 V, TI_CC2340R5_Datasheet_SWRS272F.pdf S.18).
+# Nutzbarer Anteil der bis 2.0 V spezifizierten Kapazitaet: ANNAHME 0.90, abgelesen aus
+# Panasonic_CR2032_Datasheet_2026-02.pdf S.1 "Discharge temperature characteristics" (20 C, 15 kOhm):
+# 2.4 V bei ca. 1100 h, 2.0 V bei ca. 1150 h (~96 %); mit 0.2 V Lasteinbruch Kriterium ~2.6 V bei ca.
+# 1050 h (~91 %) -> 0.90. Fuer Renata CR2450N gleicher Faktor (ANNAHME, gleiche Chemie).
+CUTOFF_FACTOR = 0.90
 BOARD = (0.05e-6, 0.2e-6)
 MLCC_REAL_PER_100U = 0.05e-6   # ANNAHME wie energy_budget.py
 MLCC_PESSA = 0.5e-6            # ANNAHME pess. A (gesamt, wie v0.1)
 
+# v0.3 (E1): A und A-32 mit 2 x 100 uF und Abschaltung 2.4 V; A-32 rechnet mit den CR2032-Zelldaten
+# des Modells (225 mAh, Renata), Panasonic CR2032 nennt ebenfalls 225 mAh (Datenblatt S.1).
 CONCEPTS = {
-    "A: CC2340 + CR2450N, 4 x 100 uF": ("CC2340R5", "CR2450N (Renata)", 400e-6),
-    "A-32: CC2340 + CR2032, 4 x 100 uF": ("CC2340R5", "CR2032 (Renata)", 400e-6),
-    "A-32: CC2340 + CR2032, 2 x 100 uF": ("CC2340R5", "CR2032 (Renata)", 200e-6),
-    "B: CH592F + CR2032, 3 x 100 uF": ("CH592F", "CR2032 (Renata)", 300e-6),
-    "C: CC2340 + LiPo 125 mAh": ("CC2340R5", "LiPo ICP401230UPR 125 mAh", 22e-6),
+    "A: CC2340 + CR2450N, 2 x 100 uF, 2.4 V": ("CC2340R5", "CR2450N (Renata)", 200e-6, True),
+    "A-32: CC2340 + CR2032, 2 x 100 uF, 2.4 V": ("CC2340R5", "CR2032 (Renata)", 200e-6, True),
+    "A (v0.2): 4 x 100 uF, 2.0 V": ("CC2340R5", "CR2450N (Renata)", 400e-6, False),
+    "A-32 (v0.2): 4 x 100 uF, 2.0 V": ("CC2340R5", "CR2032 (Renata)", 400e-6, False),
+    "B: CH592F + CR2032, 3 x 100 uF": ("CH592F", "CR2032 (Renata)", 300e-6, False),
+    "C: CC2340 + LiPo 125 mAh": ("CC2340R5", "LiPo ICP401230UPR 125 mAh", 22e-6, False),
 }
 
 
@@ -62,8 +72,10 @@ class Patch:
         (eb.I_OTHER_REAL, eb.I_OTHER_PESS, eb.I_MLCC_REAL, eb.I_MLCC_PESS, eb.GRM_RC, eb.C_BUF_NOM, eb.P_MISS) = self.old
 
 
-def calc(soc, cell, cbuf, m, case, p_miss=None):
-    s, c = eb.SOCS[soc], eb.CELLS[cell]
+def calc(soc, cell, cbuf, m, case, p_miss=None, cutoff24=False):
+    s, c = eb.SOCS[soc], dict(eb.CELLS[cell])
+    if cutoff24:
+        c["util"] = tuple(u * CUTOFF_FACTOR for u in c["util"])
     with Patch(cbuf, p_miss):
         q, parts = eb.daily(s, m, c, case)
         months = eb.lifetime_months(c, q, case != "real")
@@ -72,17 +84,17 @@ def calc(soc, cell, cbuf, m, case, p_miss=None):
 
 
 def part1():
-    print("## 1 Konzepte (Modell energy_budget.py, Standardprofil REQ-ENE-04, Parameter v0.2)\n")
+    print("## 1 Konzepte (Modell energy_budget.py, Standardprofil REQ-ENE-04, Parameter v0.3)\n")
     print("pess. A = REQ-ENE-08 mit Puffer-Leck ANNAHME 0.5 uA (Information REQ-ENE-09, Nachweis am Prototyp); "
           "**pess. DS** = Puffer-Leck an der Samsung-Datenblattgrenze (Nachweis REQ-ENE-02).\n")
     print("| Konzept | Reaktionszeit | Mittel real [uA] | Mittel pess. A [uA] | Mittel pess. DS [uA] | "
           "Laufzeit real [Mt.] | Laufzeit pess. A [Mt.] | **Laufzeit pess. DS [Mt.]** | Schlaf pess. A [uA] |")
     print("|---|---|---|---|---|---|---|---|---|")
-    for name, (soc, cell, cb) in CONCEPTS.items():
+    for name, (soc, cell, cb, cut) in CONCEPTS.items():
         for m in (1, 2, 5):
-            ir, mr, _, _ = calc(soc, cell, cb, m, "real")
-            ia, ma, pa, _ = calc(soc, cell, cb, m, "pessA")
-            ib, mb, _, _ = calc(soc, cell, cb, m, "pessB")
+            ir, mr, _, _ = calc(soc, cell, cb, m, "real", None, cut)
+            ia, ma, pa, _ = calc(soc, cell, cb, m, "pessA", None, cut)
+            ib, mb, _, _ = calc(soc, cell, cb, m, "pessB", None, cut)
             sl = (pa["sleep_soc"] + pa["sleep_board"] + pa["mlcc"] + pa.get("vpol", 0) + pa.get("li_path", 0)) / DAY * 1e6
             print(f"| {name} | {m} min | {ir:.2f} | {ia:.2f} | {ib:.2f} | {eb.fmt_m(mr)} | {eb.fmt_m(ma)} | "
                   f"**{eb.fmt_m(mb)}** | {sl:.2f} |")
@@ -91,15 +103,15 @@ def part1():
     print("| Konzept | Erreichbarkeitsintervall [s] | Mittel pess. A [uA] | Laufzeit pess. A [Mt.] | "
           "Mittel pess. DS [uA] | Laufzeit pess. DS [Mt.] |")
     print("|---|---|---|---|---|---|")
-    for name, (soc, cell, cb) in CONCEPTS.items():
-        ia, ma, _, reach = calc(soc, cell, cb, 1, "pessA", 0.5)
-        ib, mb, _, _ = calc(soc, cell, cb, 1, "pessB", 0.5)
+    for name, (soc, cell, cb, cut) in CONCEPTS.items():
+        ia, ma, _, reach = calc(soc, cell, cb, 1, "pessA", 0.5, cut)
+        ib, mb, _, _ = calc(soc, cell, cb, 1, "pessB", 0.5, cut)
         print(f"| {name} | {reach:.1f} | {ia:.2f} | {eb.fmt_m(ma)} | {ib:.2f} | {eb.fmt_m(mb)} |")
 
     print("\n### 1c Budgetanteile pess. A, 1 min (vor +20 %-Zuschlag)\n")
     print("| Konzept | Schlaf SoC | Board | MLCC | Verpol/Li-Pfad | Erreichbarkeit | Messung | LED | OTA |")
     print("|---|---|---|---|---|---|---|---|---|")
-    for name, (soc, cell, cb) in CONCEPTS.items():
+    for name, (soc, cell, cb, cut) in CONCEPTS.items():
         with Patch(cb):
             tot, p = eb.daily(eb.SOCS[soc], 1, eb.CELLS[cell], "pessA")
         base = tot / eb.PESS_TOTAL

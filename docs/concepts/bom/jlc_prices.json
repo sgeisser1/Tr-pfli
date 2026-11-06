@@ -924,6 +924,43 @@
    ]
   ]
  },
+ "C2864807": {
+  "brand": "Texas Instruments",
+  "describe": "-55℃~+125℃ 1.7V~5.5V 12bit 7ms I2C、SMBus ±1℃ VSSOP-8 Temperature Sensors ROHS",
+  "least": 5,
+  "library": "expand",
+  "loss": 0,
+  "model": "TMP1075DGKR",
+  "package": "VSSOP-8",
+  "preferred": false,
+  "stock": 15773,
+  "tiers": [
+   [
+    1,
+    0.3995
+   ],
+   [
+    10,
+    0.316
+   ],
+   [
+    30,
+    0.28
+   ],
+   [
+    100,
+    0.2358
+   ],
+   [
+    500,
+    0.2161
+   ],
+   [
+    1000,
+    0.203
+   ]
+  ]
+ },
  "C2870250": {
   "brand": "Texas Instruments",
   "describe": "-55℃~+125℃ 1.7V~5.5V 12bit 4uA 7ms Factory temperature calibration、Temperature threshold monitoring I2C、SMBus ±1℃ WSON-8-EP(2x2) Temperature Sensors ROHS",
