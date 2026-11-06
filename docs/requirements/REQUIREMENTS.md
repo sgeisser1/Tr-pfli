@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | Dokument | `docs/requirements/REQUIREMENTS.md` |
-| Version | **0.2** (nach Prüfrunde 1) |
+| Version | **0.3** (nach Prüfrunde 2) |
 | Datum | 2026-11-06 |
 | Grundlagen | `PROJEKTAUFTRAG.md` (Original), `CLIENT_INPUT.md` (Antworten Phase 0), `DECISIONS.md` |
 | Prüfberichte | `docs/reviews/phase1_requirements_{redteam,sicherheit,firmware-energie}.md`, Antworten: `phase1_requirements_response.md` |
@@ -38,7 +38,7 @@ Alles bleibt **strikt lokal**: keine Cloud, keine externen Server, kein Zugriff 
 ### 1.2 Prioritätsregel bei Zielkonflikten *(F-01)*
 **Sicherheit > Kosten > Komfort.** Verhindert eine Muss-Anforderung **ohne Sicherheitsbezug** das
 Kostenziel REQ-FAB-04, wird sie dem Auftraggeber mit den Mehrkosten zur Entscheidung vorgelegt.
-Sicherheitsanforderungen (Kap. 6) werden nie zugunsten der Kosten gesenkt.
+Sicherheitsanforderungen (Kap. 6 sowie REQ-FW-04, REQ-RF-05, REQ-RF-06) werden nie zugunsten der Kosten gesenkt. *(Runde 2: F-01)*
 
 ### 1.3 Kennzeichnungen
 **ANNAHME**: noch nicht belegte Annahme, wird in Phase 2 bestätigt oder ersetzt.
@@ -51,7 +51,7 @@ Sicherheitsanforderungen (Kap. 6) werden nie zugunsten der Kosten gesenkt.
 |---|---|
 | RB-01 | Einsatz vorerst in **einem Büroraum ca. 10 × 15 m**, innen. |
 | RB-02 | Töpfe Ø 15–30 cm, Substrat **Erde und Granulat** (z. B. Blähton-/Mineralgranulat), gedüngt. |
-| RB-03 | Umgebung: Raumklima; Sensoren können auf der Fensterbank in der Sonne stehen. Betrieb 5–45 °C Umgebung; **Kopftemperatur in praller Sonne bis 65 °C** (**ANNAHME**, am Muster messen); Lagerung −10–50 °C. *(F-13, S-W06)* |
+| RB-03 | Umgebung: Raumklima; Sensoren können auf der Fensterbank in der Sonne stehen. Betrieb mit voller Funktion 5–45 °C Umgebung. **Kopftemperatur in praller Sonne bis 65 °C** (**ANNAHME**, am Muster messen): bei 65 °C kein Schaden und keine Gefährdung (Muss), Funktion **Soll**. **Sonnenprofil** für Rechnungen: 4 h/Tag bei 50 °C Kopftemperatur, sonst 25 °C (**ANNAHME**). Lagerung −10–50 °C. *(F-13, S-W06, Runde 2: N-03)* |
 | RB-04 | Firmen-WLAN vorhanden, Qualität mässig. Ein Gateway im Firmen-WLAN ist **zulässig**, Lösungen mit wenig Eingriff ins Firmennetz werden bevorzugt. |
 | RB-05 | Kein dauerhaft laufender Rechner vorhanden. Ein Raspberry Pi nur, wenn nötig (begründen). |
 | RB-06 | Eigengebrauch, keine Zertifizierung. Sicherheit hat trotzdem höchste Priorität. |
@@ -88,9 +88,9 @@ Sicherheitsanforderungen (Kap. 6) werden nie zugunsten der Kosten gesenkt.
 | REQ-SYS-02 | Ein Gateway versorgt mindestens **15 Sensoren** im Raum nach RB-01. | Muss | A, T |
 | REQ-SYS-03 | Kapazität: bis **30 Sensoren** pro Gateway ohne Hardwareänderung. | Soll | A |
 | REQ-SYS-04 | Automatische Messungen: Intervall einstellbar **1–96×/Tag**, Standard **6×/Tag**. *(FE-13)* | Muss | T |
-| REQ-SYS-05 | Reaktionszeit der manuellen Messung (95 % der Auslösungen): **≤ 5 min** (Muss), **≤ 1 min** (Soll). Die Reaktionszeit ist im Bereich 1–5 min einstellbar; Werkseinstellung ist der kürzeste Wert, der REQ-ENE-02 bzw. -03 noch erfüllt. *(F-02, FE-03)* | Muss/Soll | A, T |
+| REQ-SYS-05 | Reaktionszeit der manuellen Messung (95 % der Auslösungen): **≤ 5 min** (Muss), **≤ 1 min** (Soll). Die Reaktionszeit ist im Bereich 1–5 min einstellbar; Werkseinstellung ist der kürzeste Wert, der REQ-ENE-02 bzw. -03 **und REQ-ENE-09** noch erfüllt. *(Runde 2: N-01)* *(F-02, FE-03)* | Muss/Soll | A, T |
 | REQ-SYS-06 | Zwei-Wege-Kommunikation Gateway → Sensor für: manuelle Messung, Kalibrierung, Einstellungen, Zeit, Firmware-Update. | Muss | T |
-| REQ-SYS-07 | Zeitstempel der Messwerte: Abweichung ≤ **±2 min** nach 14 Tagen und ≤ **±5 min** nach 60 Tagen ohne Gateway. Nach einem Energiequellenwechsel ohne Gateway werden Werte mit relativer Zeit gespeichert und beim nächsten Kontakt korrekt zurückgerechnet. *(F-07, FE-04)* | Muss | A, T |
+| REQ-SYS-07 | Zeitstempel der Messwerte: Abweichung **gegenüber der Gateway-Zeit, bei 5–45 °C** ≤ **±2 min** nach 14 Tagen und ≤ **±5 min** nach 60 Tagen ohne Gateway. Nach einem Energiequellenwechsel ohne Gateway werden Werte mit relativer Zeit gespeichert und beim nächsten Kontakt korrekt zurückgerechnet. *(F-07, FE-04, Runde 2: N-04)* | Muss | A, T |
 | REQ-SYS-08 | Eindeutige Sensor-ID, sichtbar als `troepfli-XXXX` (XXXX aus Chip-ID, hexadezimal). | Muss | I |
 | REQ-SYS-09 | Datenformat (Funk und Export) versioniert und dokumentiert. | Muss | I |
 | REQ-SYS-10 | Anbindung an MQTT / Home Assistant (Auto-Discovery). | Kann | T |
@@ -139,12 +139,12 @@ Sicherheitsanforderungen (Kap. 6) werden nie zugunsten der Kosten gesenkt.
 | REQ-ENE-01 | Variantenvergleich mindestens (a) LiPo mit USB-C-Laden und vollständiger Schutzschaltung, (b) Knopfzelle (z. B. CR2032/CR2450) mit sehr sparsamem Funkchip. Bewertet werden Sicherheit, Laufzeit, Kopfgrösse, Kosten, Aufwand; für jede Variante ein Energiebudget. | Muss | A |
 | REQ-ENE-02 | **[CC] Primärbatterie:** Laufzeit ≥ **12 Monate** im Standardprofil, gerechnet mit den pessimistischen Annahmen nach REQ-ENE-08. | Muss | A, PROTOTYP-PRÜFUNG |
 | REQ-ENE-03 | **[LI] Akku:** Laufzeit pro Ladung ≥ **3 Monate** im Standardprofil. | Muss | A, PROTOTYP-PRÜFUNG |
-| REQ-ENE-04 | **Standardprofil**: 6 Messungen/Tag mit Übertragung, 2 manuelle Messungen/Tag, Reaktionszeit **1 min** (Soll-Wert REQ-SYS-05), LED gemäss Standardmuster, 1 Firmware-Update/Jahr, Sendeleistung gemäss Funkkonzept, mittlere Temperatur 25 °C mit Zuschlag für Sonnenplatz. Zusätzlich wird die Laufzeit für 2 und 5 min Reaktionszeit ausgewiesen. *(F-02, FE-03, FE-16)* | Muss | A |
+| REQ-ENE-04 | **Standardprofil**: 6 Messungen/Tag mit Übertragung, 2 manuelle Messungen/Tag, Reaktionszeit **1 min** (Soll-Wert REQ-SYS-05), LED gemäss Standardmuster, 1 Firmware-Update/Jahr, Sendeleistung gemäss Funkkonzept, Temperatur nach Sonnenprofil (RB-03). Zusätzlich wird die Laufzeit für 2 und 5 min Reaktionszeit ausgewiesen. *(F-02, FE-03, FE-16)* | Muss | A |
 | REQ-ENE-05 | Batteriestand wird bestimmt (Spannung unter Last plus Ereigniszählung) und angezeigt; Warnung, wenn die geschätzte Restlaufzeit < **30 Tage** ist. *(F-08, FE-15)* | Muss | T |
-| REQ-ENE-06 | Spannungseinbrüche beim Senden führen nicht zu Resets oder Datenverlust bis zur definierten Abschaltschwelle; Einbruch ≤ **0.2 V** bei Zellinnenwiderstand 100 Ω; definierte Abschaltung (Unterspannung unter Last) mit sauberem Speichern. *(FE-07)* | Muss | S, T |
+| REQ-ENE-06 | Spannungseinbrüche beim Senden führen nicht zu Resets oder Datenverlust bis zur definierten Abschaltschwelle; Einbruch ≤ **0.2 V** bei Zellinnenwiderstand 100 Ω; definierte Abschaltung bei Unterspannung **2.0 V unter Last an der Zellklemme**, Lastfall Funkereignis (**ANNAHME** bis Chipwahl), mit sauberem Speichern; OTA-Dauerbetrieb nur nach REQ-FW-02. *(FE-07, Runde 2: N-05)* | Muss | S, T |
 | REQ-ENE-07 | Energieverbrauch am Prototyp mit Werkstattmitteln messbar; Messpunkt im Versorgungspfad, der **keine Schutzfunktion umgeht**. *(S-L01)* | Muss | I |
 | REQ-ENE-08 | **Pessimistische Rechenannahmen** (verbindlich für alle Laufzeitangaben): nutzbare Kapazität ≤ **75 %** der Nennkapazität für Knopfzellen mit Pufferkondensator (≤ 60 % ohne), Selbstentladung nach Herstellerangabe, Ruheströme = Datenblatt-Typwert × 1.5 oder Maximalwert, Zuschlag **+20 %** auf den Gesamtverbrauch. Nur Markenzellen laut Stückliste. *(F-08, FE-01)* | Muss | A |
-| REQ-ENE-09 | **[CC] Strombudget:** Mittelstrom im Standardprofil ≤ **8 µA**, Ruhestrom (Schlaf) ≤ **3 µA**, am Prototyp gemessen. **[LI]** Ruhestrom von Lade- und Schutzschaltung ≤ **5 µA**. *(FE-02, FE-09)* | Muss | A, T |
+| REQ-ENE-09 | **[CC] Strombudget:** Mittelstrom im Standardprofil **mit der Werkseinstellung nach REQ-SYS-05** ≤ **8 µA** *(Runde 2: N-01)*, Ruhestrom (Schlaf) ≤ **3 µA**, am Prototyp gemessen. **[LI]** Ruhestrom von Lade- und Schutzschaltung ≤ **5 µA**. *(FE-02, FE-09)* | Muss | A, T |
 
 ### 5.5 Funk
 
@@ -196,7 +196,7 @@ Sicherheitsanforderungen (Kap. 6) werden nie zugunsten der Kosten gesenkt.
 | REQ-MECH-09 | Masse-/Guard-Struktur zwischen Elektronik und Sonde. | Muss | I |
 | REQ-MECH-10 | Robustheit der Sonde, mit dokumentierter Lagerung im Kopf, Sicherheitsfaktor ≥ 2 gegen Bruch, keine bleibende Verformung: **axial 50 N** (Einstecken), **seitlich 10 N** an der Spitze, **Zug 30 N** (Herausziehen), **Fall aus 1 m** auf harten Boden (Kopf voran und flach). Lastwerte **ANNAHME**, Plausibilisierung am Prototyp. Anleitung empfiehlt Vorstechen in verdichteter Erde. *(F-10)* | Muss | S, T |
 | REQ-MECH-11 | Leiterplattendicke festgelegt (1.6 oder 2.0 mm) und begründet; Elektrodengeometrie per Feldsimulation optimiert (Empfindlichkeit, Messvolumen, Isolationsdicke). *(F-18)* | Muss | A, S |
-| REQ-MECH-12 | Gehäuse FDM-druckbar auf Bambu Lab, Material feuchte- und UV-geeignet und formstabil bis mindestens **70 °C** (RB-03) (z. B. ASA; PETG nur mit Nachweis; kein PLA). *(F-13)* | Muss | I |
+| REQ-MECH-12 | Gehäuse FDM-druckbar auf Bambu Lab, Material feuchte- und UV-geeignet und Formbeständigkeit (HDT laut Materialdatenblatt) ≥ **80 °C**, damit bei 65 °C Kopftemperatur (RB-03) Reserve für REQ-SAF-01 bleibt (z. B. ASA; PETG nur mit Nachweis; kein PLA). *(F-13, Runde 2: S-W05)* | Muss | I |
 | REQ-MECH-13 | Spritzwasserschutz Kopf: kein Wassereintritt bei Giessen von oben (1 l Wasser aus 20 cm Höhe über den Kopf, 10 Wiederholungen; Anlehnung IPX4-Methode), **geprüft mit eingesetzter Energiequelle**, danach Öffnen und Sichtprüfung auf Feuchte/Kondensat. *(S-K01)* | Muss | T |
 | REQ-MECH-14 | Sonde: dauerhaft in nassem Substrat ohne Funktionsverlust; Wassertest ≥ **30 Tage** bis zur Dichtlinie vor Freigabe der Serie (siehe REQ-MES-06). | Muss | T, PROTOTYP-PRÜFUNG |
 | REQ-MECH-15 | Batteriefach bzw. Ladeport dicht und ohne Spezialwerkzeug zugänglich (ein handelsüblicher Schraubenzieher bzw. eine Münze gilt nicht als Spezialwerkzeug); Wechsel/Laden ohne Lösen der Sondendichtung. | Muss | T |
@@ -210,7 +210,7 @@ Sicherheitsanforderungen (Kap. 6) werden nie zugunsten der Kosten gesenkt.
 
 | ID | Anforderung | Prio | Verif. |
 |---|---|---|---|
-| REQ-SAF-01 | Brandrisiko minimal. Kriterium: In jedem **Einzelfehlerfall** der FMEA-Liste (mindestens Kurzschluss am Ausgang der Energiequelle, Verpolung, Wassereintritt, Kurzschluss jedes Bauteils im Versorgungspfad) keine Flamme, kein Rauch, kein Aufblähen; Erwärmung der Gehäuseoberfläche durch den Fehler ≤ **25 K** gegenüber dem fehlerfreien Zustand bei gleicher Umgebung (**ANNAHME**, Grenzwert in Phase 2 mit Quelle belegen) und absolut stets unter der Formbeständigkeit des Gehäusematerials. *(S-W05, F-14)* | Muss | A (FMEA), T |
+| REQ-SAF-01 | Brandrisiko minimal. Kriterium: In jedem **Einzelfehlerfall** der FMEA-Liste (mindestens Kurzschluss am Ausgang der Energiequelle, Verpolung, Wassereintritt, Kurzschluss jedes Bauteils im Versorgungspfad) keine Flamme, kein Rauch, kein Aufblähen; Prüfung bei 20–25 °C Umgebung; gemessene Erwärmung durch den Fehler so, dass (a) **65 °C + Erwärmung der Zelle ≤ zulässige Zelltemperatur** laut Datenblatt, sonst schaltet eine Hardwaremassnahme den Fehler ab, und (b) **65 °C + Erwärmung des Gehäuses ≤ Formbeständigkeit des Gehäusematerials − 10 K**. Einzelfehlerliste zusätzlich: NTC offen bzw. kurzgeschlossen [LI], Kurzschluss am Ladeport [LI]. *(S-W05, F-14, Runde 2: S-W05, R2-W01)* | Muss | A (FMEA), T |
 | REQ-SAF-02 | Für die gewählte Energiequelle liegt eine **FMEA-light** vor (Fehler, Ursache, Wirkung, Bewertung, Massnahme, Restrisiko). | Muss | I |
 | REQ-SAF-03 | Wenn eine nicht wiederaufladbare Lösung sicherer und günstiger ist und die Laufzeit erfüllt, wird sie empfohlen. | Muss | A |
 | REQ-SAF-04 | Der Sicherheits-Agent hat ein Veto; offene kritische Befunde blockieren die Fertigungsfreigabe. | Muss | I |
@@ -222,14 +222,14 @@ Sicherheitsanforderungen (Kap. 6) werden nie zugunsten der Kosten gesenkt.
 | ID | Anforderung | Prio | Verif. |
 |---|---|---|---|
 | REQ-SAF-LI-01 | Zelle mit integrierter Schutzschaltung (Überladung, Tiefentladung, Überstrom/Kurzschluss). | Muss | I |
-| REQ-SAF-LI-02 | Laderegler mit NTC-Überwachung, NTC thermisch an die Zelle gekoppelt; Laden nur im Temperaturfenster laut Zelldatenblatt (typisch 0–45 °C, **ANNAHME** bis Zellwahl). *(S-W02)* | Muss | I, T |
+| REQ-SAF-LI-02 | Laderegler mit NTC-Überwachung, NTC thermisch an die Zelle gekoppelt; Laden nur im Temperaturfenster laut Zelldatenblatt (typisch 0–45 °C, **ANNAHME** bis Zellwahl); bei offenem oder kurzgeschlossenem NTC wird nicht geladen. *(S-W02, R2-W01)* | Muss | I, T |
 | REQ-SAF-LI-03 | Ladestrom ≤ 0.5 C bzw. Datenblattwert der Zelle inkl. temperaturabhängiger Reduktion; Vorladung bei tiefentladener Zelle; Ladeschluss-Timer; Toleranz der Ladeschlussspannung ≤ ±1 %. *(S-W03)* | Muss | I, T |
 | REQ-SAF-LI-04 | Verpolschutz und Tiefentladeabschaltung auf der Platine (zusätzlich zur Zelle); Ruhestrom nach Abschaltung so klein, dass die Zelle ≥ 6 Monate nicht unter die Datenblattgrenze fällt. *(S-W03)* | Muss | I, T |
 | REQ-SAF-LI-05 | Keine mechanische Belastung der Zelle: Kraftfluss beim Einstecken der Sonde und beim Tastendruck läuft nicht über die Zelle; Quellraum für die Zelle laut Datenblatt (bzw. ≥ 10 % der Dicke, **ANNAHME**). *(S-W04)* | Muss | I |
 | REQ-SAF-LI-06 | Ladeport abgedeckt und so angeordnet, dass Giesswasser ihn nicht erreicht; Anleitung: nur ausserhalb des Topfs und beaufsichtigt laden. | Muss | I, T |
-| REQ-SAF-LI-07 | **Alle Schutzfunktionen** (Überladung, NTC-Fenster, Ladestrom, Timer, Tiefentladung, Verpolung) wirken **hardwareseitig und unabhängig von der Firmware**. Nachweis: Schaltungsanalyse und Test mit gelöschter bzw. angehaltener MCU. *(S-K02)* | Muss | A, T |
-| REQ-SAF-LI-08 | VBUS-Eingang mit Sicherung bzw. PTC und Überspannungsschutz, spannungsfest bis **20 V**; Test mit verschiedenen USB-Netzteilen und mit nassem Ladeport. *(S-K04)* | Muss | I, T |
-| REQ-SAF-LI-09 | Zelle mit Temperaturen bis 65 °C (RB-03) im Lagerbereich laut Datenblatt; sonst Gegenmassnahme. *(S-W06)* | Muss | A, T |
+| REQ-SAF-LI-07 | **Alle Schutzfunktionen** (Überladung, NTC-Fenster, Ladestrom, Timer, Tiefentladung, Verpolung) wirken **hardwareseitig und unabhängig von der Firmware**. Bei Lade-ICs mit Registern (z. B. I²C) begrenzt die Hardware-Beschaltung Ladestrom und Ladeschlussspannung, sodass die Firmware sie nicht überschreiten kann. Nachweis: Schaltungsanalyse und Test mit gelöschter bzw. angehaltener MCU. *(S-K02, R2-L01)* | Muss | A, T |
+| REQ-SAF-LI-08 | VBUS-Eingang mit Sicherung bzw. PTC und Überspannungsschutz, spannungsfest bis **20 V**; Ladeport nur als **5-V-Senke** beschaltet (keine Aushandlung höherer Spannungen). Tests: (a) mindestens **3 Netzteile**, darunter ein PC-USB-Port und ein Schnellladegerät (PD/QC); (b) **Nasstest** (Port benetzt, eingesteckt): bestanden, wenn Kriterien nach REQ-SAF-01 erfüllt, Port-Erwärmung ≤ **10 K** (**ANNAHME**), volle Funktion nach Trocknung, keine Korrosion. *(S-K04, Runde 2)* | Muss | I, T |
+| REQ-SAF-LI-09 | Zelltemperatur bleibt bei 65 °C Kopftemperatur (RB-03) im Betriebs-/Lagerbereich laut Zelldatenblatt. Da typische LiPo-Grenzen darunter liegen, ist eine **konstruktive Massnahme** nachzuweisen (z. B. Wärmeschutz, Platzierung, Zelle mit höherem Bereich) und an OP-04 zu messen; reicht das nicht, ist die Akku-Variante nicht zulässig. *(S-W06, R2-W02)* | Muss | A, T |
 
 ### 6.3 Knopfzelle [CC] (falls gewählt)
 
@@ -238,7 +238,8 @@ Sicherheitsanforderungen (Kap. 6) werden nie zugunsten der Kosten gesenkt.
 | REQ-SAF-CC-01 | Verpolschutz: falsch eingelegte Zelle (24 h) schadet weder Zelle noch Elektronik. *(S-L04)* | Muss | T |
 | REQ-SAF-CC-02 | Sicherer Halter mit korrosionsbeständigen Kontakten; Zelle fällt bei Fall aus 1 m nicht heraus; Kurzschluss im Halter ausgeschlossen. *(S-K03, S-L05)* | Muss | I, T |
 | REQ-SAF-CC-03 | **Keine Lademöglichkeit**, auch im Einzelfehlerfall: mindestens zwei unabhängige Rückstrombegrenzungen (z. B. Diode + Widerstand) zu jeder externen Quelle (Programmier-/Testpads, Messpunkt); Rückstrom ≤ Herstellerangabe der Zelle. Programmieren nur ohne eingesetzte Zelle oder mit Adapter ohne Versorgung, konstruktiv sichergestellt. *(S-W01, FE-06)* | Muss | A, T |
-| REQ-SAF-CC-04 | **Verschluckschutz:** Batteriefach nur mit Werkzeug (Schraube) oder zwei gleichzeitigen, unabhängigen Handbewegungen zu öffnen (Massstab ANSI/UL 4200A); bleibt nach Falltest aus 1 m geschlossen (**ANNAHME** Fallhöhe). *(S-K03, F-14)* | **Muss** | I, T |
+| REQ-SAF-CC-05 | Zelltemperatur bei 65 °C Kopftemperatur (RB-03) innerhalb des Betriebsbereichs laut Zelldatenblatt; sonst konstruktive Massnahme. *(Runde 2: N-03)* | Muss | A, T |
+| REQ-SAF-CC-04 | **Verschluckschutz:** Batteriefach nur mit Werkzeug (unverlierbare Schraube) oder zwei gleichzeitigen, unabhängigen Handbewegungen zu öffnen (Massstab ANSI/UL 4200A, Öffnungsmoment und -winkel in Phase 4 aus der Norm bzw. Sekundärquelle belegt); bleibt nach Falltest aus 1 m geschlossen (**ANNAHME** Fallhöhe); Warnsymbol am Batteriefach. *(S-K03, F-14, R2-L02, R2-L03)* | **Muss** | I, T |
 
 ### 6.4 Netz und Daten
 
@@ -253,7 +254,7 @@ Sicherheitsanforderungen (Kap. 6) werden nie zugunsten der Kosten gesenkt.
 
 | ID | Anforderung | Prio | Verif. |
 |---|---|---|---|
-| REQ-SAF-DOC-01 | Anleitung enthält Warnhinweise (Knopfzelle: Verschlucken; Akku: Laden), Lagerung von Ersatzzellen, Entsorgung, Verhalten bei Wasser im Kopf. *(S-K03, S-L03)* | Muss | I |
+| REQ-SAF-DOC-01 | Anleitung enthält Warnhinweise (Knopfzelle: Verschlucken; Akku: nur auf nicht brennbarer Unterlage und beaufsichtigt laden, aufgeblähte Zelle nicht laden), Lagerung von Ersatzzellen, Entsorgung, Verhalten bei Wasser im Kopf. *(S-K03, S-L03, R2-L04)* | Muss | I |
 | REQ-SAF-DOC-02 | Gateway nur mit geprüftem Steckernetzteil (Angabe in Einkaufsliste). *(S-L07)* | Muss | I |
 
 ## 7 Gateway

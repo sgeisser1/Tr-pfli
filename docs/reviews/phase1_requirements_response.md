@@ -80,3 +80,26 @@ Der Energieprüfer hat für seine Machbarkeitsrechnung Datenblätter in den Scra
 (teils von Händler-Mirrors). Diese gelten **nicht** als Projektdokumentation. In Phase 2 werden die
 Datenblätter der tatsächlich betrachteten Bauteile von den Herstellern bezogen, unter
 `docs/datasheets/` abgelegt und in `INDEX.csv` eingetragen.
+
+## Runde 2 (2026-11-06) – Antworten
+
+| Befund | Quelle | Antwort | Umsetzung (v0.3) |
+|---|---|---|---|
+| S-K04 Bestehenskriterium Ladeport | Sicherheit | ✅ | REQ-SAF-LI-08: 5-V-Senke, 3 Netzteile inkl. PC-Port und PD/QC, Nasstest-Kriterien |
+| S-W05 Brandkriterium | Sicherheit | ✅ | REQ-SAF-01: Prüfung bei 20–25 °C, Zelle: 65 °C + ΔT ≤ Datenblatt, Gehäuse: 65 °C + ΔT ≤ HDT − 10 K; REQ-MECH-12 HDT ≥ 80 °C |
+| R2-W01 NTC offen/kurz, Port-Kurzschluss | Sicherheit | ✅ | REQ-SAF-LI-02, Einzelfehlerliste REQ-SAF-01 |
+| R2-W02 Gegenmassnahme LiPo bei 65 °C | Sicherheit | ✅ | REQ-SAF-LI-09 konstruktiv, sonst Akku unzulässig |
+| R2-L01 I²C-Lade-IC Hardwaregrenzen | Sicherheit | ✅ | REQ-SAF-LI-07 |
+| R2-L02 Schraube unverlierbar, Moment/Winkel | Sicherheit | ✅ | REQ-SAF-CC-04 (Werte in Phase 4 mit Quelle) |
+| R2-L03 Warnsymbol | Sicherheit | ✅ | REQ-SAF-CC-04 |
+| R2-L04 Ladehinweise | Sicherheit | ✅ | REQ-SAF-DOC-01 |
+| F-01 Rest: Sicherheitsbezug ausserhalb Kap. 6 | Red Team | ✅ | Kap. 1.2 nennt REQ-FW-04, RF-05, RF-06 |
+| N-01 ENE-09 macht Soll zum Muss | Red Team | ✅ | ENE-09 auf Werkseinstellung bezogen, SYS-05 ergänzt |
+| N-02 SAF-01 vs. MECH-12 | Red Team | ✅ | identisch mit S-W05 gelöst |
+| N-03 Temperaturumfang, CC-Gegenstück, Sonnenprofil | Red Team | ✅ | RB-03 präzisiert inkl. Sonnenprofil (ANNAHME), neu REQ-SAF-CC-05, ENE-04 |
+| N-04 Zeitreferenz/Temperatur | Red Team | ✅ | REQ-SYS-07 |
+| N-05 Abschaltspannung | Red Team | ✅ | REQ-ENE-06 (2.0 V an Zellklemme, ANNAHME) |
+
+Damit sind alle Befunde beantwortet. Gemäss Prüfregel (max. 2–3 Runden) erfolgt keine weitere
+Agentenrunde; die Aufhebung von Veto S-K04 bestätigt der Orchestrator anhand der wörtlich
+übernommenen Bedingungen der Sicherheitsrolle (siehe Bericht Sicherheit, Runde 2).

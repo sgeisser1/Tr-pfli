@@ -312,3 +312,93 @@ APP-10 (Begründung zu Push ist korrekt).
 - Texas Instruments, „Coin cells and peak current draw“, SWRA349, https://www.ti.com/lit/pdf/swra349
 - Eigene Rechnungen (Biegung, Knicken, ppm, Speicher, Strombudget): oben im Text, reproduzierbar mit
   Python-Einzeiler (nicht im Repo abgelegt).
+
+## Runde 2 (2026-11-06)
+
+| | |
+|---|---|
+| Geprüft | `REQUIREMENTS.md` v0.2, `phase1_requirements_response.md` |
+| Grundlagen | `PROJEKTAUFTRAG.md`, `CLIENT_INPUT.md` (inkl. Präzisierungen) |
+| Ergebnis | F-01 gelöst. Von 7 🔶-Punkten 6 akzeptiert, 1 strittig (F-14/SAF-01). **Neu: 2 wichtige, 3 kleine Befunde, kein kritischer.** |
+
+### F-01 (kritisch) – **gelöst, akzeptiert**
+Kap. 1.2 übernimmt die Regel Sicherheit > Kosten > Komfort mit Eskalation an den Auftraggeber.
+REQ-FAB-04 ist Muss mit Freigabevorbehalt. Jahresdiagramm, Firefox/Safari Desktop und
+5-Jahres-Historie sind auf Soll gesetzt. Das entspricht „tiefer Preis ist zwingend“ und „wenn nicht
+erreichbar, klar sagen und zeigen, was es kostet“.
+Rest (klein, kein Freigabehindernis): „Sicherheitsbezug“ ist nur über Kap. 6 definiert.
+Security-Anforderungen ausserhalb von Kap. 6 (REQ-FW-04, RF-05/06) sind damit formal
+verhandelbar. Vorschlag: In 1.2 „Kap. 6 sowie REQ-FW-04, REQ-RF-05/06“ nennen.
+
+### Urteile zu den 🔶-Antworten
+
+| Punkt | Urteil | Begründung |
+|---|---|---|
+| F-07 Puffer vs. Zeit | **akzeptiert** | ±2 min/14 d = 99 ppm, ±5 min/60 d = 58 ppm. Beides ist mit einem 32-kHz-Quarz einhaltbar (FE-04: 39 ppm worst case). 60 statt 30 Tage Puffer ist besser als mein Vorschlag. Relative Zeit nach Zellwechsel ist geregelt. Rest siehe N-04. |
+| F-09 Historie | **akzeptiert** | 2 Jahre Muss bei **30** Sensoren (strenger als mein Vorschlag mit 15): 30 × 6 × 730 = 131 400 Datensätze, roh ca. 2 MB. Das bleibt für ein MCU-Gateway mit grösserem Flash machbar. „Dauerhaft“ ist über Backup (GW-06) gewahrt. |
+| F-14 Brand/Verschlucken | **strittig** (Teil SAF-01) | Verschluckschutz als Muss ist gelöst. Das relative Kriterium ΔT ≤ 25 K ist sinnvoll begründet. Der Zusatz „absolut stets unter der Formbeständigkeit“ ist aber ohne Bezugstemperatur nicht prüfbar und widerspricht den übrigen Zahlen, siehe **N-02**. |
+| F-15 4 Lagen | **akzeptiert** | Der Wortlaut des Auftraggebers wird beibehalten, Muss ist der dokumentierte Vergleich. Damit ist das prüfbar. |
+| FE-03 1 min als Muss | **akzeptiert** | Die CLIENT_INPUT-Präzisierung legt ausdrücklich Muss ≤ 5 min und Soll ≤ 1 min fest. Den Ausschluss der Scan-Variante in Phase 2 zu entscheiden, ist korrekt. Die Muss-Kette ist aber nicht sauber, siehe **N-01**. |
+| FE-04 Quarz als Muss | **akzeptiert** | Eine lösungsneutrale Zahl in SYS-07 ist richtig. Der Nachweis braucht allerdings eine Temperaturbedingung, siehe N-04. |
+| FE-08 ESP32 an Knopfzelle | **akzeptiert** | REQ-ENE-09 ([CC] Schlaf ≤ 3 µA, Mittel ≤ 8 µA) schliesst die ESP32-Klasse für die Knopfzelle aus (Deep Sleep 5 µA laut FE-08). Für [LI] bleibt sie offen, wie von FE-08 vorgeschlagen. |
+
+### Neue Befunde aus v0.2
+
+**N-01 · wichtig · REQ-ENE-09 ↔ REQ-SYS-05 ↔ REQ-ENE-04 – Das Soll von 1 min wird über das Strombudget zum Muss.**
+- *Begründung:* ENE-09 (Muss) fordert einen Mittelstrom ≤ 8 µA im **Standardprofil**. ENE-04
+  legt das Standardprofil auf 1 min Reaktionszeit fest. Erfüllt ein Konzept 12 Monate bei 2 oder
+  5 min, aber nicht 8 µA bei 1 min, verletzt es ein Muss, obwohl SYS-05 nur ≤ 5 min verlangt.
+  Zudem richtet sich die Werkseinstellung nach SYS-05 an ENE-02/03 aus, nicht an ENE-09. Damit
+  gibt es zwei verschiedene Kriterien.
+- *Vorschlag:* Den Mittelstrom in ENE-09 auf das „Standardprofil mit der Werkseinstellung
+  nach REQ-SYS-05“ beziehen. In SYS-05 ergänzen: „… der REQ-ENE-02/03 **und** REQ-ENE-09
+  erfüllt“. Die Werte für 1/2/5 min in ENE-04 als Ausweis belassen.
+
+**N-02 · wichtig · REQ-SAF-01 ↔ RB-03 ↔ REQ-MECH-12 – Das absolute Temperaturkriterium im Fehlerfall ist nicht prüfbar.**
+- *Begründung:* Im Fehlerfall sind ΔT ≤ 25 K zulässig. In der Sonne liegt der Kopf bei 65 °C,
+  zusammen also bis 90 °C. Die Mindestformbeständigkeit nach MECH-12 ist aber nur 70 °C.
+  Bei einem Material an der Untergrenze bleiben am Sonnenplatz nur 5 K für den Fehlerfall.
+  Ein Test bei Raumtemperatur sagt darüber nichts aus.
+- *Vorschlag:* SAF-01 so fassen: „ΔT bei Raumtemperatur messen. Nachweis:
+  65 °C (RB-03) + gemessenes ΔT < Formbeständigkeit des Gehäusematerials laut Datenblatt.“
+  MECH-12 auf „≥ 65 °C + max. Fehlererwärmung, mindestens 70 °C“ koppeln, oder pauschal
+  ≥ 90 °C (Materialwert in Phase 2 aus dem Datenblatt belegen).
+
+**N-03 · klein · RB-03, REQ-ENE-04, Kap. 6.3 – Der Temperaturumfang ist unklar.**
+- *Begründung:*
+  - Betrieb ist mit 5–45 °C Umgebung angegeben, der Kopf erreicht aber 65 °C, und die
+    Lagerung ist nur bis 50 °C festgelegt. Offen bleibt, ob der Sensor bei 65 °C Kopftemperatur
+    funktionieren muss oder diese nur unbeschädigt überstehen muss.
+  - Für [CC] fehlt ein Gegenstück zu LI-09 (Zelle bei 65 °C: Selbstentladung, Auslaufen).
+  - Der „Zuschlag für Sonnenplatz“ in ENE-04 ist nicht beziffert. Die Rechnung A ist damit
+    nicht reproduzierbar.
+- *Vorschlag:* In RB-03 ergänzen: „Kopf bis 65 °C: Funktion und kein Schaden; Messgenauigkeit
+  nur 10–35 °C.“ Neue REQ-SAF-CC-05: Zelle laut Datenblatt bis 65 °C zulässig. ENE-04:
+  Sonnenprofil beziffern, z. B. „4 h/Tag bei 50 °C (**ANNAHME**)“.
+
+**N-04 · klein · REQ-SYS-07 ↔ REQ-GW-09 – Bezug und Bedingungen der Zeitgenauigkeit fehlen.**
+- *Begründung:*
+  - SYS-07 nennt keine Referenz: Ist die Abweichung gegen die Gateway-Zeit oder gegen die echte
+    Zeit gemeint? Die Gateway-Drift (±2 min/Monat) addiert sich sonst.
+  - SYS-07 nennt auch keine Temperatur. Gerechnet mit einem Quarz bei dauerhaft 65 °C
+    (20 ppm + 0.034 ppm/K² × 40² ≈ 74 ppm, Koeffizient **ANNAHME**, typisch für
+    Stimmgabelquarze) ergeben sich 386 s in 60 d. Das liegt über ±5 min.
+- *Vorschlag:* „Abweichung gegenüber der Gateway-Zeit beim letzten Abgleich, über
+  RB-03-Umgebung 5–45 °C; Nachweis A aus dem Datenblatt plus T über 7 d.“
+
+**N-05 · klein · REQ-ENE-06/08 – Abschaltschwelle und Messpunkt fehlen.**
+- *Begründung:*
+  - Die Laufzeitrechnung hängt von der Abschaltspannung ab, die nirgends beziffert ist
+    (FE-07 schlug 2.0 V unter Last vor).
+  - 0.2 V bei 100 Ω bedeuten einen Zellstrom ≤ 2 mA während des Ereignisses. Das ist richtig,
+    erzwingt aber einen Puffer-C. Offen bleibt, ob an der Zellklemme oder an VDD gemessen wird.
+  - Der OTA-Dauerbetrieb ist nicht abgegrenzt.
+- *Vorschlag:* In ENE-08 ergänzen: „Ende der nutzbaren Kapazität = 2.0 V unter Last
+  (**ANNAHME** bis Chipwahl)“. In ENE-06 ergänzen: „gemessen an der Zellklemme, Lastfall
+  Funkereignis; OTA nur oberhalb der Schwelle nach FW-02“.
+
+Geprüft ohne Befund: Pufferdauer 60 d vs. Warnschwelle 30 d (ENE-05), Strombudget gegen Laufzeit
+(8 µA + 20 % = 84 mAh/a gegen 169 mAh nutzbar bei CR2032 ergibt ≈ 1.9 Jahre, also Reserve
+vorhanden), UI-03 vs. OP-02 (1×/min), SAF-CC-04 vs. MECH-15 (Münze als Werkzeug passt zu
+UL 4200A, **ANNAHME** ohne lokale Norm), FW-05 (2 % ≈ 3.4 mAh), GW-01-Speicherbedarf.
+Rechnungen: Python-Einzeiler, reproduzierbar aus den hier genannten Zahlen.

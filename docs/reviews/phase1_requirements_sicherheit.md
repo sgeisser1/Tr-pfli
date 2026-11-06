@@ -213,3 +213,52 @@ Gateway (S-L06), Verpolung 24 h (S-L04).
 Hinweis: IEC 62133-2 und IEC 60086-4 waren nicht frei verfügbar und wurden nicht im Wortlaut geprüft.
 Grenzwerte aus diesen Normen sind nicht übernommen. Massgeblich sind die Zell-Datenblätter, die in Phase 2
 lokal abgelegt werden.
+
+## Runde 2 (2026-11-06)
+
+| | |
+|---|---|
+| Geprüft | `REQUIREMENTS.md` v0.2 (Kap. 6, RB-03, REQ-MECH-12/13/15, REQ-FW-04/06, REQ-ENE-07, REQ-DOC-02/03), `phase1_requirements_response.md` |
+| Prüfer | Sicherheits-Agent (mit Veto) |
+| Ergebnis | **S-K01, S-K02, S-K03 aufgehoben. S-K04 bleibt (nur Variante [LI])**, weil dem Nasstest das Bestehenskriterium fehlt. S-W05 bedingt akzeptiert. 2 neue wichtige, 4 neue kleine Befunde. |
+
+### R2.1 Status der Vetos
+
+Bedingung je Veto: Muss-Anforderung mit prüfbarem Kriterium **und** im Testplan REQ-DOC-03 vorgemerkt.
+
+| Veto | Umsetzung v0.2 | Muss | Kriterium prüfbar | in REQ-DOC-03 | Status |
+|---|---|---|---|---|---|
+| S-K01 Wasser bei eingesetzter Energiequelle | REQ-SAF-05, REQ-MECH-13 | ja | ja (Flutung je Raum separat, 24 h, Kriterien REQ-SAF-01; MECH-13 mit Zelle + Sichtprüfung) | ja (REQ-SAF-05) | **aufgehoben** |
+| S-K02 Schutz unabhängig von Firmware | REQ-SAF-LI-07, für [CC] über REQ-SAF-CC-03 (Diode + Widerstand, rein passiv) | ja | ja (Schaltungsanalyse + Test mit gelöschter/angehaltener MCU) | ja (-LI-07) | **aufgehoben** (Präzisierung siehe R2-L01) |
+| S-K03 Verschluckschutz | REQ-SAF-CC-04 Muss, -CC-02, -DOC-01 | ja | ja (Werkzeug oder zwei gleichzeitige Bewegungen nach UL 4200A, Falltest 1 m, Zelle bleibt eingeschlossen) | ja (-CC-04) | **aufgehoben** (Ergänzungen R2-L02, R2-L03) |
+| S-K04 Ladeport [LI] | REQ-SAF-LI-08, -LI-06 | ja | **nein**: „Test mit verschiedenen USB-Netzteilen und mit nassem Ladeport“ nennt kein Bestehenskriterium und keinen Prüfumfang | ja (-LI-08) | **bleibt** |
+
+**VETO S-K04 (bleibt, nur Variante Li-Akku).** Es fehlt:
+1. Bestehenskriterium Nasstest: „Port mit Leitungswasser benetzt eingesteckt, 1 h laden: Kriterien nach REQ-SAF-01, Erwärmung am Port ≤ 10 K (**ANNAHME**), nach Trocknung volle Funktion, keine sichtbare Korrosion.“
+2. Prüfumfang: mindestens 3 Netzteile, darunter PC-Port und ein USB-PD/QC-Schnellladegerät.
+3. CC-Beschaltung nur als 5-V-Senke (keine PD/QC-Aushandlung), damit 20 V nur im Fehlerfall anliegen können.
+
+*Aufhebung:* Diese drei Punkte in REQ-SAF-LI-08 aufnehmen. Fällt die Variante [LI] in Phase 2 weg, ist das Veto gegenstandslos.
+
+### R2.2 Urteil zu S-W05 (Erwärmung ≤ 25 K statt absolut)
+
+**Bedingt akzeptabel.** Ein Differenzkriterium ist sinnvoll, weil der Kopf in der Sonne schon ohne Fehler warm wird. Die Formulierung in v0.2 hat aber drei Lücken:
+- *Bezugspunkt falsch für [LI]:* Gemessen wird nur die Gehäuseoberfläche. Massgeblich für das Brandrisiko ist die **Zelltemperatur**. 65 °C (RB-03) + 25 K ergibt 90 °C. In diesem Bereich beginnt bei Li-Zellen die exotherme Zersetzung, und die maximale Zelltemperatur laut Datenblatt (typ. 60 °C) ist klar überschritten.
+- *Grenzwert wirkt in der Sonne nicht:* REQ-MECH-12 verlangt Formstabilität nur bis 70 °C. In der Sonne bleiben also nur 5 K Reserve, die 25 K stehen dort nur auf dem Papier. Das ist kein Sicherheitsproblem, weil die absolute Obergrenze greift, aber ein Widerspruch in der Darstellung.
+- *Prüfbedingung fehlt:* Bei welcher Umgebungstemperatur geprüft wird, ist offen.
+
+**Gegenvorschlag REQ-SAF-01 (Ersatz für den Temperaturteil):**
+„Prüfung bei 20–25 °C Umgebung. (a) Gehäuseoberfläche: Erwärmung durch den Fehler ≤ 25 K (**ANNAHME**, Quelle Phase 2). (b) [LI] und [CC]: Die an der Zelle gemessene Fehlererwärmung ΔT_Zelle erfüllt 65 °C + ΔT_Zelle ≤ maximal zulässige Zelltemperatur laut Datenblatt; sonst muss der Fehler durch eine Hardwaremassnahme abgeschaltet werden (Sicherung, PTC, Schutz-IC). (c) Absolut: 65 °C + Erwärmung Gehäuse ≤ Formbeständigkeit des Gehäusematerials (Datenblatt) − 10 K.“
+
+### R2.3 Neue Befunde aus der Überarbeitung
+
+| ID | Stufe | REQ | Befund | Vorschlag |
+|---|---|---|---|---|
+| R2-W01 | wichtig | REQ-SAF-LI-02, -01 | NTC-Fehler (Unterbrechung, Kurzschluss, abgelöster NTC) fehlen als Einzelfehler. Ein offener NTC darf nicht als „im Fenster“ gelten. | Test: NTC offen und kurzgeschlossen → Laden stoppt. In die FMEA-Pflichtliste von REQ-SAF-01 aufnehmen, ebenso den Kurzschluss VBUS/Ladeport. |
+| R2-W02 | wichtig | REQ-SAF-LI-09, RB-03 | „sonst Gegenmassnahme“ ist unbestimmt. Typische LiPo-Lagerobergrenzen liegen unter 65 °C, die Abweichung ist also wahrscheinlich. Ein Hinweis in der Anleitung allein genügt nicht. | „Gegenmassnahme konstruktiv (helle Farbe, Abschattung, Zellwahl), Wirksamkeit an OP-04 gemessen; Freigabe durch den Sicherheits-Agenten.“ |
+| R2-L01 | klein | REQ-SAF-LI-07 | Lade-ICs mit I²C-Registern erlauben Firmware-Änderungen am Ladestrom bzw. an der Ladespannung. | Zusatz: „Hardware-Obergrenzen (z. B. ILIM-Widerstand) liegen auch bei beliebiger Registerbelegung innerhalb der Zellspezifikation.“ |
+| R2-L02 | klein | REQ-SAF-CC-04 | Bei Münz- oder Schraubverschluss fehlen Öffnungsmoment und Drehwinkel; die Schraube ist nicht unverlierbar. | Werte aus UL 4200A übernehmen (am Normtext prüfen, bis dahin **ANNAHME**); Schraube unverlierbar im Deckel. |
+| R2-L03 | klein | REQ-SAF-DOC-01 | Das Warnsymbol am Gehäuse bzw. Fach aus S-K03 fehlt; es gibt nur die Anleitung. | Symbol bzw. Prägung „Knopfzelle – von Kindern fernhalten“ am Fach (Soll). |
+| R2-L04 | klein | REQ-SAF-LI-06, -DOC-01 | In den Anweisungen fehlen „auf nicht brennbarer Unterlage laden“ und „aufgeblähte oder beschädigte Zelle nicht laden“. | Ergänzen. |
+
+Keine neuen Lücken in Kap. 6.4 (Netz). REQ-FW-04, REQ-RF-05/06 und REQ-SAF-NET-01..04 setzen S-W07 bis S-W09 ausreichend um.
