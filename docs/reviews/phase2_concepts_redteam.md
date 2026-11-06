@@ -262,3 +262,169 @@ Diese Angaben habe ich gegen das Datenblatt bzw. per Nachrechnung geprüft und r
 
 Nicht geprüft: die übrigen LCSC-Lagerbestände und JLC-Basic-Status (keine API-Abfrage), MCUboot auf dem CC2340
 (Phase 3), Koexistenz am ESP32-S3.
+
+---
+
+## Runde 2
+
+| | |
+|---|---|
+| Geprüft | `CONCEPTS.md` v0.2, `phase2_concepts_response.md`, `DECISIONS.md` D-005, `scripts/{cost_model,concept_costs,concept_energy}.py` (selbst ausgeführt), `docs/concepts/bom/bom_A*.csv` |
+| Eigene Rechnung | Scratchpad `/tmp/claude-1000/-home-sgeisser-git-Tr-pfli/8b053e22-18f3-446f-bac7-d1e0173ecf11/scratchpad/rt3/rt3_buffer.py` (nutzt `concept_energy.calc` und `energy_budget`) |
+| Datum | 2026-11-06 |
+
+### R2.0 Urteil in Kürze
+
+K-1 und K-2 sind **sachgerecht gelöst**. Die Skripte rechnen 11.19 / 8.08 CHF reproduzierbar, und die
+D-005-Regression stimmt. **Neu und wichtig:** (1) Die SWD-Pads funktionieren mit 2 × 100 kΩ grundsätzlich nicht.
+(2) Der Puffer ist mit 4 × 100 µF inkonsistent dimensioniert. Mit 2 × 100 µF erfüllt **A-32** REQ-ENE-02 auch an
+der Datenblatt-Leckgrenze, und damit kippt die Begründung „A vor A-32“. (3) Die Aussage „A erfüllt mit
+CR2450 ≤ CHF 2.97“ ist eine korrekte Bedingung, aber kein Beleg, und sie hat 0 Reserve. Nichts Kritisches.
+
+### R2.1 Messkette (K-1) – Prüfung gegen die Datenblätter
+
+| Punkt | Prüfung | Ergebnis |
+|---|---|---|
+| Zählgrenze 2–6 MHz | 48-MHz-Synchronisation (TRM S.481). Bei 6 MHz entfallen ≥ 8 Systemtakte auf eine Periode | ✔ plausibel; f2 = 1.6 MHz liegt unter dem Bereich, ist aber unkritisch |
+| Speisung DIO12 | High-Drive auf RGE-Pin 5 (DS S.7); VOH ≥ 2.47 V @ 10 mA (DS S.31) | ✔ |
+| Pegel am Zähleingang | VIH = 0.8·VDDS (DS S.32). Das LVC-Ausgangssignal reicht bis zur Speisung (DIO12 ≈ VDDS) | ✔ Das 1.8-V-Rail wurde zu Recht verworfen |
+| Ratiometrie | VT±/VCC driftet: 0.50–0.62 bei 3 V, 0.48–0.68 bei 2.3 V (LVC S.7). Die Steigung wird **je Messung** über Cref1 neu bestimmt, damit kürzen sich VT± und R | ✔ |
+| tpd | In T1 − T0 fällt tpd heraus, in T0 bleibt es. Ohne Korrektur liegt der Fehler bei 2–10 % der Periode. Kalibrierung + VDD/T-Tabelle ist richtig, denn tpd lässt sich mit C-Umschaltung grundsätzlich **nicht** vom Sonden-C trennen (dafür wäre eine R-Umschaltung nötig). Den Rest schätze ich auf ≈ 1 % der Periode über VDD 3.0 → 2.2 V (**ANNAHME (RT)**) | ✔ mit PROTOTYP-PRÜFUNG |
+| Strom | 0.9 mA ohne Querstrom: Der Schmitt-Eingang liegt dauernd zwischen den Schwellen, ΔICC ≤ 500 µA (LVC S.7) → ≈ 1.5 mA | klein, energetisch ohne Bedeutung |
+
+**r2-k1 (klein):** Ist Cref „aus“ (GPIO hochohmig), bleibt Cref in Serie mit der Pinkapazität (≈ 5–7 pF,
+DS S.32 CI GPIO, Wert der Analogpins). Die Aus-Kapazität beträgt damit ≈ 4–5 pF. Sie hängt von Spannung und
+Temperatur ab, und die Gleichspannungslage des Pins ist undefiniert. Ausserdem sind DIO8 und DIO11 im ROM-Bootloader
+**SPI-CLK/CS-Eingänge** (TRM Tab. 8-38, S.464) und floaten dort. Eine Fehldetektion von SPI statt UART ist denkbar.
+*Vorschlag:* Den Eingangspuffer der Cref-Pins abschalten. Bootloader-Start und Aus-Kapazität über die Temperatur
+als PROTOTYP-PRÜFUNG aufnehmen.
+
+### R2.2 Pinplan QFN24 – Stichproben
+
+Gegen DS S.7 und S.9–12 (Tab. 6-1) und TRM S.464–465 geprüft, alle **korrekt**: DIO8 = Pin 3, DIO11 = 4,
+DIO12 = 5, DIO13 = 6, DIO16 = 7, DIO17 = 8, DIO20 = 9, DIO21 = 10, DIO24 = 12, RSTN = 13, DIO3/DIO4 = 14/15,
+DIO6 = 19. High-Drive DIO12/16/17/24 ✔. I2C0SDA auf DIO16 (Mux 3) und I2C0SCL auf DIO17 (Mux 3) ✔.
+DIO24 als T1C0 bzw. T0PE ✔. Bootloader serialIoCfgIndex 0: RX DIO20, TX DIO6, Trigger DIO21 aktiv low ✔.
+
+**R2-W2 (wichtig): SWD über die Pads funktioniert nicht, und an DIO16 droht ein Ruhestromleck.**
+- SWDIO hat einen internen Pull-up, SWCLK einen Pull-down, beide „enabled by default“ („On-chip
+  pullup/pulldown resistors for SWDIO and SWCLK“, TRM S.22). Die Ströme liegen bei 39–109 µA (Pull-up) bzw.
+  10–40 µA (Pull-down) bei 1.8 V (DS S.31) und sind bei 3 V höher.
+- Über 200 kΩ Serienwiderstand fallen damit 8–20 V ab. Die Sonde kann die Leitung nicht umschalten. Dazu kommen
+  die I²C-Pull-ups von 4.7 kΩ am selben Netz: Sie halten die Leitung fest, wenn TMP_PWR high oder low ist.
+- Die Angabe „SWD nur langsam, ≤ 50 kHz“ (Kap. 2.2/2.7) ist daher falsch. SWD fehlt ganz.
+- **Energiefalle:** Bleibt der interne Pull-up auf DIO16 nach dem Boot aktiv, speist er bei abgeschaltetem
+  TMP_PWR über 4.7 kΩ den TMP1075 zurück. Das sind ≈ 66 µA, gegenüber einem Schlafbudget von 3 µA.
+- *Vorschlag:*
+  - SWD-Pads streichen. Programmiert wird nur über UART (REQ-FW-06 bleibt erfüllt), Debugging am LaunchPad.
+  - Firmware-Regel: früh im Boot SWDCEN löschen und die Pulls an DIO16 und DIO17 abschalten (TRM S.952).
+    Ob das bei einem per CCFG gesperrten Debugport geht, ist Phase 3 bzw. PROTOTYP-PRÜFUNG.
+  - Alternative: I²C auf DIO8 (SDA, Mux 4) und DIO24 (SCL, Mux 5) legen, den Zähleingang auf DIO11 (T0C0).
+    Das ist dann neu zu prüfen.
+
+### R2.3 Kosten nach D-005 (selbst gerechnet)
+
+`concept_costs.py --detail` liefert **A 11.19 / A-32 8.08 CHF** (Serie 20/16/15). Von Hand nachgerechnet:
+(5.48 USD × 0.8189 × 1.015 + 0.36) × 16/15 + 5.67 × 1.05 = 5.24 + 5.95 = **11.19** ✔. Die D-005-Regression
+über 5/10/15/20 Stk ergibt 30.05 USD + 0.448 USD/Platine ✔.
+
+Dominante Posten bei A (CHF je Sensor, Faktor 0.8866 für Kurs, Karte und 16/15):
+
+| Posten | CHF |
+|---|---|
+| Zelle CR2450N inkl. 5 % | **4.31** |
+| Gehäuse, Dichtungen, Versiegelung, Schraube inkl. 5 % | 1.64 |
+| Röntgen (2 leadless × 0.82 USD) | **1.45** |
+| CC2340R52 | 1.19 |
+| Halter | 0.42 |
+| PCB-Grenzkosten | 0.40 |
+| 4 × 100 µF | 0.39 |
+| MWST-Anteil | 0.38 |
+| TMP1075 | 0.28 |
+| Rest | ≈ 0.7 |
+
+**R2-W3 (wichtig): „A erfüllt REQ-FAB-04 mit CR2450 ≤ CHF 2.97“ ist rechnerisch richtig
+((11.19 − 10)/1.05 = 1.13 CHF), aber nicht belegt.**
+- Der einzige Preis ist ein unbestätigtes Suchergebnis für einen **300er-Pack**. Für 15 Sensoren bezahlt man
+  den Pack.
+- Die Reserve liegt bei 0.00 CHF. Jeder offene OP-K1-Posten kippt die Aussage: Pre-reflow +1.93 CHF, Röntgen
+  1.45 CHF unsicher, PCB 167 statt 150 mm. Auch A-32 liegt mit Pre-reflow bei 10.03 CHF > 10.
+- *Hebel:*
+  - TMP1075 im **VSSOP-8 (DGK)**: ±1 °C von −40 bis 110 °C, also besser als DSG, und nicht leadless
+    (`TI_TMP1075_Datasheet_SBOS854F.pdf` S.4 Tab. 4-1). Das spart Röntgen ≈ 0.73 CHF. LCSC-Nummer und Preis habe
+    ich **nicht geprüft**.
+  - 2 statt 4 Puffer (R2-W1) sparen 0.19 CHF.
+  - Zusammen ergibt das A ≈ 10.27 CHF mit der Renata-Zelle. Das Ziel wird dann ab einem Zellpreis ≤ CHF 3.85
+    erreicht.
+
+### R2.4 Laufzeit und Puffer
+
+Der Rückgang von 82 auf 27.5 Monate ist **rechnerisch korrekt**. 400 µF an der Samsung-Grenze von 100 MΩ·µF
+(Katalog S.53) ergeben 12 µA und 18.9 µA Mittelstrom pess. Er folgt aber aus zwei Verschärfungen zugleich: dem
+Puffer von 2 auf 4 × 100 µF und der Leckgrenze statt 0.5 µA. Die Grenze gilt für eine Messung nach 60–120 s bei
+**Nennspannung** (S.53). Der Dauerleckstrom bei 3 V liegt real um Grössenordnungen tiefer (**ANNAHME (RT)**). Als
+Nachweisfall ist die Grenze zulässig, aber sehr konservativ.
+
+**R2-W1 (wichtig): Die Pufferdimensionierung ist in sich widersprüchlich.**
+
+`energy_budget.py` Tab. 6 rechnet den Prüffall (100 Ω, Einbruch ≤ 0.2 V) mit GLDO-Strömen (9 mA, DCDC aus) und
+mit 1.5 ms CPU **innerhalb** des Funkbursts. Bleibt VDDS über 2.2 V, läuft aber der DCDC (DS S.18). Eigene
+Rechnung (`rt3_buffer.py`):
+
+| Dimensionierungsfall | C_eff [µF] | C_nenn [µF] (50 % DC-Bias) |
+|---|---|---|
+| Dokument (GLDO, CPU im Burst) | 162 | 325 → 4 × 100 |
+| DCDC, Strom × 3.0/2.6 | 98 | 196 → 2 × 100 |
+| DCDC, CPU vor/nach dem Burst | 79 | 158 → 2 × 100 mit Reserve |
+| GLDO, CPU vor/nach dem Burst | 131 | 263 → 3 × 100 |
+
+Laufzeit pess. DS bei 1 min (Klammer: mit 50 % Koexistenzverlust):
+
+| Puffer | A [Monate] | A-32 [Monate] |
+|---|---|---|
+| 4 × 100 µF | 27.5 (22.5) | 11.9 (9.7) |
+| 3 × 100 µF | 33.5 (26.4) | 14.6 (11.4) |
+| **2 × 100 µF** | 42.8 (31.9) | **18.9 (13.8)** |
+| 1 × 100 µF | 59.3 (40.2) | 26.7 (17.6) |
+
+**Einfache Lösung für Leckstrom und Kosten zugleich:**
+- Die Firmware erledigt die CPU-Arbeit vor oder nach dem Funkburst.
+- Die Unterspannungsabschaltung liegt so, dass der DCDC unter Last aktiv bleibt: VDDS ≥ 2.2 V, also Abschaltung
+  an der Klemme ≈ 2.4 V statt 2.0 V. Das ist eine Änderung von REQ-ENE-06 und braucht einen PL-Entscheid. Der
+  Kapazitätsverlust ist bei Lithium-Knopfzellen wegen der flachen Kurve klein (**ANNAHME (RT)**).
+- Dann genügen **2 × 100 µF**, nachzuweisen per SPICE (OP-K6). Das spart 0.19 CHF und halbiert die Leckgrenze.
+
+Weitere Hebel und ihr Nutzen:
+
+| Hebel | Nutzen |
+|---|---|
+| Kleinere TX-Leistung | **kaum**: RX 5.3 mA ≥ TX 5.1 mA (DS S.20), RX bestimmt die Spitze |
+| Anderer Kondensatortyp | Tantal und Polymer haben schlechtere Leckgrenzen. Nur ein MLCC ohne „*“-Markierung (500 statt 100 MΩ·µF, S.53) oder mit höherer Nennspannung (weniger DC-Bias-Verlust) bringt etwas; Datenblatt je Teil nötig |
+| Zuschaltbarer Puffer | bringt bei Grenz-Leck wenig: τ = 100 s gegenüber 27.5 s Intervall, Nachladeverlust ≈ 10.5 statt 12 µA. Dazu kommen FET, Pin und Einschaltstrom → **nicht empfohlen** |
+
+**R2-W4 (wichtig): Die Empfehlung A vor A-32 ist so nicht tragfähig.**
+- Ihr Hauptargument, die Laufzeit, hängt allein an der 4-×-100-µF-Dimensionierung. Mit 2 × 100 µF erfüllt A-32
+  REQ-ENE-02 bei 1 min und Datenblatt-Leckgrenze, auch mit Koexistenzverlust (13.8 Monate).
+- A-32 erfüllt REQ-FAB-04 mit Reserve (≈ 7.9 CHF) und REQ-MECH-02. A erfüllt REQ-FAB-04 nur unter einer
+  unbelegten Bedingung.
+- Übrig bleibt der „leichte“ Sicherheitsvorteil von A (Clip-Halter, S2-L06).
+- *Vorschlag:* Nach Prioritäten entscheidet der Sicherheits-Agent über die Clip-Kurzschlussgefahr. Ohne Einwand
+  wird **A-32 Hauptvariante**, sonst A mit TMP1075-DGK und belegtem Zellpreis. Der Prototyp sollte
+  2 × 100 µF + 2 Reserve-Footprints haben, damit OP-K5/K6 den Entscheid am Muster liefern.
+
+### R2.5 Antworten auf die Runde-1-Befunde
+
+| Befund | Urteil |
+|---|---|
+| K-1 Messkette | **akzeptiert** (Rest r2-k1, Strom/tpd klein) |
+| K-2 Kostenzuordnung | **akzeptiert** (D-005 korrekt umgesetzt) |
+| W-1 A-32 | **akzeptiert**; meine 34 Monate galten nur mit der Leck-ANNAHME, zu Recht korrigiert. Die Schlussfolgerung ist **strittig** → R2-W4 |
+| W-2 Energie-Nachweise | **akzeptiert** (TMP geschaltet, Schlaf 2.63 µA pess. A); REQ-ENE-06-Dimensionierung **strittig** → R2-W1 |
+| W-3 GPIO-Budget | **akzeptiert** (Pinplan stimmt); neu R2-W2 (SWD) |
+| W-4 Kopf | **akzeptiert** (Keystone 3008/3009-Lager plausibel begründet) |
+| W-5 Kostenposten | **akzeptiert**; PCB-Länge 167 mm bleibt offen (OP-K1b) |
+| W-6 Koexistenz | **akzeptiert** |
+| k-1…k-7 | **akzeptiert** |
+| Funkmodul (Kap. 4) | **akzeptiert** als zurückgestellt |
+
+Nicht geprüft: LCSC-Nummer und Preis TMP1075DGK, JLC-Röntgenpflicht (OP-K1), Panasonic-Zellpreise, SPICE.
