@@ -48,3 +48,9 @@ Format: Nr. · Datum · Entscheid · Alternativen · Begründung · Quelle · St
 - **Entscheid:** Elmer 26.2 (PPA) installiert und verifiziert, Aufruf nur über `scripts/elmer.sh`;
   2D-Parameterstudien mit scikit-fem + gmsh in `.venv`.
 - **Status:** entschieden (2026-11-06)
+
+### D-004 · 2026-11-06 · Anforderungen v1.0 freigegeben
+- **Entscheid:** `REQUIREMENTS.md` v1.0 nach zwei Prüfrunden (Sicherheit, Red Team, Firmware/Energie) vom Auftraggeber freigegeben.
+- **Ergänzungen bei Freigabe:** LED signalisiert „Giessen nötig“ (REQ-UI-07); öffentlicher NTP für Gateway erlaubt; nur Innenbereich; privates Handy, Zertifikat installierbar; Drucker P1S.
+- **Quelle:** Auftraggeber im Chat 2026-11-06; Prüfberichte `docs/reviews/phase1_*`.
+- **Status:** gültig

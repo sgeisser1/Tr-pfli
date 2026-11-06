@@ -3,11 +3,11 @@
 | | |
 |---|---|
 | Dokument | `docs/requirements/REQUIREMENTS.md` |
-| Version | **0.3** (nach Prüfrunde 2) |
+| Version | **1.0** (freigegeben) |
 | Datum | 2026-11-06 |
 | Grundlagen | `PROJEKTAUFTRAG.md` (Original), `CLIENT_INPUT.md` (Antworten Phase 0), `DECISIONS.md` |
 | Prüfberichte | `docs/reviews/phase1_requirements_{redteam,sicherheit,firmware-energie}.md`, Antworten: `phase1_requirements_response.md` |
-| Status | zur Freigabe durch den Auftraggeber |
+| Status | **freigegeben durch den Auftraggeber am 2026-11-06** (Antworten zu OP-01..08 eingearbeitet) |
 
 Änderungen gegenüber v0.1 sind mit der Befund-ID markiert, z. B. *(S-K01)*.
 
@@ -55,7 +55,7 @@ Sicherheitsanforderungen (Kap. 6 sowie REQ-FW-04, REQ-RF-05, REQ-RF-06) werden n
 | RB-04 | Firmen-WLAN vorhanden, Qualität mässig. Ein Gateway im Firmen-WLAN ist **zulässig**, Lösungen mit wenig Eingriff ins Firmennetz werden bevorzugt. |
 | RB-05 | Kein dauerhaft laufender Rechner vorhanden. Ein Raspberry Pi nur, wenn nötig (begründen). |
 | RB-06 | Eigengebrauch, keine Zertifizierung. Sicherheit hat trotzdem höchste Priorität. |
-| RB-07 | Fertigung der Sensor-Leiterplatte inkl. Bestückung bei JLCPCB; Gehäuse auf Bambu Lab P1S mit AMS (**ANNAHME** Modell). |
+| RB-07 | Fertigung der Sensor-Leiterplatte inkl. Bestückung bei JLCPCB; Gehäuse auf **Bambu Lab P1S mit AMS** (bestätigt). |
 | RB-08 | Kein Programmieradapter vorhanden; keine Messgeräte-Anschaffung von ca. 100 CHF. Werkstatt sonst gut ausgerüstet. |
 | RB-09 | Stückzahlen: Prototyp-Los in kleinster sinnvoller JLC-Menge (aktuelle Mindestmengen PCB und PCBA in Phase 2 recherchiert), danach Serie 10–15 Sensoren. *(F-18)* |
 
@@ -84,7 +84,7 @@ Sicherheitsanforderungen (Kap. 6 sowie REQ-FW-04, REQ-RF-05, REQ-RF-06) werden n
 
 | ID | Anforderung | Prio | Verif. |
 |---|---|---|---|
-| REQ-SYS-01 | Das System arbeitet ohne Internetverbindung vollständig. Kein Datenverkehr zu Servern ausserhalb des LAN; einzige Ausnahme: Zeitabgleich des Gateways nach REQ-GW-09. *(F-06)* | Muss | T, I |
+| REQ-SYS-01 | Das System arbeitet ohne Internetverbindung vollständig. Kein Datenverkehr zu Servern ausserhalb des LAN; einzige Ausnahme: Zeitabgleich des Gateways über öffentlichen NTP (vom Auftraggeber freigegeben, OP-08), abschaltbar. *(F-06)* | Muss | T, I |
 | REQ-SYS-02 | Ein Gateway versorgt mindestens **15 Sensoren** im Raum nach RB-01. | Muss | A, T |
 | REQ-SYS-03 | Kapazität: bis **30 Sensoren** pro Gateway ohne Hardwareänderung. | Soll | A |
 | REQ-SYS-04 | Automatische Messungen: Intervall einstellbar **1–96×/Tag**, Standard **6×/Tag**. *(FE-13)* | Muss | T |
@@ -179,6 +179,7 @@ Sicherheitsanforderungen (Kap. 6 sowie REQ-FW-04, REQ-RF-05, REQ-RF-06) werden n
 | REQ-UI-03 | LED-Energie ≤ **5 %** des Energiebudgets im Standardprofil; keine periodischen Anzeigen häufiger als **1×/min**. *(FE-11)* | Muss | A |
 | REQ-UI-04 | Tasterfunktionen mindestens: kurz = manuelle Messung + Status, lang (≥ 3 s) = Pairing, sehr lang (≥ 10 s) = Werkseinstellungen. | Muss | T |
 | REQ-UI-05 | LED aus normaler Blickrichtung (stehend, schräg von oben) erkennbar; Taster mit einem Finger bedienbar, ohne die Sonde im Topf zu verbiegen. | Muss | T |
+| REQ-UI-07 | **Giessen nötig an der LED:** Liegt der Feuchteindex unter dem Schwellenwert, zeigt die LED ein eigenes Muster (z. B. kurzer Blinkpuls), höchstens **1×/min**, innerhalb des LED-Budgets REQ-UI-03; pro Sensor in der PWA abschaltbar; Zeitfenster (z. B. nur tagsüber) einstellbar. Schwellenwert kommt vom Gateway. *(OP-02)* | Muss | A, T |
 | REQ-UI-06 | Fehlbetätigung (z. B. Giesswasser, Anstossen) löst keine Werkseinstellung aus. | Muss | T |
 
 ### 5.8 Mechanik und Sonde
@@ -269,7 +270,7 @@ Sicherheitsanforderungen (Kap. 6 sowie REQ-FW-04, REQ-RF-05, REQ-RF-06) werden n
 | REQ-GW-06 | Backup und Wiederherstellung der gesamten Datenbank inkl. Kopplungen (UC-14). *(F-11)* | Muss | T |
 | REQ-GW-07 | Lösung (fertiges Board oder eigenes PCB) begründet; Raspberry Pi nur, wenn nötig (RB-05); Variante ohne Firmen-WLAN im Konzept mitbewertet. *(F-18)* | Muss | A |
 | REQ-GW-08 | Gehäuse 3D-druckbar, passend zum Sensordesign. | Muss | I |
-| REQ-GW-09 | Zeit ohne Internet: Zeitquelle im LAN (z. B. Firmen-NTP-Server, Uhrzeit des Browsers beim Öffnen der PWA) oder interne Uhr. Gangabweichung ≤ **±2 min/Monat** ohne Referenz; Zeit bleibt nach Stromausfall ≥ **24 h** erhalten, sonst werden keine Zeiten an Sensoren verteilt und Werte bis zum Abgleich markiert. Öffentlicher NTP im Internet nur nach Freigabe des Auftraggebers (OP-08). *(F-06, FE-05)* | Muss | A, T |
+| REQ-GW-09 | Zeit ohne Internet: Zeitquelle im LAN (z. B. Firmen-NTP-Server, Uhrzeit des Browsers beim Öffnen der PWA) oder interne Uhr. Gangabweichung ≤ **±2 min/Monat** ohne Referenz; Zeit bleibt nach Stromausfall ≥ **24 h** erhalten, sonst werden keine Zeiten an Sensoren verteilt und Werte bis zum Abgleich markiert. Öffentlicher NTP ist zulässig (OP-08) und abschaltbar. *(F-06, FE-05)* | Muss | A, T |
 | REQ-GW-10 | Wechsel von WLAN-Zugangsdaten und IP-Adresse ohne Neukopplung der Sensoren; PWA bleibt über einen festen Namen erreichbar. *(F-11)* | Muss | T |
 | REQ-GW-11 | Software-Update von Gateway und PWA ohne Verlust von Daten und Kopplungen. *(F-19)* | Muss | T |
 
@@ -286,7 +287,7 @@ Sicherheitsanforderungen (Kap. 6 sowie REQ-FW-04, REQ-RF-05, REQ-RF-06) werden n
 | REQ-APP-07 | Zwei-Punkt-Kalibrierung mit geführtem Ablauf. | Muss | T |
 | REQ-APP-08 | CSV-Export (alle oder ausgewählte Pflanzen, Zeitraum). | Muss | T |
 | REQ-APP-09 | Keine externen Ressourcen zur Laufzeit (Schriften, Bibliotheken lokal). | Muss | I |
-| REQ-APP-10 | Hinweis „Giessen nötig“ ist **in der PWA** sichtbar. Push-Benachrichtigungen über Hersteller-Server sind ausgeschlossen (REQ-SYS-01); Alternativen siehe OP-02. | Muss | I |
+| REQ-APP-10 | Hinweis „Giessen nötig“ ist **in der PWA** und **an der Sensor-LED** (REQ-UI-07) sichtbar. Push-Benachrichtigungen über Hersteller-Server sind ausgeschlossen (REQ-SYS-01). | Muss | I |
 | REQ-APP-11 | Sprache Deutsch; Bedienung ohne Anleitung für UC-03, UC-04, UC-06, UC-07. | Soll | T |
 
 ## 9 Design *(F-12)*
@@ -324,7 +325,7 @@ Sicherheitsanforderungen (Kap. 6 sowie REQ-FW-04, REQ-RF-05, REQ-RF-06) werden n
 ## 12 Abgrenzungen (nicht im Umfang)
 
 - Kein absoluter volumetrischer Wassergehalt; nur kalibrierter Feuchteindex.
-- Kein Einsatz im Freien, keine Hydrokultur ohne Substrat (**ANNAHME**, OP-03).
+- Kein Einsatz im Freien, keine reine Hydrokultur (bestätigt, OP-03).
 - Keine Cloud, kein Fernzugriff von ausserhalb des LAN, keine Push-Benachrichtigungen über Hersteller-Server.
 - Keine automatische Bewässerung, keine Aktoren.
 - Keine Zertifizierung (CE/FCC); nur Funkchips/-module im lizenzfreien 2.4-GHz-Band mit regelkonformer Sendeleistung.
@@ -332,13 +333,13 @@ Sicherheitsanforderungen (Kap. 6 sowie REQ-FW-04, REQ-RF-05, REQ-RF-06) werden n
 
 ## 13 Offene Punkte und Annahmen
 
-| Nr. | Punkt | Wer klärt |
+| Nr. | Punkt | Status |
 |---|---|---|
-| OP-01 | Druckermodell bestätigen (P1S?). | Auftraggeber |
-| OP-02 | „Giessen nötig“: genügt die Anzeige in der PWA? Oder zusätzlich LED am Sensor (energetisch tragbar, wenn selten, z. B. 1×/min kurz) bzw. Meldung über MQTT/Home Assistant? | Auftraggeber |
-| OP-03 | Nur Innenbereich, keine Hydrokultur? | Auftraggeber |
-| OP-04 | Kopftemperatur in der Sonne (RB-03, 65 °C) am Muster messen. | Prototyp |
-| OP-05 | Kopfgrösse REQ-MECH-02 hängt von der Energiequelle ab. | Phase 2 |
-| OP-06 | Lastannahmen REQ-MECH-10 plausibilisieren. | Phase 2/4, Prototyp |
-| OP-07 | Firmenhandys: Dürfen Zertifikate/Profile installiert werden? Lösung muss REQ-SAF-NET-04 erfüllen. | Auftraggeber / Phase 2 |
-| OP-08 | Darf das Gateway die Uhrzeit von einem öffentlichen Zeitserver (NTP) holen, oder gibt es einen NTP-Server im Firmennetz? | Auftraggeber |
+| OP-01 | Druckermodell | ✅ Bambu Lab P1S mit AMS |
+| OP-02 | „Giessen nötig“ | ✅ zusätzlich über die Status-LED → REQ-UI-07 |
+| OP-03 | Einsatzbereich | ✅ nur innen, keine reine Hydrokultur |
+| OP-04 | Kopftemperatur in der Sonne (65 °C) messen | offen → Prototyp |
+| OP-05 | Kopfgrösse abhängig von Energiequelle | offen → Phase 2 |
+| OP-06 | Lastannahmen Sonde plausibilisieren | offen → Phase 2/4, Prototyp |
+| OP-07 | Zertifikat auf dem Handy | ✅ Auftraggeber nutzt sein privates Handy, Installation eines Zertifikats/Profils möglich. REQ-SAF-NET-04 gilt weiterhin. |
+| OP-08 | Öffentlicher NTP für das Gateway | ✅ zulässig |
