@@ -1,0 +1,42 @@
+== Versionen ==
+  [OK]    python3 -> /usr/bin/python3
+  [OK]    kicad-cli -> /usr/bin/kicad-cli
+  [OK]    ngspice -> /usr/bin/ngspice
+  [OK]    freecadcmd -> /usr/bin/freecadcmd
+  [OK]    blender -> /usr/bin/blender
+  [OK]    gmsh -> /usr/bin/gmsh
+  [OK]    ccx -> /usr/bin/ccx
+  [OK]    git -> /usr/bin/git
+  [OK]    curl -> /usr/bin/curl
+  kicad-cli (WSL): 9.0.9
+  kicad-cli (Windows): 10.0.5
+== Optionale/fehlende Werkzeuge ==
+  [FEHLT] pdftoppm
+  [FEHLT] pdftotext
+  [FEHLT] zip
+  [FEHLT] node
+  [FEHLT] npm
+  [FEHLT] ElmerSolver
+  [FEHLT] ElmerGrid
+  [FEHLT] pio
+  [FEHLT] west
+  [OK]    python: numpy
+  [OK]    python: scipy
+  [OK]    python: matplotlib
+  [OK]    python: sympy
+  [OK]    python: requests
+  [OK]    python: yaml
+  [OK]    python: serial
+  [OK]    python: cryptography
+  [OK]    python: pcbnew
+  [FEHLT] python: gmsh
+  [FEHLT] python: skfem
+  [FEHLT] python: meshio
+  [FEHLT] python: pypdf
+== Funktionstest KiCad (Board erzeugen, DRC, Gerber, STEP) ==
+  [OK]    DRC (KiCad 9)
+  [OK]    Gerber-Export
+  [OK]    STEP-Export
+  [OK]    DRC (KiCad 10)
+== Funktionstest ngspice (RC-Puffer, erwartet vmin ~2.870 V) ==
+  vmin                =  2.870293e+00 at=  4.001100e-03
