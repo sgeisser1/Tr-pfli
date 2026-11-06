@@ -1,0 +1,1652 @@
+{
+ "C1035": {
+  "brand": "Sunlord",
+  "describe": "1.85Ω 10uH 17MHz 30@2MHz 3mA ±10% 0603 Inductors (SMD) ROHS",
+  "least": 20,
+  "library": "base",
+  "loss": 10,
+  "model": "SDFL1608S100KTF",
+  "package": "0603",
+  "preferred": false,
+  "stock": 418508,
+  "tiers": [
+   [
+    1,
+    0.0279
+   ],
+   [
+    200,
+    0.022
+   ],
+   [
+    600,
+    0.0194
+   ],
+   [
+    4000,
+    0.0176
+   ],
+   [
+    8000,
+    0.0167
+   ],
+   [
+    20000,
+    0.0162
+   ]
+  ]
+ },
+ "C148209": {
+  "brand": "Littelfuse",
+  "describe": "-65℃~+150℃ 12.3A@10/1000us 1uA 20V 24.5V 32.4V 400W@10/1000us IEC 61000-4-2 TVS Unidirectional DO-214AC(SMA) ESD and Surge Protection (TVS/ESD) ROHS",
+  "least": 5,
+  "library": "expand",
+  "loss": 2,
+  "model": "SMAJ20A",
+  "package": "DO-214AC(SMA)",
+  "preferred": false,
+  "stock": 2267,
+  "tiers": [
+   [
+    1,
+    0.1038
+   ],
+   [
+    50,
+    0.0811
+   ],
+   [
+    150,
+    0.0696
+   ],
+   [
+    500,
+    0.0611
+   ],
+   [
+    2500,
+    0.0542
+   ],
+   [
+    5000,
+    0.0508
+   ]
+  ]
+ },
+ "C15008": {
+  "brand": "Samsung Electro-Mechanics",
+  "describe": "100uF 6.3V X5R ±20% 1206 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+  "least": 5,
+  "library": "base",
+  "loss": 4,
+  "model": "CL31A107MQHNNNE",
+  "package": "1206",
+  "preferred": false,
+  "stock": 1603434,
+  "tiers": [
+   [
+    1,
+    0.1091
+   ],
+   [
+    100,
+    0.086
+   ],
+   [
+    300,
+    0.0742
+   ],
+   [
+    2000,
+    0.0644
+   ],
+   [
+    4000,
+    0.0609
+   ],
+   [
+    10000,
+    0.0587
+   ]
+  ]
+ },
+ "C15127": {
+  "brand": "Alpha & Omega Semicon",
+  "describe": "1 P-Channel 14nC@10V 30V 47mΩ@10V、60mΩ@4.5V、85mΩ@2.5V 4A 55pF 645pF 80pF 900mV SOT-23 MOSFETs ROHS",
+  "least": 5,
+  "library": "base",
+  "loss": 4,
+  "model": "AO3401A",
+  "package": "SOT-23",
+  "preferred": false,
+  "stock": 1701682,
+  "tiers": [
+   [
+    1,
+    0.0829
+   ],
+   [
+    50,
+    0.0655
+   ],
+   [
+    150,
+    0.0567
+   ],
+   [
+    500,
+    0.0495
+   ],
+   [
+    3000,
+    0.0469
+   ],
+   [
+    6000,
+    0.0452
+   ]
+  ]
+ },
+ "C1525": {
+  "brand": "Samsung Electro-Mechanics",
+  "describe": "100nF 16V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+  "least": 20,
+  "library": "base",
+  "loss": 10,
+  "model": "CL05B104KO5NNNC",
+  "package": "0402",
+  "preferred": false,
+  "stock": 34703955,
+  "tiers": [
+   [
+    1,
+    0.0031
+   ],
+   [
+    1000,
+    0.0023
+   ],
+   [
+    3000,
+    0.002
+   ],
+   [
+    10000,
+    0.0017
+   ],
+   [
+    50000,
+    0.0016
+   ],
+   [
+    50200,
+    0.0016
+   ]
+  ]
+ },
+ "C1546": {
+  "brand": "FH (Guangdong Fenghua Advanced Tech)",
+  "describe": "100pF 50V C0G ±5% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+  "least": 20,
+  "library": "base",
+  "loss": 10,
+  "model": "0402CG101J500NT",
+  "package": "0402",
+  "preferred": false,
+  "stock": 2700621,
+  "tiers": [
+   [
+    1,
+    0.003
+   ],
+   [
+    1000,
+    0.0022
+   ],
+   [
+    3000,
+    0.0018
+   ],
+   [
+    10000,
+    0.0016
+   ],
+   [
+    50000,
+    0.0013
+   ],
+   [
+    50200,
+    0.0013
+   ]
+  ]
+ },
+ "C1548": {
+  "brand": "FH (Guangdong Fenghua Advanced Tech)",
+  "describe": "15pF 50V C0G ±5% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+  "least": 20,
+  "library": "base",
+  "loss": 10,
+  "model": "0402CG150J500NT",
+  "package": "0402",
+  "preferred": false,
+  "stock": 1220594,
+  "tiers": [
+   [
+    1,
+    0.0026
+   ],
+   [
+    1000,
+    0.0019
+   ],
+   [
+    3000,
+    0.0016
+   ],
+   [
+    10000,
+    0.0013
+   ],
+   [
+    50000,
+    0.0011
+   ],
+   [
+    50200,
+    0.0011
+   ]
+  ]
+ },
+ "C1552": {
+  "brand": "FH (Guangdong Fenghua Advanced Tech)",
+  "describe": "1.5pF 50V C0G 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+  "least": 20,
+  "library": "expand",
+  "loss": 10,
+  "model": "0402CG1R5C500NT",
+  "package": "0402",
+  "preferred": true,
+  "stock": 171054,
+  "tiers": [
+   [
+    1,
+    0.0045
+   ],
+   [
+    1000,
+    0.0036
+   ],
+   [
+    3000,
+    0.003
+   ],
+   [
+    10000,
+    0.0024
+   ],
+   [
+    50000,
+    0.0021
+   ],
+   [
+    50200,
+    0.0021
+   ]
+  ]
+ },
+ "C15525": {
+  "brand": "Samsung Electro-Mechanics",
+  "describe": "10uF 6.3V X5R ±20% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+  "least": 20,
+  "library": "base",
+  "loss": 10,
+  "model": "CL05A106MQ5NUNC",
+  "package": "0402",
+  "preferred": false,
+  "stock": 9187111,
+  "tiers": [
+   [
+    1,
+    0.0258
+   ],
+   [
+    1000,
+    0.0192
+   ],
+   [
+    3000,
+    0.0163
+   ],
+   [
+    10000,
+    0.0141
+   ],
+   [
+    50000,
+    0.0133
+   ],
+   [
+    100000,
+    0.0127
+   ]
+  ]
+ },
+ "C1555": {
+  "brand": "FH (Guangdong Fenghua Advanced Tech)",
+  "describe": "22pF 50V C0G ±5% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+  "least": 20,
+  "library": "base",
+  "loss": 10,
+  "model": "0402CG220J500NT",
+  "package": "0402",
+  "preferred": false,
+  "stock": 1720386,
+  "tiers": [
+   [
+    1,
+    0.0019
+   ],
+   [
+    1000,
+    0.0015
+   ],
+   [
+    3000,
+    0.0012
+   ],
+   [
+    10000,
+    0.001
+   ],
+   [
+    50000,
+    0.0009
+   ],
+   [
+    50200,
+    0.0009
+   ]
+  ]
+ },
+ "C17168": {
+  "brand": "UNI-ROYAL(Uniroyal Elec)",
+  "describe": "-55℃~+155℃ 0Ω 50V 62.5mW Thick Film Resistor ±1% ±800ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+  "least": 20,
+  "library": "base",
+  "loss": 10,
+  "model": "0402WGF0000TCE",
+  "package": "0402",
+  "preferred": false,
+  "stock": 14179220,
+  "tiers": [
+   [
+    1,
+    0.0011
+   ],
+   [
+    1000,
+    0.0009
+   ],
+   [
+    3000,
+    0.0007
+   ],
+   [
+    10000,
+    0.0007
+   ],
+   [
+    50000,
+    0.0005
+   ],
+   [
+    50200,
+    0.0005
+   ]
+  ]
+ },
+ "C183096": {
+  "brand": "Texas Instruments",
+  "describe": "-40℃~+85℃ 1 1.5V~8V 2.8V 4.275V 4uA Lithium Battery Not supported Protection IC Support WSON-6(1.5x1.5) Battery Management ROHS",
+  "least": 5,
+  "library": "expand",
+  "loss": 0,
+  "model": "BQ29700DSER",
+  "package": "WSON-6(1.5x1.5)",
+  "preferred": false,
+  "stock": 3239,
+  "tiers": [
+   [
+    1,
+    0.5452
+   ],
+   [
+    10,
+    0.4142
+   ],
+   [
+    30,
+    0.3569
+   ],
+   [
+    100,
+    0.2865
+   ],
+   [
+    500,
+    0.2554
+   ],
+   [
+    1000,
+    0.2358
+   ]
+  ]
+ },
+ "C202311": {
+  "brand": "Texas Instruments",
+  "describe": "0℃~+125℃ 1 125uA 3.5V~28V 4.2V 800mA Charging IC Support SOT-23-6 Battery Management ROHS",
+  "least": 5,
+  "library": "expand",
+  "loss": 0,
+  "model": "BQ21040DBVR",
+  "package": "SOT-23-6",
+  "preferred": false,
+  "stock": 2346,
+  "tiers": [
+   [
+    1,
+    0.4137
+   ],
+   [
+    50,
+    0.3361
+   ],
+   [
+    150,
+    0.3029
+   ],
+   [
+    500,
+    0.2613
+   ],
+   [
+    3000,
+    0.2289
+   ],
+   [
+    6000,
+    0.2179
+   ]
+  ]
+ },
+ "C20416850": {
+  "brand": "Texas Instruments",
+  "describe": "VQFN-24(4x4) Microcontrollers (MCU/MPU/SOC) ROHS",
+  "least": 0,
+  "library": "expand",
+  "loss": 0,
+  "model": "CC2340R52E0RGER",
+  "package": "VQFN-24(4x4)",
+  "preferred": false,
+  "stock": 9278,
+  "tiers": [
+   [
+    1,
+    1.5864
+   ],
+   [
+    10,
+    1.3375
+   ],
+   [
+    30,
+    1.2016
+   ],
+   [
+    100,
+    1.0461
+   ],
+   [
+    500,
+    0.9774
+   ],
+   [
+    1000,
+    0.9463
+   ]
+  ]
+ },
+ "C2286": {
+  "brand": "Hubei KENTO Elec",
+  "describe": "-40℃~+85℃ 1.6mm x 0.8mm square LED 1.8V~2.4V 120° 20mA 300mcd 40mW 615nm~630nm 645nm Discrete Diode Red Water Clear 0603 LED Indication - Discrete ROHS",
+  "least": 20,
+  "library": "base",
+  "loss": 10,
+  "model": "KT-0603R",
+  "package": "0603",
+  "preferred": false,
+  "stock": 6652043,
+  "tiers": [
+   [
+    1,
+    0.0077
+   ],
+   [
+    1000,
+    0.0059
+   ],
+   [
+    4000,
+    0.0046
+   ],
+   [
+    8000,
+    0.004
+   ],
+   [
+    48000,
+    0.0037
+   ],
+   [
+    100000,
+    0.0036
+   ]
+  ]
+ },
+ "C23733": {
+  "brand": "Samsung Electro-Mechanics",
+  "describe": "10V 4.7uF X5R ±20% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+  "least": 20,
+  "library": "base",
+  "loss": 10,
+  "model": "CL05A475MP5NRNC",
+  "package": "0402",
+  "preferred": false,
+  "stock": 1078497,
+  "tiers": [
+   [
+    1,
+    0.0118
+   ],
+   [
+    500,
+    0.0092
+   ],
+   [
+    1500,
+    0.008
+   ],
+   [
+    10000,
+    0.0072
+   ],
+   [
+    20000,
+    0.0068
+   ],
+   [
+    50000,
+    0.0066
+   ]
+  ]
+ },
+ "C25117": {
+  "brand": "UNI-ROYAL(Uniroyal Elec)",
+  "describe": "-55℃~+155℃ 470Ω 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+  "least": 20,
+  "library": "base",
+  "loss": 10,
+  "model": "0402WGF4700TCE",
+  "package": "0402",
+  "preferred": false,
+  "stock": 3072093,
+  "tiers": [
+   [
+    1,
+    0.001
+   ],
+   [
+    1000,
+    0.0008
+   ],
+   [
+    3000,
+    0.0007
+   ],
+   [
+    10000,
+    0.0006
+   ],
+   [
+    50000,
+    0.0005
+   ],
+   [
+    50200,
+    0.0005
+   ]
+  ]
+ },
+ "C25741": {
+  "brand": "UNI-ROYAL(Uniroyal Elec)",
+  "describe": "-55℃~+155℃ 100kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+  "least": 20,
+  "library": "base",
+  "loss": 12,
+  "model": "0402WGF1003TCE",
+  "package": "0402",
+  "preferred": false,
+  "stock": 8423441,
+  "tiers": [
+   [
+    1,
+    0.0013
+   ],
+   [
+    1000,
+    0.001
+   ],
+   [
+    3000,
+    0.0009
+   ],
+   [
+    10000,
+    0.0008
+   ],
+   [
+    50000,
+    0.0007
+   ],
+   [
+    50200,
+    0.0007
+   ]
+  ]
+ },
+ "C25744": {
+  "brand": "UNI-ROYAL(Uniroyal Elec)",
+  "describe": "-55℃~+155℃ 10kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+  "least": 20,
+  "library": "base",
+  "loss": 15,
+  "model": "0402WGF1002TCE",
+  "package": "0402",
+  "preferred": false,
+  "stock": 16479329,
+  "tiers": [
+   [
+    1,
+    0.0028
+   ],
+   [
+    1000,
+    0.0021
+   ],
+   [
+    3000,
+    0.0018
+   ],
+   [
+    10000,
+    0.0016
+   ],
+   [
+    50000,
+    0.0015
+   ],
+   [
+    50200,
+    0.0015
+   ]
+  ]
+ },
+ "C25879": {
+  "brand": "UNI-ROYAL(Uniroyal Elec)",
+  "describe": "-55℃~+155℃ 2.2kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+  "least": 20,
+  "library": "base",
+  "loss": 10,
+  "model": "0402WGF2201TCE",
+  "package": "0402",
+  "preferred": false,
+  "stock": 3395376,
+  "tiers": [
+   [
+    1,
+    0.0011
+   ],
+   [
+    1000,
+    0.0009
+   ],
+   [
+    3000,
+    0.0008
+   ],
+   [
+    10000,
+    0.0007
+   ],
+   [
+    50000,
+    0.0006
+   ],
+   [
+    50200,
+    0.0006
+   ]
+  ]
+ },
+ "C25900": {
+  "brand": "UNI-ROYAL(Uniroyal Elec)",
+  "describe": "-55℃~+155℃ 4.7kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+  "least": 20,
+  "library": "base",
+  "loss": 10,
+  "model": "0402WGF4701TCE",
+  "package": "0402",
+  "preferred": false,
+  "stock": 15882040,
+  "tiers": [
+   [
+    1,
+    0.0017
+   ],
+   [
+    1000,
+    0.0013
+   ],
+   [
+    3000,
+    0.0011
+   ],
+   [
+    10000,
+    0.001
+   ],
+   [
+    50000,
+    0.0009
+   ],
+   [
+    50200,
+    0.0009
+   ]
+  ]
+ },
+ "C25905": {
+  "brand": "UNI-ROYAL(Uniroyal Elec)",
+  "describe": "-55℃~+155℃ 5.1kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+  "least": 20,
+  "library": "base",
+  "loss": 15,
+  "model": "0402WGF5101TCE",
+  "package": "0402",
+  "preferred": false,
+  "stock": 4621078,
+  "tiers": [
+   [
+    1,
+    0.0023
+   ],
+   [
+    1000,
+    0.0017
+   ],
+   [
+    3000,
+    0.0015
+   ],
+   [
+    10000,
+    0.0013
+   ],
+   [
+    50000,
+    0.0012
+   ],
+   [
+    50200,
+    0.0012
+   ]
+  ]
+ },
+ "C26083": {
+  "brand": "UNI-ROYAL(Uniroyal Elec)",
+  "describe": "-55℃~+155℃ 1MΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+  "least": 20,
+  "library": "base",
+  "loss": 15,
+  "model": "0402WGF1004TCE",
+  "package": "0402",
+  "preferred": false,
+  "stock": 2826972,
+  "tiers": [
+   [
+    1,
+    0.0012
+   ],
+   [
+    1000,
+    0.0009
+   ],
+   [
+    3000,
+    0.0008
+   ],
+   [
+    10000,
+    0.0007
+   ],
+   [
+    50000,
+    0.0006
+   ],
+   [
+    50200,
+    0.0006
+   ]
+  ]
+ },
+ "C27001": {
+  "brand": "UNI-ROYAL(Uniroyal Elec)",
+  "describe": "-55℃~+155℃ 237kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+  "least": 20,
+  "library": "expand",
+  "loss": 10,
+  "model": "0402WGF2373TCE",
+  "package": "0402",
+  "preferred": false,
+  "stock": 2437,
+  "tiers": [
+   [
+    1,
+    0.0032
+   ],
+   [
+    1000,
+    0.0025
+   ],
+   [
+    3000,
+    0.0021
+   ],
+   [
+    10000,
+    0.0019
+   ],
+   [
+    50000,
+    0.0017
+   ],
+   [
+    50200,
+    0.0017
+   ]
+  ]
+ },
+ "C27123": {
+  "brand": "Sunlord",
+  "describe": "2.7nH 200mΩ 6GHz 800mA 8@100MHz Multilayer inductor 0402 Inductors (SMD) ROHS",
+  "least": 20,
+  "library": "expand",
+  "loss": 10,
+  "model": "SDCL1005C2N7STDF",
+  "package": "0402",
+  "preferred": false,
+  "stock": 110991,
+  "tiers": [
+   [
+    1,
+    0.0031
+   ],
+   [
+    200,
+    0.0027
+   ],
+   [
+    600,
+    0.0024
+   ],
+   [
+    2000,
+    0.0023
+   ],
+   [
+    10000,
+    0.0022
+   ],
+   [
+    20000,
+    0.0021
+   ]
+  ]
+ },
+ "C2870250": {
+  "brand": "Texas Instruments",
+  "describe": "-55℃~+125℃ 1.7V~5.5V 12bit 4uA 7ms Factory temperature calibration、Temperature threshold monitoring I2C、SMBus ±1℃ WSON-8-EP(2x2) Temperature Sensors ROHS",
+  "least": 0,
+  "library": "expand",
+  "loss": 0,
+  "model": "TMP1075DSGR",
+  "package": "WSON-8-EP(2x2)",
+  "preferred": false,
+  "stock": 34641,
+  "tiers": [
+   [
+    1,
+    0.3995
+   ],
+   [
+    10,
+    0.3111
+   ],
+   [
+    30,
+    0.2718
+   ],
+   [
+    100,
+    0.2243
+   ],
+   [
+    500,
+    0.203
+   ],
+   [
+    1000,
+    0.1916
+   ]
+  ]
+ },
+ "C2925606": {
+  "brand": "HCI",
+  "describe": "-40℃~+85℃ 40Ω 48MHz 8pF Crystal Oscillator ±10ppm ±20ppm SMD3225-4P Crystals ROHS",
+  "least": 5,
+  "library": "expand",
+  "loss": 2,
+  "model": "XC32M4-48.000-F08NLDT",
+  "package": "SMD3225-4P",
+  "preferred": false,
+  "stock": 8817,
+  "tiers": [
+   [
+    1,
+    0.0993
+   ],
+   [
+    50,
+    0.0796
+   ],
+   [
+    150,
+    0.0698
+   ],
+   [
+    500,
+    0.0624
+   ],
+   [
+    3000,
+    0.0565
+   ],
+   [
+    6000,
+    0.0536
+   ]
+  ]
+ },
+ "C2984676": {
+  "brand": "DOWO",
+  "describe": "-40℃~+85℃ 150mΩ 1A 24V 40A 500mA 600mW 700mΩ 8s 1206 Resettable Fuses ROHS",
+  "least": 5,
+  "library": "expand",
+  "loss": 2,
+  "model": "500mA/24V",
+  "package": "1206",
+  "preferred": false,
+  "stock": 10119,
+  "tiers": [
+   [
+    1,
+    0.0901
+   ],
+   [
+    50,
+    0.0718
+   ],
+   [
+    150,
+    0.0624
+   ],
+   [
+    500,
+    0.0555
+   ],
+   [
+    2500,
+    0.049
+   ],
+   [
+    4000,
+    0.0462
+   ]
+  ]
+ },
+ "C318884": {
+  "brand": "XKB Connection",
+  "describe": "-30℃~+85℃ 1.5mm 1.6N 100,000 cycles 12V 5.1mm 5.1mm 50mA Gold No Round Button SPST Surface Mount,Vertical Without Bracket SMD-4P,5.1x5.1mm Tactile Switches ROHS",
+  "least": 5,
+  "library": "base",
+  "loss": 8,
+  "model": "TS-1187A-B-A-B",
+  "package": "SMD-4P,5.1x5.1mm",
+  "preferred": false,
+  "stock": 968070,
+  "tiers": [
+   [
+    1,
+    0.0207
+   ],
+   [
+    200,
+    0.016
+   ],
+   [
+    600,
+    0.0139
+   ],
+   [
+    4000,
+    0.0121
+   ],
+   [
+    8000,
+    0.0115
+   ],
+   [
+    20000,
+    0.0111
+   ]
+  ]
+ },
+ "C32346": {
+  "brand": "Seiko Epson",
+  "describe": "-40℃~+85℃ 12.5pF 32.768kHz 70kΩ SMD crystal oscillator ±20ppm SMD3215-2P Crystals ROHS",
+  "least": 5,
+  "library": "base",
+  "loss": 1,
+  "model": "Q13FC13500004",
+  "package": "SMD3215-2P",
+  "preferred": false,
+  "stock": 483715,
+  "tiers": [
+   [
+    1,
+    0.1715
+   ],
+   [
+    50,
+    0.1353
+   ],
+   [
+    150,
+    0.1174
+   ],
+   [
+    500,
+    0.1017
+   ],
+   [
+    3000,
+    0.083
+   ],
+   [
+    6000,
+    0.0804
+   ]
+  ]
+ },
+ "C35740": {
+  "brand": "Texas Instruments",
+  "describe": "-40℃~+125℃ 1 1 1.16V~3.33V 1.65V~5.5V 10uA 3.8V 32mA 32mA 390mV~1.87V 550mV 6.5ns@2.5V,50pF 74LVC Schmitt trigger 电源关断保护、噪声抑制功能 SC-70-5 Inverters ROHS",
+  "least": 5,
+  "library": "expand",
+  "loss": 4,
+  "model": "SN74LVC1G14DCKR",
+  "package": "SC-70-5",
+  "preferred": false,
+  "stock": 98074,
+  "tiers": [
+   [
+    1,
+    0.0567
+   ],
+   [
+    100,
+    0.0441
+   ],
+   [
+    300,
+    0.0379
+   ],
+   [
+    3000,
+    0.0331
+   ],
+   [
+    6000,
+    0.0294
+   ],
+   [
+    9000,
+    0.0274
+   ]
+  ]
+ },
+ "C3747031": {
+  "brand": "Texas Instruments",
+  "describe": "-40℃~+125℃@(Tj) 1 130uVrms 200mA 25nA 360mV@(200mA) 3V 55dB@(1kHz) 6V Fixed Positive Under Voltage Lockout、Over Current Protection、Thermal Shutdown SOT-23-5 Voltage Regulators - Linear, Low Drop Out (LDO) Regulators ROHS",
+  "least": 0,
+  "library": "expand",
+  "loss": 0,
+  "model": "TPS7A0230PDBVR",
+  "package": "SOT-23-5",
+  "preferred": false,
+  "stock": 27756,
+  "tiers": [
+   [
+    1,
+    0.3193
+   ],
+   [
+    10,
+    0.28
+   ],
+   [
+    30,
+    0.2636
+   ],
+   [
+    100,
+    0.2227
+   ],
+   [
+    500,
+    0.2129
+   ],
+   [
+    1000,
+    0.208
+   ]
+  ]
+ },
+ "C39831287": {
+  "brand": "WCH(Jiangsu Qin Heng)",
+  "describe": "-20dBm -40℃~+85℃ -95dBm 1.7V~3.3V 2.4GHz 2Mbps Bluetooth SPI、USB、UART、ADC、I2C、PWM Supports software reset、Power-on Reset、Power-off reset function QFN-28(4x4) RF Transceiver ICs ROHS",
+  "least": 0,
+  "library": "expand",
+  "loss": 0,
+  "model": "CH592F",
+  "package": "QFN-28(4x4)",
+  "preferred": false,
+  "stock": 27866,
+  "tiers": [
+   [
+    1,
+    0.8333
+   ],
+   [
+    10,
+    0.6696
+   ],
+   [
+    30,
+    0.5878
+   ],
+   [
+    100,
+    0.5075
+   ],
+   [
+    500,
+    0.4584
+   ],
+   [
+    1000,
+    0.4339
+   ]
+  ]
+ },
+ "C456012": {
+  "brand": "SHOU HAN",
+  "describe": "-30℃~+85℃ 1 3,000 Cycles 3A 5V 6.8mm 6P Black Female Surface Mount, Right Angle Type-C SMD USB Connectors ROHS",
+  "least": 0,
+  "library": "expand",
+  "loss": 2,
+  "model": "TYPE-C 6P",
+  "package": "SMD",
+  "preferred": false,
+  "stock": 1004642,
+  "tiers": [
+   [
+    1,
+    0.039
+   ],
+   [
+    100,
+    0.0315
+   ],
+   [
+    300,
+    0.0277
+   ],
+   [
+    1000,
+    0.0238
+   ],
+   [
+    5000,
+    0.0228
+   ],
+   [
+    10000,
+    0.022
+   ]
+  ]
+ },
+ "C5213768": {
+  "brand": "Keystone",
+  "describe": "- Battery Snap ROHS",
+  "least": 2,
+  "library": "expand",
+  "loss": 0,
+  "model": "3034TR",
+  "package": "-",
+  "preferred": false,
+  "stock": 664,
+  "tiers": [
+   [
+    1,
+    0.3913
+   ],
+   [
+    10,
+    0.3618
+   ],
+   [
+    200,
+    0.3618
+   ],
+   [
+    1000,
+    0.3618
+   ]
+  ]
+ },
+ "C52923": {
+  "brand": "Samsung Electro-Mechanics",
+  "describe": "1uF 25V X5R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+  "least": 20,
+  "library": "base",
+  "loss": 12,
+  "model": "CL05A105KA5NQNC",
+  "package": "0402",
+  "preferred": false,
+  "stock": 11682710,
+  "tiers": [
+   [
+    1,
+    0.0058
+   ],
+   [
+    1000,
+    0.0044
+   ],
+   [
+    3000,
+    0.0038
+   ],
+   [
+    10000,
+    0.0034
+   ],
+   [
+    50000,
+    0.0032
+   ],
+   [
+    100000,
+    0.0031
+   ]
+  ]
+ },
+ "C70377": {
+  "brand": "Q&J",
+  "describe": "Battery base CR2032 Phosphor bronze - ROHS",
+  "least": 5,
+  "library": "expand",
+  "loss": 1,
+  "model": "CR2032-BS-6-1",
+  "package": "-",
+  "preferred": false,
+  "stock": 57793,
+  "tiers": [
+   [
+    1,
+    0.142
+   ],
+   [
+    50,
+    0.1336
+   ],
+   [
+    1000,
+    0.111
+   ],
+   [
+    5000,
+    0.1069
+   ]
+  ]
+ },
+ "C77131": {
+  "brand": "Murata Electronics",
+  "describe": "-40℃~+125℃ 0.5mm 100mW 10kΩ 1mW/℃ 1mm 310uA 3380K 3434K 3455K ±1% ±1% 0402 NTC Thermistors ROHS",
+  "least": 20,
+  "library": "expand",
+  "loss": 12,
+  "model": "NCP15XH103F03RC",
+  "package": "0402",
+  "preferred": false,
+  "stock": 302510,
+  "tiers": [
+   [
+    1,
+    0.0167
+   ],
+   [
+    500,
+    0.0129
+   ],
+   [
+    1500,
+    0.0112
+   ],
+   [
+    10000,
+    0.0091
+   ],
+   [
+    20000,
+    0.0086
+   ],
+   [
+    50000,
+    0.0082
+   ]
+  ]
+ },
+ "C8545": {
+  "brand": "Jiangsu Changjing Electronics Technology Co., Ltd.",
+  "describe": "1 N-channel 115mA 2.5V 225mW 25pF 50pF 5pF 5Ω@10V 60V N-Channel ±20V SOT-23 MOSFETs ROHS",
+  "least": 10,
+  "library": "base",
+  "loss": 8,
+  "model": "2N7002",
+  "package": "SOT-23",
+  "preferred": false,
+  "stock": 4181111,
+  "tiers": [
+   [
+    1,
+    0.0171
+   ],
+   [
+    500,
+    0.0133
+   ],
+   [
+    3000,
+    0.0116
+   ],
+   [
+    6000,
+    0.0104
+   ],
+   [
+    24000,
+    0.0099
+   ],
+   [
+    51000,
+    0.0095
+   ]
+  ]
+ },
+ "C89132": {
+  "brand": "Sunlord",
+  "describe": "10uH 650mA 800mA 826mΩ ±20% 0806 Power Inductors ROHS",
+  "least": 5,
+  "library": "expand",
+  "loss": 4,
+  "model": "WPN201610H100MT",
+  "package": "0806",
+  "preferred": false,
+  "stock": 5075,
+  "tiers": [
+   [
+    1,
+    0.0418
+   ],
+   [
+    100,
+    0.0339
+   ],
+   [
+    300,
+    0.03
+   ],
+   [
+    2000,
+    0.0259
+   ],
+   [
+    4000,
+    0.0235
+   ],
+   [
+    10000,
+    0.0223
+   ]
+  ]
+ },
+ "C9009": {
+  "brand": "YXC Crystal Oscillators",
+  "describe": "-40℃~+85℃ 12pF 32MHz 40Ω Crystal Oscillator ±10ppm ±20ppm SMD3225-4P Crystals ROHS",
+  "least": 5,
+  "library": "expand",
+  "loss": 4,
+  "model": "X322532MOB4SI",
+  "package": "SMD3225-4P",
+  "preferred": false,
+  "stock": 296728,
+  "tiers": [
+   [
+    1,
+    0.0957
+   ],
+   [
+    50,
+    0.0765
+   ],
+   [
+    150,
+    0.0667
+   ],
+   [
+    500,
+    0.0587
+   ],
+   [
+    3000,
+    0.05
+   ],
+   [
+    6000,
+    0.0482
+   ]
+  ]
+ },
+ "C908265": {
+  "brand": "FUXINSEMI",
+  "describe": "-55℃~+150℃ 1.2V 1.5W 11nC@4.5V 125pF 18mΩ@4.5V 2 N-Channel 20V 6A 800pF SOT-23-6L MOSFETs ROHS",
+  "least": 5,
+  "library": "expand",
+  "loss": 4,
+  "model": "FS8205A",
+  "package": "SOT-23-6L",
+  "preferred": false,
+  "stock": 21975,
+  "tiers": [
+   [
+    1,
+    0.0718
+   ],
+   [
+    100,
+    0.0585
+   ],
+   [
+    300,
+    0.0518
+   ],
+   [
+    3000,
+    0.0398
+   ],
+   [
+    6000,
+    0.0359
+   ],
+   [
+    9000,
+    0.0339
+   ]
+  ]
+ },
+ "C964809": {
+  "brand": "MYOUNG",
+  "describe": "-25~85℃ Battery base CR2450 Gold plating Phosphor bronze - ROHS",
+  "least": 2,
+  "library": "expand",
+  "loss": 0,
+  "model": "BS-24-B4AA016",
+  "package": "-",
+  "preferred": false,
+  "stock": 2042,
+  "tiers": [
+   [
+    1,
+    0.5845
+   ],
+   [
+    10,
+    0.4748
+   ],
+   [
+    50,
+    0.3962
+   ],
+   [
+    100,
+    0.3422
+   ],
+   [
+    500,
+    0.3095
+   ],
+   [
+    1000,
+    0.2931
+   ]
+  ]
+ },
+ "C968585": {
+  "brand": "Texas Instruments",
+  "describe": "-40℃~+125℃ 2 2.7V~3.6V 28bit I2C WSON-12(4x4) Capacitive Sensor IC ROHS",
+  "least": 0,
+  "library": "expand",
+  "loss": 0,
+  "model": "FDC2212DNTR",
+  "package": "WSON-12(4x4)",
+  "preferred": false,
+  "stock": 310,
+  "tiers": [
+   [
+    1,
+    6.6301
+   ],
+   [
+    10,
+    6.0244
+   ],
+   [
+    30,
+    5.6364
+   ],
+   [
+    100,
+    5.2615
+   ],
+   [
+    102,
+    5.2615
+   ],
+   [
+    104,
+    5.2615
+   ]
+  ]
+ },
+ "C99010": {
+  "brand": "Seiko Epson",
+  "describe": "-40℃~+85℃ 32.768kHz 70kΩ 9pF Crystal Oscillator ±20ppm SMD3215-2P Crystals ROHS",
+  "least": 5,
+  "library": "expand",
+  "loss": 2,
+  "model": "Q13FC13500003",
+  "package": "SMD3215-2P",
+  "preferred": false,
+  "stock": 33692,
+  "tiers": [
+   [
+    1,
+    0.204
+   ],
+   [
+    50,
+    0.1629
+   ],
+   [
+    150,
+    0.1453
+   ],
+   [
+    500,
+    0.1233
+   ],
+   [
+    3000,
+    0.096
+   ],
+   [
+    6000,
+    0.0901
+   ]
+  ]
+ },
+ "_abruf": "2026-11-06"
+}

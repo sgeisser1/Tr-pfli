@@ -3,9 +3,8 @@
 
 Aufruf:  .venv/bin/python scripts/concept_energy.py
 
-Teil 1 nutzt scripts/energy_budget.py unveraendert (gleiche Parameter, gleiche Funktionen) und
-waehlt die Kombination SoC/Zelle je Konzept aus; zusaetzlich die Sensitivitaet "Puffer 2 x 100 uF
-mit Datenblatt-Leckgrenze" (Konzepte A/B bestuecken 2 x 100 uF).
+Teil 1 nutzt die Funktionen von scripts/energy_budget.py unveraendert und setzt je Konzept nur die
+Board-, Puffer- und Koexistenzparameter (Klasse Patch, v0.2 nach Pruefrunde 1).
 Teil 2 rechnet die Variante C-WLAN (ESP32-C3 mit WLAN im Sensor, gleicher LiPo-Pfad).
 
 Quellen Teil 2 (lokal):
@@ -21,49 +20,88 @@ import energy_budget as eb  # noqa: E402
 
 DAY = eb.DAY
 
+# ---------------------------------------------------------------------------------------------
+# Konzeptspezifische Parameter v0.2 (Pruefrunde 1, RT W-2 / k-1, S2-W02):
+#  - TMP1075 + I2C-Pull-ups an GPIO geschaltet -> 0 uA im Schlaf (statt Shutdown 0.37 typ / 0.65 max uA,
+#    TI_TMP1075_Datasheet_SBOS854F.pdf S.7)
+#  - Board-Rest: GPIO-Leckstroeme ANNAHME 0.05 real / 0.1 pess (RT 2), Reserve 0.1 pess (ANNAHME)
+#  - Puffer nach REQ-ENE-06 pess.: A/A-32 4 x 100 uF (325 uF noetig, energy_budget.py Tab. 6), B 3 x 100 uF
+#  - Leckgrenze Puffer = Samsung-Katalog (bestuecktes Teil C15008): >= 100 MOhm*uF (= 100 Ohm*F) fuer markierte
+#    Hochkapazitaets-Typen, Samsung_CL31A107MQHNNNE_Catalog_2015-11.pdf S.53 -> 3 uA je 100 uF bei 3 V.
+#    (nach Dauerpruefung S.55: 25 bzw. 12.5 MOhm*uF -> nur als Hinweis)
+# ---------------------------------------------------------------------------------------------
+SAMSUNG_RC = 100.0
+BOARD = (0.05e-6, 0.2e-6)
+MLCC_REAL_PER_100U = 0.05e-6   # ANNAHME wie energy_budget.py
+MLCC_PESSA = 0.5e-6            # ANNAHME pess. A (gesamt, wie v0.1)
+
 CONCEPTS = {
-    "A Knopf: CC2340R5 + CR2450N": ("CC2340R5", "CR2450N (Renata)"),
-    "B Spar: CH592F + CR2032": ("CH592F", "CR2032 (Renata)"),
-    "C Akku: CC2340R5 + LiPo 125 mAh": ("CC2340R5", "LiPo ICP401230UPR 125 mAh"),
+    "A: CC2340 + CR2450N, 4 x 100 uF": ("CC2340R5", "CR2450N (Renata)", 400e-6),
+    "A-32: CC2340 + CR2032, 4 x 100 uF": ("CC2340R5", "CR2032 (Renata)", 400e-6),
+    "A-32: CC2340 + CR2032, 2 x 100 uF": ("CC2340R5", "CR2032 (Renata)", 200e-6),
+    "B: CH592F + CR2032, 3 x 100 uF": ("CH592F", "CR2032 (Renata)", 300e-6),
+    "C: CC2340 + LiPo 125 mAh": ("CC2340R5", "LiPo ICP401230UPR 125 mAh", 22e-6),
 }
 
 
+class Patch:
+    """Setzt globale Parameter von energy_budget.py voruebergehend (Modell selbst unveraendert)."""
+    def __init__(self, cbuf, p_miss=None):
+        self.cbuf, self.p_miss = cbuf, p_miss
+
+    def __enter__(self):
+        self.old = (eb.I_OTHER_REAL, eb.I_OTHER_PESS, eb.I_MLCC_REAL, eb.I_MLCC_PESS, eb.GRM_RC, eb.C_BUF_NOM, eb.P_MISS)
+        eb.I_OTHER_REAL, eb.I_OTHER_PESS = BOARD
+        eb.I_MLCC_REAL = MLCC_REAL_PER_100U * self.cbuf / 100e-6
+        eb.I_MLCC_PESS = MLCC_PESSA
+        eb.GRM_RC, eb.C_BUF_NOM = SAMSUNG_RC, self.cbuf
+        if self.p_miss is not None:
+            eb.P_MISS = self.p_miss
+
+    def __exit__(self, *a):
+        (eb.I_OTHER_REAL, eb.I_OTHER_PESS, eb.I_MLCC_REAL, eb.I_MLCC_PESS, eb.GRM_RC, eb.C_BUF_NOM, eb.P_MISS) = self.old
+
+
+def calc(soc, cell, cbuf, m, case, p_miss=None):
+    s, c = eb.SOCS[soc], eb.CELLS[cell]
+    with Patch(cbuf, p_miss):
+        q, parts = eb.daily(s, m, c, case)
+        months = eb.lifetime_months(c, q, case != "real")
+        reach = eb.reach_interval(m * 60)
+    return q / DAY * 1e6, months, parts, reach
+
+
 def part1():
-    print("## 1 Konzepte A/B/C (Modell energy_budget.py, Standardprofil REQ-ENE-04)\n")
-    print("| Konzept | Reaktionszeit | Mittelstrom real [uA] | Mittelstrom pess. A [uA] | "
-          "Laufzeit real [Monate] | Laufzeit pess. A [Monate] | Schlaf pess. (SoC+Board) [uA] |")
-    print("|---|---|---|---|---|---|---|")
-    for name, (soc, cell) in CONCEPTS.items():
-        s, c = eb.SOCS[soc], eb.CELLS[cell]
+    print("## 1 Konzepte (Modell energy_budget.py, Standardprofil REQ-ENE-04, Parameter v0.2)\n")
+    print("pess. A = REQ-ENE-08 mit Puffer-Leck ANNAHME 0.5 uA (Information REQ-ENE-09, Nachweis am Prototyp); "
+          "**pess. DS** = Puffer-Leck an der Samsung-Datenblattgrenze (Nachweis REQ-ENE-02).\n")
+    print("| Konzept | Reaktionszeit | Mittel real [uA] | Mittel pess. A [uA] | Mittel pess. DS [uA] | "
+          "Laufzeit real [Mt.] | Laufzeit pess. A [Mt.] | **Laufzeit pess. DS [Mt.]** | Schlaf pess. A [uA] |")
+    print("|---|---|---|---|---|---|---|---|---|")
+    for name, (soc, cell, cb) in CONCEPTS.items():
         for m in (1, 2, 5):
-            qr, _ = eb.daily(s, m, c, "real")
-            qp, pp = eb.daily(s, m, c, "pessA")
-            sl = (pp["sleep_soc"] + pp["sleep_board"] + pp["mlcc"] + pp.get("vpol", 0)
-                  + pp.get("li_path", 0)) / DAY * 1e6
-            print(f"| {name} | {m} min | {qr/DAY*1e6:.2f} | {qp/DAY*1e6:.2f} | "
-                  f"{eb.fmt_m(eb.lifetime_months(c, qr, False))} | "
-                  f"**{eb.fmt_m(eb.lifetime_months(c, qp, True))}** | {sl:.2f} |")
+            ir, mr, _, _ = calc(soc, cell, cb, m, "real")
+            ia, ma, pa, _ = calc(soc, cell, cb, m, "pessA")
+            ib, mb, _, _ = calc(soc, cell, cb, m, "pessB")
+            sl = (pa["sleep_soc"] + pa["sleep_board"] + pa["mlcc"] + pa.get("vpol", 0) + pa.get("li_path", 0)) / DAY * 1e6
+            print(f"| {name} | {m} min | {ir:.2f} | {ia:.2f} | {ib:.2f} | {eb.fmt_m(mr)} | {eb.fmt_m(ma)} | "
+                  f"**{eb.fmt_m(mb)}** | {sl:.2f} |")
 
-    print("\n### 1b Sensitivitaet Puffer-Leckstrom (pess. B, Datenblattgrenze 50 Ohm*F), 1 min\n")
-    print("| Konzept | Puffer nominal | Leckgrenze @3 V [uA] | Mittelstrom pess. B [uA] | Laufzeit pess. B [Monate] |")
-    print("|---|---|---|---|---|")
-    orig = eb.C_BUF_NOM
-    try:
-        for name, (soc, cell) in list(CONCEPTS.items())[:2]:
-            for cnom in (100e-6, 200e-6):
-                eb.C_BUF_NOM = cnom
-                s, c = eb.SOCS[soc], eb.CELLS[cell]
-                q, _ = eb.daily(s, 1, c, "pessB")
-                print(f"| {name} | {cnom*1e6:.0f} uF | {3.0/(eb.GRM_RC/cnom)*1e6:.1f} | {q/DAY*1e6:.2f} | "
-                      f"{eb.fmt_m(eb.lifetime_months(c, q, True))} |")
-    finally:
-        eb.C_BUF_NOM = orig
+    print("\n### 1b Sensitivitaet Koexistenz Gateway: 50 % verpasste Advertising-Fenster (P_MISS 0.5), 1 min\n")
+    print("| Konzept | Erreichbarkeitsintervall [s] | Mittel pess. A [uA] | Laufzeit pess. A [Mt.] | "
+          "Mittel pess. DS [uA] | Laufzeit pess. DS [Mt.] |")
+    print("|---|---|---|---|---|---|")
+    for name, (soc, cell, cb) in CONCEPTS.items():
+        ia, ma, _, reach = calc(soc, cell, cb, 1, "pessA", 0.5)
+        ib, mb, _, _ = calc(soc, cell, cb, 1, "pessB", 0.5)
+        print(f"| {name} | {reach:.1f} | {ia:.2f} | {eb.fmt_m(ma)} | {ib:.2f} | {eb.fmt_m(mb)} |")
 
-    print("\n### 1c Budgetanteile pess. A, 1 min (Anteil vor +20 %-Zuschlag)\n")
+    print("\n### 1c Budgetanteile pess. A, 1 min (vor +20 %-Zuschlag)\n")
     print("| Konzept | Schlaf SoC | Board | MLCC | Verpol/Li-Pfad | Erreichbarkeit | Messung | LED | OTA |")
     print("|---|---|---|---|---|---|---|---|---|")
-    for name, (soc, cell) in CONCEPTS.items():
-        tot, p = eb.daily(eb.SOCS[soc], 1, eb.CELLS[cell], "pessA")
+    for name, (soc, cell, cb) in CONCEPTS.items():
+        with Patch(cb):
+            tot, p = eb.daily(eb.SOCS[soc], 1, eb.CELLS[cell], "pessA")
         base = tot / eb.PESS_TOTAL
         f = lambda k: f"{p.get(k, 0)/base*100:.1f} %"  # noqa: E731
         vp = (p.get("vpol", 0) + p.get("li_path", 0)) / base * 100

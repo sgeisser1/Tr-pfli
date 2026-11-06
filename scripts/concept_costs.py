@@ -1,269 +1,282 @@
 #!/usr/bin/env python3
-"""Troepfli - Kostenvergleich der Konzepte A/B/B2/C (Phase 2, docs/concepts/CONCEPTS.md).
+"""Troepfli - Kostenvergleich der Konzepte (Phase 2, docs/concepts/CONCEPTS.md v0.2).
 
 Aufruf:  .venv/bin/python scripts/concept_costs.py            (alle Konzepte, Markdown-Tabellen)
          .venv/bin/python scripts/concept_costs.py --detail   (zusaetzlich Einzelberichte cost_model)
          .venv/bin/python scripts/concept_costs.py --csv      (BOM-CSV nach docs/concepts/bom/ schreiben)
 
-Nutzt scripts/cost_model.py unveraendert (compute/report). Nur Standardbibliothek.
+Kostendefinition D-005 (Projektleiter 2026-11-06), umgesetzt in scripts/cost_model.py:
+  Stueckkosten = alles pro Sensor (Bauteile in der Preisstaffel der Bestellmenge, PCB-Grenzkosten,
+  Loetstellen, Roentgen, Zelle, Gehaeusematerial, Kleinteile, Ausschuss, Reserveboard),
+  Einmalkosten = PCB-Fixanteil, Setup, Schablone, Extended-Gebuehren, Versand, Verzollung ...
+  Vollkosten pro Sensor = Bestellung total / nutzbare Sensoren.
 
-Datenquellen der BOM-Zeilen:
-  - JLC-Teilesuche (API selectSmtComponentList), Abruf 2026-11-06: Basic/Extended, Lager,
-    Stueckpreis in der Staffel mit 20 Stk ("p20"), leastPatchNumber -> moq, lossNumber -> attrition.
-  - LOKAL (CHF inkl. MWST): Zellpreise aus docs/concepts/research_energie.md 1.2/2.1,
-    Gehaeuse/Kleinteile = ANNAHME (unten markiert).
-Loetstellen (joints) = Pinzahl laut Gehaeuse (inkl. Exposed Pad), ANNAHME bis zum Footprint.
+Bauteildaten: docs/concepts/bom/jlc_prices.json (scripts/jlc_price_cache.py, JLC-API, Abruf 2026-11-06):
+  Basic/Preferred/Extended, Preisstaffeln, leastPatchNumber -> moq, lossNumber -> attrition.
+Loetstellen = Pinzahl inkl. Exposed Pad (ANNAHME bis Footprint). Lokale Teile = ANNAHME, siehe unten.
 """
 from __future__ import annotations
 
 import csv
+import json
 import os
 import sys
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
 import cost_model as cm  # noqa: E402
 from cost_model import BomLine as L  # noqa: E402
 
+JLC = json.load(open(os.path.join(HERE, "..", "docs", "concepts", "bom", "jlc_prices.json"), encoding="utf-8"))
+
 # ---------------------------------------------------------------------------------------------
-# ANNAHMEN lokal beschaffter Teile (CHF inkl. MWST)
+# Lokal beschaffte Teile (CHF inkl. MWST). ANNAHME, wo nicht anders vermerkt.
 # ---------------------------------------------------------------------------------------------
-ASA_CHF_PER_G = 0.035      # ANNAHME: ASA-Filament ca. CHF 30-35/kg (Bambu), inkl. Fehldrucke nicht
+ASA_CHF_PER_G = 0.035      # ANNAHME: ASA-Filament ca. CHF 30-35/kg
 SCREW_CHF = 0.10           # ANNAHME: unverlierbare Schraube M2 Edelstahl (REQ-SAF-CC-04)
-SEAL_CHF = 0.15            # ANNAHME: O-Ring/Dichtung Batteriefach bzw. Ladeport (REQ-MECH-13/15)
-POTTING_CHF = 0.40         # ANNAHME: Versiegelung Sonde/Dichtlinie (Epoxid/Coating, REQ-MECH-07)
-CR2450N_CHF = 4.10         # research_energie.md 1.2: CHF 3.70-4.50 (Mitte), Renata CR2450N
-CR2032_CHF = 2.65          # research_energie.md 1.2: CHF 2.65-3.00 (unterer Wert, ab 2 Stk), Renata CR2032
+INSERT_CHF = 0.10          # ANNAHME: Gewinde-Einschmelzmutter M2 (RT W-5)
+SEAL_CHF = 0.15            # ANNAHME: je Dichtung; 2 Dichtungen (Batteriefach + Sonde, REQ-SAF-05; RT W-5)
+POTTING_CHF = 0.40         # ANNAHME: Versiegelung Sonde/Dichtlinie (REQ-MECH-07)
+EPOXY_2L_CHF = 0.60        # ANNAHME: Epoxid-Tauchbeschichtung Sonde 2 Lagen (Acryl ungeeignet, RT W-5)
+AMS_PURGE_G = 4            # ANNAHME: Spuelabfall AMS fuer Logo, g ASA pro Sensor (RT W-5)
+CR2450N_CHF = 4.10         # research_energie.md 1.2: Renata CR2450N CHF 3.70-4.50 (Mitte)
+CR2032_RENATA_CHF = 2.65   # research_energie.md 1.2: Renata CR2032 CHF 2.65-3.00
+CR2032_PANA_CHF = 1.38     # Panasonic CR2032, galaxus.ch 2er-Pack CHF 1.38/Stk (Suchergebnis 2026-11-06;
+                           # 6er 0.54, 48er/120er 0.61 CHF/Stk) -> konservativ 1.38, vor Bestellung pruefen
 LIPO_CHF = 6.00            # research_energie.md 2.1: ANNAHME CHF 4-8 (Mitte), Renata ICP401230UPR
-COAT_2L_CHF = 0.30         # ANNAHME B2: Conformal Coating der Sonde selbst (Spray/Tauchen) pro Sensor
 
 
-def common_ui_prog():
-    """LED, Taster, Programmier-Rueckstromsperre, Strommessbruecke (alle Basic)."""
+def J(lcsc, qty, joints, label, leadless=False):
+    """BOM-Zeile aus dem JLC-Cache."""
+    d = JLC[lcsc]
+    cat = "basic" if d["library"] == "base" else ("preferred" if d["preferred"] else "extended")
+    tiers = tuple((int(a), float(b)) for a, b in d["tiers"])
+    p20 = cm.part_price(L("x", 1, tiers=tiers), 20)
+    return L(f"{label} {d['model']} {lcsc}", qty, p20, 0, cat, True, joints, max(1, int(d["least"])),
+             int(d["loss"]), "JLC", tiers, leadless)
+
+
+def LOK(label, chf):
+    return L(label, 1, 0, chf, "none", False, 0, 1, 0, "LOKAL")
+
+
+def merge(bom):
+    """Gleiche LCSC-Nummern zusammenfassen (Pruefbericht Fertigung k-2)."""
+    out, idx = [], {}
+    for b in bom:
+        key = b.part.split()[-1] if b.source == "JLC" else b.part
+        if key in idx and b.source == "JLC":
+            o = out[idx[key]]
+            o.qty_per_board += b.qty_per_board
+        else:
+            idx[key] = len(out)
+            out.append(L(**{**b.__dict__}))
+    return out
+
+
+# ---------------------------------------------------------------------------------------------
+def cc2340_core():
     return [
-        L("LED rot 0603 KT-0603R C2286", 1, 0.0077, 0, "basic", True, 2, 20, 10),
-        L("R 470R 0402 LED C25117", 1, 0.0010, 0, "basic", True, 2, 20, 10),
-        L("Taster 5.1x5.1 TS-1187A C318884", 1, 0.0207, 0, "basic", True, 4, 5, 8),
-        L("Diode 1N4148WS VPROG C2128", 1, 0.0112, 0, "basic", True, 2, 20, 12),
-        L("R 100R 0402 VPROG C25076", 1, 0.0012, 0, "basic", True, 2, 20, 15),
-        L("R 1k 0402 UART-Serie C11702", 2, 0.0013, 0, "basic", True, 2, 20, 10),
-        L("R 0R 0402 Strommessbruecke C17168", 1, 0.0011, 0, "basic", True, 2, 20, 10),
+        J("C20416850", 1, 25, "SoC", leadless=True),
+        J("C2925606", 1, 4, "Quarz 48 MHz 8 pF"),
+        J("C99010", 1, 2, "Quarz 32.768 kHz 9 pF"),
+        J("C89132", 1, 2, "L 10uH DCDC"),
+        J("C15525", 2, 2, "C 10uF VDDR/VDDS"),
+        J("C1525", 7, 2, "C 100nF Abblock (VDDS x3, VDDR, TMP, OSZ, Reserve)"),
+        J("C52923", 1, 2, "C 1uF VDDD"),
+        J("C25741", 1, 2, "R 100k nRST-Pull-up"),
+        J("C27123", 1, 2, "L 2.7nH LC-Filter"),
+        J("C1552", 2, 2, "C 1.5pF LC-Filter"),
+        J("C1548", 1, 2, "C 15pF DC-Block"),
+        J("C17168", 1, 2, "R 0R Pi-Netz"),
     ]
 
 
-def cc2340_core(rf_full=False):
-    b = [
-        L("SoC CC2340R52E0RGER C20416850", 1, 1.3375, 0, "extended", True, 25, 1, 0),
-        L("Quarz 48 MHz XXHCELNANF C5160139", 1, 0.1430, 0, "extended", True, 4, 5, 2),
-        L("Quarz 32.768 kHz 9 pF Q13FC13500003 C99010", 1, 0.2040, 0, "extended", True, 2, 5, 2),
-        L("L 10uH 0806 DCDC WPN201610H100MT C89132", 1, 0.0418, 0, "extended", True, 2, 5, 4),
-        L("C 10uF 0402 CL05A106MQ5NUNC C15525", 2, 0.0258, 0, "basic", True, 2, 20, 10),
-        L("C 100nF 0402 CL05B104KO5NNNC C1525", 7, 0.0031, 0, "basic", True, 2, 20, 10),
-        L("C 1uF 0402 CL05A105KA5NQNC C52923", 1, 0.0058, 0, "basic", True, 2, 20, 12),
-        L("R 100k 0402 nRST C25741", 1, 0.0013, 0, "basic", True, 2, 20, 12),
-        # HF: LC-Filter nach TI-Referenz (SWRA834A S.5 Abb. 3-1: 2.8 nH -> 2.7 nH 0402, 2 x 1.5 pF, 15 pF)
-        L("L 2.7nH 0402 SDCL1005C2N7STDF C27123", 1, 0.0031, 0, "extended", True, 2, 20, 10),
-        L("C 1.5pF 0402 C0G 0402CG1R5C500NT C1552", 2, 0.0045, 0, "extended", True, 2, 20, 10),
-        L("C 15pF 0402 C0G 0402CG150J500NT C1548", 1, 0.0026, 0, "basic", True, 2, 20, 10),
-        # Pi-Netz: Bestueckung 0R (Basic), Querglieder DNM, Abstimmung am Prototyp
-        L("R 0R 0402 Pi-Netz C17168", 1, 0.0011, 0, "basic", True, 2, 20, 10),
+def messkette():
+    """RT K-1: Oszillator 2-8 MHz, Speisung High-Drive-GPIO, C-Umschaltung per GPIO (kein Analogschalter)."""
+    return [
+        J("C35740", 1, 5, "Oszillator Schmitt-Inverter"),
+        J("C25900", 1, 2, "R 4.7k Oszillator-Rueckkopplung"),
+        J("C1555", 1, 2, "C 22pF C0G Cref1 (Steigung)"),
+        J("C1546", 1, 2, "C 100pF C0G Cref2 (f2, Salzdiagnose)"),
     ]
-    if rf_full:
-        b += [L("L 2nH 0402 SDCL1005C2N0STDF C43365", 1, 0.0062, 0, "extended", True, 2, 20, 10),
-              L("C 1.2pF 0402 0402CG1R2C500NT C1551", 1, 0.0049, 0, "extended", True, 2, 20, 10)]
-    return b
 
 
 def tmp1075():
+    """RT W-2/k-4: TMP1075 + I2C-Pull-ups an einem GPIO (0 uA im Schlaf)."""
+    return [J("C2870250", 1, 9, "Temp TMP1075", leadless=True), J("C25900", 2, 2, "R 4.7k I2C-Pull-up")]
+
+
+def ui_prog(lines=4):
+    """S2-K01: keine VPROG-Leitung, keine Messbruecke, kein nRST-Pad; Pads RX, TX, SWDIO, SWDCK je 2 x 100 kOhm."""
     return [
-        L("Temp TMP1075DSGR C2870250", 1, 0.3111, 0, "extended", True, 9, 1, 0),
-        L("R 4.7k 0402 I2C-Pull-up C25900", 2, 0.0017, 0, "basic", True, 2, 20, 10),
+        J("C2286", 1, 2, "LED rot"), J("C25117", 1, 2, "R 470R LED"),
+        J("C318884", 1, 4, "Taster"),
+        J("C25741", 2 * lines, 2, "R 100k Pad-Serie (2 je Leitung)"),
     ]
 
 
 def housing(grams):
     return [
-        L(f"Gehaeuse ASA {grams} g (ANNAHME {ASA_CHF_PER_G} CHF/g)", 1, 0, grams * ASA_CHF_PER_G, "none", False,
-          0, 1, 0, "LOKAL"),
-        L("Dichtung/O-Ring (ANNAHME)", 1, 0, SEAL_CHF, "none", False, 0, 1, 0, "LOKAL"),
-        L("Versiegelung Sonde (ANNAHME)", 1, 0, POTTING_CHF, "none", False, 0, 1, 0, "LOKAL"),
+        LOK(f"Gehaeuse ASA {grams} g + {AMS_PURGE_G} g AMS-Spuelung (ANNAHME)", (grams + AMS_PURGE_G) * ASA_CHF_PER_G),
+        LOK("2 Dichtungen (ANNAHME)", 2 * SEAL_CHF),
+        LOK("Versiegelung Sonde (ANNAHME)", POTTING_CHF),
+        LOK("Schraube unverlierbar + Gewindeeinsatz (ANNAHME)", SCREW_CHF + INSERT_CHF),
     ]
 
 
-# ---------------------------------------------------------------------------------------------
-# Konzept A "Knopf": CC2340R52 + LVC1G14-Oszillator + TMP1075 + CR2450N
-# ---------------------------------------------------------------------------------------------
-BOM_A = cc2340_core() + [
-    L("Oszillator SN74LVC1G14DCKR C35740", 1, 0.0567, 0, "extended", True, 5, 5, 4),
-    L("R 2.2k 0402 Oszillator f1 C25879", 1, 0.0011, 0, "basic", True, 2, 20, 10),
-    L("R 22k 0402 Oszillator f2 C25768", 1, 0.0012, 0, "basic", True, 2, 20, 10),
-    L("C 22pF 0402 C0G Referenz C1555", 1, 0.0019, 0, "basic", True, 2, 20, 10),
+BOM_A = merge(cc2340_core() + messkette() + tmp1075() + [
+    J("C964809", 1, 2, "Halter CR2450"),
+    J("C15127", 1, 3, "P-FET Verpolschutz"),
+    J("C15008", 4, 2, "C 100uF Puffer (REQ-ENE-06 pess.)"),
+] + ui_prog() + [LOK("Zelle Renata CR2450N", CR2450N_CHF)] + housing(15))
+
+BOM_A32 = merge(cc2340_core() + messkette() + tmp1075() + [
+    J("C5213768", 1, 3, "Halter CR2032 Keystone 3034 (Minuspol = ENIG-Pad)"),
+    J("C15127", 1, 3, "P-FET Verpolschutz"),
+    J("C15008", 4, 2, "C 100uF Puffer (REQ-ENE-06 pess.)"),
+] + ui_prog() + [LOK("Zelle Panasonic CR2032", CR2032_PANA_CHF)] + housing(11))
+
+BOM_A2 = merge(BOM_A + [LOK("Epoxid-Tauchbeschichtung Sonde 2 L (ANNAHME)", EPOXY_2L_CHF)])
+
+BOM_B = merge([
+    J("C39831287", 1, 29, "SoC", leadless=True),
+    J("C9009", 1, 4, "Quarz 32 MHz"),
+    J("C32346", 1, 2, "Quarz 32.768 kHz 12.5 pF"),
+    J("C89132", 1, 2, "L 10uH DC-DC"),
+    J("C23733", 1, 2, "C 4.7uF VDCID"),
+    J("C15525", 1, 2, "C 10uF"),
+    J("C1525", 5, 2, "C 100nF"),
+    J("C17168", 1, 2, "R 0R Pi-Netz"),
 ] + tmp1075() + [
-    L("Halter CR2450 BS-24-B4AA016 C964809", 1, 0.4748, 0, "extended", True, 2, 2, 0),
-    L("P-MOSFET Verpolschutz AO3401A C15127", 1, 0.0829, 0, "basic", True, 3, 5, 4),
-    L("C 100uF 1206 Puffer CL31A107MQHNNNE C15008", 2, 0.1091, 0, "basic", True, 2, 5, 4),
-] + common_ui_prog() + [
-    L("Zelle Renata CR2450N (lokal)", 1, 0, CR2450N_CHF, "none", False, 0, 1, 0, "LOKAL"),
-    L("Schraube unverlierbar (ANNAHME)", 1, 0, SCREW_CHF, "none", False, 0, 1, 0, "LOKAL"),
-] + housing(15)
+    J("C70377", 1, 2, "Halter CR2032"),
+    J("C15127", 1, 3, "P-FET Verpolschutz"),
+    J("C15008", 3, 2, "C 100uF Puffer (245 uF pess.)"),
+] + ui_prog() + [LOK("Zelle Renata CR2032", CR2032_RENATA_CHF)] + housing(10))
 
-# ---------------------------------------------------------------------------------------------
-# Konzept B "Spar": CH592F + Touch-Key (LVC1G14 als DNM-Rueckfall) + TMP1075 + CR2032
-# ---------------------------------------------------------------------------------------------
-BOM_B = [
-    L("SoC CH592F C39831287", 1, 0.6696, 0, "extended", True, 29, 1, 0),
-    L("Quarz 32 MHz X322532MOB4SI C9009", 1, 0.0957, 0, "extended", True, 4, 5, 4),
-    L("Quarz 32.768 kHz 12.5 pF Q13FC13500004 C32346", 1, 0.1715, 0, "basic", True, 2, 5, 1),
-    L("L 10uH 0806 DC-DC WPN201610H100MT C89132", 1, 0.0418, 0, "extended", True, 2, 5, 4),
-    L("C 4.7uF 0402 VDCID CL05A475MP5NRNC C23733", 1, 0.0118, 0, "basic", True, 2, 20, 10),
-    L("C 10uF 0402 CL05A106MQ5NUNC C15525", 1, 0.0258, 0, "basic", True, 2, 20, 10),
-    L("C 100nF 0402 CL05B104KO5NNNC C1525", 5, 0.0031, 0, "basic", True, 2, 20, 10),
-    L("R 0R 0402 Pi-Netz C17168", 1, 0.0011, 0, "basic", True, 2, 20, 10),
+BOM_C = merge(cc2340_core() + [
+    J("C968585", 1, 13, "CDC FDC2212", leadless=True),
+    J("C1035", 2, 2, "L 10uH LC-Tank"),
+    J("C1555", 2, 2, "C 22pF LC-Tank"),
 ] + tmp1075() + [
-    L("Halter CR2032 CR2032-BS-6-1 C70377", 1, 0.1420, 0, "extended", True, 2, 5, 1),
-    L("P-MOSFET Verpolschutz AO3401A C15127", 1, 0.0829, 0, "basic", True, 3, 5, 4),
-    L("C 100uF 1206 Puffer CL31A107MQHNNNE C15008", 2, 0.1091, 0, "basic", True, 2, 5, 4),
-] + common_ui_prog() + [
-    L("Zelle Renata CR2032 (lokal)", 1, 0, CR2032_CHF, "none", False, 0, 1, 0, "LOKAL"),
-    L("Schraube unverlierbar (ANNAHME)", 1, 0, SCREW_CHF, "none", False, 0, 1, 0, "LOKAL"),
-] + housing(10)
+    J("C202311", 1, 6, "Lader"), J("C25744", 1, 2, "R 10k ISET"),
+    J("C77131", 1, 2, "NTC 10k"), J("C27001", 1, 2, "R 237k TS"),
+    J("C52923", 4, 2, "C 1uF IN/OUT"),
+    J("C183096", 1, 7, "Schutz-IC", leadless=True), J("C908265", 1, 6, "Doppel-N-FET"),
+    J("C25117", 1, 2, "R 470R Schutz-IC"), J("C25879", 1, 2, "R 2.2k Schutz-IC"),
+    J("C15127", 2, 3, "P-FET Verpol + Teiler"),
+    J("C3747031", 1, 5, "LDO 3.0 V"), J("C456012", 1, 10, "USB-C"), J("C25905", 2, 2, "R 5.1k CC"),
+    J("C2984676", 1, 2, "PPTC"), J("C148209", 1, 2, "TVS"),
+    J("C26083", 2, 2, "R 1M Teiler"), J("C8545", 1, 3, "N-FET Teiler"),
+] + ui_prog() + [
+    LOK("Akku Renata ICP401230UPR (ANNAHME Preis)", LIPO_CHF),
+    LOK("Waermeschutz Zelle + Klebepad (ANNAHME)", 0.30),
+    LOK("Abdeckung Ladeport TPU (ANNAHME)", 0.05),
+] + housing(14))
 
-# B2: wie B, 2 Lagen, Sonde selbst beschichtet (Elektroden aussen, Coating statt Prepreg)
-BOM_B2 = BOM_B + [L("Coating Sonde 2 Lagen (ANNAHME, selbst)", 1, 0, COAT_2L_CHF, "none", False, 0, 1, 0, "LOKAL")]
+LCSC_ALL = {b.part.split()[-1] for bom in (BOM_A, BOM_A32, BOM_B, BOM_C) for b in bom if b.source == "JLC"}
 
-# A2: wie A, 2 Lagen, Sonde selbst beschichtet (Vergleich 2 vs. 4 Lagen)
-BOM_A2 = BOM_A + [L("Coating Sonde 2 Lagen (ANNAHME, selbst)", 1, 0, COAT_2L_CHF, "none", False, 0, 1, 0, "LOKAL")]
-
-# Option: RC-Oszillator in B bestueckt (Rueckfall falls Touch-Key nicht genuegt)
-BOM_B_OSC = BOM_B + [
-    L("Oszillator SN74LVC1G14DCKR C35740", 1, 0.0567, 0, "extended", True, 5, 5, 4),
-    L("R 2.2k 0402 Oszillator f1 C25879", 1, 0.0011, 0, "basic", True, 2, 20, 10),
-    L("C 22pF 0402 C0G Referenz C1555", 1, 0.0019, 0, "basic", True, 2, 20, 10),
-]
-
-# ---------------------------------------------------------------------------------------------
-# Konzept C "Akku": CC2340R52 + FDC2212 + TMP1075 + LiPo 125 mAh + BQ21040 + BQ29700 + TPS7A02
-# ---------------------------------------------------------------------------------------------
-BOM_C = cc2340_core() + [
-    L("CDC FDC2212DNTR C968585", 1, 6.0244, 0, "extended", True, 13, 1, 0),
-    L("L 10uH 0603 LC-Tank SDFL1608S100KTF C1035", 2, 0.0279, 0, "basic", True, 2, 20, 10),
-    L("C 22pF 0402 C0G LC-Tank C1555", 2, 0.0019, 0, "basic", True, 2, 20, 10),
-] + tmp1075() + [
-    L("Lader BQ21040DBVR C202311", 1, 0.4137, 0, "extended", True, 6, 5, 0),
-    L("R 10k 0402 ISET C25744", 1, 0.0028, 0, "basic", True, 2, 20, 15),
-    L("NTC 10k NCP15XH103F03RC C77131", 1, 0.0167, 0, "extended", True, 2, 20, 12),
-    L("R 237k 0402 TS C27001", 1, 0.0032, 0, "extended", True, 2, 20, 10),
-    L("C 1uF 0402 25V IN/OUT CL05A105KA5NQNC C52923", 4, 0.0058, 0, "basic", True, 2, 20, 12),
-    L("Schutz-IC BQ29700DSER C183096", 1, 0.4142, 0, "extended", True, 7, 5, 0),
-    L("Doppel-N-FET FS8205A C908265", 1, 0.0718, 0, "extended", True, 6, 5, 4),
-    L("R 470R 0402 Schutz-IC VDD C25117", 1, 0.0010, 0, "basic", True, 2, 20, 10),
-    L("R 2.2k 0402 Schutz-IC V- C25879", 1, 0.0011, 0, "basic", True, 2, 20, 10),
-    L("P-MOSFET Verpolschutz AO3401A C15127", 1, 0.0829, 0, "basic", True, 3, 5, 4),
-    L("LDO 3.0 V TPS7A0230PDBVR C3747031", 1, 0.2800, 0, "extended", True, 5, 1, 0),
-    L("USB-C 6P SHOU HAN C456012", 1, 0.0390, 0, "extended", True, 10, 1, 2),
-    L("R 5.1k 0402 CC C25905", 2, 0.0023, 0, "basic", True, 2, 20, 15),
-    L("PPTC 500 mA 24 V C2984676", 1, 0.0901, 0, "extended", True, 2, 5, 2),
-    L("TVS SMAJ20A C148209", 1, 0.1038, 0, "extended", True, 2, 5, 2),
-    L("Teiler Batteriespannung R 1M 0402 C26083", 2, 0.0012, 0, "basic", True, 2, 20, 15),
-    L("Teiler-Schalter P-FET AO3401A C15127", 1, 0.0829, 0, "basic", True, 3, 5, 4),
-    L("Teiler-Schalter N-FET 2N7002 C8545", 1, 0.0171, 0, "basic", True, 3, 10, 8),
-] + common_ui_prog() + [
-    L("Akku Renata ICP401230UPR 125 mAh (ANNAHME Preis)", 1, 0, LIPO_CHF, "none", False, 0, 1, 0, "LOKAL"),
-    L("Waermeschutz Zelle + Klebepad (ANNAHME)", 1, 0, 0.30, "none", False, 0, 1, 0, "LOKAL"),
-    L("Abdeckung Ladeport TPU (ANNAHME)", 1, 0, 0.05, "none", False, 0, 1, 0, "LOKAL"),
-] + housing(14)
-
+# (BOM, Lagen, ENIG)
 CONCEPTS = {
-    "A Knopf (4L)": (BOM_A, 4),
-    "A2 Knopf (2L+Coating)": (BOM_A2, 2),
-    "B Spar (4L)": (BOM_B, 4),
-    "B2 Spar (2L+Coating)": (BOM_B2, 2),
-    "B+Osz. (4L, Rueckfall bestueckt)": (BOM_B_OSC, 4),
-    "C Akku (4L)": (BOM_C, 4),
+    "A (CR2450N, 4 L)": (BOM_A, 4, False),
+    "A-32 (Panasonic CR2032, 4 L, ENIG)": (BOM_A32, 4, True),
+    "A2 (CR2450N, 2 L + Epoxid)": (BOM_A2, 2, False),
+    "B (CH592F, 4 L)": (BOM_B, 4, False),
+    "C (Akku, 4 L)": (BOM_C, 4, False),
 }
 
 SCEN = {
-    "Prototyp 5 PCB / 2 bestueckt": dict(pcb_qty=5, pcba_qty=2),
-    "Prototyp 5 PCB / 5 bestueckt": dict(pcb_qty=5, pcba_qty=5),
-    "Serie 15 / 15": dict(pcb_qty=15, pcba_qty=15),
+    "Prototyp 5 PCB / 2 bestueckt": dict(pcb_qty=5, pcba_qty=2, sensors=2),
+    "Prototyp 5 PCB / 5 bestueckt": dict(pcb_qty=5, pcba_qty=5, sensors=5),
+    "Serie 20 PCB / 16 bestueckt / 15 Sensoren": dict(pcb_qty=20, pcba_qty=16, sensors=15),
 }
 
 
+def run(bom, layers, enig=False, **kw):
+    return cm.compute(bom, layers, 1.6, enig=enig, **kw)
+
+
 def summarize(bom):
-    ext = sorted({b.part for b in bom if b.jlc_assembled and b.category == "extended"})
-    basic = sorted({b.part for b in bom if b.jlc_assembled and b.category == "basic"})
-    comp = sum(b.qty_per_board * b.unit_price_usd for b in bom if b.source != "LOKAL")
-    lokal = sum(b.qty_per_board * b.unit_price_chf for b in bom if b.source == "LOKAL")
-    return len(ext), len(basic), comp, lokal
-
-
-def run(bom, layers, scale=1.0, **kw):
-    orig = dict(cm.PCB_PRICE_USD)
-    try:
-        for k in cm.PCB_PRICE_USD:
-            cm.PCB_PRICE_USD[k] = orig[k] * scale
-        return cm.compute(bom, layers, 1.6, **kw)
-    finally:
-        cm.PCB_PRICE_USD.clear()
-        cm.PCB_PRICE_USD.update(orig)
+    ext = [b for b in bom if b.jlc_assembled and b.category == "extended"]
+    pref = [b for b in bom if b.jlc_assembled and b.category == "preferred"]
+    basic = [b for b in bom if b.jlc_assembled and b.category == "basic"]
+    lok = sum(b.unit_price_chf for b in bom if b.source == "LOKAL")
+    return len(ext), len(pref), len(basic), lok
 
 
 def write_csv(outdir):
     os.makedirs(outdir, exist_ok=True)
+    names = {"A (CR2450N, 4 L)": "A", "A-32 (Panasonic CR2032, 4 L, ENIG)": "A32", "A2 (CR2450N, 2 L + Epoxid)": "A2",
+             "B (CH592F, 4 L)": "B", "C (Akku, 4 L)": "C"}
+    for old in ("bom_B2.csv", "bom_B_Osz.csv"):
+        p = os.path.join(outdir, old)
+        if os.path.exists(p):
+            os.remove(p)
     fields = ["part", "qty_per_board", "unit_price_usd", "unit_price_chf", "category", "jlc_assembled",
-              "joints", "moq", "attrition", "source"]
-    for name, (bom, _) in CONCEPTS.items():
-        short = name.split()[0].replace("+Osz.", "_Osz")
-        fn = os.path.join(outdir, f"bom_{short}.csv")
+              "joints", "moq", "attrition", "source", "tiers", "leadless"]
+    for name, (bom, _, _) in CONCEPTS.items():
+        fn = os.path.join(outdir, f"bom_{names[name]}.csv")
         with open(fn, "w", newline="", encoding="utf-8") as f:
             w = csv.writer(f, delimiter=";")
             w.writerow(fields)
             for b in bom:
-                w.writerow([b.part, b.qty_per_board, b.unit_price_usd, b.unit_price_chf, b.category,
-                            "ja" if b.jlc_assembled else "nein", b.joints, b.moq, b.attrition, b.source])
-        print("geschrieben:", fn)
+                w.writerow([b.part, b.qty_per_board, b.unit_price_usd, round(b.unit_price_chf, 4), b.category,
+                            "ja" if b.jlc_assembled else "nein", b.joints, b.moq, b.attrition, b.source,
+                            "|".join(f"{a}:{p}" for a, p in b.tiers), "ja" if b.leadless else "nein"])
+        print("geschrieben:", os.path.relpath(fn))
 
 
 def main():
     if "--csv" in sys.argv:
-        write_csv(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "docs", "concepts", "bom"))
+        write_csv(os.path.join(HERE, "..", "docs", "concepts", "bom"))
         return
-    print(f"# Troepfli Konzeptkosten - Ausgabe scripts/concept_costs.py\n")
-    print(f"USD->CHF {cm.USD_TO_CHF:.4f} ({cm.FX_DATE}); PCB-Preise und Versand aus dem JLC-Rechner (Auftraggeber, 2026-11-06); "
-          f"Versand GSDL wenn Warenwert <= 65 USD, sonst DHL; 1.6 mm, PCBA auto.\n")
+    print("# Troepfli Konzeptkosten - Ausgabe scripts/concept_costs.py (Kostendefinition D-005)\n")
+    print(f"USD->CHF {cm.USD_TO_CHF:.4f}; PCB fix/Grenzkosten D-005; Versand GSDL bis 65 USD Warenwert, sonst DHL; "
+          f"1.6 mm, PCBA auto; Roentgen ein; Pre-reflow aus (W-2, siehe Abschnitt 4); "
+          f"JLC-Teiledaten Abruf {JLC['_abruf']}.\n")
     print("## 1 BOM-Uebersicht\n")
-    print("| Konzept | Extended-Typen (JLC) | Basic-Typen | Bauteile JLC USD/Sensor | lokal CHF/Sensor |")
+    print("| Konzept | Extended-Typen | Preferred | Basic | lokal CHF/Sensor (ohne Ausschuss) |")
     print("|---|---|---|---|---|")
-    for name, (bom, layers) in CONCEPTS.items():
-        e, b, comp, lok = summarize(bom)
-        print(f"| {name} | {e} | {b} | {comp:.2f} | {lok:.2f} |")
+    for name, (bom, _, _) in CONCEPTS.items():
+        e, p, b, lok = summarize(bom)
+        print(f"| {name} | {e} | {p} | {b} | {lok:.2f} |")
 
-    print("\n## 2 Stueck- und Einmalkosten (CHF)\n")
-    print("| Konzept | Szenario | PCBA | Stueck CHF | davon PCB-Anteil USD | Einmal CHF | Bestellung total CHF |")
-    print("|---|---|---|---|---|---|---|")
-    for name, (bom, layers) in CONCEPTS.items():
+    print("\n## 2 Stueck-, Einmal- und Vollkosten (CHF)\n")
+    print("| Konzept | Szenario | Versand | Stueck CHF | Einmal CHF | Bestellung total CHF | Vollkosten/Sensor CHF |"
+          " Warenwert USD (GSDL <= 65) | Abgaben CHF (frei <= 5) |")
+    print("|---|---|---|---|---|---|---|---|---|")
+    for name, (bom, layers, enig) in CONCEPTS.items():
         for sn, kw in SCEN.items():
-            r = run(bom, layers, **kw)
-            print(f"| {name} | {sn} | {r['mode']} | **{r['unit_chf']:.2f}** | "
-                  f"{r['unit']['PCB (Anteil pro Platine)']:.2f} | {r['once_chf']:.2f} | {r['total_chf']:.2f} |")
+            r = run(bom, layers, enig, **kw)
+            ww = r["goods_usd"] - r["once"].get(f"Versand {r['ship']}", 0)
+            print(f"| {name} | {sn} | {r['ship']} | **{r['unit_chf']:.2f}** | {r['once_chf']:.2f} | "
+                  f"{r['total_chf']:.2f} | {r['full_chf']:.2f} | {ww:.1f} | {r['vat_chf']:.2f} |")
 
-    print("\n## 3 Vergleich 2 vs. 4 Lagen (gleiche BOM, ohne Coating-Zuschlag), Stueckkosten CHF\n")
-    print("| BOM | Prototyp 5/2 4L | Prototyp 5/2 2L | Serie 15/15 4L | Serie 15/15 2L | Differenz Serie |")
-    print("|---|---|---|---|---|---|")
-    for name, bom in (("A", BOM_A), ("B", BOM_B), ("C", BOM_C)):
-        v = {(l, q): run(bom, l, pcb_qty=q[0], pcba_qty=q[1])["unit_chf"] for l in (4, 2) for q in ((5, 2), (15, 15))}
-        print(f"| {name} | {v[(4,(5,2))]:.2f} | {v[(2,(5,2))]:.2f} | {v[(4,(15,15))]:.2f} | {v[(2,(15,15))]:.2f} | "
-              f"{v[(4,(15,15))]-v[(2,(15,15))]:.2f} |")
+    print("\n## 3 Option Prototyp-Los: zusaetzlich 2-Lagen-Variante A2 (eigene Bestellung)\n")
+    for sn in ("Prototyp 5 PCB / 2 bestueckt", "Prototyp 5 PCB / 5 bestueckt"):
+        r = run(BOM_A2, 2, False, **SCEN[sn])
+        print(f"- A2 {sn}: Bestellung total {r['total_chf']:.2f} CHF (Versand {r['ship']}), "
+              f"Einmal {r['once_chf']:.2f} CHF")
 
-    print("\n## 4 Versandart und Hinweise je Szenario\n")
-    for name, (bom, layers) in CONCEPTS.items():
-        for sn, kw in SCEN.items():
-            r = run(bom, layers, **kw)
-            print(f"- {name} / {sn}: Versand {r['ship']}; " + ("; ".join(r["notes"]) or "-"))
+    print("\n## 4 Offener Posten 'Pre-reflow soldering' (Fertigung W-2): Serie 20/16/15, Stueckkosten CHF\n")
+    print("| Konzept | ohne Pre-reflow | mit 0.016 USD/Loetstelle | Differenz |")
+    print("|---|---|---|---|")
+    for name, (bom, layers, enig) in CONCEPTS.items():
+        a = run(bom, layers, enig, **SCEN["Serie 20 PCB / 16 bestueckt / 15 Sensoren"])["unit_chf"]
+        b = run(bom, layers, enig, pre_reflow=True, **SCEN["Serie 20 PCB / 16 bestueckt / 15 Sensoren"])["unit_chf"]
+        print(f"| {name} | {a:.2f} | {b:.2f} | +{b - a:.2f} |")
+
+    print("\n## 5 Vergleich 2 vs. 4 Lagen (BOM A ohne Coating), Serie 20/16/15\n")
+    r4 = run(BOM_A, 4, False, **SCEN["Serie 20 PCB / 16 bestueckt / 15 Sensoren"])
+    r2 = run(BOM_A, 2, False, **SCEN["Serie 20 PCB / 16 bestueckt / 15 Sensoren"])
+    print(f"| Lagen | Stueck CHF | Einmal CHF | Vollkosten/Sensor CHF |\n|---|---|---|---|\n"
+          f"| 4 L | {r4['unit_chf']:.2f} | {r4['once_chf']:.2f} | {r4['full_chf']:.2f} |\n"
+          f"| 2 L | {r2['unit_chf']:.2f} | {r2['once_chf']:.2f} | {r2['full_chf']:.2f} |")
 
     if "--detail" in sys.argv:
-        for name, (bom, layers) in CONCEPTS.items():
+        for name, (bom, layers, enig) in CONCEPTS.items():
             for sn, kw in SCEN.items():
-                cm.report(run(bom, layers, **kw), f"{name} - {sn}")
+                cm.report(run(bom, layers, enig, **kw), f"{name} - {sn}")
 
 
 if __name__ == "__main__":

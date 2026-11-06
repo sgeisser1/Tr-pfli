@@ -14,14 +14,21 @@ Kennzeichnung:
   [DRITTQUELLE] nicht von JLC/Behoerde, nur Orientierung
   [ANNAHME]    nicht belegt -> vor Bestellung durch Wert aus dem JLC-Online-Rechner ersetzen
 
-Ergebnisse:
-  - Stueckkosten pro bestuecktem Sensor (fuer REQ-FAB-04, ohne Einmalkosten)
-  - Einmalkosten pro Bestellung (fuer REQ-FAB-05)
-  jeweils in USD und CHF.
+Ergebnisse (Kostendefinition D-005, Projektleiter 2026-11-06):
+  - Stueckkosten pro Sensor (REQ-FAB-04): alles, was pro Sensor anfaellt = Bauteile (Preisstaffel der
+    tatsaechlichen Bestellmenge), PCB-Grenzkosten pro Platine, Bestueckung/Loetstellen, Roentgen pro
+    leadless Bauteil, MWST-Anteil, lokale Teile (Zelle, Gehaeusematerial, Kleinteile) inkl. Ausschuss,
+    Reserveboard(s) auf die nutzbaren Sensoren verteilt.
+  - Einmalkosten pro Bestellung (REQ-FAB-05): PCB-Fixanteil, Setup, Schablone, Extended-Gebuehren,
+    Mindestabnahme-Ueberschuss, unbestueckte Reserveplatinen, Versand, MWST-Anteil, Verzollung.
+  - Vollkosten pro Sensor = Bestellung total / Anzahl nutzbare Sensoren.
 
 BOM-CSV-Format (Kopfzeile, Semikolon oder Komma):
   part;qty_per_board;unit_price_usd;unit_price_chf;category;jlc_assembled;joints;moq;attrition;source
-    category      : basic | extended | tht | none   (none = nicht von JLC bestueckt)
+    category      : basic | preferred | extended | tht | none   (none = nicht von JLC bestueckt;
+                    preferred = "Preferred Extended", Economic gebuehrenfrei [JLC prototype-assembly])
+    tiers         : optional, Preisstaffel "start:preis|start:preis" (USD, JLC-API)
+    leadless      : optional ja/nein (QFN/WSON/DFN -> Roentgengebuehr)
     jlc_assembled : ja/nein
     joints        : Loetstellen pro Bauteil (Pins)
     moq           : Mindestabnahme LCSC pro Bestellung (Stueck), Ueberschuss = Einmalkosten
@@ -126,6 +133,19 @@ SURCHARGE_ENIG_USD = {2: 11.9, 4: 11.9}   # 4 L belegt (5 Stk); 2 L [ANNAHME] gl
 SURCHARGE_EPOXY_VIA_USD = {2: 20.3, 4: 20.3}  # 4 L belegt (5 Stk); 2 L [ANNAHME]; [JLC] gratis erst ab 6 Lagen
 SURCHARGE_COLOR_USD = 0.0         # gruen = Standard; andere Farben [ANNAHME] Aufpreis, im Rechner pruefen
 
+# D-005 (Projektleiter 2026-11-06): PCB-Preis linear = Fixanteil pro Bestellung (-> Einmalkosten)
+# + Grenzkosten pro Platine (-> Stueckkosten); lineare Regression ueber 5/10/15/20 Stk der Tabellen oben.
+PCB_FIX_USD = {(2, 1.6): 5.10, (4, 1.6): 30.05, (4, 2.0): 71.05}
+PCB_VAR_USD = {(2, 1.6): 0.358, (4, 1.6): 0.448, (4, 2.0): 0.554}
+# ENIG/Epoxy-Vias als Fixaufschlag pro Bestellung [ANNAHME: Mengenabhaengigkeit nicht abgelesen]
+
+# [JLC] https://jlcpcb.com/help/article/pcb-assembly-price ("Last updated on Oct 22, 2026"), Pruefbericht
+# docs/reviews/phase2_concepts_fertigung.md W-1: "X-ray Inspection (Component Quantity) 1-10 pcs: $1.64/pc,
+# 11-50 pcs: $0.82/pc ..." fuer BGA/QFN/leadless; ueber 50 Stk [ANNAHME] 0.82 USD/Stk (Staffel nicht erfasst).
+XRAY_TIERS = [(1, 1.64), (11, 0.82)]
+# [ANNAHME] Ausschuss lokal beschaffter Teile/Druck (AMS-Spuelung, Fehldrucke) 5 %
+LOCAL_SCRAP = 0.05
+
 # =============================================================================
 # 4) Versand nach CH und Import
 # =============================================================================
@@ -176,6 +196,27 @@ class BomLine:
     moq: int = 1
     attrition: int = 0
     source: str = "JLC"             # JLC | LOKAL
+    tiers: tuple = ()               # ((start_qty, usd), ...) aus JLC-API; leer -> unit_price_usd
+    leadless: bool = False          # Roentgenpflichtig (QFN/WSON/DFN) [JLC W-1]
+
+
+def part_price(b: "BomLine", order_qty: int) -> float:
+    """Stueckpreis in der Staffel der tatsaechlichen Bestellmenge (Pruefbericht Fertigung W-3)."""
+    if not b.tiers:
+        return b.unit_price_usd
+    price = sorted(b.tiers)[0][1]
+    for start, p in sorted(b.tiers):
+        if order_qty >= start:
+            price = p
+    return price
+
+
+def xray_rate(n_total: int) -> float:
+    rate = XRAY_TIERS[0][1]
+    for start, r in XRAY_TIERS:
+        if n_total >= start:
+            rate = r
+    return rate
 
 
 # BEISPIEL-BOM -- NUR ZUR DEMONSTRATION DES SKRIPTS. Keine echten Teile, keine LCSC-Nummern,
@@ -217,6 +258,8 @@ def load_bom(path: str) -> list[BomLine]:
             moq=int(float(r.get("moq") or 1)),
             attrition=int(float(r.get("attrition") or 0)),
             source=(r.get("source") or "JLC").strip().upper(),
+            tiers=tuple((int(a), float(b)) for a, b in (t.split(":") for t in (r.get("tiers") or "").split("|") if t)),
+            leadless=_bool(r.get("leadless", "nein")),
         ))
     return out
 
@@ -263,7 +306,10 @@ def choose_pcba(thickness: float, pcba_qty: int, want: str) -> str:
 def compute(bom: list[BomLine], layers: int, thickness: float, pcb_qty: int, pcba_qty: int,
             ship: str = "GSDL", pcba: str = "auto", enig: bool = False, epoxy_vias: bool = False,
             confirm_placement: bool = True, programming_hours: float = 0.0,
-            coating_cm2_per_side: float = 0.0, coating_sides: int = 0) -> dict:
+            coating_cm2_per_side: float = 0.0, coating_sides: int = 0, sensors: int | None = None,
+            pre_reflow: bool | None = None, xray: bool = True, local_scrap: float = LOCAL_SCRAP) -> dict:
+    sensors = sensors or pcba_qty
+    pre_reflow = APPLY_PRE_REFLOW if pre_reflow is None else pre_reflow
     if pcba_qty < PCBA_MIN_QTY:
         raise ValueError("PCBA-Mindestmenge 2")
     if pcb_qty < pcba_qty:
@@ -279,11 +325,16 @@ def compute(bom: list[BomLine], layers: int, thickness: float, pcb_qty: int, pcb
 
     once, unit = {}, {}  # USD; unit = pro bestuecktem Board
 
-    # --- Leiterplatte
-    pcb_total = pcb_price_usd(layers, thickness, pcb_qty, enig, epoxy_vias)
-    unit["PCB (Anteil pro Platine)"] = pcb_total / pcb_qty
+    # --- Leiterplatte (D-005: Fixanteil -> einmalig, Grenzkosten -> Stueck)
+    key = (layers, 2.0 if thickness > 1.6 + 1e-9 else 1.6)
+    if key not in PCB_FIX_USD:
+        raise ValueError(f"kein PCB-Fix/Grenzkostenwert fuer {key}")
+    pcb_fix = PCB_FIX_USD[key] + (SURCHARGE_ENIG_USD[layers] if enig else 0.0) \
+        + (SURCHARGE_EPOXY_VIA_USD[layers] if epoxy_vias else 0.0) + SURCHARGE_COLOR_USD
+    unit["PCB Grenzkosten pro Platine"] = PCB_VAR_USD[key]
+    once["PCB Fixanteil pro Bestellung (D-005)"] = pcb_fix
     if pcb_qty > pcba_qty:
-        once["PCB unbestueckte Mehrplatinen"] = pcb_total / pcb_qty * (pcb_qty - pcba_qty)
+        once["PCB unbestueckte Reserveplatinen"] = PCB_VAR_USD[key] * (pcb_qty - pcba_qty)
 
     # --- Bauteile (nur JLC-Paket) + Mindestabnahmen
     comp_unit_usd = 0.0
@@ -295,30 +346,37 @@ def compute(bom: list[BomLine], layers: int, thickness: float, pcb_qty: int, pcb
             continue
         need = b.qty_per_board * pcba_qty
         order = max(math.ceil(need) + b.attrition, b.moq)
-        comp_unit_usd += b.qty_per_board * b.unit_price_usd
-        surplus_usd += (order - need) * b.unit_price_usd
+        price = part_price(b, order)
+        comp_unit_usd += b.qty_per_board * price
+        surplus_usd += (order - need) * price
     unit["Bauteile JLC/LCSC"] = comp_unit_usd
     once["Bauteile Mindestabnahme/Verlust-Ueberschuss"] = surplus_usd
 
     # --- Bestueckung
     smt_joints = sum(b.joints * b.qty_per_board for b in bom
-                     if b.jlc_assembled and b.category in ("basic", "extended"))
+                     if b.jlc_assembled and b.category in ("basic", "preferred", "extended"))
     tht_joints = sum(b.joints * b.qty_per_board for b in bom if b.jlc_assembled and b.category == "tht")
     smt_unit = smt_joints * fee["smt_per_joint"]
     if mode == "standard":
         smt_unit = max(smt_unit, fee["single_board_min_smt"])
     unit["SMT-Bestueckung"] = smt_unit
-    if APPLY_PRE_REFLOW:
-        unit["Pre-reflow soldering (unklar)"] = smt_joints * PRE_REFLOW_PER_JOINT
+    if pre_reflow:
+        unit["Pre-reflow soldering (unklar, W-2)"] = smt_joints * PRE_REFLOW_PER_JOINT
+    n_leadless = sum(b.qty_per_board for b in bom if b.jlc_assembled and b.leadless)
+    if xray and n_leadless:
+        unit[f"Roentgen ({n_leadless:g} leadless/Board)"] = n_leadless * xray_rate(int(n_leadless * pcba_qty))
     if tht_joints:
         unit["Handloetung THT"] = tht_joints * fee["manual_per_joint"]
         once["Handloet-Pauschale"] = fee["hand_solder_labor"]
     once["PCBA Setup"] = fee["setup"]
     once["Schablone"] = fee["stencil"]
     types_ext = {b.part for b in bom if b.jlc_assembled and b.category == "extended"}
+    types_pref = {b.part for b in bom if b.jlc_assembled and b.category == "preferred"}
     types_basic = {b.part for b in bom if b.jlc_assembled and b.category in ("basic", "tht")}
-    once[f"Feeder/Extended ({len(types_ext)} ext., {len(types_basic)} basic Typen)"] = (
-        len(types_ext) * fee["feeder_extended"] + len(types_basic) * fee["feeder_basic"])
+    once[f"Feeder/Extended ({len(types_ext)} ext., {len(types_pref)} pref., {len(types_basic)} basic Typen)"] = (
+        len(types_ext) * fee["feeder_extended"]
+        + len(types_pref) * (0.0 if mode == "economic" else fee["feeder_basic"])
+        + len(types_basic) * fee["feeder_basic"])
     if confirm_placement:
         once["Confirm Parts Placement"] = fee["confirm_placement"]
     if mode == "standard":
@@ -365,16 +423,20 @@ def compute(bom: list[BomLine], layers: int, thickness: float, pcb_qty: int, pcb
     vat_unit_chf = abgaben * share_unit / pcba_qty
     vat_once_chf = abgaben * (1 - share_unit)
 
-    unit_chf = unit_usd * fx + vat_unit_chf + lokal_unit_chf
+    board_chf = unit_usd * fx + vat_unit_chf                 # JLC-Anteil pro bestuecktem Board
+    lokal_sensor_chf = lokal_unit_chf * (1 + local_scrap)    # lokale Teile inkl. Ausschuss
+    unit_chf = board_chf * pcba_qty / sensors + lokal_sensor_chf
     once_chf = once_usd * fx + vat_once_chf + carrier_fee
+    total_chf = board_chf * pcba_qty + lokal_sensor_chf * sensors + once_chf
     return {
         "mode": mode, "layers": layers, "thickness": thickness, "pcb_qty": pcb_qty,
         "pcba_qty": pcba_qty, "ship": ship, "unit": unit, "once": once,
         "unit_usd": unit_usd, "once_usd": once_usd, "goods_usd": goods_usd,
         "lokal_unit_chf": lokal_unit_chf, "base_chf": base_chf, "vat_chf": vat,
         "carrier_fee_chf": carrier_fee, "vat_unit_chf": vat_unit_chf, "vat_once_chf": vat_once_chf,
-        "unit_chf": unit_chf, "once_chf": once_chf,
-        "total_chf": unit_chf * pcba_qty + once_chf, "notes": notes,
+        "unit_chf": unit_chf, "once_chf": once_chf, "sensors": sensors, "board_chf": board_chf,
+        "lokal_sensor_chf": lokal_sensor_chf, "full_chf": total_chf / sensors,
+        "total_chf": total_chf, "notes": notes,
         "weight_kg": WEIGHT_PACKAGING_KG + WEIGHT_PER_BOARD_KG * pcb_qty,
     }
 
@@ -382,14 +444,17 @@ def compute(bom: list[BomLine], layers: int, thickness: float, pcb_qty: int, pcb
 def report(r: dict, title: str) -> None:
     print(f"\n=== {title} ===")
     print(f"{r['layers']} Lagen, {r['thickness']} mm, PCB {r['pcb_qty']} Stk, bestueckt {r['pcba_qty']} Stk, "
+          f"nutzbare Sensoren {r['sensors']}, "
           f"PCBA {r['mode']}, Versand {r['ship']}, Gewicht ca. {r['weight_kg']:.2f} kg [ANNAHME]")
-    print("  Stueckkosten pro Sensor (USD):")
+    print("  JLC-Anteil pro bestuecktem Board (USD):")
     for k, v in r["unit"].items():
         print(f"    {k:<52s} {v:8.2f}")
     print(f"    {'Summe JLC-Anteil':<52s} {r['unit_usd']:8.2f} USD")
     print(f"    {'+ MWST-Anteil CH':<52s} {r['vat_unit_chf']:8.2f} CHF")
-    print(f"    {'+ lokal beschaffte Teile':<52s} {r['lokal_unit_chf']:8.2f} CHF")
-    print(f"    {'= STUECKKOSTEN':<52s} {r['unit_chf']:8.2f} CHF")
+    print(f"    {'= JLC-Anteil pro Board':<52s} {r['board_chf']:8.2f} CHF")
+    print(f"    {'x Boards / Sensoren':<52s} {r['pcba_qty']}/{r['sensors']}")
+    print(f"    {'+ lokal beschaffte Teile inkl. Ausschuss':<52s} {r['lokal_sensor_chf']:8.2f} CHF")
+    print(f"    {'= STUECKKOSTEN pro Sensor (D-005)':<52s} {r['unit_chf']:8.2f} CHF")
     print("  Einmalkosten pro Bestellung (USD):")
     for k, v in r["once"].items():
         print(f"    {k:<52s} {v:8.2f}")
@@ -398,7 +463,8 @@ def report(r: dict, title: str) -> None:
     print(f"    {'+ Verzollungsgebuehr Kurier/Post':<52s} {r['carrier_fee_chf']:8.2f} CHF")
     print(f"    {'= EINMALKOSTEN':<52s} {r['once_chf']:8.2f} CHF")
     print(f"  JLC-Rechnung total {r['goods_usd']:.2f} USD = {r['base_chf']:.2f} CHF; "
-          f"MWST {r['vat_chf']:.2f} CHF; Bestellung total {r['total_chf']:.2f} CHF")
+          f"MWST {r['vat_chf']:.2f} CHF; Bestellung total {r['total_chf']:.2f} CHF; "
+          f"VOLLKOSTEN pro Sensor {r['full_chf']:.2f} CHF")
     for n in r["notes"]:
         print("  Hinweis:", n)
 
@@ -432,10 +498,11 @@ def main(argv=None) -> int:
     scen = [
         ("Prototyp 4L 1.6 mm: 5 PCB / 2 bestueckt", dict(layers=4, thickness=1.6, pcb_qty=5, pcba_qty=2)),
         ("Prototyp 4L 1.6 mm: 5 PCB / 5 bestueckt", dict(layers=4, thickness=1.6, pcb_qty=5, pcba_qty=5)),
-        ("Serie 4L 1.6 mm: 15 / 15", dict(layers=4, thickness=1.6, pcb_qty=15, pcba_qty=15)),
-        ("Serie 4L 2.0 mm: 15 / 15 (nur Standard-PCBA)", dict(layers=4, thickness=2.0, pcb_qty=15, pcba_qty=15)),
-        ("Serie 2L 1.6 mm: 15 / 15", dict(layers=2, thickness=1.6, pcb_qty=15, pcba_qty=15)),
-        ("Serie 4L 1.6 mm: 15 / 15, DHL", dict(layers=4, thickness=1.6, pcb_qty=15, pcba_qty=15, ship="DHL")),
+        ("Serie 4L 1.6 mm: 20 PCB / 16 bestueckt / 15 Sensoren",
+         dict(layers=4, thickness=1.6, pcb_qty=20, pcba_qty=16, sensors=15)),
+        ("Serie 4L 2.0 mm: 20/16/15 (nur Standard-PCBA)",
+         dict(layers=4, thickness=2.0, pcb_qty=20, pcba_qty=16, sensors=15)),
+        ("Serie 2L 1.6 mm: 20/16/15", dict(layers=2, thickness=1.6, pcb_qty=20, pcba_qty=16, sensors=15)),
     ]
     rows = []
     for t, kw in scen:
@@ -443,9 +510,10 @@ def main(argv=None) -> int:
         report(r, t)
         rows.append((t, r))
     print("\n=== Uebersicht (CHF) ===")
-    print(f"  {'Szenario':<46s} {'PCBA':>9s} {'Stueck':>8s} {'Einmal':>8s} {'Total':>8s}")
+    print(f"  {'Szenario':<52s} {'PCBA':>9s} {'Stueck':>8s} {'Einmal':>8s} {'Total':>8s} {'Voll':>8s}")
     for t, r in rows:
-        print(f"  {t:<46s} {r['mode']:>9s} {r['unit_chf']:8.2f} {r['once_chf']:8.2f} {r['total_chf']:8.2f}")
+        print(f"  {t:<52s} {r['mode']:>9s} {r['unit_chf']:8.2f} {r['once_chf']:8.2f} {r['total_chf']:8.2f} "
+              f"{r['full_chf']:8.2f}")
     return 0
 
 
