@@ -54,3 +54,14 @@ Format: Nr. · Datum · Entscheid · Alternativen · Begründung · Quelle · St
 - **Ergänzungen bei Freigabe:** LED signalisiert „Giessen nötig“ (REQ-UI-07); öffentlicher NTP für Gateway erlaubt; nur Innenbereich; privates Handy, Zertifikat installierbar; Drucker P1S.
 - **Quelle:** Auftraggeber im Chat 2026-11-06; Prüfberichte `docs/reviews/phase1_*`.
 - **Status:** gültig
+
+### D-005 · 2026-11-06 · Definition Stückkosten (REQ-FAB-04)
+- **Entscheid:** Stückkosten = alle Kosten, die pro Sensor anfallen (Bauteile mit passender Preisstaffel,
+  Grenzkosten der Leiterplatte, Bestückung pro Lötstelle, Energiequelle, Gehäusematerial, Kleinteile,
+  Ausschuss). Der Fixanteil des PCB-Preises pro Bestellung zählt zu den Einmalkosten. Zusätzlich werden
+  Vollkosten pro Sensor (Total / Anzahl) ausgewiesen.
+- **Begründung:** Lineare Aufteilung der vom Auftraggeber abgelesenen JLC-Preise: 2 L 1.6 mm 5.10 USD fix +
+  0.358 USD/Platine; 4 L 1.6 mm 30.05 + 0.448; 4 L 2.0 mm 71.05 + 0.554. Vorher wurde der volle PCB-Preis
+  den Stückkosten zugeschlagen, das Setup der Bestückung aber den Einmalkosten (Red Team K-2, Phase 2).
+- **Alternativen:** voller PCB-Preis in Stückkosten (inkonsistent); nur Vollkosten (vermischt Prototyp-/Serieneffekte).
+- **Status:** gültig, dem Auftraggeber zur Kenntnis
