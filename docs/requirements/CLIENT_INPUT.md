@@ -22,3 +22,13 @@ Ergänzt die ursprüngliche Projektbeschreibung. Gilt als Grundlage für Phase 1
 - **Firmen-WLAN:** Die Firma sieht eigene Geräte im WLAN evtl. nicht gern, **möglich ist es aber
   durchaus.** → Gateway im Firmen-WLAN ist zulässig; Lösungen mit möglichst wenig Eingriff ins
   Firmennetz bevorzugen und Alternativen (z. B. ohne WLAN-Gateway) im Konzept mitbewerten.
+
+## Ergänzungen Phase 2 (2026-11-06)
+- **Firmen-WLAN-Test bestanden:** Geräte im Firmen-WLAN sehen sich gegenseitig. Ein Gateway im
+  Firmen-WLAN ist ok und schnell. Wunsch: nicht zu viele Geräte ins Netz → nur das Gateway im WLAN,
+  Sensoren ausschliesslich über BLE.
+- **JLC-Preise** (Rechner, 22 × 150 mm, grün, LeadFree HASL, abgelesen vom Auftraggeber), USD gesamt für 5/10/15/20 Stk:
+  2 L 1.6 mm 6.9/8.7/10.4/12.3 · 4 L 1.6 mm 32.3/34.5/36.8/39.0 · 4 L 2.0 mm 73.8/76.6/79.4/82.1 ·
+  4 L 1.6 mm 5 Stk ENIG 44.2, ENIG + Epoxy filled & capped 64.5.
+- **Versand CH** (JLC): DHL Express 23.44 USD, UPS 25.36, FedEx 31.15, Global Standard Direct Line 7.63 USD
+  (10–12 Tage, max. 1.5 kg und Warenwert ≤ 65 USD).
