@@ -130,6 +130,9 @@ BOM_B = [
 # B2: wie B, 2 Lagen, Sonde selbst beschichtet (Elektroden aussen, Coating statt Prepreg)
 BOM_B2 = BOM_B + [L("Coating Sonde 2 Lagen (ANNAHME, selbst)", 1, 0, COAT_2L_CHF, "none", False, 0, 1, 0, "LOKAL")]
 
+# A2: wie A, 2 Lagen, Sonde selbst beschichtet (Vergleich 2 vs. 4 Lagen)
+BOM_A2 = BOM_A + [L("Coating Sonde 2 Lagen (ANNAHME, selbst)", 1, 0, COAT_2L_CHF, "none", False, 0, 1, 0, "LOKAL")]
+
 # Option: RC-Oszillator in B bestueckt (Rueckfall falls Touch-Key nicht genuegt)
 BOM_B_OSC = BOM_B + [
     L("Oszillator SN74LVC1G14DCKR C35740", 1, 0.0567, 0, "extended", True, 5, 5, 4),
@@ -171,6 +174,7 @@ BOM_C = cc2340_core() + [
 
 CONCEPTS = {
     "A Knopf (4L)": (BOM_A, 4),
+    "A2 Knopf (2L+Coating)": (BOM_A2, 2),
     "B Spar (4L)": (BOM_B, 4),
     "B2 Spar (2L+Coating)": (BOM_B2, 2),
     "B+Osz. (4L, Rueckfall bestueckt)": (BOM_B_OSC, 4),
@@ -224,8 +228,8 @@ def main():
         write_csv(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "docs", "concepts", "bom"))
         return
     print(f"# Troepfli Konzeptkosten - Ausgabe scripts/concept_costs.py\n")
-    print(f"USD->CHF {cm.USD_TO_CHF:.4f} ({cm.FX_DATE}); PCB-Preise und Versand = ANNAHME aus cost_model.py; "
-          f"Versand GSDL, 1.6 mm, PCBA auto.\n")
+    print(f"USD->CHF {cm.USD_TO_CHF:.4f} ({cm.FX_DATE}); PCB-Preise und Versand aus dem JLC-Rechner (Auftraggeber, 2026-11-06); "
+          f"Versand GSDL wenn Warenwert <= 65 USD, sonst DHL; 1.6 mm, PCBA auto.\n")
     print("## 1 BOM-Uebersicht\n")
     print("| Konzept | Extended-Typen (JLC) | Basic-Typen | Bauteile JLC USD/Sensor | lokal CHF/Sensor |")
     print("|---|---|---|---|---|")
@@ -242,19 +246,19 @@ def main():
             print(f"| {name} | {sn} | {r['mode']} | **{r['unit_chf']:.2f}** | "
                   f"{r['unit']['PCB (Anteil pro Platine)']:.2f} | {r['once_chf']:.2f} | {r['total_chf']:.2f} |")
 
-    print("\n## 3 Sensitivitaet PCB-Grundpreis (ANNAHME x0.5 / x1.0 / x1.5), Serie 15/15, Stueckkosten CHF\n")
-    print("| Konzept | PCB x0.5 | PCB x1.0 | PCB x1.5 | REQ-FAB-04 (<= 10 CHF) bei x1.5 |")
-    print("|---|---|---|---|---|")
-    for name, (bom, layers) in CONCEPTS.items():
-        v = [run(bom, layers, s, pcb_qty=15, pcba_qty=15)["unit_chf"] for s in (0.5, 1.0, 1.5)]
-        print(f"| {name} | {v[0]:.2f} | {v[1]:.2f} | {v[2]:.2f} | {'erfuellt' if v[2] <= 10 else 'verfehlt'} |")
+    print("\n## 3 Vergleich 2 vs. 4 Lagen (gleiche BOM, ohne Coating-Zuschlag), Stueckkosten CHF\n")
+    print("| BOM | Prototyp 5/2 4L | Prototyp 5/2 2L | Serie 15/15 4L | Serie 15/15 2L | Differenz Serie |")
+    print("|---|---|---|---|---|---|")
+    for name, bom in (("A", BOM_A), ("B", BOM_B), ("C", BOM_C)):
+        v = {(l, q): run(bom, l, pcb_qty=q[0], pcba_qty=q[1])["unit_chf"] for l in (4, 2) for q in ((5, 2), (15, 15))}
+        print(f"| {name} | {v[(4,(5,2))]:.2f} | {v[(2,(5,2))]:.2f} | {v[(4,(15,15))]:.2f} | {v[(2,(15,15))]:.2f} | "
+              f"{v[(4,(15,15))]-v[(2,(15,15))]:.2f} |")
 
-    print("\n## 4 Sensitivitaet Prototyp 5/2: Einmalkosten CHF bei PCB x0.5 / x1.5\n")
-    print("| Konzept | Einmal x0.5 | Einmal x1.0 | Einmal x1.5 |")
-    print("|---|---|---|---|")
+    print("\n## 4 Versandart und Hinweise je Szenario\n")
     for name, (bom, layers) in CONCEPTS.items():
-        v = [run(bom, layers, s, pcb_qty=5, pcba_qty=2)["once_chf"] for s in (0.5, 1.0, 1.5)]
-        print(f"| {name} | {v[0]:.2f} | {v[1]:.2f} | {v[2]:.2f} |")
+        for sn, kw in SCEN.items():
+            r = run(bom, layers, **kw)
+            print(f"- {name} / {sn}: Versand {r['ship']}; " + ("; ".join(r["notes"]) or "-"))
 
     if "--detail" in sys.argv:
         for name, (bom, layers) in CONCEPTS.items():

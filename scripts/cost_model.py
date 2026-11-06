@@ -106,30 +106,38 @@ COAT_PER_CM2 = 0.0048           # pro beschichteter Seite
 # =============================================================================
 # 3) JLCPCB Leiterplatte (Fertigung)
 # =============================================================================
-# Der JLC-Online-Rechner (cart.jlcpcb.com/quote) ist nicht oeffentlich dokumentiert/skriptbar.
-# Die folgenden Preise sind [ANNAHME] fuer ca. 22 x 150 mm, FR-4, gruen, HASL bleifrei, 1 oz,
-# Standard-Stackup, ohne Spezialoptionen. Belegt ist nur: Promo "$2 / 5 pcs" gilt nur bis
-# 100 x 100 mm (2 Lagen) [JLC https://jlcpcb.com/help/article/7-pcb-fabrication-services-and-production-time]
-# -> 150 mm Laenge faellt NICHT in den Promo-Preis. MUSS vor Bestellung im Rechner abgelesen werden.
+# Der JLC-Online-Rechner (cart.jlcpcb.com/quote) ist nicht skriptbar. Die Preise unten hat der
+# Auftraggeber am 2026-11-06 im Rechner abgelesen (22 x 150 mm, FR-4, gruen, LeadFree HASL, 1 oz,
+# Standardoptionen). Promo "$2 / 5 pcs" gilt nur bis 100 x 100 mm [JLC] und ist nicht enthalten.
 BOARD_W_MM = 22.0   # [ANNAHME] Kontur
 BOARD_L_MM = 150.0  # [ANNAHME] Kontur
-PCB_PRICE_USD = {   # (Lagen, Stueck) -> USD fuer 1.6 mm      [ANNAHME, ersetzen!]
-    (2, 5): 7.0, (2, 10): 9.0, (2, 15): 11.0, (2, 20): 13.0,
-    (4, 5): 15.0, (4, 10): 20.0, (4, 15): 25.0, (4, 20): 30.0,
+# [JLC-RECHNER] Preise ab 2026-11-06 BELEGT: "JLCPCB-Rechner, vom Auftraggeber abgelesen 2026-11-06",
+# 22 x 150 mm, gruen, LeadFree HASL, Standardoptionen. USD gesamt pro Bestellung (inkl. aller Platinen).
+PCB_PRICE_USD = {   # (Lagen, Stueck) -> USD fuer 1.6 mm
+    (2, 5): 6.9, (2, 10): 8.7, (2, 15): 10.4, (2, 20): 12.3,
+    (4, 5): 32.3, (4, 10): 34.5, (4, 15): 36.8, (4, 20): 39.0,
 }
-SURCHARGE_2MM_FACTOR = 1.30       # [ANNAHME] Aufpreis 2.0 mm gegenueber 1.6 mm
-SURCHARGE_ENIG_USD = {2: 10.0, 4: 10.0}   # [ANNAHME] ENIG statt HASL, pro Bestellung
-SURCHARGE_EPOXY_VIA_USD = {2: 25.0, 4: 25.0}  # [ANNAHME]; [JLC] gratis erst ab 6 Lagen
+PCB_PRICE_2MM_USD = {  # (Lagen, Stueck) -> USD fuer 2.0 mm  [JLC-RECHNER 2026-11-06, Auftraggeber]
+    (4, 5): 73.8, (4, 10): 76.6, (4, 15): 79.4, (4, 20): 82.1,
+}
+SURCHARGE_2MM_FACTOR = 1.30       # [ANNAHME] nur noch fuer 2 Lagen / 2.0 mm (nicht abgelesen)
+# [JLC-RECHNER 2026-11-06] 4 L 1.6 mm 5 Stk: HASL 32.3, ENIG 44.2 (+11.9), ENIG + Epoxy filled & capped 64.5 (+20.3)
+SURCHARGE_ENIG_USD = {2: 11.9, 4: 11.9}   # 4 L belegt (5 Stk); 2 L [ANNAHME] gleich; Mengenabhaengigkeit [ANNAHME] keine
+SURCHARGE_EPOXY_VIA_USD = {2: 20.3, 4: 20.3}  # 4 L belegt (5 Stk); 2 L [ANNAHME]; [JLC] gratis erst ab 6 Lagen
 SURCHARGE_COLOR_USD = 0.0         # gruen = Standard; andere Farben [ANNAHME] Aufpreis, im Rechner pruefen
 
 # =============================================================================
 # 4) Versand nach CH und Import
 # =============================================================================
-# [ANNAHME] Versandkosten JLC -> CH, 0.2-0.5 kg. JLC-Versandrechner (jlcpcb.com/shipping) ist JS-basiert,
-# Werte nicht abrufbar. Orientierung [DRITTQUELLE] chiptron.eu 2025 (Slowakei): DHL Express 21.50 USD
-# (rabattiert, regulaer 29.51 USD) fuer kleine PCB-Bestellung.
-SHIPPING_USD = {"GSDL": 12.0, "DHL": 25.0}
-# GSDL = "Global Standard Direct Line": Zustellung in CH [ANNAHME] durch Die Post.
+# [JLC] Versand in die Schweiz, JLC-Seite (Screenshot Auftraggeber, 2026-11-06), BELEGT:
+#   DHL Express 23.44 USD (2-4 Tage), UPS Express Saver 25.36, FedEx Express 31.15,
+#   Global Standard Direct Line (GSDL) 7.63 USD (10-12 Tage), nur bis 1.5 kg UND Warenwert <= 65 USD.
+# Im Modell rechenbar: GSDL und DHL (Verzollungsgebuehren nur fuer Post/DHL belegt). UPS/FedEx nur dokumentiert.
+SHIPPING_USD = {"GSDL": 7.63, "DHL": 23.44}
+SHIPPING_OTHER_USD = {"UPS": 25.36, "FEDEX": 31.15}
+GSDL_MAX_GOODS_USD = 65.0   # Warenwert (ohne Versand) [JLC, Screenshot Auftraggeber]
+GSDL_MAX_KG = 1.5
+# GSDL: Zustellung in CH [ANNAHME] durch Die Post. Ueber den Grenzen faellt das Modell auf DHL zurueck.
 
 # [OFFIZIELL] ESTV https://www.estv.admin.ch/de/mwst-steuersaetze-schweiz (abgerufen 2026-11-06):
 # Normalsatz 8.1 % (seit 1.1.2024), keine beschlossene Aenderung auf der Seite.
@@ -214,24 +222,27 @@ def load_bom(path: str) -> list[BomLine]:
 
 
 def pcb_price_usd(layers: int, thickness: float, qty: int, enig: bool, epoxy_vias: bool) -> float:
-    """PCB-Fertigungspreis pro Bestellung (USD). [ANNAHME]-Tabelle, Interpolation fuer Zwischenmengen."""
-    keys = sorted(q for (l, q) in PCB_PRICE_USD if l == layers)
+    """PCB-Fertigungspreis pro Bestellung (USD). Tabelle aus dem JLC-Rechner (2026-11-06),
+    Interpolation fuer Zwischenmengen; 2.0 mm aus eigener Tabelle, sonst Faktor [ANNAHME]."""
+    thick = thickness > 1.6 + 1e-9
+    table = PCB_PRICE_2MM_USD if thick and any(l == layers for (l, _) in PCB_PRICE_2MM_USD) else PCB_PRICE_USD
+    keys = sorted(q for (l, q) in table if l == layers)
     if not keys:
-        raise ValueError(f"keine Preisannahme fuer {layers} Lagen")
+        raise ValueError(f"keine Preisangabe fuer {layers} Lagen")
     if qty <= keys[0]:
-        base = PCB_PRICE_USD[(layers, keys[0])]
+        base = table[(layers, keys[0])]
     elif qty >= keys[-1]:
         # linear extrapolieren mit letzter Steigung
         q1, q2 = keys[-2], keys[-1]
-        p1, p2 = PCB_PRICE_USD[(layers, q1)], PCB_PRICE_USD[(layers, q2)]
+        p1, p2 = table[(layers, q1)], table[(layers, q2)]
         base = p2 + (p2 - p1) / (q2 - q1) * (qty - q2)
     else:
         for q1, q2 in zip(keys, keys[1:]):
             if q1 <= qty <= q2:
-                p1, p2 = PCB_PRICE_USD[(layers, q1)], PCB_PRICE_USD[(layers, q2)]
+                p1, p2 = table[(layers, q1)], table[(layers, q2)]
                 base = p1 + (p2 - p1) * (qty - q1) / (q2 - q1)
                 break
-    if thickness > 1.6 + 1e-9:
+    if thick and table is PCB_PRICE_USD:
         base *= SURCHARGE_2MM_FACTOR
     if enig:
         base += SURCHARGE_ENIG_USD[layers]
@@ -321,11 +332,17 @@ def compute(bom: list[BomLine], layers: int, thickness: float, pcb_qty: int, pcb
         once["Coating Engineering"] = COAT_ENGINEERING_1S if coating_sides == 1 else COAT_ENGINEERING_2S
         unit["Coating"] = COAT_CLEAN_PER_PCS + COAT_PER_CM2 * coating_cm2_per_side * coating_sides
 
-    # --- Versand
-    once[f"Versand {ship} [ANNAHME]"] = SHIPPING_USD[ship]
+    # --- Versand ([JLC] 2026-11-06); GSDL nur bis Warenwert 65 USD und 1.5 kg, sonst DHL
+    unit_usd = sum(unit.values())
+    goods_wo_ship = unit_usd * pcba_qty + sum(once.values())
+    weight = WEIGHT_PACKAGING_KG + WEIGHT_PER_BOARD_KG * pcb_qty
+    if ship == "GSDL" and (goods_wo_ship > GSDL_MAX_GOODS_USD or weight > GSDL_MAX_KG):
+        notes.append(f"GSDL nicht zulaessig (Warenwert {goods_wo_ship:.2f} USD > {GSDL_MAX_GOODS_USD} USD "
+                     f"oder Gewicht > {GSDL_MAX_KG} kg) -> DHL Express gerechnet.")
+        ship = "DHL"
+    once[f"Versand {ship}"] = SHIPPING_USD[ship]
 
     # --- Summen USD
-    unit_usd = sum(unit.values())
     once_usd = sum(once.values())
     goods_usd = unit_usd * pcba_qty + once_usd  # Rechnungsbetrag JLC inkl. Versand
     fx = USD_TO_CHF * (1 + FX_CARD_MARKUP)
@@ -401,7 +418,7 @@ def main(argv=None) -> int:
 
     print(f"Troepfli Kostenmodell | USD->CHF {USD_TO_CHF:.4f} ({FX_DATE}), Kartenaufschlag "
           f"{FX_CARD_MARKUP:.1%} [ANNAHME] | MWST CH {CH_VAT:.1%}")
-    print("ACHTUNG: PCB-Fertigungspreise und Versand sind [ANNAHME] -> im JLC-Rechner ablesen und oben ersetzen.")
+    print("PCB-Preise und Versand: JLC-Rechner/JLC-Seite, vom Auftraggeber abgelesen 2026-11-06 (2.0 mm/2 L, ENIG 2 L = ANNAHME).")
     bom = load_bom(a.bom) if a.bom else EXAMPLE_BOM
     if not a.bom:
         print(">>> BEISPIEL-BOM (fiktiv, nur Demonstration) <<<")
