@@ -65,3 +65,17 @@ Format: Nr. · Datum · Entscheid · Alternativen · Begründung · Quelle · St
   den Stückkosten zugeschlagen, das Setup der Bestückung aber den Einmalkosten (Red Team K-2, Phase 2).
 - **Alternativen:** voller PCB-Preis in Stückkosten (inkonsistent); nur Vollkosten (vermischt Prototyp-/Serieneffekte).
 - **Status:** gültig, dem Auftraggeber zur Kenntnis
+
+### D-006 · 2026-11-07 · Konzeptwahl: A-32
+- **Entscheid (Auftraggeber):** Konzept **A-32**: TI CC2340R52 (QFN24) + RC-Oszillator (SN74LVC1G14, 2–6 MHz,
+  ratiometrisch) + TMP1075DGKR + **Panasonic CR2032** im Clip-Halter, 2 × 100 µF Puffer, Programmierung über
+  Dummy-Zellen-Adapter + UART-Pads mit 2 × 100 kΩ; 4 Lagen 1.6 mm, Economic PCBA; Gateway ESP32-S3 + RTC ohne Ladepfad.
+- **Alternativen:** A (CR2450N, mehr Laufzeitreserve, Kopf 17 mm höher, 10.18 CHF), B (CH592, keine signierbaren
+  Updates), C (LiPo, 65 °C nicht zulässig, 20.79 CHF), C-WLAN (Laufzeit Stunden).
+- **Begründung:** erfüllt alle Muss-Anforderungen; Stückkosten 7.07 CHF; Kopf ≈ 28 × 13 × 45 mm; Laufzeit
+  pessimistisch 17 Monate (12.5 im ungünstigsten Fall). Sicherheitsauflagen R2-A1…A4 und R2-W01 sind in Phase 4 nachzuweisen.
+- **Quelle:** `docs/concepts/CONCEPTS.md` v0.3, Prüfberichte `docs/reviews/phase2_*`.
+- **Status:** gültig
+
+### D-007 · 2026-11-07 · Designvorgaben
+- **Auftraggeber:** „schöne harte Formen“, schlichte, einfache Logos, aber auch etwas verspielt. Keine weiteren Vorgaben.

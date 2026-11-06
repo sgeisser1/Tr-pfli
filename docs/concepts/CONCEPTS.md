@@ -11,7 +11,7 @@
 | Rechnungen | `scripts/energy_budget.py` (Modell unverändert), `scripts/concept_energy.py` (Konzeptparameter v0.3, Abschaltung 2.4 V, Koexistenz, C-WLAN), `scripts/cost_model.py` (D-005, Staffelpreise, Röntgen, Preferred, Reserve), `scripts/concept_costs.py` (BOMs), `scripts/jlc_price_cache.py` (JLC-Teiledaten → `docs/concepts/bom/jlc_prices.json`) |
 | Stücklisten | `docs/concepts/bom/bom_{A,A32,A2,B,C}.csv` (`concept_costs.py --csv`) |
 | Register | neue/geänderte Teile in `docs/datasheets/_staging/INDEX_konzepte.csv` (v0.2- und v0.3-Zeilen am Ende); Herstellerregeln Rückstrom in `docs/references/` |
-| Status | **zur Entscheidung durch den Auftraggeber** (Wahl A oder A-32, Kap. 7) |
+| Status | **entschieden: A-32** (Auftraggeber 2026-11-07, D-006) |
 
 **Kennzeichnung:** **ANNAHME** = nicht belegt. **PROTOTYP-PRÜFUNG** = erst am Muster nachweisbar.
 `Datei, S. x` = PDF-Seite. JLC-Daten aus der JLC-Teilesuche, **Abruf 2026-11-06**. 1 USD = 0.8189 CHF
