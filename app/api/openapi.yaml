@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: fluidi Gateway API
-  version: 1.0.0-draft
+  version: 1.1.0-draft
   summary: Lokale REST-API des fluidi-Gateways (Raspberry Pi Zero 2 W, D-014) für die PWA „fluidi“.
   description: |
     Normativ zusammen mit `docs/interfaces/GATEWAY_API.md` (Abläufe, Sicherheit, Fehlercodes, SSE).
@@ -11,7 +11,8 @@ info:
     und den Header `X-CSRF-Token`. Aufrufe mit `x-fluidi-elevated: true` brauchen zusätzlich
     eine frische Passwortbestätigung (`POST /auth/elevate`, gültig 5 min).
     Lesende Aufrufe sind ohne Anmeldung erlaubt, solange `settings.public_read` = true
-    (Werkseinstellung, siehe GATEWAY_API.md Kap. 3.4); sonst ebenfalls Sitzung nötig.
+    (Gateway-Werk aus, Mock ein; GATEWAY_API.md Kap. 3.4); sonst ebenfalls Sitzung nötig.
+    Öffentliches Dashboard: eigener HTTP-Port (Werk 8080), nur `GET /dashboard` (D-020).
   license:
     name: Projektintern
 servers:
@@ -967,6 +968,49 @@ paths:
         '401': {$ref: '#/components/responses/Error'}
         '404': {$ref: '#/components/responses/Error'}
 
+  # ---------------------------------------------------------------- Welle 2 (Gateway Pi, PWA Frost)
+  /pairing/candidates/{device}/confirm:
+    parameters: [{name: device, in: path, required: true, schema: {$ref: '#/components/schemas/SensorId'}}]
+    post:
+      tags: [pairing]
+      summary: Farbfolge (SAS) bestätigen oder ablehnen (PROTOCOL 4.2, REQ-RF-05)
+      description: |
+        Nach `accept` geht der Job `pair` in den Zustand `awaiting_confirmation`; `result.sas` enthält die fünf
+        Farben (rot/grün/gelb), die auch die Sensor-LED zeigt. Der Nutzer drückt kurz die Sensortaste UND
+        bestätigt hier. `match=false` bricht die Kopplung ab (möglicher Angriff). Frist 60 s.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [match]
+              additionalProperties: false
+              properties:
+                match: {type: boolean}
+      responses:
+        '202':
+          description: Bestätigung übernommen; Job läuft weiter
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Job'}
+        '404': {$ref: '#/components/responses/Error'}
+        '409': {$ref: '#/components/responses/Error'}
+  /climate:
+    get:
+      tags: [system]
+      summary: Raumklima am Gateway (D-017, SHT4x), letzter Wert und Verlauf (> 3 Tage als Stundenmittel)
+      security: [{}, {session: []}]
+      parameters:
+        - {name: from, in: query, schema: {type: integer}, description: 'Unix-s, Standard jetzt − 7 Tage'}
+        - {name: to, in: query, schema: {type: integer}}
+      responses:
+        '200':
+          description: Klima
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Climate'}
+
 components:
   securitySchemes:
     session:
@@ -1115,6 +1159,56 @@ components:
         forecast: {$ref: '#/components/schemas/ForecastSummary'}
         last_watered: {oneOf: [{$ref: '#/components/schemas/Timestamp'}, {type: 'null'}]}
         mood: {$ref: '#/components/schemas/Mood'}
+        regime: {type: string, enum: [A, B, C, D], description: 'Giessverhalten (PFLANZENPROFILE.md): A abtrocknen, B oben abtrocknen, C gleichmässig feucht, D Sonderfall'}
+        winter_factor: {type: ['number', 'null'], description: 'Winterschwelle = Schwelle × Faktor in den Wintermonaten (ANNAHME)'}
+        care: {$ref: '#/components/schemas/Care'}
+        salt: {$ref: '#/components/schemas/Salt'}
+    Care:
+      type: object
+      description: 'Regime-Hinweise (PFLANZENPROFILE Kap. 4.3); „zu nass“ erst 48 h nach der letzten Giessung (D-021)'
+      properties:
+        regime: {type: string, enum: [A, B, C, D]}
+        phase: {type: ['string', 'null'], enum: [dry_phase, null]}
+        too_wet: {type: boolean}
+        winter_active: {type: boolean}
+        effective_threshold_pct: {type: integer, description: 'wirksame Giessschwelle (Winterfaktor berücksichtigt)'}
+        hints:
+          type: array
+          items:
+            type: object
+            required: [kind, level, text]
+            properties:
+              kind: {type: string, enum: [too_wet, dry_phase, soon, early, not_thorough, reminder, hydro, winter]}
+              level: {type: string, enum: [info, warn]}
+              text: {type: string}
+    Salt:
+      type: object
+      description: 'Dünger-/Salzhinweis aus der Zeitreihe (D-018, MESSKETTE_SALZ A+): Spitze nach dem Giessen > 130 % (ANNAHME, OP-K3)'
+      properties:
+        state: {type: string, enum: [none, fertilized, suspected]}
+        peak_pct: {type: ['number', 'null']}
+        since: {oneOf: [{$ref: '#/components/schemas/Timestamp'}, {type: 'null'}]}
+        last_fertilized: {oneOf: [{$ref: '#/components/schemas/Timestamp'}, {type: 'null'}]}
+        text: {type: ['string', 'null']}
+    Climate:
+      type: object
+      required: [source, latest, t, temp_c, rh_pct]
+      properties:
+        source: {type: string, enum: [sht4x, sim, 'off']}
+        latest:
+          oneOf:
+            - type: 'null'
+            - type: object
+              properties:
+                t: {$ref: '#/components/schemas/Timestamp'}
+                temp_c: {type: number}
+                rh_pct: {type: number}
+                source: {type: string}
+        from: {type: integer}
+        to: {type: integer}
+        t: {type: array, items: {type: integer}}
+        temp_c: {type: array, items: {type: number}}
+        rh_pct: {type: array, items: {type: number}}
     Pot:
       type: ['object', 'null']
       additionalProperties: false
@@ -1167,22 +1261,46 @@ components:
                   current: {type: boolean}
     Species:
       type: object
+      description: 'Artenprofil aus app/data/species.json (Quelle docs/software/PFLANZENPROFILE.md, D-021). Klasse/Regime/Abtrocknung aus Quellen, alle Prozentwerte Startwerte (ANNAHME).'
       required: [key, name, water_class, start_range, source]
       properties:
         key: {type: string}
         name: {type: string}
         latin: {type: string}
-        water_class: {type: string, enum: [dry, medium, moist], description: 'Zuordnung ANNAHME, vom Nutzer zu prüfen'}
+        water_class: {type: ['string', 'null'], enum: [dry, medium, moist, null], description: 'trocken/mittel/feucht (D-020); null bei Regime D'}
         water_class_text: {type: string}
         start_range:
           type: object
           required: [lower_pct, upper_pct]
           properties:
-            lower_pct: {type: integer}
-            upper_pct: {type: integer}
-        source: {type: string, enum: [startwert, quelle], description: 'startwert = fluidi-Annahme; quelle = mit Literaturangabe'}
+            lower_pct: {type: ['integer', 'null'], description: 'Giessschwelle (Startwert)'}
+            upper_pct: {type: ['integer', 'null'], description: '„zu nass“ (Startwert), geprüft erst 48 h nach dem Giessen'}
+            reminder_days: {type: integer, description: 'nur Regime D: Erinnerung nach Tagen'}
+        source: {type: string, enum: [startwert, quelle], description: 'quelle = Klasse/Regime mit Literaturangabe; Prozentwerte bleiben Startwerte'}
         note: {type: string}
         illustration: {type: string}
+        regime: {type: ['string', 'null'], enum: [A, B, C, D, null]}
+        regime_text: {type: ['string', 'null']}
+        dryness: {type: ['string', 'null'], description: 'Abtrocknungsgrad laut Quelle (deutsch)'}
+        dryness_source: {type: ['string', 'null'], description: 'Wortlaut der Quelle'}
+        winter: {type: ['string', 'null']}
+        winter_factor: {type: ['number', 'null']}
+        waterlogging: {type: ['string', 'null']}
+        drought: {type: ['string', 'null']}
+        substrate: {type: ['string', 'null']}
+        start_note: {type: string}
+        sources:
+          type: array
+          items:
+            type: object
+            required: [id]
+            properties:
+              id: {type: string}
+              title: {type: ['string', 'null']}
+              publisher: {type: ['string', 'null']}
+              url: {type: ['string', 'null']}
+              retrieved: {type: ['string', 'null']}
+              type: {type: ['string', 'null']}
     JournalEntry:
       type: object
       required: [id, plant_id, t, type, source, status]
@@ -1276,7 +1394,7 @@ components:
       properties:
         id: {type: string}
         level: {type: string, enum: [critical, warn, info]}
-        kind: {type: string, enum: [needs_water, air, flooded, sensor_error, stale, battery_low, weak_signal, cert_expiry, storage]}
+        kind: {type: string, enum: [needs_water, air, flooded, sensor_error, stale, battery_low, weak_signal, cert_expiry, storage, salt, too_wet, reminder]}
         plant_id: {type: ['integer', 'null']}
         sensor_id: {oneOf: [{$ref: '#/components/schemas/SensorId'}, {type: 'null'}]}
         since: {$ref: '#/components/schemas/Timestamp'}
@@ -1390,6 +1508,7 @@ components:
               forecast_days: {type: ['number', 'null']}
               next_water: {oneOf: [{$ref: '#/components/schemas/Timestamp'}, {type: 'null'}]}
         roomplan: {$ref: '#/components/schemas/RoomPlan'}
+        climate: {oneOf: [{type: 'null'}, {type: object}], description: 'Raumklima am Gateway (D-017)'}
     PlantCreate:
       type: object
       required: [name, substrate]
@@ -1405,6 +1524,9 @@ components:
         upper_pct: {type: ['integer', 'null'], minimum: 0, maximum: 100}
         location: {type: string, maxLength: 40}
         pot: {$ref: '#/components/schemas/Pot'}
+        regime: {type: ['string', 'null'], enum: [A, B, C, D, null], description: 'null = aus der Art'}
+        winter_factor: {type: ['number', 'null'], minimum: 0.1, maximum: 1.0}
+        winter: {type: boolean, description: 'Winteranpassung für diese Pflanze'}
     PlantPatch:
       type: object
       additionalProperties: false
@@ -1419,6 +1541,9 @@ components:
         upper_pct: {type: ['integer', 'null'], minimum: 0, maximum: 100}
         location: {type: string, maxLength: 40}
         pot: {$ref: '#/components/schemas/Pot'}
+        regime: {type: ['string', 'null'], enum: [A, B, C, D, null], description: 'null = aus der Art'}
+        winter_factor: {type: ['number', 'null'], minimum: 0.1, maximum: 1.0}
+        winter: {type: boolean, description: 'Winteranpassung für diese Pflanze'}
     Sensor:
       type: object
       required: [id, plant_id, fw_version, last_seen, battery, signal, interval_per_day, effective_interval_per_day, pending_config, error]
@@ -1438,6 +1563,9 @@ components:
         buffered_records: {type: ['integer', 'null'], description: Werte im Sensorpuffer, noch nicht übertragen}
         error: {type: ['object', 'null'], properties: {code: {type: string}, text: {type: string}, t: {$ref: '#/components/schemas/Timestamp'}}}
         unpairing: {type: boolean}
+        address: {type: string, description: 'BLE-Adresse (48 bit) = eindeutige Identität (PROTOCOL 2.3); fluidi-XXXX ist nur 16 bit'}
+        lost_records: {type: integer, description: 'im Sensor überschriebene, nie quittierte Werte'}
+        reset_reason: {type: ['string', 'null']}
     SensorPatch:
       type: object
       additionalProperties: false
@@ -1493,7 +1621,7 @@ components:
       properties:
         id: {type: string}
         kind: {type: string, enum: [measure, calibration_capture, pair, unpair, identify, config]}
-        state: {type: string, enum: [queued, waiting_for_sensor, running, done, failed, timeout, cancelled]}
+        state: {type: string, enum: [queued, waiting_for_sensor, running, awaiting_confirmation, done, failed, timeout, cancelled], description: 'awaiting_confirmation nur bei pair (SAS-Vergleich, result.sas)'}
         sensor_id: {oneOf: [{$ref: '#/components/schemas/SensorId'}, {type: 'null'}]}
         plant_id: {type: ['integer', 'null']}
         created: {$ref: '#/components/schemas/Timestamp'}
@@ -1511,6 +1639,7 @@ components:
         hw_rev: {type: string}
         first_seen: {$ref: '#/components/schemas/Timestamp'}
         known: {type: boolean, description: 'war früher gekoppelt (Neukopplung)'}
+        address: {type: string}
     PairingState:
       type: object
       required: [active, candidates]
@@ -1566,7 +1695,7 @@ components:
             ntp_enabled: {type: boolean}
             ntp_server: {type: string}
             timezone: {type: string, description: IANA-Name, z. B. Europe/Zurich}
-        public_read: {type: boolean, description: Lesen ohne Anmeldung im LAN}
+        public_read: {type: boolean, description: 'Lesen ohne Anmeldung im LAN; Gateway-Werk AUS (F-8), Kollegen nutzen das Dashboard'}
         mqtt: {$ref: '#/components/schemas/MqttSettings'}
         notifications: {$ref: '#/components/schemas/NotificationSettings'}
         dashboard: {$ref: '#/components/schemas/DashboardSettings'}
@@ -1708,7 +1837,7 @@ components:
       required: [enabled, public]
       properties:
         enabled: {type: boolean}
-        public: {type: boolean, description: 'ohne Anmeldung lesbar (eigener Port, nur Dashboard)'}
+        public: {type: boolean, description: 'ohne Anmeldung lesbar: eigener HTTP-Port (Werk 8080), nur Dashboard, nur lesen (D-020)'}
         port: {type: integer}
         title: {type: string}
         show_names: {type: boolean}
@@ -1869,5 +1998,5 @@ components:
             required: [t, type]
             properties:
               t: {type: integer}
-              type: {type: string, enum: [calibration, sensor_change, gap, watering]}
+              type: {type: string, enum: [calibration, sensor_change, gap, watering, fertilizing]}
               text: {type: string}

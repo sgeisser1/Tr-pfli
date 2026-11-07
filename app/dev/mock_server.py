@@ -166,7 +166,7 @@ class State:
                 "ntfy": {"enabled": False, "url": "", "topic": "fluidi"},
                 "webpush": {"enabled": False, "allowed": False},
             },
-            "dashboard": {"enabled": True, "public": False, "port": 8443, "title": "Pflanzen im Büro",
+            "dashboard": {"enabled": True, "public": False, "port": 8080, "title": "Pflanzen im Büro",
                           "show_names": True, "rotate_s": 20},
         }
         self.network = {"ssid": "Buero-WLAN", "connected": True, "rssi_dbm": -58, "ip": "192.168.10.47",
@@ -178,6 +178,7 @@ class State:
                                "uploaded": C.iso(now() - 3 * 86400)}]
         self.rollout = None
         self.pairing = {"active": False, "until": None, "candidates": []}
+        self.pair_wait = {}
         self.plants: dict[int, dict] = {}
         self.sensors: dict[str, dict] = {}
         self.cal: dict[str, dict] = {}
@@ -506,7 +507,16 @@ class State:
         m = latest["moisture_pct"] if latest else None
         md = AN.mood(st, m, p["threshold_pct"], p.get("upper_pct"), stale, bool(p["sensor_id"]),
                      bool(s and s["error"]), fc.get("days"))
-        return {"forecast": {k: fc[k] for k in ("state", "next_water", "days", "days_low", "days_high", "confidence")}
+        rg = SPECIES_REGIME.get(p.get("species")) or "B"
+        care = {"regime": rg, "phase": "dry_phase" if rg == "A" and st == "ok" else None, "too_wet": md == "drowning",
+                "winter_active": False, "effective_threshold_pct": p["threshold_pct"],
+                "hints": [{"kind": "dry_phase", "level": "info", "text": "Trockenphase erwünscht – noch nicht giessen."}]
+                if rg == "A" and st == "ok" else []}
+        salt = {"state": "suspected", "peak_pct": 142.0, "since": C.iso(now() - 5 * 86400), "last_fertilized": C.iso(now() - 6 * 86400),
+                "text": "Dünger/Salz erkannt – die Anzeige im nassen Bereich ist unsicher. Gelegentlich mit klarem Wasser durchspülen."} \
+            if p["name"] == "Monstera" else {"state": "none", "peak_pct": None, "since": None, "last_fertilized": None, "text": None}
+        return {"regime": rg, "winter_factor": None, "care": care, "salt": salt,
+                "forecast": {k: fc[k] for k in ("state", "next_water", "days", "days_low", "days_high", "confidence")}
                 | {"next_water": C.iso(fc["next_water"]) if fc["next_water"] else None},
                 "last_watered": C.iso(a["last_watered"]) if a["last_watered"] else None, "mood": md}
 
@@ -1034,7 +1044,8 @@ def plant_get(h: Handler, plant_id, **_):
 def plant_patch(h: Handler, plant_id, body, **_):
     p_real = _plant(h.S, plant_id)
     p = dict(p_real)  # erst prüfen, dann übernehmen
-    for k in ("name", "substrate", "threshold_pct", "water_led", "notes", "species", "upper_pct", "location", "pot"):
+    for k in ("name", "substrate", "threshold_pct", "water_led", "notes", "species", "upper_pct", "location", "pot",
+              "regime", "winter_factor", "winter"):
         if k in body:
             v = body[k]
             if k == "name":
@@ -1386,9 +1397,46 @@ def pairing_accept(h: Handler, device, body, **_):
 
     def running():
         S.job_update(j, state="running", progress=0.3, message="Schlüsselaustausch")
-        threading.Timer(2.5, done).start()
+        threading.Timer(1.0, ask).start()
+
+    def ask():
+        S.job_update(j, state="awaiting_confirmation", progress=0.5,
+                     message="Farbfolge vergleichen: Stimmen die Farben am Sensor mit der App überein?",
+                     result={"sas": ["gelb", "grün", "rot", "rot", "grün"], "sas_codes": [2, 1, 0, 0, 1]})
+    S.pair_wait[device] = (j, done)
     threading.Timer(0.8, running).start()
     h.send_json(202, j)
+
+
+@route("POST", "/pairing/candidates/{device}/confirm")
+def pairing_confirm(h: Handler, device, body, **_):
+    S = h.S
+    if not isinstance(body.get("match"), bool):
+        raise ApiError(400, "validation", "match (true/false) fehlt", "match")
+    w = S.pair_wait.get(device)
+    if not w:
+        raise ApiError(404, "not_found", "Keine laufende Kopplung für diesen Sensor")
+    j, done = w
+    if j["state"] != "awaiting_confirmation":
+        raise ApiError(409, "conflict", "Farbfolge noch nicht bereit")
+    S.pair_wait.pop(device, None)
+    if body["match"]:
+        threading.Timer(0.8, done).start()
+    else:
+        S.job_update(j, state="failed", message="Kopplung fehlgeschlagen: Farben stimmen nicht überein")
+    h.send_json(202, j)
+
+
+@route("GET", "/climate", auth="read")
+def climate_get(h: Handler, q, **_):
+    t1 = _int(q, "to", int(now()))
+    t0 = _int(q, "from", t1 - 7 * 86400)
+    step = 3600 if t1 - t0 > 3 * 86400 else 300
+    ts = list(range(t0 - t0 % step + step, t1, step))[-800:]
+    temp = [round(21.5 + 1.5 * math.sin((t % 86400) / 86400 * 2 * math.pi - 2.0), 2) for t in ts]
+    rh = [round(42 - 6 * math.sin((t % 86400) / 86400 * 2 * math.pi - 2.0), 1) for t in ts]
+    latest = {"t": C.iso(ts[-1]), "temp_c": temp[-1], "rh_pct": rh[-1], "source": "sim"} if ts else None
+    h.send_json(200, {"source": "sim", "latest": latest, "from": t0, "to": t1, "t": ts, "temp_c": temp, "rh_pct": rh})
 
 
 # ------------------------------------------------------------------------------ Einstellungen
@@ -1699,17 +1747,38 @@ SPECIES = [
     ("chlorophytum", "Grünlilie", "Chlorophytum comosum", "medium"),
     ("generic", "Andere Pflanze", "", "medium"),
 ]
-SPECIES_KEYS = {k for k, *_ in SPECIES}
-
-
 def species_out():
+    """Artenprofile aus app/data/species.json (PFLANZENPROFILE.md, D-021) – gleiche Abbildung wie das Gateway."""
+    try:
+        data = json.loads((APP_DIR / "data" / "species.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        data = {"species": []}
+    regimes, srcs = data.get("regimes", {}), data.get("sources", {})
     out = []
-    for key, name, latin, cls in SPECIES:
-        lo, hi, txt = _CLASSES[cls]
-        out.append({"key": key, "name": name, "latin": latin, "water_class": cls, "water_class_text": txt,
-                    "start_range": {"lower_pct": lo, "upper_pct": hi}, "source": "startwert", "note": _STARTWERT,
-                    "illustration": key})
+    for it in data.get("species", []):
+        st = it.get("start") or {}
+        cls = it.get("water_class")
+        lo, hi = st.get("water_at_pct"), st.get("upper_pct")
+        if lo is None and cls in _CLASSES:
+            lo, hi = _CLASSES[cls][0], _CLASSES[cls][1]
+        sr = {"lower_pct": lo, "upper_pct": hi}
+        if st.get("reminder_days"):
+            sr["reminder_days"] = st["reminder_days"]
+        out.append({"key": it["id"], "name": it.get("name_de", it["id"]), "latin": it.get("botanical", ""),
+                    "water_class": cls, "water_class_text": it.get("class") or "Sonderfall", "start_range": sr,
+                    "source": "quelle" if it.get("sources") else "startwert", "note": it.get("notes_de") or _STARTWERT,
+                    "illustration": it.get("illustration") or "generic", "regime": it.get("regime"),
+                    "regime_text": (regimes.get(it.get("regime")) or {}).get("text"), "dryness": it.get("dryness_de"),
+                    "dryness_source": it.get("dryness_source"), "winter": it.get("winter_de"),
+                    "winter_factor": it.get("winter_factor"), "waterlogging": it.get("waterlogging"),
+                    "drought": it.get("drought"), "substrate": it.get("substrate_de"), "start_note": _STARTWERT,
+                    "sources": [{"id": k, **{f: srcs[k].get(f) for f in ("title", "publisher", "url", "retrieved", "type")}}
+                                for k in it.get("sources", []) if k in srcs]})
     return out
+
+
+SPECIES_KEYS = {x["key"] for x in species_out()} | {k for k, *_ in SPECIES}
+SPECIES_REGIME = {x["key"]: x["regime"] for x in species_out()}
 
 
 def default_roomplan():
@@ -2030,7 +2099,8 @@ def dashboard_get(h: Handler, sess, **_):
     h.send_json(200, {"generated": C.iso(now()), "title": d["title"], "public": d["public"],
                       "summary": {"plants": len(plants), "needs_water": sum(p["needs_water"] for p in plants),
                                   "warnings": sum(1 for a in al if a["level"] != "info" and a["kind"] != "needs_water")},
-                      "plants": plants, "roomplan": room})
+                      "plants": plants, "roomplan": room,
+                      "climate": {"t": C.iso(now()), "temp_c": 21.8, "rh_pct": 41.0, "source": "sim"}})
 
 
 # ------------------------------------------------------------------------------ System

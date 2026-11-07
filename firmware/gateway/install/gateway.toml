@@ -1,0 +1,17 @@
+# /etc/fluidi/gateway.toml – Betriebsparameter des Gateways (fachliche Einstellungen über die PWA)
+[gateway]
+data_dir = "/var/lib/fluidi"
+app_dir = "/opt/fluidi/current/app"
+hostname = "fluidi.local"
+https_port = 443
+http_port = 80            # nur Weiterleitung, /ca.crt, Fingerabdruck
+dashboard_port = 8080     # öffentliches Dashboard (HTTP, nur lesen), nur aktiv wenn in der PWA freigegeben
+radio = "bleak"
+adapter = "hci0"          # eingebautes BLE des Pi Zero 2 W; XIAO nRF52840 als USB-Empfänger: Option (D-014)
+passive_scan = false
+p_miss = 0.10             # ANNAHME bis Koexistenztest OP-K12 (PROTOCOL 2.2, FW-P8)
+climate = "auto"          # auto | sht4x | off
+i2c_bus = 1
+climate_addr = 0x44
+fw_pubkey = "/etc/fluidi/keys/sensor-fw.pem"        # öffentlicher Schlüssel Sensor-Firmware (vom Entwickler)
+gw_update_pubkey = "/etc/fluidi/keys/gateway-update.pem"

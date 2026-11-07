@@ -128,6 +128,38 @@ class ServiceWorker(unittest.TestCase):
         self.assertIn("url.pathname.startsWith('/api/')", self.sw)  # API nicht aus dem Shell-Cache
 
 
+class PublicDashboard(unittest.TestCase):
+    """Öffentliches Dashboard (eigener HTTP-Port, D-020): nur wenige Dateien, keine Inline-Skripte, nur GET /dashboard."""
+
+    def test_page_and_import_graph(self):
+        html = (APP / "dashboard.html").read_text(encoding="utf-8")
+        self.assertIsNone(re.search(r"<script(?![^>]*\bsrc=)[^>]*>", html))
+        self.assertIsNone(re.search(r"\sstyle=", html))
+        for ref in re.findall(r'(?:src|href)="([^"#:]+)"', html):
+            self.assertTrue((APP / ref).is_file(), ref)
+        seen, todo = set(), ["dashboard.js"]
+        while todo:
+            f = todo.pop()
+            seen.add(f)
+            for imp in re.findall(r"from '\./([\w-]+\.js)'", (APP / "js" / f).read_text(encoding="utf-8")):
+                if imp not in seen:
+                    todo.append(imp)
+        # muss zur Freigabeliste des Gateways passen (server.py DASH_FILES)
+        self.assertEqual(seen, {"dashboard.js", "board.js", "dom.js", "art.js"})
+        src = (APP / "js" / "dashboard.js").read_text(encoding="utf-8")
+        self.assertIn("api/v1/dashboard", src)
+        self.assertEqual(set(re.findall(r"api/v1/[a-z/]+", src)), {"api/v1/dashboard"})
+
+
+class FrostOnly(unittest.TestCase):
+    def test_single_style(self):
+        css = (APP / "css" / "app.css").read_text(encoding="utf-8")
+        self.assertIn('html[data-theme="frost"][data-scheme="dark"]', css)
+        self.assertNotIn('data-theme="botanik"', css)
+        self.assertNotIn('data-theme="stele"', css)
+        self.assertIn('data-theme="frost"', (APP / "index.html").read_text(encoding="utf-8"))
+
+
 class ConceptDrafts(unittest.TestCase):
     """Klickbare Stil-Entwürfe (app/concept/): gleiche Regeln wie die PWA (REQ-APP-09, CSP)."""
     C = APP / "concept"

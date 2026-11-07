@@ -3,11 +3,11 @@
 | | |
 |---|---|
 | Dokument | `docs/interfaces/GATEWAY_API.md` |
-| Version | **1.0-Entwurf** (API-Version `v1`) |
+| Version | **1.1-Entwurf** (API-Version `v1`, abwärtskompatibel erweitert in Phase 4 Welle 2) |
 | Datum | 2026-11-07 |
 | Autor | Software-Agent (Phase 4d, Welle 1) |
 | Maschinenlesbar | `app/api/openapi.yaml` (OpenAPI 3.1, normativ für Schemas) |
-| Referenzimplementierung | `app/dev/mock_server.py` (Python, nur Standardbibliothek) |
+| Implementierungen | Gateway `firmware/gateway/fluidi_gw/` (Pi, D-014); Mock `app/dev/mock_server.py` (Entwicklung). Beide gegen `openapi.yaml` getestet |
 | Plattform | **neutral**: gilt für ESP32-S3 und Raspberry Pi Zero 2 W (siehe `firmware/gateway/ARCHITECTURE.md`) |
 | Status | zur Prüfung; Gateway↔Sensor-Funkprotokoll: `firmware/PROTOCOL.md` (Firmware-Agent, parallel) |
 
@@ -98,7 +98,7 @@ Backup erstellen, Backup einspielen. Antwort sonst `403 elevation_required`; die
 wiederholt die Anfrage.
 
 ### 3.4 Lesen ohne Anmeldung
-`settings.public_read` (Werk **ein**, ANNAHME – Entscheid Auftraggeber): Übersicht, Verlauf, CSV, Systemstatus
+`settings.public_read` (Gateway-Werk **aus** seit Welle 2: F-8, Kollegen nutzen das öffentliche Dashboard D-020; Mock: ein): Übersicht, Verlauf, CSV, Systemstatus
 sind im LAN ohne Anmeldung lesbar (REQ-SAF-NET-01 fordert Schutz nur für schreibende Aktionen; die Daten sind
 nicht vertraulich). Nie öffentlich: Kopplung, Firmware, Ereignisprotokoll, WLAN-Daten, Kalibrierläufe, Backups.
 Ist `public_read=false`, verlangen alle Endpunkte ausser `/auth/*` eine Sitzung.
@@ -180,6 +180,12 @@ ab; Läufe verfallen nach 6 h. Punkte können wiederholt werden.
    `sensor_id`, `plant_id`. Ausserhalb des Fensters gibt es keine Kandidaten (404).
 4. Neue Sensoren starten mit der **Startkalibrierung** (`calibration: default`, REQ-MES-07).
 
+### 5.3a Farbfolge bestätigen (SAS, PROTOCOL 4.2) – neu
+Nach `accept` geht der Job `pair` in `awaiting_confirmation`; `result.sas` = fünf Farben (`rot|grün|gelb`), dieselben
+wie an der Sensor-LED. Der Nutzer drückt kurz die Sensortaste **und** ruft
+`POST /pairing/candidates/{device}/confirm {match: true}` auf (W). `match: false` bricht ab. Frist 60 s nach Anzeige.
+Das Gateway speichert den Schlüssel erst nach beiden Bestätigungen und gültigem `PAIR_CONFIRM_S`.
+
 ### 5.4 Firmware-Verteilung (UC-08, REQ-FW-02/04)
 1. Upload `POST /firmware/sensor-images` (E): Gateway prüft **Signatur mit dem öffentlichen Projektschlüssel**,
    Abbildformat, Hardware-Kompatibilität und Sicherheitszähler (Anti-Rollback). Fehler → `422 signature_invalid`
@@ -207,6 +213,17 @@ Erreichbarkeit bleibt über `fluidi.local`; Sensoren sind nicht betroffen.
 sendet die angemeldete PWA die Browserzeit (`POST /system/time`); mit gültiger Zeit wird sie nur mit
 `force=true` + elevate übernommen. Ohne gültige Zeit verteilt das Gateway keine Zeit an Sensoren; empfangene
 Werte bekommen Flag 2.
+
+### 5.8 Raumklima (D-017) – neu
+`GET /climate?from&to` (L): `latest {t, temp_c, rh_pct}`, Verlauf (bis 3 Tage Rohwerte im 5-min-Raster, darüber
+Stundenmittel), `source` = `sht4x|sim|off`. Auch im Dashboard (`climate`).
+
+### 5.9 Profile, Pflege, Salz – neu
+`Species` enthält die Artenprofile aus `app/data/species.json` (Regime A–D, Abtrocknungsgrad mit Quellen,
+Winterfaktor; D-021). `Plant.care` liefert die wirksame Schwelle (Winterfaktor), Trockenphase (Regime A) und Hinweise;
+„zu nass“ (`care.too_wet`, Alert `too_wet`) erst **48 h nach der letzten Giessung** (D-021). `Plant.salt` =
+Dünger-/Salzhinweis aus der Zeitreihe (D-018). `PlantCreate/PlantPatch` akzeptieren `regime`, `winter_factor`,
+`winter`. Journal-Typ `fertilizing` = Taste „Gedüngt“.
 
 ## 6 Server-Sent Events (`GET /stream`)
 
@@ -291,8 +308,8 @@ Batterie: `mv` unter Last vom Sensor, `pct` und `days_left` schätzt das Gateway
 
 | Nr. | Punkt | Wer |
 |---|---|---|
-| API-1 | Befehlswege, Schlüsselaustausch, Zeit/Relativzeit, Batteriemodell, Mittelung im Sensor: Abgleich mit `firmware/PROTOCOL.md` | Firmware + Software |
+| API-1 | ~~Abgleich mit `firmware/PROTOCOL.md`~~ erledigt in Welle 2: Gateway setzt PROTOCOL v1 um; Befunde `docs/reviews/phase4_protocol_software.md` | Firmware + Software |
 | API-2 | `public_read` Werk ein? (Komfort vs. Sicherheit) | Auftraggeber |
 | API-3 | Signalschwellen, Temperaturkoeffizient `k`, Startkalibrierung je Substrat | Prototyp |
-| API-4 | Giessen-LED-Zeitfenster: Gateway rechnet in UTC-Minuten um und aktualisiert bei Zeitumstellung (ANNAHME) | Firmware |
+| API-4 | ~~UTC-Minuten~~ geklärt: PROTOCOL 8 `led_window` in Lokalzeit + `TIME_SET.tz_min`; Gateway sendet TIME_SET bei Wechsel des Versatzes (Zeitumstellung). Wochentage: Emulation über `water_led` (Befund W-7) | Firmware |
 | API-5 | Benachrichtigungen ohne Hersteller-Push (REQ-APP-10): vorerst nur PWA + LED, optional MQTT → Home Assistant | Auftraggeber (Software-Konzeptschritt) |

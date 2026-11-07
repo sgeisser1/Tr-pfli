@@ -1,7 +1,7 @@
 {
   "name": "fluidi",
   "short_name": "fluidi",
-  "description": "Bodenfeuchte deiner Pflanzen – lokal, ohne Cloud.",
+  "description": "Bodenfeuchte deiner Pflanzen – lokal, ohne Cloud. Stil Frost.",
   "lang": "de-CH",
   "dir": "ltr",
   "id": "./",
@@ -9,14 +9,67 @@
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#EEEBE5",
-  "theme_color": "#EEEBE5",
-  "categories": ["utilities", "lifestyle"],
+  "background_color": "#EAF4FB",
+  "theme_color": "#EAF4FB",
+  "categories": [
+    "utilities",
+    "lifestyle"
+  ],
   "icons": [
-    {"src": "icons/icon-48.png", "sizes": "48x48", "type": "image/png", "purpose": "any"},
-    {"src": "icons/icon-96.png", "sizes": "96x96", "type": "image/png", "purpose": "any"},
-    {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
-    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
-    {"src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+    {
+      "src": "icons/icon-48.png",
+      "sizes": "48x48",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Gegossen eintragen",
+      "short_name": "Gegossen",
+      "url": "./#/",
+      "icons": [
+        {
+          "src": "icons/icon-96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "url": "./#/dashboard",
+      "icons": [
+        {
+          "src": "icons/icon-96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
   ]
 }

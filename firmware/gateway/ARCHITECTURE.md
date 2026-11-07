@@ -3,12 +3,12 @@
 | | |
 |---|---|
 | Dokument | `firmware/gateway/ARCHITECTURE.md` |
-| Version | 0.1 (Entwurf zur Prüfung) |
+| Version | 0.2 (Kap. 14: Umsetzung Pi, Phase 4 Welle 2) |
 | Datum | 2026-11-07 |
 | Autor | Software-Agent (Phase 4d, Welle 1) |
 | Grundlagen | `REQUIREMENTS.md` v1.0 (Kap. 4, 6.4, 7, 8), `CONCEPTS.md` Kap. 5, `research_gateway.md`, D-006…D-012 |
 | Schnittstellen | PWA: `docs/interfaces/GATEWAY_API.md` + `app/api/openapi.yaml`; Funk: `firmware/PROTOCOL.md` (parallel) |
-| Status | **Plattform offen** (Projektleiter 2026-11-07): ESP32-S3 (Konzept E6) oder Raspberry Pi Zero 2 W. Kap. 1–10 gelten für beide, Kap. 11/12 skizzieren je eine Umsetzung, Kap. 13 vergleicht. |
+| Status | **Plattform entschieden: Raspberry Pi Zero 2 W (D-014).** Kap. 11 (ESP32) nur noch Archiv. Umsetzung: Kap. 14, Code `firmware/gateway/fluidi_gw/`, Installation `docs/manuals/GATEWAY_SETUP.md`. |
 
 Kennzeichnungen: **ANNAHME**, **PROTOTYP-PRÜFUNG**, **ABGLEICH PROTOCOL** (mit `firmware/PROTOCOL.md` abzustimmen).
 
@@ -332,3 +332,93 @@ Jobs, SSE, CSV und Kalibrierungsrechnung (`fluidi_calc.py`). Ausbau-Schritte:
 | OP-GW-4 | Koexistenz-/Reichweitentest (OP-K12) mit der gewählten Plattform | Prototyp |
 | OP-GW-5 | Einrichtungsprogramm A1 (Web Serial) vs. A2 (Python) | Software, nach Plattformentscheid |
 | OP-GW-6 | Abgleich mit `firmware/PROTOCOL.md` (Kap. 4, 6, 7) | Firmware + Software |
+
+
+---
+
+## 14 Umsetzung Raspberry Pi Zero 2 W (Phase 4 Welle 2)
+
+Stand Software 0.5.0. Geprüft mit `python3 -m unittest discover -s firmware/gateway/tests -p 'test_*.py'`
+(Simulation, Python 3.12 in WSL); am echten Pi noch nicht gelaufen (**PROTOTYP-PRÜFUNG**, GATEWAY_SETUP Kap. 10).
+
+### 14.1 Module (`firmware/gateway/fluidi_gw/`)
+
+| Modul | Aufgabe |
+|---|---|
+| `service.py`, `__main__.py` | Zusammenbau, systemd-Benachrichtigung (READY, WATCHDOG nur bei lebendem Funk-Thread), CLI (`serve`, `sim`, `setup-code`, `reset-password`, `pki-init`, `fingerprint`, `test-image`) |
+| `config.py` | `/etc/fluidi/gateway.toml` (Pfade, Ports, Funk, `p_miss`, Startkalibrierung) |
+| `protocol.py` | PROTOCOL.md v1: Frames, Advertising, SECURE (AES-CCM, ctr), Kopplung (ECDH, HKDF, SAS), SESSION_INFO, Datensatz, TLV, OTA-Nutzlasten, Formel `adv_interval` (Kap. 2.2) |
+| `crypto.py`, `_pure.py` | `cryptography` (OpenSSL) auf dem Pi; reine Python-Rückfallebene für Tests (gegen FIPS-197, RFC 5869, GCM-Testfall und OpenSSL geprüft) |
+| `central.py` | BLE-Central im asyncio-Thread: Verbindungsentscheid (PROTOCOL 2.5), max. 3 Verbindungen, Sitzung, Nachlieferung in Blöcken (lesen → COMMIT → ACK), Befehle, Kopplung mit SAS, OTA (Go-back-N) |
+| `transport.py` | `BleakRadio` (bleak 3.0.2 / BlueZ) oder `SimRadio` (simulierte Sensoren im Prozess) |
+| `simsensor.py` | Sensorseite des Protokolls für Simulation und Tests (Ring 1122, Quittung, Sperre, Laufzeit statt Uhr, OTA mit Test/Bestätigung) |
+| `timesync.py` | Zeitrekonstruktion aus (boot_id, uptime) und Synchronpunkten (PROTOCOL 7) |
+| `store.py` | SQLite (WAL, `synchronous=FULL`), Tabellen Kap. 3.1 + Synchronpunkte, Sitzungen, Klima, Abbilder |
+| `model.py` | Fachmodell: Pflanzen, Zuordnungen (UC-11), Kalibrierung, Tagebuch, Jobs, Auswertung (gemeinsamer Rechenkern `app/dev/fluidi_calc.py`, `fluidi_analysis.py`), Artenprofile (`app/data/species.json`, D-021: Regime, Winterfaktor, „zu nass“ erst nach 48 h), Salz-Hinweis (D-018), Batterie, Einstellungen an den Sensor |
+| `api.py`, `server.py` | REST/SSE nach `app/api/openapi.yaml`; HTTPS 443, Port 80 (Weiterleitung, `/ca`), Dashboard-Port 8080 (nur lesen) |
+| `mcuboot.py` | MCUboot-Abbild prüfen (Magic, SHA-256, ECDSA-P-256, Sicherheitszähler, HW-TLV-Vorschlag 0xA0) |
+| `backup.py` | `.fbk` v1 (Kap. 14.5) |
+| `pki.py` | Einmal-CA mit Name Constraint `fluidi.local` (Kap. 9) |
+| `climate.py` | SHT4x über `/dev/i2c-1` (Datenblatt V7.3), Simulationsmodus (D-017) |
+| `mqtt.py` | MQTT-3.1.1-Minimalclient + HA-Discovery (Kann, standardmässig aus) |
+| `timesvc.py`, `sysinfo.py` | Zeitquelle (timedatectl/NTP, Browserzeit als Versatz), Systemwerte |
+| `helper.py` | Root-Helfer (WLAN mit Rückfall, NTP, Neustart, Release-Umschaltung) über systemd-Path-Unit |
+
+Threads: HTTP (ThreadingHTTPServer, je Anfrage), Funk (asyncio, bleak), Klima (Intervall 5 min). Gemeinsamer Zustand
+über `Model.lock`. Kein aiohttp: nur Standardbibliothek + `bleak` (+ `cryptography` aus apt).
+
+### 14.2 Datenpfad und Fehlerfälle (Kap. 4, umgesetzt und getestet)
+
+| Fall | Umsetzung | Test |
+|---|---|---|
+| Duplikat (Quittung verloren) | PRIMARY KEY (sensor, seq), `INSERT OR IGNORE`, trotzdem quittieren | `test_session.DataPath.test_duplicates_after_lost_ack` |
+| Nachlieferung | READ_RECORDS je 110, COMMIT, dann ACK bis zur höchsten **lückenlos gespeicherten** seq; Flag 3 | `test_backfill_ack_and_time` |
+| Zeitsprung Sensor (Neustart ohne Gateway) | Rückrechnung vom ersten Synchronpunkt der neuen boot_id, Flag 1; spätere Punkte rechnen unsichere Werte der letzten 90 Tage neu | `test_reboot_without_gateway`, `test_protocol.TimeSync` |
+| Gateway ohne gültige Zeit | Synchronpunkte gespeichert, aber nicht verwendet; Flag 2; keine Zeitverteilung | `TimeSync.test_invalid_points_ignored` |
+| Unbekannter Sensor | kein Verbindungsaufbau, keine Speicherung, nur im Kopplungsfenster Kandidat | `Pairing.test_unknown_sensor_ignored` |
+| MIC ungültig / Replay | Sitzung sofort beendet, Zähler `auth_fail`, nichts gespeichert | `test_bad_mic_session_dropped`, `Crypto.test_secure_channel_replay_and_tamper` |
+| Ring übergelaufen | `lost_records` aus SESSION_INFO → Ereignisprotokoll, PWA | `test_ring_overflow_reported` |
+| ERROR-Frame (unauthentisiert) | nur anzeigen, **nie** Schlüssel löschen | Code `central.Session.run` |
+
+### 14.3 Abweichungen von Kap. 1–12 (bewusst)
+
+| Thema | Vorher | Jetzt | Grund |
+|---|---|---|---|
+| Einrichtungscode | über USB-Konsole | vom Installationsskript (SSH) angezeigt; Reset per SSH (`reset-password`) | Pi ohne USB-Konsole im Betrieb; SSH nur während der Einrichtung, danach aus |
+| `public_read` | Werk ein | **Werk aus** | F-8 (SOFTWARE_CONCEPT 17); Kollegen nutzen das öffentliche Dashboard (D-020) |
+| Dashboard | Port 8443 (HTTPS) | **HTTP 8080**, nur Dashboard-Dateien + `GET /api/v1/dashboard`, abschaltbar | D-020 |
+| OTA-Transport | „SMP-ähnlich / smpclient“ | **eigene OTA-Nachrichten im SECURE-Kanal** (PROTOCOL 9.3) | PROTOCOL ist verbindlich; SMP liefe am gesicherten Kanal vorbei |
+| Backup-Inhalt | 24-B-Datensätze (plattformneutral) | SQLite-Abbild im verschlüsselten Container | ESP32 entfällt (D-014); vollständiger, einfacher |
+| Sitzungen PWA | im RAM | in SQLite (nur Hash des Tokens) | „angemeldet bleiben“ überlebt Neustarts |
+| Benachrichtigungen | E-Mail/ntfy/Web Push als Option | nur In-App, Badge, LED, Dashboard; API lehnt E-Mail/ntfy/Web Push mit 409 ab | D-020 |
+| Raumplan | mehrere Räume möglich | API prüft **ein** Raum | D-020 |
+
+### 14.4 SD-Karte: Schreibrate (Schätzung, ANNAHME – am Gerät messen)
+
+| Quelle | Transaktionen/Tag (15 Sensoren) |
+|---|---|
+| Sitzungen (8 Messungen + ≈ 4 Zeit-/Statussitzungen je Sensor): Messwerte, Synchronpunkt, Sensorstatus | 15 × 12 × 3 ≈ 540 |
+| flüchtige Werte (RSSI, zuletzt gesehen, Batterie) gebündelt alle 15 min | 96 |
+| Raumklima gebündelt alle 30 min | 48 |
+| Ereignisprotokoll, Bedienung | ≈ 20 |
+| **Summe** | **≈ 700** |
+
+Je Transaktion mit WAL und `synchronous=FULL` ≈ 2–3 Seiten à 4 KiB plus späterer Checkpoint (×2) und ext4-Journal
+(≈ ×1.5) → ≈ 20–35 KiB → **≈ 15–25 MB/Tag ≈ 6–9 GB/Jahr**. Bei einer 32-GB-Karte ist das weniger als eine
+Vollbeschreibung pro Jahr; das Hauptrisiko bleibt Korruption bei Stromausfall (abgedeckt durch WAL + Quittung erst
+nach COMMIT). Messung: `GET /system` → `storage.db_transactions`, `storage.sd_written_bytes` (aus `/proc/diskstats`).
+Weitere Massnahmen (Installationsskript): Journal im RAM, keine Swap-Datei, `noatime`, `/tmp` als tmpfs.
+Overlay-Root nur mit separater Datenpartition (GATEWAY_SETUP Kap. 8).
+
+### 14.5 Backup-Format `.fbk` v1 (umgesetzt)
+`"FLUIDIBK"` · Format u16 = 1 · Kopflänge u16 · Kopf-JSON (Gateway-ID, Zeit, KDF PBKDF2-SHA256 mit Salt/Iterationen
+200 000) · Nonce 12 B · AES-256-GCM(gzip-Tar mit `manifest.json` + `fluidi.sqlite`) mit Tag; AAD = alles vor der
+Nonce. Beim Einspielen bleiben Passwort, Einrichtungscode, Zertifikat und WLAN des Zielgeräts; das Gateway startet neu
+und übernimmt die Datenbank (`restore-pending.sqlite`). Test: `test_api.GatewayApi.test_backup_roundtrip`.
+
+### 14.6 Offene Punkte (neu)
+| Nr. | Punkt | Wer |
+|---|---|---|
+| OP-GW-7 | Befunde zur Schnittstelle PROTOCOL.md: `docs/reviews/phase4_protocol_software.md` (K-1, K-2 vor dem ersten Muster klären) | Firmware + Software |
+| OP-GW-8 | bleak/BlueZ am Pi: Verbindungsdauer bis HELLO, MTU, GATT-Cache, Koexistenz (OP-K12) | Prototyp |
+| OP-GW-9 | Startkalibrierung (0.01 pF) und Batteriemodell gegen Muster (API-3, FW-P6) | Prototyp |

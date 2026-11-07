@@ -1,0 +1,7 @@
+# Root-Helfer: nur die in helper.py fest programmierten Aktionen, Anfragen werden streng geprüft
+[Unit]
+Description=fluidi Helfer (Root-Aktionen für den Gateway-Dienst)
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 -I /usr/local/sbin/fluidi-helper

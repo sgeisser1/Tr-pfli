@@ -1,0 +1,11 @@
+# startet fluidi-helper, sobald der Dienst eine Anfrage ablegt (WLAN, NTP, Neustart, Update)
+[Unit]
+Description=fluidi Helfer-Anfragen
+
+[Path]
+DirectoryNotEmpty=/var/lib/fluidi/requests
+MakeDirectory=yes
+DirectoryMode=0700
+
+[Install]
+WantedBy=multi-user.target

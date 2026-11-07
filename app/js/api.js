@@ -1,31 +1,28 @@
-// fluidi – API-Zugriff (docs/interfaces/GATEWAY_API.md). Gleiche Herkunft, Cookie-Sitzung + CSRF-Header.
+// fluidi – API-Zugriff (docs/interfaces/GATEWAY_API.md, app/api/openapi.yaml). Gleiche Herkunft, Cookie-Sitzung + CSRF.
+// Fehler „Anmeldung nötig“ öffnet die Anmeldung, „Passwort bestätigen“ (elevate) ein Bottom-Sheet und wiederholt die Anfrage.
+import { h, sheet } from './dom.js';
 
-const BASE = 'api/v1';
+const BASE = '/api/v1';
+let csrf = null;
+let status = null;
+const hooks = { onAuthRequired: null };
 
 export class ApiError extends Error {
-  constructor(status, code, message, extra = {}) {
+  constructor(st, code, message, extra = {}) {
     super(message);
-    this.status = status;
+    this.status = st;
     this.code = code;
     Object.assign(this, extra);
   }
 }
 
-const auth = { csrf: null, status: null };
-let hooks = { onAuthRequired: null, onElevate: null, onOffline: null };
-
-export function setHooks(h) {
-  hooks = { ...hooks, ...h };
-}
-export function authState() {
-  return auth.status;
-}
+export const setHooks = (h2) => Object.assign(hooks, h2);
+export const authState = () => status;
 
 export async function refreshAuth() {
-  const st = await request('GET', '/auth/status', undefined, { noHooks: true });
-  auth.status = st;
-  auth.csrf = st.csrf || null;
-  return st;
+  status = await req('GET', '/auth/status', undefined, { noHooks: true });
+  csrf = status.csrf || null;
+  return status;
 }
 
 function url(path, query) {
@@ -33,18 +30,12 @@ function url(path, query) {
   if (query) {
     const qs = new URLSearchParams();
     for (const [k, v] of Object.entries(query)) if (v !== undefined && v !== null && v !== '') qs.set(k, String(v));
-    const s = qs.toString();
-    if (s) u += '?' + s;
+    if (qs.toString()) u += '?' + qs;
   }
   return u;
 }
 
-/**
- * request(method, path, body, opts)
- * body: Objekt (JSON) | Blob/ArrayBuffer (octet-stream) | undefined
- * opts: { query, headers, raw (Response zurückgeben), noHooks }
- */
-export async function request(method, path, body, opts = {}) {
+export async function req(method, path, body, opts = {}) {
   const headers = { Accept: 'application/json', ...(opts.headers || {}) };
   let payload;
   if (body instanceof Blob || body instanceof ArrayBuffer) {
@@ -54,149 +45,138 @@ export async function request(method, path, body, opts = {}) {
     headers['Content-Type'] = 'application/json';
     payload = JSON.stringify(body);
   }
-  if (method !== 'GET' && auth.csrf) headers['X-CSRF-Token'] = auth.csrf;
+  if (method !== 'GET' && csrf) headers['X-CSRF-Token'] = csrf;
   let res;
   try {
     res = await fetch(url(path, opts.query), { method, headers, body: payload, credentials: 'same-origin', cache: 'no-store' });
-  } catch (e) {
-    if (hooks.onOffline && !opts.noHooks) hooks.onOffline(true);
-    throw new ApiError(0, 'offline', 'Gateway nicht erreichbar. Bist du im richtigen WLAN?');
+  } catch (_) {
+    throw new ApiError(0, 'offline', 'Gateway nicht erreichbar – bist du im richtigen WLAN?');
   }
-  if (hooks.onOffline && !opts.noHooks) hooks.onOffline(res.headers.get('X-Fluidi-Offline') === '1');
   if (res.ok) {
     if (opts.raw) return res;
     if (res.status === 204) return null;
-    const ct = res.headers.get('Content-Type') || '';
-    return ct.includes('application/json') ? res.json() : res.text();
+    return (res.headers.get('Content-Type') || '').includes('application/json') ? res.json() : res.text();
   }
   let err = { code: 'internal', message: `Fehler ${res.status}` };
-  try {
-    const j = await res.json();
-    if (j && j.error) err = j.error;
-  } catch (_) { /* kein JSON */ }
-  const retry = Number(res.headers.get('Retry-After')) || err.retry_after_s;
-  const e = new ApiError(res.status, err.code, err.message, { field: err.field, retryAfter: retry });
+  try { err = (await res.json()).error || err; } catch (_) { /* kein JSON */ }
+  const e = new ApiError(res.status, err.code, err.message, { field: err.field, retryAfter: Number(res.headers.get('Retry-After')) || err.retry_after_s });
   if (!opts.noHooks) {
-    if (e.code === 'elevation_required' && hooks.onElevate) {
-      const ok = await hooks.onElevate();
-      if (ok) return request(method, path, body, { ...opts, noHooks: true });
+    if (e.code === 'elevation_required' && (await elevateSheet())) return req(method, path, body, { ...opts, noHooks: true });
+    if (e.code === 'auth_required' || e.code === 'csrf') {
+      if (await loginSheet()) return req(method, path, body, { ...opts, noHooks: true });
+      if (hooks.onAuthRequired) hooks.onAuthRequired(e);
     }
-    if ((e.code === 'auth_required' || e.code === 'csrf') && hooks.onAuthRequired) hooks.onAuthRequired(e);
   }
   throw e;
 }
 
-export const get = (p, query) => request('GET', p, undefined, { query });
-export const post = (p, b, o) => request('POST', p, b === undefined ? {} : b, o);
-export const patch = (p, b) => request('PATCH', p, b);
-export const put = (p, b) => request('PUT', p, b);
-export const del = (p) => request('DELETE', p);
+export const get = (p, query) => req('GET', p, undefined, { query });
+export const post = (p, b = {}, o) => req('POST', p, b, o);
+export const patch = (p, b) => req('PATCH', p, b);
+export const put = (p, b) => req('PUT', p, b);
+export const del = (p, query) => req('DELETE', p, undefined, { query });
 
-export async function login(password, remember) {
-  const s = await request('POST', '/auth/login', { password, remember }, { noHooks: true });
-  auth.csrf = s.csrf;
+export async function login(password, remember = true) {
+  const s = await req('POST', '/auth/login', { password, remember }, { noHooks: true });
+  csrf = s.csrf;
   await refreshAuth();
   return s;
 }
 export async function setup(setup_code, password) {
-  const s = await request('POST', '/auth/setup', { setup_code, password }, { noHooks: true });
-  auth.csrf = s.csrf;
+  const s = await req('POST', '/auth/setup', { setup_code, password }, { noHooks: true });
+  csrf = s.csrf;
   await refreshAuth();
   return s;
 }
-export async function elevate(password) {
-  return request('POST', '/auth/elevate', { password }, { noHooks: true });
-}
 export async function logout() {
-  try {
-    await request('POST', '/auth/logout', {}, { noHooks: true });
-  } finally {
-    auth.csrf = null;
-    await refreshAuth().catch(() => null);
-  }
+  try { await req('POST', '/auth/logout', {}, { noHooks: true }); } finally { csrf = null; await refreshAuth().catch(() => null); }
 }
 
-/** Auf einen Job warten: SSE-Ereignisse bevorzugt, sonst Polling (1 s). */
-export function watchJob(job, onUpdate, stream) {
-  const final = new Set(['done', 'failed', 'timeout', 'cancelled']);
-  return new Promise((resolve) => {
-    let stop = false;
-    let unsub = null;
-    const finish = (j) => {
-      if (stop) return;
-      stop = true;
-      if (unsub) unsub();
-      resolve(j);
-    };
-    const handle = (j) => {
-      if (stop || j.id !== job.id) return;
-      onUpdate && onUpdate(j);
-      if (final.has(j.state)) finish(j);
-    };
-    if (stream) unsub = stream.on('job', handle);
-    const poll = async () => {
-      while (!stop) {
-        await new Promise((r) => setTimeout(r, stream && stream.connected ? 4000 : 1000));
-        if (stop) break;
-        try {
-          handle(await get(`/jobs/${encodeURIComponent(job.id)}`));
-        } catch (_) { /* weiter versuchen */ }
-      }
-    };
-    poll();
+/** Anmeldung als Sheet (einziger Admin, REQ-SAF-NET-01). */
+export function loginSheet(text = 'Für diese Aktion braucht es dein Passwort.') {
+  if (status && status.setup_required) return Promise.resolve(false);
+  return sheet((close) => {
+    const pw = h('input.input', { type: 'password', autocomplete: 'current-password', placeholder: 'Passwort', 'aria-label': 'Passwort' });
+    const msg = h('p.err');
+    queueMicrotask(() => pw.focus());
+    return h('form.stack', {
+      onsubmit: async (ev) => {
+        ev.preventDefault();
+        try { await login(pw.value, true); close(true); } catch (e) { msg.textContent = e.message; pw.value = ''; }
+      },
+    }, h('h2', null, 'Anmelden'), h('p.muted', null, text), pw, msg, h('button.btn.primary', { type: 'submit' }, 'Anmelden'));
   });
 }
 
-/** Server-Sent Events mit automatischem Wiederverbinden (iOS schliesst SSE im Hintergrund). */
-export function openStream() {
-  const listeners = new Map();
+/** Heikle Aktionen: Passwort erneut bestätigen (5 min gültig, GATEWAY_API 3.3). */
+export function elevateSheet() {
+  return sheet((close) => {
+    const pw = h('input.input', { type: 'password', autocomplete: 'current-password', placeholder: 'Passwort', 'aria-label': 'Passwort' });
+    const msg = h('p.err');
+    queueMicrotask(() => pw.focus());
+    return h('form.stack', {
+      onsubmit: async (ev) => {
+        ev.preventDefault();
+        try { await req('POST', '/auth/elevate', { password: pw.value }, { noHooks: true }); close(true); } catch (e) { msg.textContent = e.message; pw.value = ''; }
+      },
+    }, h('h2', null, 'Passwort bestätigen'), h('p.muted', null, 'Diese Aktion ist heikel (Firmware, Backup, WLAN, Passwort). Bitte bestätige dein Passwort.'),
+    pw, msg, h('button.btn.primary', { type: 'submit' }, 'Bestätigen'));
+  });
+}
+
+/** Auf einen Job warten (SSE bevorzugt, sonst Polling 1 s, iOS/Android im Hintergrund). */
+export async function watchJob(job, onUpdate, live, final = ['done', 'failed', 'timeout', 'cancelled']) {
+  let j = job;
+  let off = null;
+  const p = new Promise((resolve) => {
+    const check = (x) => {
+      if (x.id !== job.id) return;
+      j = x;
+      onUpdate && onUpdate(x);
+      if (final.includes(x.state)) resolve(x);
+    };
+    if (live) off = live.on('job', check);
+    const tick = async () => {
+      if (final.includes(j.state)) return;
+      try { check(await get(`/jobs/${job.id}`)); } catch (_) { /* nächster Versuch */ }
+      if (!final.includes(j.state)) setTimeout(tick, 1000);
+    };
+    setTimeout(tick, 600);
+  });
+  const r = await p;
+  if (off) off();
+  return r;
+}
+
+/** Server-Sent Events: Live-Aktualisierung; verbindet bei visibilitychange neu (Android/iOS schliessen im Hintergrund). */
+export function stream() {
+  const ls = new Map();
   let es = null;
-  const api = {
-    connected: false,
-    on(type, fn) {
-      if (!listeners.has(type)) listeners.set(type, new Set());
-      listeners.get(type).add(fn);
-      if (es && !wrapped.has(type)) {
-        wrapped.add(type);
-        es.addEventListener(type, wrap(type));
-      }
-      return () => listeners.get(type).delete(fn);
-    },
-    close() {
-      if (es) es.close();
-      es = null;
-      api.connected = false;
-    },
-    connect,
-  };
-  const wrapped = new Set();
-  function wrap(type) {
-    return (ev) => {
+  const wired = new Set();
+  const wire = (t) => {
+    if (!es || wired.has(t)) return;
+    wired.add(t);
+    es.addEventListener(t, (ev) => {
       let d;
-      try {
-        d = JSON.parse(ev.data);
-      } catch (_) {
-        return;
-      }
-      for (const fn of listeners.get(type) || []) fn(d);
-    };
-  }
-  function connect() {
-    if (es) return;
-    es = new EventSource(BASE + '/stream', { withCredentials: true });
-    wrapped.clear();
-    for (const type of listeners.keys()) {
-      wrapped.add(type);
-      es.addEventListener(type, wrap(type));
-    }
-    es.onopen = () => (api.connected = true);
-    es.onerror = () => (api.connected = false);
-  }
+      try { d = JSON.parse(ev.data); } catch (_) { return; }
+      for (const f of ls.get(t) || []) f(d);
+    });
+  };
+  const on = (t, fn) => {
+    if (!ls.has(t)) ls.set(t, new Set());
+    ls.get(t).add(fn);
+    wire(t);
+    return () => ls.get(t).delete(fn);
+  };
+  const connect = () => {
+    if (es || typeof EventSource === 'undefined') return;
+    es = new EventSource(BASE + '/stream');
+    wired.clear();
+    for (const t of ls.keys()) wire(t);
+    es.onerror = () => { if (es && es.readyState === 2) { es = null; setTimeout(connect, 5000); } };
+  };
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible' && (!es || es.readyState === 2)) {
-      es = null;
-      connect();
-    }
+    if (document.visibilityState === 'visible' && (!es || es.readyState === 2)) { es = null; connect(); }
   });
-  return api;
+  return { on, connect };
 }

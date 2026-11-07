@@ -1,0 +1,10 @@
+# fluidi Gateway – Pakete für den Raspberry Pi Zero 2 W (Raspberry Pi OS Lite 64 bit, Bookworm oder Trixie)
+# Python: Bookworm 3.11.x, Trixie 3.13.x (python3 --version); Mindestversion 3.11 (tomllib).
+#
+# Aus Debian (apt, install_gateway.sh): python3-cryptography (Bookworm 38.0.4, Trixie 43.0.0 –
+#   packages.debian.org, abgerufen 2026-11-07), bluez, avahi-daemon, nftables, i2c-tools (Diagnose).
+# Aus PyPI in die venv (--system-site-packages, damit python3-cryptography aus apt genutzt wird):
+bleak==3.0.2          # BLE-Central (BlueZ über D-Bus); verlangt Python >= 3.10 und dbus-fast (PyPI, 2026-05-02)
+dbus-fast>=1.83.0     # Abhängigkeit von bleak unter Linux
+# Ohne Installation lauffähig (nur Standardbibliothek): Simulation, Tests, MQTT (eigener Minimal-Client),
+# I²C-Klimasensor (i2c-dev per ioctl). Versionen am Pi festhalten: pip freeze > /opt/fluidi/current/pip-freeze.txt

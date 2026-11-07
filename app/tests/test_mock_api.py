@@ -258,6 +258,17 @@ class MockApiTest(unittest.TestCase):
         dev = p["candidates"][0]["device"]
         st, j = c.json("POST", f"/api/v1/pairing/candidates/{dev}/accept", {"plant": {"name": "Testpflanze", "substrate": "erde"}})
         self.assertEqual(st, 202)
+        # SAS: Farbfolge vergleichen und bestätigen (PROTOCOL 4.2)
+        for _ in range(40):
+            st, j2 = c.json("GET", f"/api/v1/jobs/{j['id']}")
+            if j2["state"] == "awaiting_confirmation":
+                break
+            time.sleep(0.2)
+        self.check("/jobs/{job_id}", "get", 200, j2)
+        self.assertEqual(len(j2["result"]["sas"]), 5)
+        st, j3 = c.json("POST", f"/api/v1/pairing/candidates/{dev}/confirm", {"match": True})
+        self.assertEqual(st, 202)
+        self.check("/pairing/candidates/{device}/confirm", "post", 202, j3)
         fin = self.wait_job(c, j)
         self.assertEqual(fin["state"], "done")
         st, plant = c.json("GET", f"/api/v1/plants/{fin['result']['plant_id']}")
@@ -344,8 +355,12 @@ class MockApiTest(unittest.TestCase):
         c = Client(self.base)
         st, sp = c.json("GET", "/api/v1/species")
         self.check("/species", "get", 200, sp)
-        self.assertGreaterEqual(len(sp), 10)
-        self.assertTrue(all(x["source"] == "startwert" and "ANNAHME" in x["note"] for x in sp))
+        self.assertGreaterEqual(len(sp), 40)  # app/data/species.json (PFLANZENPROFILE.md, D-021)
+        self.assertTrue(all("ANNAHME" in x["start_note"] for x in sp))
+        self.assertEqual({x["regime"] for x in sp}, {"A", "B", "C", "D"})
+        self.assertEqual(next(x for x in sp if x["key"] == "epipremnum")["regime"], "A")  # D-021 (2)
+        st, cl = c.json("GET", "/api/v1/climate")
+        self.check("/climate", "get", 200, cl)
         st, plants = c.json("GET", "/api/v1/plants")
         moods = {p["mood"] for p in plants}
         self.assertTrue({"happy", "thirsty", "confused", "sleepy", "unknown"} <= moods, moods)
