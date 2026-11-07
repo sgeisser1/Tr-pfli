@@ -49,12 +49,12 @@ def log(*a):
 
 
 HOUSING = ['Kappe_blau', 'Huelse_grau', 'Kragen', 'Verguss_Kragen', 'Verguss_Schott', 'Schottkeil', 'Stoessel',
-           'Fenster_transluzent', 'Mutter_M2', 'Schraube_M2x4', 'ORing_Kragen', 'ORing_Zapfen', 'Taste_blau',
+           'Fenster_transluzent', 'Mutter_M2', 'Schraube_M2', 'ORing_Kragen', 'ORing_Zapfen', 'Taste_blau',
            'Klemmring', 'Membran_Silikon', 'Tastenteller']
 CAST = ('Verguss_Kragen', 'Verguss_Schott')    # werden um die Platine gegossen (nur in Endlage pruefen)
 PLASTIC = ['Kappe_blau', 'Huelse_grau', 'Kragen', 'Schottkeil', 'Stoessel', 'Fenster_transluzent', 'Taste_blau',
            'Klemmring', 'Tastenteller', 'Membran_Silikon', 'ORing_Zapfen', 'ORing_Kragen']
-METAL_HOUSING = ['Mutter_M2', 'Schraube_M2x4']
+METAL_HOUSING = ['Mutter_M2', 'Schraube_M2']
 
 # Datenblatt-Hoehen (max.) fuer Bauteile, deren KiCad-Modell ein Ersatz ist oder fehlt
 DS_H = {
@@ -196,10 +196,28 @@ def main():
     S, sl_plain, _ = FS.build()
     AX, AY, fps, ebb = read_board()
     board, pcb_gen, comps, src, cell, ant = build_pcb(AX, AY, fps)
+    # V-K (D-023): Layout Rev B liegt noch auf der alten Lage. Zelle/Clip und Kragenfeld an die Layoutvorgabe verschieben
+    # (Zellmitte z CELL_C, Feld z KCOMP0 statt 4.4), Pads und Courtyards mit.
+    SHIFT = {'BT1': Z['CELL_C'] - fps['BT1']['z'], 'U3': Z['KCOMP0'] - 4.4, 'C24': Z['KCOMP0'] - 4.4}
+    for ref, dz in SHIFT.items():
+        f_ = fps[ref]
+        f_['z'] += dz
+        f_['crt'] = (f_['crt'][0], f_['crt'][1], f_['crt'][2] + dz, f_['crt'][3] + dz)
+        for p_ in f_['pads']:
+            p_['z'] = (p_['z'][0] + dz, p_['z'][1] + dz)
+        comps[ref] = moved(comps[ref], dz=dz)
+        src[ref] += ', um %+.2f mm in z verschoben (V-K)' % dz
+    cell = moved(cell, dz=SHIFT['BT1'])
+    # Quetschrippen (M-4) werden beim Einbau gequetscht: Kollisionen gegen die Kappe ohne Rippen, Rippen getrennt
+    KAPPE_RIB = S['Kappe_blau']
+    S['Kappe_blau'] = FS.RIBS['Kappe_ohne_Rippen']
     log('=== fluidi Sensor: Kollisionspruefung Gehaeuse <-> Platine (KiCad-STEP), Schnittstelle Rev %s (%s) ===' % (FP.REV, FP.REV_DATE))
     log('Eingaben: %s, %s; Gehaeuse fluidi_sensor.build()' % (os.path.relpath(STEP, REPO), os.path.relpath(BOARD, REPO)))
 
     # ---------------------------------------------------------------- A Koordinatenbezug
+    log('V-K-Verschiebung gegenueber Layout Rev B: %s' % ', '.join('%s %+.2f mm' % kv for kv in SHIFT.items()))
+    log('Quetschrippen: Ueberdeckung Platine / Rippen %.3f mm3 (gewollt, gequetscht); Kappe sonst ohne Rippen geprueft'
+        % pcb_gen.common(FS.RIBS['Rippen']).Volume)
     log('\nA Koordinatenbezug')
     log('   Hilfsursprung KiCad (aux_axis_origin) X %.3f Y %.3f = Mitte Platinenoberkante (Soll: Kontur x +-13, z %.1f)'
         % (AX, AY, PCB['Z_TOP']))
@@ -321,8 +339,8 @@ def main():
     f = fps['BT1']
     cb = comps['BT1'].BoundBox
     log('   Footprint %s, Zellmitte (x %.2f, z %.2f), Drehung %.0f Grad' % (f['fpid'], f['x'], f['z'], f['rot']))
-    log('   Clipkoerper (Modell): x %.2f ... %.2f, z %.2f ... %.2f, Hoehe %.2f (Schnittstelle Rev B: x %.1f ... %.1f, z %.1f ... %.1f)'
-        % (cb.XMin, cb.XMax, cb.ZMin, cb.ZMax, PCB['Y_F'] - cb.YMin, -7.0, 9.1, 7.5, 30.6))
+    log('   Clipkoerper (Modell): x %.2f ... %.2f, z %.2f ... %.2f, Hoehe %.2f (Datenblatt: x %.1f ... %.1f, W %.1f, H %.1f)'
+        % (cb.XMin, cb.XMax, cb.ZMin, cb.ZMax, PCB['Y_F'] - cb.YMin, FP.CLIP['X0'], FP.CLIP['X1'], FP.CLIP['W'], FP.CLIP['H']))
     # Anschlaege (Lappen bis zur Platine) auf der -x-Seite = geschlossenes Ende
     low = comps['BT1'].common(box(-20, 20, PCB['Y_F'] - 1.5, PCB['Y_F'] - 0.4, 0, 40))
     stops = [so.BoundBox for so in low.Solids if so.BoundBox.XMax < f['x'] - 4]
@@ -331,25 +349,28 @@ def main():
             % (min(s.XMin for s in stops), max(s.XMax for s in stops)))
     pz0 = min(p['z'][0] for p in f['pads'] if p['num'] == '1')
     pz1 = max(p['z'][1] for p in f['pads'] if p['num'] == '1')
-    log('   Clip-Pads (VBAT): z %.3f ... %.3f; Z3 beginnt z %.2f (Verguss %.2f), Z5B endet z %.2f (Kragen %.2f)'
-        % (pz0, pz1, Z['BULK0'] - 0.5, Z['BULK0'], Z['COL1'] + 0.2, Z['COL1']))
-    log('     -> Pad ragt %.2f mm in Z3, Luft zum Schott-Verguss %.2f mm; ragt %.2f mm in Z5B, Luft zum Kragen %.2f mm'
-        % (pz1 - (Z['BULK0'] - 0.5), Z['BULK0'] - pz1, (Z['COL1'] + 0.2) - pz0, pz0 - Z['COL1']))
-    log('     Fach (Kragen-Oberkante bis Schott-Unterkante) %.2f mm, Clip ueber Pads %.2f mm -> Rest %.2f mm (je Seite %.2f)'
-        % (Z['BULK0'] - Z['COL1'], pz1 - pz0, Z['BULK0'] - Z['COL1'] - (pz1 - pz0), (Z['BULK0'] - Z['COL1'] - (pz1 - pz0)) / 2))
-    for dzc in (-0.4, 0.4):
-        log('     Variante Zelle/Clip %+.1f mm in z: Pads z %.2f ... %.2f -> Luft Kragen %.2f, Schott %.2f mm'
-            % (dzc, pz0 + dzc, pz1 + dzc, pz0 + dzc - Z['COL1'], Z['BULK0'] - pz1 - dzc))
+    fach = Z['BULK0'] - Z['COL1']
+    log('   Fach (Kragen-Oberkante z %.2f bis Schott-Unterkante z %.2f): %.2f mm; Z5B endet z %.2f, Z3 beginnt z %.2f'
+        % (Z['COL1'], Z['BULK0'], fach, Z['COL1'] + 0.2, Z['BULK0'] - 0.5))
+    log('   Clip-Pads Footprint Rev B (Spanne %.2f), an die V-K-Lage verschoben: z %.3f ... %.3f -> Luft Kragen %.2f, Schott %.2f mm'
+        % (pz1 - pz0, pz0, pz1, pz0 - Z['COL1'], Z['BULK0'] - pz1))
     zc = f['z']
     w = FP.CLIP['W']
-    log('     Pad-Spanne auf Katalogminimum W %.1f (LS-W1 a): Pads z %.2f ... %.2f -> Luft Kragen %.2f, Schott %.2f mm'
-        % (w, zc - w / 2, zc + w / 2, zc - w / 2 - Z['COL1'], Z['BULK0'] - zc - w / 2))
-    tol = math.sqrt(0.2 ** 2 + 0.1 ** 2)
-    log('     Toleranz Lage Pad zur Vergusskante mit Anschlag (Rev C): JLC-Kontur +-0.2 (JLCPCB_NOTES Kap. 3), FDM Anschlag->Schott '
-        '+-0.1, Lehre +-0.1 (nur Kragen) -> Schott +-%.2f (RSS) / +-0.30 (worst), Kragen +-%.2f (RSS) / +-0.40 (worst)'
-        % (tol, math.sqrt(0.2 ** 2 + 0.1 ** 2 + 0.1 ** 2)))
-    log('     Fachlaenge fuer >= 0.3 mm inkl. Toleranz (RSS): %.2f + 2 x 0.30 + %.2f + %.2f = %.2f mm (heute %.2f, fehlt %.2f)'
-        % (w, tol, 0.245, w + 0.6 + tol + 0.245, Z['BULK0'] - Z['COL1'], w + 0.6 + tol + 0.245 - (Z['BULK0'] - Z['COL1'])))
+    q0, q1 = zc - w / 2, zc + w / 2
+    tol_s = math.sqrt(0.2 ** 2 + 0.1 ** 2)
+    tol_k = math.sqrt(0.2 ** 2 + 0.1 ** 2 + 0.1 ** 2)
+    log('   Clip-Pads Layoutvorgabe (Spanne W %.1f, Katalogminimum): z %.2f ... %.2f (KiCad Y %.3f ... %.3f) -> Luft Kragen %.2f, '
+        'Schott %.2f mm' % (w, q0, q1, PCB['Z_TOP'] - q1, PCB['Z_TOP'] - q0, q0 - Z['COL1'], Z['BULK0'] - q1))
+    log('     Toleranz Pad zur Vergusskante (Anschlag): JLC-Kontur +-0.2 (JLCPCB_NOTES Kap. 3), FDM Anschlag->Schott +-0.1, '
+        'Lehre +-0.1 (nur Kragen) -> Schott +-%.2f RSS / +-0.30 worst, Kragen +-%.2f RSS / +-0.40 worst' % (tol_s, tol_k))
+    log('     -> kleinste Luft inkl. Toleranz: Schott %.2f (RSS) / %.2f (worst), Kragen %.2f (RSS) / %.2f (worst); '
+        'Forderung LS-W1 >= 0.30: %s' % (Z['BULK0'] - q1 - tol_s, Z['BULK0'] - q1 - 0.3, q0 - Z['COL1'] - tol_k,
+                                         q0 - Z['COL1'] - 0.4,
+                                         'erfuellt (RSS)' if min(Z['BULK0'] - q1 - tol_s, q0 - Z['COL1'] - tol_k) >= 0.3 - 1e-6
+                                         else 'NICHT erfuellt'))
+    log('     Pads in Zonen: unten %s Z5B-Grenze (z %.2f), oben %s Z3-Grenze (z %.2f)'
+        % ('oberhalb' if q0 >= Z['COL1'] + 0.2 else 'UNTERHALB', Z['COL1'] + 0.2,
+           'unterhalb' if q1 <= Z['BULK0'] - 0.5 else 'OBERHALB', Z['BULK0'] - 0.5))
     for h in ('Kragen', 'Verguss_Kragen', 'Schottkeil', 'Verguss_Schott', 'Kappe_blau', 'Huelse_grau', 'ORing_Kragen', 'ORing_Zapfen'):
         d1 = dist(comps['BT1'], S[h], 5.0)
         d2 = dist(cell, S[h], 5.0)
@@ -374,7 +395,7 @@ def main():
     # Zelle nach -x (geschlossenes Ende): Testpads
     tps = [fps[r] for r in ('TP1', 'TP2', 'TP3') if r in fps]
     if tps:
-        log('   Testpads TP1-TP3 x %.2f ... %.2f; Zellrand x %.2f -> Abstand %.2f mm (Ausschub +x)'
+        log('   Testpads (Layout Rev B: TP1-TP3, TP3 entfaellt nach A-1) x %.2f ... %.2f; Zellrand x %.2f -> Abstand %.2f mm (Ausschub +x)'
             % (min(min(p['x'][0] for p in t['pads']) for t in tps), max(max(p['x'][1] for p in t['pads']) for t in tps),
                f['x'] - FP.CELL['D'] / 2, (f['x'] - FP.CELL['D'] / 2) - max(max(p['x'][1] for p in t['pads']) for t in tps)))
 
@@ -391,7 +412,7 @@ def main():
         'Reserve unten %.2f mm' % (FP.SW['ACT_D'], f['x'] - a, f['x'] + a, f['z'] - a, f['z'] + a, T['X0'], T['X1'], T['Z_TIP'],
                                    f['x'] - a - T['X0'], T['X1'] - (f['x'] + a), f['z'] - a - T['Z_TIP']))
     gap = sb.YMin - T['Y1']
-    log('   Spalt Zunge - Betaetiger (Modell): %.2f mm (Soll 0.20); mit h_max 2.1: %.2f mm' % (gap, PCB['Y_F'] - 2.1 - T['Y1']))
+    log('   Spalt Zunge - Betaetiger (Modell): %.2f mm (Soll %.2f, M-4); mit h_max 2.1: %.2f mm' % (gap, FP.SW['GAP'], PCB['Y_F'] - 2.1 - T['Y1']))
     d = dist(comps['SW1'], S['Kappe_blau'])
     log('   kleinster Abstand SW1 - Kappe: %.2f mm' % d)
 
@@ -449,8 +470,8 @@ def main():
                kp['DEPTH'] - (PCB['Y_F'] - b_.YMin), DS_H.get(r, (PCB['Y_F'] - b_.YMin,))[0],
                kp['DEPTH'] - DS_H.get(r, (PCB['Y_F'] - b_.YMin,))[0], comps[r].distToShape(S['Kragen'])[0],
                comps[r].distToShape(S['Mutter_M2'])[0]))
-        log('        Feld K-2 x -9.0 ... -4.6, z 4.4 ... 6.8: Pads %s' %
-            ('innerhalb' if px0 >= -9.0 and px1 <= -4.6 and pz0 >= 4.4 and pz1 <= 6.8 else 'AUSSERHALB'))
+        log('        Feld K-2 x -9.0 ... -4.6, z %.1f ... %.1f: Pads %s' % (Z['KCOMP0'], Z['KCOMP1'],
+            'innerhalb' if px0 >= -9.0 and px1 <= -4.6 and pz0 >= Z['KCOMP0'] and pz1 <= Z['KCOMP1'] else 'AUSSERHALB'))
 
     # ---------------------------------------------------------------- J Schott
     log('\nJ Schott (Verguss z %.1f ... %.1f, Z3 z %.1f ... %.1f)' % (Z['BULK0'], Z['BULK1'], Z['BULK0'] - 0.5, Z['BAND0']))
@@ -494,6 +515,7 @@ def main():
     log('   %s' % ('frei' if not first else 'Kollision bei %d mm mit %s' % first))
 
     # ---------------------------------------------------------------- Export
+    S['Kappe_blau'] = KAPPE_RIB
     housing_c = [S[h] for h in HOUSING]
     asm = Part.makeCompound(housing_c + [pcb_gen] + list(comps.values()) + [cell] + ([ant] if ant else []))
     asm.exportStep(os.path.join(OUT, 'fluidi_sensor_mit_pcb.step'))

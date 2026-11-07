@@ -1,61 +1,62 @@
 {
  "LC1": {
-  "sigma_nom_edge": 125.4,
-  "sigma_hot": 151.0,
+  "sigma_nom_edge": 124.6,
+  "sigma_hot": 149.4,
   "Kt": 1.21,
-  "sigma_max_free": 167.67,
-  "SF_min": 2.29,
-  "SF_typ_l": 3.74,
+  "sigma_max_free": 167.09,
+  "SF_min": 2.31,
+  "SF_typ_l": 3.78,
   "SF_max": 2.06,
-  "u_tip": 30.695,
-  "u_tip_hand": 29.908
+  "u_tip": 30.162,
+  "u_tip_hand": 29.325
  },
  "LC2": {
-  "sigma": 13.39,
-  "hand": 10.031,
-  "SF_min": 25.8
+  "sigma": 12.65,
+  "hand": 9.966,
+  "SF_min": 27.3
  },
  "LC3": {
-  "sigma": 2.34,
+  "sigma": 2.3,
   "hand": 1.562,
-  "SF_strength": 147.0
+  "SF_strength": 150.0
  },
  "LC4": {
-  "sigma": 1.43,
+  "sigma": 1.38,
   "hand": 0.938,
-  "SF_strength": 241.0
+  "SF_strength": 250.0
  },
  "LC5": {
-  "Pcr": 29.0,
-  "hand": 29.425,
-  "SF": 0.58
+  "Pcr": 29.3,
+  "hand": 29.813,
+  "SF": 0.59
  },
  "LC6": {
-  "Pcr": 235.9,
-  "hand": 240.811,
-  "SF": 4.72
+  "Pcr": 238.4,
+  "hand": 243.993,
+  "SF": 4.77
  },
  "LC1b": {
-  "sigma_hot": 149.76,
-  "sigma_max_pcb": 190.9,
-  "u_tip": 53.745
+  "sigma_hot": 148.59,
+  "sigma_max_pcb": 174.95,
+  "u_tip": 53.874,
+  "SF_max_pcb": 1.97
  },
- "m_total_kg": 0.0281,
+ "m_total_kg": 0.027899999999999998,
  "fall_1m": {
   "Sensor_gesamt_obere_Schranke": {
-   "E_Nmm": 275.7,
-   "F_equiv_N": 13.4,
-   "sigma": 202.3,
+   "E_Nmm": 273.7,
+   "F_equiv_N": 13.5,
+   "sigma": 201.3,
    "SF_min": 1.71,
-   "SF_typ_l": 2.79
+   "SF_typ_l": 2.81
   },
   "nur_Sondenmasse": {
-   "E_Nmm": 62.1,
+   "E_Nmm": 61.7,
    "F_equiv_N": 6.4,
-   "sigma": 96.1,
-   "SF_min": 3.59,
-   "SF_typ_l": 5.88
+   "sigma": 95.6,
+   "SF_min": 3.61,
+   "SF_typ_l": 5.91
   }
  },
- "k_tip_N_per_mm": 0.3258
+ "k_tip_N_per_mm": 0.3315
 }

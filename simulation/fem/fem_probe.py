@@ -6,7 +6,8 @@ Lauf:  freecadcmd simulation/fem/fem_probe.py            (ca. 15 min)
 Ausgabe: simulation/fem/results.json, summary.json, fem_log.txt, work/<fall>/ (ccx-Dateien),
          fem_probe_LC1_seitlich_y.FCStd (feinstes Netz inkl. Ergebnis)
 
-Modell (Masse aus mechanical/gen/fluidi_params.py, Schnittstelle Rev B; Rev A: Lauf vom 2026-11-07 in REPORT.md Kap. 2):
+Modell (Masse aus mechanical/gen/fluidi_params.py, Schnittstelle Rev C mit V-K (D-023): Vergusskante z 1.3, Kragen
+z 1.3 ... 6.6, Huelsenboden 1.3; Rev B: Vergusskante z 2.0, REPORT.md Kap. 4; Rev A: Kap. 2):
   Leiterplatte FR4 20 x 1.6 mm, Spitze 45 Grad, von z = -105 (Spitze) bis z = 32.0 (Schott, eingespannt).
   Kragen (Verguss + ASA) als ein Koerper z 2.0 ... 7.3 um die Platine (bis Nutgrund 22.1 x 7.1), mit der Platine
   verbunden (gemeinsames Netz = Verguss haftet), Aussenflaechen fest (Huelse liegt nach 0.2 mm Spiel an und stuetzt
@@ -23,9 +24,9 @@ Werkstoffe:
   FR4 E = 20 GPa, nu = 0.15: ANNAHME (Datenblatt nennt keinen Modul; typisch 18-24 GPa).
   Kragen E = 3 GPa, nu = 0.35: ANNAHME Epoxid; ASA 2.45 GPa (BambuLab_ASA_TechnicalDataSheet_V2.0.pdf S.2) -> der
       steifere Wert erhoeht die Kerbspannung (konservativ).
-Handrechnung (hand() unten): L = 107 mm (Spitze bis Vergusskante), W = 20*1.6^2/6 = 8.53 mm3, I = 6.83 mm4;
-  LC1 sigma = 10*107/8.53 = 125.4 MPa, f = F L^3/(3EI) = 29.9 mm; Knicken frei pi^2 E I/(4 L^2) = 29.4 N,
-  gefuehrt 2.046 pi^2 E I/L^2 = 241 N. Verguss: Kragen 30 N / (43.2*5.3 mm2) = 0.13 MPa, Schott 50 N / (43.2*1.2) = 0.96 MPa.
+Handrechnung (hand() unten): L = Z_EDGE - Z_TIP (V-K: 106.3 mm, Rev B 107), W = 20*1.6^2/6 = 8.53 mm3, I = 6.83 mm4;
+  LC1 sigma = 10*106.3/8.53 = 124.6 MPa, f = F L^3/(3EI) = 29.3 mm; Knicken frei pi^2 E I/(4 L^2) = 29.8 N,
+  gefuehrt 2.046 pi^2 E I/L^2 = 244 N. Verguss: Kragen 30 N / (43.2*5.3 mm2) = 0.13 MPa, Schott 50 N / (43.2*1.2) = 0.96 MPa.
 """
 import json
 import math
@@ -218,6 +219,10 @@ def run_case(case, h_fine, keep=False):
         out['vm_max'] = round(max(res.vonMises), 2)
         for zq in (-50.0, -20.0, -5.0, -1.0, 0.0, 1.0, 1.5):
             out['sigma_zz_at_%g' % zq] = at(zq, 0.35 if zq > -5 else 1.0)
+        # Rev C / V-K: Auswertung relativ zur Vergusskante (0.5 mm davor, Fenster +-0.35 wie Rev B bei z 1.5 / Kante 2.0)
+        out['z_edge'] = Z_EDGE
+        out['sigma_zz_hot'] = at(Z_EDGE - 0.5, 0.35)
+        out['sigma_zz_edge_m1'] = at(Z_EDGE - 1.0, 0.35)
         prof = {}
         for zz, yy, sz, a1, a3 in surf:
             key = round(zz, 1)

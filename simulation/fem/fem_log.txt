@@ -1,4 +1,4 @@
-Handrechnung: {'I_weak': 6.827, 'W_weak': 8.533, 'W_strong': 106.667, 'L_lever': 107.0, 'sig_lat_y': 125.391, 'sig_lat_x': 10.031, 'sig_axial': 1.562, 'sig_tension': 0.938, 'u_tip_y': 29.908, 'Pcr_free': 29.425, 'Pcr_guided': 240.811}
+Handrechnung: {'I_weak': 6.827, 'W_weak': 8.533, 'W_strong': 106.667, 'L_lever': 106.3, 'sig_lat_y': 124.57, 'sig_lat_x': 9.966, 'sig_axial': 1.562, 'sig_tension': 0.938, 'u_tip_y': 29.325, 'Pcr_free': 29.813, 'Pcr_guided': 243.993}
   gmsh: Error   : Netgen optimizer is not compiled in this version of Gmsh
 Error   : Netgen optimizer is not compiled in this version of Gmsh
 Error   : Netgen optimizer is not compiled in this version of Gmsh
@@ -13,7 +13,7 @@ Error   :     7 errors
 Error   : Check the full log for details
 Error   : ------------------------------
 
-  LC1_seitlich_y h=1.00 Knoten  30627  {'sigma_zz_max_free': 148.31, 'sigma_1_max_free': 151.52, 'sigma_zz_edge': 101.02, 'sigma_1_max_pcb': 151.52, 'vm_max': 138.53, 'sigma_zz_at_-50': 65.65, 'sigma_zz_at_-20': 101.0, 'sigma_zz_at_-5': 120.16, 'sigma_zz_at_-1': 124.32, 'sigma_zz_at_0': 127.15, 'sigma_zz_at_1': 132.31, 'sigma_zz_at_1.5': 148.31, 'u_tip': 30.409, 'u_tip_vec': [-0.0002, 30.4065, -0.0005]}  (12 s)
+  LC1_seitlich_y h=1.00 Knoten  30763  {'sigma_zz_max_free': 139.23, 'sigma_1_max_free': 140.02, 'sigma_zz_edge': 94.3, 'sigma_1_max_pcb': 140.02, 'vm_max': 124.74, 'sigma_zz_at_-50': 65.71, 'sigma_zz_at_-20': 101.03, 'sigma_zz_at_-5': 119.9, 'sigma_zz_at_-1': 124.85, 'sigma_zz_at_0': 127.83, 'sigma_zz_at_1': 139.23, 'sigma_zz_at_1.5': 94.3, 'z_edge': 1.3, 'sigma_zz_hot': 139.23, 'sigma_zz_edge_m1': 130.35, 'u_tip': 29.902, 'u_tip_vec': [0.0, 29.8992, -0.0004]}  (11 s)
   gmsh: Error   : Netgen optimizer is not compiled in this version of Gmsh
 Error   : Netgen optimizer is not compiled in this version of Gmsh
 Error   : Netgen optimizer is not compiled in this version of Gmsh
@@ -28,7 +28,7 @@ Error   :     7 errors
 Error   : Check the full log for details
 Error   : ------------------------------
 
-  LC1_seitlich_y h=0.50 Knoten  65078  {'sigma_zz_max_free': 156.73, 'sigma_1_max_free': 159.28, 'sigma_zz_edge': 115.67, 'sigma_1_max_pcb': 159.28, 'vm_max': 140.65, 'sigma_zz_at_-50': 65.78, 'sigma_zz_at_-20': 100.85, 'sigma_zz_at_-5': 120.39, 'sigma_zz_at_-1': 124.51, 'sigma_zz_at_0': 127.51, 'sigma_zz_at_1': 131.16, 'sigma_zz_at_1.5': 152.9, 'u_tip': 30.559, 'u_tip_vec': [-0.0, 30.5569, -0.0007]}  (32 s)
+  LC1_seitlich_y h=0.50 Knoten  69964  {'sigma_zz_max_free': 151.39, 'sigma_1_max_free': 153.32, 'sigma_zz_edge': 113.39, 'sigma_1_max_pcb': 153.32, 'vm_max': 141.0, 'sigma_zz_at_-50': 65.83, 'sigma_zz_at_-20': 101.0, 'sigma_zz_at_-5': 120.18, 'sigma_zz_at_-1': 124.87, 'sigma_zz_at_0': 128.17, 'sigma_zz_at_1': 151.39, 'sigma_zz_at_1.5': 151.39, 'z_edge': 1.3, 'sigma_zz_hot': 150.96, 'sigma_zz_edge_m1': 128.97, 'u_tip': 30.084, 'u_tip_vec': [0.0001, 30.0809, -0.0005]}  (36 s)
   gmsh: Error   : Netgen optimizer is not compiled in this version of Gmsh
 Error   : Netgen optimizer is not compiled in this version of Gmsh
 Error   : Netgen optimizer is not compiled in this version of Gmsh
@@ -43,7 +43,7 @@ Error   :     7 errors
 Error   : Check the full log for details
 Error   : ------------------------------
 
-  LC1_seitlich_y h=0.25 Knoten 253763  {'sigma_zz_max_free': 167.67, 'sigma_1_max_free': 171.29, 'sigma_zz_edge': 136.01, 'sigma_1_max_pcb': 171.29, 'vm_max': 163.22, 'sigma_zz_at_-50': 65.77, 'sigma_zz_at_-20': 101.47, 'sigma_zz_at_-5': 120.33, 'sigma_zz_at_-1': 123.89, 'sigma_zz_at_0': 126.65, 'sigma_zz_at_1': 129.38, 'sigma_zz_at_1.5': 150.96, 'u_tip': 30.695, 'u_tip_vec': [0.0, 30.692, -0.0007]}  (229 s)
+  LC1_seitlich_y h=0.25 Knoten 297549  {'sigma_zz_max_free': 167.09, 'sigma_1_max_free': 172.24, 'sigma_zz_edge': 133.66, 'sigma_1_max_pcb': 172.24, 'vm_max': 166.66, 'sigma_zz_at_-50': 65.6, 'sigma_zz_at_-20': 101.47, 'sigma_zz_at_-5': 120.21, 'sigma_zz_at_-1': 124.77, 'sigma_zz_at_0': 127.61, 'sigma_zz_at_1': 167.09, 'sigma_zz_at_1.5': 167.09, 'z_edge': 1.3, 'sigma_zz_hot': 149.43, 'sigma_zz_edge_m1': 128.22, 'u_tip': 30.162, 'u_tip_vec': [-0.0, 30.1599, -0.0005]}  (304 s)
   gmsh: Error   : Netgen optimizer is not compiled in this version of Gmsh
 Error   : Netgen optimizer is not compiled in this version of Gmsh
 Error   : Netgen optimizer is not compiled in this version of Gmsh
@@ -58,7 +58,7 @@ Error   :     7 errors
 Error   : Check the full log for details
 Error   : ------------------------------
 
-  LC2_seitlich_x h=0.50 Knoten  65134  {'sigma_zz_max_free': 13.39, 'sigma_1_max_free': 13.97, 'sigma_zz_edge': 10.62, 'sigma_1_max_pcb': 21.93, 'vm_max': 20.18, 'sigma_zz_at_-50': 4.77, 'sigma_zz_at_-20': 7.58, 'sigma_zz_at_-5': 9.1, 'sigma_zz_at_-1': 9.79, 'sigma_zz_at_0': 10.17, 'sigma_zz_at_1': 10.74, 'sigma_zz_at_1.5': 12.79, 'u_tip': 0.216, 'u_tip_vec': [0.2156, 0.0001, -0.0]}  (34 s)
+  LC2_seitlich_x h=0.50 Knoten  70022  {'sigma_zz_max_free': 12.65, 'sigma_1_max_free': 13.09, 'sigma_zz_edge': 10.31, 'sigma_1_max_pcb': 21.53, 'vm_max': 19.65, 'sigma_zz_at_-50': 4.77, 'sigma_zz_at_-20': 7.58, 'sigma_zz_at_-5': 9.1, 'sigma_zz_at_-1': 9.82, 'sigma_zz_at_0': 10.38, 'sigma_zz_at_1': 12.65, 'sigma_zz_at_1.5': 12.65, 'z_edge': 1.3, 'sigma_zz_hot': 12.25, 'sigma_zz_edge_m1': 10.38, 'u_tip': 0.213, 'u_tip_vec': [0.2124, -0.0003, -0.0]}  (38 s)
   gmsh: Error   : Netgen optimizer is not compiled in this version of Gmsh
 Error   : Netgen optimizer is not compiled in this version of Gmsh
 Error   : Netgen optimizer is not compiled in this version of Gmsh
@@ -73,7 +73,7 @@ Error   :     7 errors
 Error   : Check the full log for details
 Error   : ------------------------------
 
-  LC3_axial_druck h=0.50 Knoten  65062  {'sigma_zz_max_free': 2.34, 'sigma_1_max_free': 2.44, 'sigma_zz_edge': 1.91, 'sigma_1_max_pcb': 7.04, 'vm_max': 5.99, 'sigma_zz_at_-50': 1.56, 'sigma_zz_at_-20': 1.57, 'sigma_zz_at_-5': 1.58, 'sigma_zz_at_-1': 1.66, 'sigma_zz_at_0': 1.74, 'sigma_zz_at_1': 1.84, 'sigma_zz_at_1.5': 2.31, 'u_tip': 0.011, 'u_tip_vec': [-0.0, -0.0034, 0.0099]}  (34 s)
+  LC3_axial_druck h=0.50 Knoten  69711  {'sigma_zz_max_free': 2.3, 'sigma_1_max_free': 2.4, 'sigma_zz_edge': 1.86, 'sigma_1_max_pcb': 7.03, 'vm_max': 5.98, 'sigma_zz_at_-50': 1.56, 'sigma_zz_at_-20': 1.57, 'sigma_zz_at_-5': 1.58, 'sigma_zz_at_-1': 1.69, 'sigma_zz_at_0': 1.78, 'sigma_zz_at_1': 2.3, 'sigma_zz_at_1.5': 2.3, 'z_edge': 1.3, 'sigma_zz_hot': 2.18, 'sigma_zz_edge_m1': 1.8, 'u_tip': 0.01, 'u_tip_vec': [-0.0, -0.0024, 0.0098]}  (38 s)
   gmsh: Error   : Netgen optimizer is not compiled in this version of Gmsh
 Error   : Netgen optimizer is not compiled in this version of Gmsh
 Error   : Netgen optimizer is not compiled in this version of Gmsh
@@ -88,7 +88,7 @@ Error   :     7 errors
 Error   : Check the full log for details
 Error   : ------------------------------
 
-  LC4_zug        h=0.50 Knoten  65170  {'sigma_zz_max_free': 1.43, 'sigma_1_max_free': 1.5, 'sigma_zz_edge': 1.12, 'sigma_1_max_pcb': 4.21, 'vm_max': 3.59, 'sigma_zz_at_-50': 0.94, 'sigma_zz_at_-20': 0.94, 'sigma_zz_at_-5': 0.95, 'sigma_zz_at_-1': 0.99, 'sigma_zz_at_0': 1.04, 'sigma_zz_at_1': 1.1, 'sigma_zz_at_1.5': 1.39, 'u_tip': 0.006, 'u_tip_vec': [0.0, 0.002, -0.0059]}  (34 s)
+  LC4_zug        h=0.50 Knoten  70132  {'sigma_zz_max_free': 1.38, 'sigma_1_max_free': 1.44, 'sigma_zz_edge': 1.11, 'sigma_1_max_pcb': 4.21, 'vm_max': 3.6, 'sigma_zz_at_-50': 0.94, 'sigma_zz_at_-20': 0.94, 'sigma_zz_at_-5': 0.95, 'sigma_zz_at_-1': 1.01, 'sigma_zz_at_0': 1.07, 'sigma_zz_at_1': 1.38, 'sigma_zz_at_1.5': 1.38, 'z_edge': 1.3, 'sigma_zz_hot': 1.3, 'sigma_zz_edge_m1': 1.08, 'u_tip': 0.006, 'u_tip_vec': [-0.0, 0.0015, -0.0059]}  (37 s)
   gmsh: Error   : Netgen optimizer is not compiled in this version of Gmsh
 Error   : Netgen optimizer is not compiled in this version of Gmsh
 Error   : Netgen optimizer is not compiled in this version of Gmsh
@@ -103,7 +103,7 @@ Error   :     7 errors
 Error   : Check the full log for details
 Error   : ------------------------------
 
-  LC5_knick_frei h=0.50 Knoten  65232  {'buckling_factors': [0.580105, 5.19324], 'P_cr_N': [29.0, 259.7]}  (63 s)
+  LC5_knick_frei h=0.50 Knoten  70128  {'buckling_factors': [0.5861806, 5.247305], 'P_cr_N': [29.3, 262.4]}  (61 s)
   gmsh: Error   : Netgen optimizer is not compiled in this version of Gmsh
 Error   : Netgen optimizer is not compiled in this version of Gmsh
 Error   : Netgen optimizer is not compiled in this version of Gmsh
@@ -118,7 +118,7 @@ Error   :     7 errors
 Error   : Check the full log for details
 Error   : ------------------------------
 
-  LC6_knick_gefuehrt h=0.50 Knoten  65347  {'buckling_factors': [4.718001, 13.83362], 'P_cr_N': [235.9, 691.7]}  (58 s)
+  LC6_knick_gefuehrt h=0.50 Knoten  70083  {'buckling_factors': [4.767222, 13.97641], 'P_cr_N': [238.4, 698.8]}  (59 s)
   gmsh: Error   : Netgen optimizer is not compiled in this version of Gmsh
 Error   : Netgen optimizer is not compiled in this version of Gmsh
 Error   : Netgen optimizer is not compiled in this version of Gmsh
@@ -133,4 +133,4 @@ Error   :     7 errors
 Error   : Check the full log for details
 Error   : ------------------------------
 
-  LC1b_ohne_Kragenstuetze h=0.50 Knoten  65076  {'sigma_zz_max_free': 154.36, 'sigma_1_max_free': 156.96, 'sigma_zz_edge': 112.25, 'sigma_1_max_pcb': 190.9, 'vm_max': 200.95, 'sigma_zz_at_-50': 65.84, 'sigma_zz_at_-20': 100.89, 'sigma_zz_at_-5': 120.25, 'sigma_zz_at_-1': 123.99, 'sigma_zz_at_0': 126.75, 'sigma_zz_at_1': 129.97, 'sigma_zz_at_1.5': 149.76, 'u_tip': 53.745, 'u_tip_vec': [0.0002, 53.742, 0.0001]}  (35 s)
+  LC1b_ohne_Kragenstuetze h=0.50 Knoten  69879  {'sigma_zz_max_free': 149.94, 'sigma_1_max_free': 151.47, 'sigma_zz_edge': 111.43, 'sigma_1_max_pcb': 174.95, 'vm_max': 194.86, 'sigma_zz_at_-50': 65.7, 'sigma_zz_at_-20': 100.87, 'sigma_zz_at_-5': 120.07, 'sigma_zz_at_-1': 124.36, 'sigma_zz_at_0': 127.37, 'sigma_zz_at_1': 149.94, 'sigma_zz_at_1.5': 149.94, 'z_edge': 1.3, 'sigma_zz_hot': 148.59, 'sigma_zz_edge_m1': 128.41, 'u_tip': 53.874, 'u_tip_vec': [-0.0001, 53.8707, 0.0]}  (38 s)

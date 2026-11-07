@@ -103,3 +103,67 @@ Alternativen:
   - `mechanical/sensor/`, neu: `collision_pcb_step.txt`, `fluidi_sensor_mit_pcb.step`
   - `mechanical/interfaces/`: `pcb_outline.json`, `.dxf`, `pcb_rev_b_floorplan.png` (Kontur geprüft unverändert)
 - `docs/interfaces/PCB_OUTLINE.md` → Rev C.
+
+## 6 Nachtrag Runde 2 (2026-11-08): V-K und M-4 umgesetzt (D-023)
+
+### 6.1 Änderungen (Generator `fluidi_params.py` / `fluidi_sensor.py`)
+
+| Punkt | Rev C (Runde 1) | **Rev C mit V-K/M-4** |
+|---|---|---|
+| Hülsenboden | 2.0 | **1.3** |
+| Kragen / Vergusskante Sonde | z 2.0 … 7.3 | **z 1.3 … 6.6** (Mutter 1.6 … 3.2, O-Ring-Nut 3.6 … 6.0, Tasche 1.3 … 6.1) |
+| Fach (Kragen → Schott) | 23.5 | **24.2**; Distanzlehre `print/distanzlehre_24p2` (alt `_23p5` gelöscht) |
+| Zellmitte | z 19.05 (Y 34.45) | **z 18.70 (Y 34.80)** |
+| Schraube | M2 × 4 | **M2 × 3**: Einschraubtiefe 1.40 mm (3.5 Gänge), Spitze 0.2 unter der Mutteroberkante; Freibohrung bis z 3.3, 0.30 mm unter der O-Ring-Nut (M2 × 4 hätte 0.8 über die Mutter geragt, 0.05 mm neben dem Nutgrund) |
+| F-Referenz der Platine (M-4) | Gabel F 0.05 / B 0.15, Keil 0.15 Luft | vordere Gabelwange und Schottkeil-Rückseite **genau bei y 6.6**. Quetschrippen bis y 7.95: 1 an der hinteren Gabelwange (x −5.5), 2 an der Schott-Rückwand (x ± 9), alle mit Einlauffase. Überdeckung bei Dicke 1.44 … 1.76: 0.09 … 0.41 |
+| Taster (M-4) | Hub 0.6, Spalt 0.20, Keilvorspalt 0.15 | **Hub 0.8, Spalt 0.25, Keilvorspalt 0.10** |
+
+### 6.2 Ergebnisse
+
+- `check_sensor.txt`:
+  - Kollisionen in Ruhe: keine. Platine/Kappe ohne Rippen 0.0000 mm³, Rippen 0.435 mm³ (gewollt gequetscht).
+  - Taste gedrückt (Hub 0.8): keine Überdeckung. Hülse abziehen, Zelle ausschieben, Platine einschieben: frei.
+  - Anschlag: 0.00 mm.
+- **Clip-Pads (Layoutvorgabe W 23.1):** z 7.15 … 30.25, Luft zu beiden Vergusskanten **0.55 mm**.
+  - Mit Toleranz: Schott ≥ 0.33 (RSS) / 0.25 (worst), Kragen ≥ 0.31 (RSS) / 0.15 (worst) → **LS-W1 erfüllt (RSS)**.
+  - Die Pads liegen ausserhalb Z3 und Z5B.
+  - Der heutige Rev-B-Footprint (23.24) an der V-K-Lage hätte 0.48 je Seite.
+- **Taster-Toleranzkette (2b):**
+  - Weg am Betätiger 0.90 mm, nötig 0.45 (Spalt 0.25 + Hub 0.2). Reserve nominal 0.45.
+  - Toleranzen RSS ± 0.32 → Reserve **+0.13** (vorher Rev C: Spalt 0.05 … 0.61, Reserve negativ ab Spalt 0.29). Worst case −0.20.
+  - Spalt in Ruhe min. 0.08 (RSS) bzw. −0.05 (worst; kleiner als der Mindesthub 0.1, also kein Dauerbetätigen).
+  - Nach dem Schaltpunkt bleiben 0.45 mm Überhub. Den nimmt die Biegung des Fingers auf (**PROTOTYP-PRÜFUNG** Schaltgefühl, Tasterbelastung).
+- **STEP-Prüfung** (`collision_pcb_step.txt`; BT1 −0.35, U3/C24 −0.70 an die Layoutvorgabe verschoben):
+  - Kollision: keine.
+  - Kleinste Abstände:
+    - Clip ↔ Kragen / Schottkeil 0.48 (Rev-B-Footprint)
+    - SW1 ↔ Zunge 0.25
+    - U3 ↔ Kragen 0.40, C24 0.70
+    - Epoxid über U3 0.57 (DS 0.60)
+  - U3/C24 liegen im Feld z 3.7 … 6.1.
+  - Lage in z: dz −0.25 kollisionsfrei, dz > 0 sperrt der Anschlag.
+  - Antenne: Kappe 0.76, Stössel 1.26, M2 44.6 mm.
+  - Einschieben und Hülse abziehen: frei.
+
+### 6.3 Masstabelle für das Layout (KiCad, Hilfsursprung (150, 30))
+
+| Element | Vorgabe |
+|---|---|
+| BT1 (Footprint-Ursprung = Zellmitte) | **(3.000, 34.800)**, 90° |
+| Plus-Pads 2 × | 5.08 (X) × 1.27 (Y), X 0.46 … 5.54; **Padmitten Y 23.885 / 45.715** (lokal ± 10.915), Aussenkanten Y 23.250 / 46.350 (Spanne 23.10) |
+| Minuspad | 4 × 4, Mitte (3.000, 34.800), Via-in-Pad gefüllt |
+| Clipkörper (Fab) | X −4.4 … 11.7, Y 23.25 … 46.35, H 4.1 |
+| Vergusskanten | Schott Y 22.70, Kragen Y 46.90, Sonde Y 52.20 |
+| DRC | Pad-Rand ≥ 0.5 mm zu Y 22.70 und Y 46.90 (Regelflächen Y 22.2 … 23.2 und 46.4 … 47.4 ohne Pads) |
+| U3 | (−6.69, **48.60**), C24 (−8.45, **48.70**) (je +0.70) |
+| Kragenfeld K-2 | X −9.0 … −4.6, **Y 47.4 … 49.8** |
+| Zonen | Z3 Y 20.8 … 23.2; Z4 Y 23.2 … 46.7; Z5B Y 46.7 … 50.0; Z5A Y 50.0 … 52.7; Z6 Y 52.7 … 58.5 |
+| Testpads Fach | nur TP1, TP2 (X −10.6, Y 25.5 / 28.5, Via-in-Pad); TP3 entfällt (A-1) → 4 VIP: VBAT, Minus, TP1, TP2 |
+| Platinenanschlag | X −8.0 … −3.0 an der Oberkante (Y 0 … 1.5 Gabel): keine Bauteile, Kupfer erlaubt |
+- **FEM** (`simulation/fem/REPORT.md` Kap. 5), Vergusskante z 1.3:
+  - LC1: 149.4 MPa 0.5 mm vor der Kante, SF **2.31**; 167 MPa an der Kante, SF 2.06.
+  - LC6: **238 N**.
+  - LC1b: 175 MPa, SF 1.97 (Rev B 1.81).
+  - Fall 1 m: SF 1.71, unverändert.
+  - REQ-MECH-10 erfüllt (Bedingung D-023).
+  - Hülsenboden 1.3 von Hand gerechnet: Schub 0.52 MPa (Einstecken 50 N), 2.9 MPa (Kippen LC1), SF ≥ 9.

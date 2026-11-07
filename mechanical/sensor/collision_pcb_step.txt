@@ -1,5 +1,7 @@
 === fluidi Sensor: Kollisionspruefung Gehaeuse <-> Platine (KiCad-STEP), Schnittstelle Rev C (2026-11-08) ===
 Eingaben: hardware/sensor/out/fluidi_sensor.step, hardware/sensor/fluidi_sensor.kicad_pcb; Gehaeuse fluidi_sensor.build()
+V-K-Verschiebung gegenueber Layout Rev B: BT1 -0.35 mm, U3 -0.70 mm, C24 -0.70 mm
+Quetschrippen: Ueberdeckung Platine / Rippen 0.435 mm3 (gewollt, gequetscht); Kappe sonst ohne Rippen geprueft
 
 A Koordinatenbezug
    Hilfsursprung KiCad (aux_axis_origin) X 150.000 Y 30.000 = Mitte Platinenoberkante (Soll: Kontur x +-13, z 53.5)
@@ -65,9 +67,9 @@ B Bauteile: Lage, Hoehe (Modell bzw. Datenblatt), Zone
    TP1   TestPoint_Pad_D1.5mm                    -10.60   28.00   0.00   0.00  Z4_FACH_F (4.1)            Pad/Kupfer
    TP2   TestPoint_Pad_D1.5mm                    -10.60   25.00   0.00   0.00  Z4_FACH_F (4.1)            Pad/Kupfer
    TP3   TestPoint_Pad_D1.0mm                    -10.60   22.00   0.00   0.00  Z4_FACH_F (4.1)            Pad/Kupfer
-   BT1   BatteryHolder_Keystone_3034_1x20mm_Neg    3.00   19.05   4.00   4.10  Z4_FACH_F (4.1)            ok (Fach 4.1)
-   U3    SOT-563                                  -6.69    5.60   0.63   0.63  Z5B_KRAGEN_BAUTEILE (0.0)  ok (Feld 0.7)
-   C24   C_0402_1005Metric                        -8.45    5.50   0.50   0.50  Z5B_KRAGEN_BAUTEILE (0.0)  ok (Feld 0.7)
+   BT1   BatteryHolder_Keystone_3034_1x20mm_Neg    3.00   18.70   4.00   4.10  Z4_FACH_F (4.1)            ok (Fach 4.1)
+   U3    SOT-563                                  -6.69    4.90   0.63   0.63  Z5B_KRAGEN_BAUTEILE (0.0)  ok (Feld 0.7)
+   C24   C_0402_1005Metric                        -8.45    4.80   0.50   0.50  Z5B_KRAGEN_BAUTEILE (0.0)  ok (Feld 0.7)
    -> Hoehenueberschreitungen: keine
    Quellen h_max: U1 TI_CC2340R5_Datasheet_SWRS272F.pdf S. 77, RGE0024B "1 MAX" (Ersatzmodell RGE0024H 0.8); L1 Sunlord_WPN201610H100MT_Datasheet_LCSC-2023-10.pdf S. 2, WPN201610H C max 1.0 (Ersatzmodell DFE201610P 1.0); D1 TUOZHAN_P4-1615G2B2R4TS2-06T-001-24_Datasheet_A0.pdf S. 4: 0.6 +-0.1, 1.6 x 1.5 +-0.1 (kein Modell im STEP); BT1 Keystone_3034_Catalog_M65.pdf S. 1: H .160 (4.1) (KiCad-Modell 4.0); SW1 XUNPU_TS-1088-AR02016_Datasheet_LCSC-2022-06.pdf S. 1: H 2.0, Allgemeintoleranz 0.5-2: +-0.10; U3 TI_TMP1075_Datasheet_SBOS854F.pdf S. 36, DRL0006A "0.6 MAX" (KiCad-Modell 0.63)
 
@@ -76,56 +78,54 @@ C Kollisionen in Endlage (Schnittvolumen > 1e-04 mm3) und kleinster Abstand je B
    (Clip/Zelle: Kontaktfeder des Modells ungespannt, Ueberdeckung 14.78 mm3 beabsichtigt)
    Kleinste Abstaende (<= 3 mm) Bauteil -> Gehaeuse:
    Antenne_Cu   0.76 Kappe_blau, 1.00 Membran_Silikon, 1.26 Stoessel
-   BT1          0.13 Schottkeil, 0.13 Verguss_Schott, 0.13 Kragen
-   C1           0.60 Kappe_blau, 1.50 Schottkeil, 1.50 Verguss_Schott
-   C2           0.60 Kappe_blau, 1.50 Schottkeil, 1.50 Verguss_Schott
+   BT1          0.48 Schottkeil, 0.48 Kragen, 0.48 Verguss_Kragen
+   C1           0.60 Kappe_blau, 1.50 Schottkeil, 1.58 Verguss_Schott
+   C2           0.60 Kappe_blau, 1.50 Schottkeil, 1.58 Verguss_Schott
    C24          0.70 Kragen, 3.00 Huelse_grau, 3.15 ORing_Kragen
-   C3           0.60 Kappe_blau, 1.50 Schottkeil, 1.50 Verguss_Schott
-   C4           0.60 Kappe_blau, 1.50 Schottkeil, 1.50 Verguss_Schott
+   C3           0.60 Kappe_blau, 1.50 Schottkeil, 1.58 Verguss_Schott
+   C4           0.60 Kappe_blau, 1.50 Schottkeil, 1.58 Verguss_Schott
    Q1           0.76 Kappe_blau, 2.95 Huelse_grau
    Q2           1.00 Kappe_blau, 3.80 Huelse_grau
    R10          0.80 Kappe_blau, 3.00 Huelse_grau, 3.12 ORing_Zapfen
-   SW1          0.20 Kappe_blau, 2.78 Fenster_transluzent, 3.00 Huelse_grau
+   SW1          0.25 Kappe_blau, 2.78 Fenster_transluzent, 3.00 Huelse_grau
    U3           0.40 Kragen, 2.81 Huelse_grau, 3.02 ORing_Kragen
    (alle anderen Bauteile >= 1.0 mm zum Gehaeuse)
 
 D Lage der Platine in z (Platine + Bauteile + Zelle verschoben, Gehaeuse fest; Kragen per Lehre am Schott)
    freier Weg nach oben bis zum ersten Anschlag: 0.05 mm (PCB/Kappe_blau)
-   dz -0.25 mm: BT1/Kragen 0.122 mm3
-   dz +0.25 mm: BT1/Schottkeil 0.122 mm3, PCB/Kappe_blau 2.000 mm3
-   dz +0.40 mm: BT1/Schottkeil 0.275 mm3, PCB/Kappe_blau 3.200 mm3
-   dz +0.70 mm: U3/Kragen 0.161 mm3, BT1/Schottkeil 0.581 mm3, PCB/Kappe_blau 5.600 mm3
+   dz -0.25 mm: keine Kollision
+   dz +0.25 mm: PCB/Kappe_blau 2.000 mm3
+   dz +0.40 mm: PCB/Kappe_blau 3.200 mm3
+   dz +0.70 mm: U3/Kragen 0.161 mm3, BT1/Schottkeil 0.357 mm3, PCB/Kappe_blau 5.600 mm3
 
 E Batterieclip Keystone 3034 und CR2032
-   Footprint fluidi:BatteryHolder_Keystone_3034_1x20mm_NegPad4mm, Zellmitte (x 3.00, z 19.05), Drehung 90 Grad
-   Clipkoerper (Modell): x -4.76 ... 11.65, z 7.43 ... 30.67, Hoehe 4.00 (Schnittstelle Rev B: x -7.0 ... 9.1, z 7.5 ... 30.6)
+   Footprint fluidi:BatteryHolder_Keystone_3034_1x20mm_NegPad4mm, Zellmitte (x 3.00, z 18.70), Drehung 90 Grad
+   Clipkoerper (Modell): x -4.76 ... 11.65, z 7.08 ... 30.32, Hoehe 4.00 (Datenblatt: x -4.4 ... 11.7, W 23.1, H 4.1)
    Anschlaglappen (reichen bis 0.4 mm ueber F): x -4.76 ... -1.62 -> geschlossenes Ende -x, Einschub/Ausschub +x (bestaetigt)
-   Clip-Pads (VBAT): z 7.430 ... 30.670; Z3 beginnt z 30.30 (Verguss 30.80), Z5B endet z 7.50 (Kragen 7.30)
-     -> Pad ragt 0.37 mm in Z3, Luft zum Schott-Verguss 0.13 mm; ragt 0.07 mm in Z5B, Luft zum Kragen 0.13 mm
-     Fach (Kragen-Oberkante bis Schott-Unterkante) 23.50 mm, Clip ueber Pads 23.24 mm -> Rest 0.26 mm (je Seite 0.13)
-     Variante Zelle/Clip -0.4 mm in z: Pads z 7.03 ... 30.27 -> Luft Kragen -0.27, Schott 0.53 mm
-     Variante Zelle/Clip +0.4 mm in z: Pads z 7.83 ... 31.07 -> Luft Kragen 0.53, Schott -0.27 mm
-     Pad-Spanne auf Katalogminimum W 23.1 (LS-W1 a): Pads z 7.50 ... 30.60 -> Luft Kragen 0.20, Schott 0.20 mm
-     Toleranz Lage Pad zur Vergusskante mit Anschlag (Rev C): JLC-Kontur +-0.2 (JLCPCB_NOTES Kap. 3), FDM Anschlag->Schott +-0.1, Lehre +-0.1 (nur Kragen) -> Schott +-0.22 (RSS) / +-0.30 (worst), Kragen +-0.24 (RSS) / +-0.40 (worst)
-     Fachlaenge fuer >= 0.3 mm inkl. Toleranz (RSS): 23.10 + 2 x 0.30 + 0.22 + 0.24 = 24.17 mm (heute 23.50, fehlt 0.67)
-   Abstand Clip / Zelle - Kragen           0.13 / 1.75
-   Abstand Clip / Zelle - Verguss_Kragen   0.13 / 1.75
-   Abstand Clip / Zelle - Schottkeil       0.13 / 1.75
-   Abstand Clip / Zelle - Verguss_Schott   0.13 / 1.75
-   Abstand Clip / Zelle - Kappe_blau       1.15 / 1.75
+   Fach (Kragen-Oberkante z 6.60 bis Schott-Unterkante z 30.80): 24.20 mm; Z5B endet z 6.80, Z3 beginnt z 30.30
+   Clip-Pads Footprint Rev B (Spanne 23.24), an die V-K-Lage verschoben: z 7.080 ... 30.320 -> Luft Kragen 0.48, Schott 0.48 mm
+   Clip-Pads Layoutvorgabe (Spanne W 23.1, Katalogminimum): z 7.15 ... 30.25 (KiCad Y 23.250 ... 46.350) -> Luft Kragen 0.55, Schott 0.55 mm
+     Toleranz Pad zur Vergusskante (Anschlag): JLC-Kontur +-0.2 (JLCPCB_NOTES Kap. 3), FDM Anschlag->Schott +-0.1, Lehre +-0.1 (nur Kragen) -> Schott +-0.22 RSS / +-0.30 worst, Kragen +-0.24 RSS / +-0.40 worst
+     -> kleinste Luft inkl. Toleranz: Schott 0.33 (RSS) / 0.25 (worst), Kragen 0.31 (RSS) / 0.15 (worst); Forderung LS-W1 >= 0.30: erfuellt (RSS)
+     Pads in Zonen: unten oberhalb Z5B-Grenze (z 6.80), oben unterhalb Z3-Grenze (z 30.30)
+   Abstand Clip / Zelle - Kragen           0.48 / 2.10
+   Abstand Clip / Zelle - Verguss_Kragen   0.48 / 2.10
+   Abstand Clip / Zelle - Schottkeil       0.48 / 2.10
+   Abstand Clip / Zelle - Verguss_Schott   1.50 / 2.10
+   Abstand Clip / Zelle - Kappe_blau       1.50 / 2.10
    Abstand Clip / Zelle - Huelse_grau      0.95 / 1.14
-   Abstand Clip / Zelle - ORing_Kragen     2.01 / 2.64
-   Abstand Clip / Zelle - ORing_Zapfen     1.91 / 2.54
+   Abstand Clip / Zelle - ORing_Kragen     2.36 / 2.98
+   Abstand Clip / Zelle - ORing_Zapfen     2.26 / 2.89
    Zelle 30 mm nach +x aus-/einschieben (Huelse abgezogen), gegen Gehaeuse und alle Bauteile ausser Clip: frei
    Zelle in montierter Huelse: Weg bis Seitenwand 2.40 mm (Clip haelt die Zelle)
-   Testpads TP1-TP3 x -11.35 ... -9.85; Zellrand x -7.00 -> Abstand 2.85 mm (Ausschub +x)
+   Testpads (Layout Rev B: TP1-TP3, TP3 entfaellt nach A-1) x -11.35 ... -9.85; Zellrand x -7.00 -> Abstand 2.85 mm (Ausschub +x)
 
 F Taster SW1 gegen Biegezunge der Kappe
    SW1 Button_Switch_SMD:SW_SPST_TS-1088-xR020, Mitte (-6.00, 45.10), Drehung 0; Pads x -8.75...-7.70 z 44.10...46.10, x -4.30...-3.25 z 44.10...46.10
    Modell x -8.50 ... -3.50, z 43.60 ... 46.60, Oberseite y 4.60 (h 2.00)
    Betaetiger Ø1.8: x -6.90 ... -5.10, z 44.20 ... 46.00; Zunge x -7.6 ... -4.4, z ab 43.5 -> seitliche Reserve 0.70 / 0.70 mm, Reserve unten 0.70 mm
-   Spalt Zunge - Betaetiger (Modell): 0.20 mm (Soll 0.20); mit h_max 2.1: 0.10 mm
-   kleinster Abstand SW1 - Kappe: 0.20 mm
+   Spalt Zunge - Betaetiger (Modell): 0.25 mm (Soll 0.25, M-4); mit h_max 2.1: 0.15 mm
+   kleinster Abstand SW1 - Kappe: 0.25 mm
 
 G RGB-LED D1 unter dem Tropfenfenster
    D1 fluidi:LED_RGB_TUOZHAN_1615 Mitte (0.00, 43.90), Drehung 180; Tropfen-/Lichtschaftmitte (0.00, 43.90) -> Versatz 0.00 mm (Tol. LED +-0.3)
@@ -138,7 +138,7 @@ H Antenne AE1
    Variante _Right: Einspeisung/Kurzschluss links, offenes Ende rechts (wie Schnittstelle verlangt)
    Abstand Antennenkupfer - Kappe_blau           0.76 mm
    Abstand Antennenkupfer - Huelse_grau          5.17 mm
-   Abstand Antennenkupfer - Kragen               40.50 mm
+   Abstand Antennenkupfer - Kragen               41.20 mm
    Abstand Antennenkupfer - Schottkeil           15.80 mm
    Abstand Antennenkupfer - Stoessel             1.26 mm
    Abstand Antennenkupfer - Fenster_transluzent  3.51 mm
@@ -147,26 +147,26 @@ H Antenne AE1
    Abstand Antennenkupfer - Tastenteller         2.12 mm
    Abstand Antennenkupfer - Membran_Silikon      1.00 mm
    Abstand Antennenkupfer - ORing_Zapfen         14.76 mm
-   Abstand Antennenkupfer - ORing_Kragen         41.49 mm
-   Abstand Antennenkupfer - Mutter_M2            43.90 mm
-   Abstand Antennenkupfer - Schraube_M2x4        43.82 mm
-   Abstand Antennenkupfer - Verguss_Kragen       40.50 mm
-   Abstand Antennenkupfer - Verguss_Schott       15.80 mm
-   Abstand Antennenkupfer - BT1 (Bauteil)        17.13 mm (Metall)
+   Abstand Antennenkupfer - ORing_Kragen         42.19 mm
+   Abstand Antennenkupfer - Mutter_M2            44.60 mm
+   Abstand Antennenkupfer - Schraube_M2          44.82 mm
+   Abstand Antennenkupfer - Verguss_Kragen       41.20 mm
+   Abstand Antennenkupfer - Verguss_Schott       15.88 mm
+   Abstand Antennenkupfer - BT1 (Bauteil)        17.48 mm (Metall)
    Abstand Antennenkupfer - SW1 (Bauteil)        2.28 mm (Metall)
-   Abstand Antennenkupfer - CR2032               18.85 mm (Metall)
+   Abstand Antennenkupfer - CR2032               19.20 mm (Metall)
 
 I Kragen und Kragenverguss (Z5A/Z5B)
-   Bauteile unterhalb z 7.5: C24, U3
-   U3   Koerper x -7.49 ... -5.89 z 4.80 ... 6.40 h 0.63; Pads x -7.74 ... -5.64 z 4.92 ... 6.28; Courtyard x -7.94 ... -5.44 z 4.61 ... 6.59
-        Tasche x -9.6 ... -4.4, z 2.0 ... 6.8, Tiefe 1.2: Rand x 2.11 / 1.49, z oben 0.40; Epoxid ueber Koerper 0.57 mm (h_max 0.60: 0.60); Abstand Kragen 0.40, Mutter 4.30 mm
-        Feld K-2 x -9.0 ... -4.6, z 4.4 ... 6.8: Pads innerhalb
-   C24  Koerper x -8.70 ... -8.20 z 5.00 ... 6.00 h 0.50; Pads x -8.76 ... -8.14 z 4.74 ... 6.26; Courtyard x -8.96 ... -7.94 z 4.55 ... 6.45
-        Tasche x -9.6 ... -4.4, z 2.0 ... 6.8, Tiefe 1.2: Rand x 0.90 / 3.80, z oben 0.80; Epoxid ueber Koerper 0.70 mm (h_max 0.50: 0.70); Abstand Kragen 0.70, Mutter 6.29 mm
-        Feld K-2 x -9.0 ... -4.6, z 4.4 ... 6.8: Pads innerhalb
+   Bauteile unterhalb z 6.8: C24, U3
+   U3   Koerper x -7.49 ... -5.89 z 4.10 ... 5.70 h 0.63; Pads x -7.74 ... -5.64 z 4.22 ... 5.58; Courtyard x -7.94 ... -5.44 z 3.91 ... 5.89
+        Tasche x -9.6 ... -4.4, z 1.3 ... 6.1, Tiefe 1.2: Rand x 2.11 / 1.49, z oben 0.40; Epoxid ueber Koerper 0.57 mm (h_max 0.60: 0.60); Abstand Kragen 0.40, Mutter 4.30 mm
+        Feld K-2 x -9.0 ... -4.6, z 3.7 ... 6.1: Pads innerhalb
+   C24  Koerper x -8.70 ... -8.20 z 4.30 ... 5.30 h 0.50; Pads x -8.76 ... -8.14 z 4.04 ... 5.56; Courtyard x -8.96 ... -7.94 z 3.85 ... 5.75
+        Tasche x -9.6 ... -4.4, z 1.3 ... 6.1, Tiefe 1.2: Rand x 0.90 / 3.80, z oben 0.80; Epoxid ueber Koerper 0.70 mm (h_max 0.50: 0.70); Abstand Kragen 0.70, Mutter 6.29 mm
+        Feld K-2 x -9.0 ... -4.6, z 3.7 ... 6.1: Pads innerhalb
 
 J Schott (Verguss z 30.8 ... 32.0, Z3 z 30.3 ... 32.7)
-   Pads in Z3: BT1 Pad 1 z 29.40 ... 30.67
+   Pads in Z3: BT1 Pad 1 z 29.05 ... 30.32
    tiefstes Bauteil im Band: C1 Unterkante z 33.50 -> 1.50 mm ueber Schott-Oberkante (Verguss, Keil)
 
 K Platine (STEP, mit Clip, ohne Zelle) 60 mm von unten durch das Schott einschieben

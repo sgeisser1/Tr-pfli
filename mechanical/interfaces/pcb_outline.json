@@ -2,8 +2,8 @@
  "title": "fluidi Sensor P3 - Schnittstelle PCB-Kontur <-> Gehaeuse",
  "revision": "C",
  "date": "2026-11-08",
- "revision_note": "Rev C ersetzt Rev B, Kontur unveraendert: Clip 3034 nach Datenblatt x -4.4...11.7 (Rev B -7...9.1 falsch), Clip-Pad-Spanne 23.1 (z 7.50...30.60), Antenne Footprint _Right an Layout-Lage, Feld Z5B x -9.0...-4.6 (K-2), Z5A Innenlagen nur GND/Guard + Sonde (K-1), K-3, TP3 entfaellt und 4 VIP im Fach (A-1), Platinenanschlag in der Kappe (Lage z), STEP-Koordinatenbezug. Rev B: Kopf V4 (D-019).",
- "status": "verbindlich fuer Layout Rev C (Aenderung nur ueber neue Revision). Offen: LS-W1 (Pad - Verguss >= 0.3 inkl. Toleranz) braucht Fachverlaengerung, Entscheid Projektleitung (docs/reviews/phase4_kollision_mechanik.md)",
+ "revision_note": "Rev C (mit V-K, D-023) ersetzt Rev B, Kontur unveraendert: Fach 24.2 (Huelsenboden 1.3, Kragen 0.7 tiefer, Vergusskante z 1.3), Zelle z 18.70, Clip 3034 nach Datenblatt x -4.4...11.7 (Rev B -7...9.1 falsch), Clip-Pad-Spanne 23.1 (z 7.15...30.25, Rand 0.55 zum Verguss), Feld U3/C24 z 3.7...6.1, Taster M-4, Antenne Footprint _Right an Layout-Lage, Feld Z5B x -9.0...-4.6 (K-2), Z5A Innenlagen nur GND/Guard + Sonde (K-1), K-3, TP3 entfaellt und 4 VIP im Fach (A-1), Platinenanschlag in der Kappe (Lage z), STEP-Koordinatenbezug. Rev B: Kopf V4 (D-019).",
+ "status": "verbindlich fuer Layout Rev C (Aenderung nur ueber neue Revision); V-K und M-4 nach D-023",
  "generator": "mechanical/gen/fluidi_params.py",
  "doc": "docs/interfaces/PCB_OUTLINE.md",
  "units": "mm",
@@ -12,7 +12,7 @@
   "kicad": "X = x, Y = 53.5 - z (Ursprung Mitte Oberkante, Y nach unten), Top-View = Ansicht von vorne, F.Cu = bestueckte Seite zeigt zum Fenster (-y)",
   "kicad_page": "Hilfsursprung (aux_axis_origin) = Mitte Oberkante, in fluidi_sensor.kicad_pcb bei Seite (150, 30): x = X_p - 150, z = 53.5 - (Y_p - 30)",
   "kicad_step": "kicad-cli pcb export step ohne Ursprungsoption: X_s = X_p, Y_s = -Y_p, Z_s = Hoehe ueber B. Kopf: x = X_s - 150, y = 8.2 - Z_s, z = 83.5 + Y_s (Drehung +90 Grad um x, Verschiebung (-150, 8.2, 83.5)); fluidi_pcb_collision.py",
-  "field": "simulation/field/REPORT.md: z_f = -z (0 an der Kopfunterkante, + zur Spitze); Vergusskante liegt bei z = 2.0 (z_f = -2.0), d. h. 2 mm hoeher als dort angenommen (konservativ fuer Luftanteil)"
+  "field": "simulation/field/REPORT.md: z_f = -z (0 an der Kopfunterkante, + zur Spitze); Vergusskante liegt bei z = 1.3 (z_f = -1.3, V-K), d. h. 1.3 mm hoeher als dort angenommen (konservativ fuer Luftanteil)"
  },
  "head": {
   "W": 34.0,
@@ -366,7 +366,7 @@
     32.7
    ],
    "hmax": 0.0,
-   "rule": "Schott-Verguss z 30.8...32.0: keine Bauteile, keine Vias, kein Kupfer auf Aussenlagen, Loetstopplack geschlossen. Signale nur Innenlagen (M-03, S3-K1). Ausnahme Rev C: Clip-Pads XBT1 bis z 30.60 (Pad-Spanne 23.1, Kap. 5); Abstand Pad - Verguss nominal 0.20 (LS-W1: >= 0.3 inkl. Toleranz erst mit Fachverlaengerung, Entscheid offen).",
+   "rule": "Schott-Verguss z 30.8...32.0: keine Bauteile, keine Vias, kein Kupfer auf Aussenlagen, Loetstopplack geschlossen. Signale nur Innenlagen (M-03, S3-K1). Clip-Pads XBT1 enden bei z 30.25, Pad-Rand >= 0.5 mm zur Vergusskante (DRC, LS-W1, V-K).",
    "kicad_Y": [
     20.8,
     23.2
@@ -380,14 +380,14 @@
     13.0
    ],
    "z": [
-    7.5,
+    6.8,
     30.3
    ],
    "hmax": 4.1,
-   "rule": "Zellfach: nur Keystone 3034 (gedreht, geschlossenes Ende -x, Ein-/Ausschub +x; Clipkoerper x -4.4...11.7 nach Datenblatt B 7.4/L 16.1; Zelle x -7.0...13.0) und Minuspad 4 x 4; Testpads nur TP1 (TX), TP2 (RX) im Streifen x -12.7...-7.5, z 12...30 (TP3 entfaellt, Auflage A-1; Adapter-GND ueber das Minuspad). Genau 4 Via-in-Pad, gefuellt und ueberkupfert (POFV): VBAT-Clip-Pad, Minuspad, TP1, TP2; sonst keine Vias. Unter der Zelle nur Loetstopplack ausser Minuspad (R2-W01 Nr. 2). Leitungen nur Innenlagen, >= 1.0 zur Kante (K-3). 2 x 100 kOhm im Elektronikraum (R2-A3). Schulter z 7.7...11.5 (45 Grad, Innenecke R 2) ohne Kupfer aussen.",
+   "rule": "Zellfach z 6.60...30.80 (Kragen bis Schott, V-K 24.2 mm): nur Keystone 3034 (gedreht, geschlossenes Ende -x, Ein-/Ausschub +x; Clipkoerper x -4.4...11.7 nach Datenblatt B 7.4/L 16.1; Zelle x -7.0...13.0) und Minuspad 4 x 4; Testpads nur TP1 (TX), TP2 (RX) im Streifen x -12.7...-7.5, z 12...30 (TP3 entfaellt, Auflage A-1; Adapter-GND ueber das Minuspad). Genau 4 Via-in-Pad, gefuellt und ueberkupfert (POFV): VBAT-Clip-Pad, Minuspad, TP1, TP2; sonst keine Vias. Unter der Zelle nur Loetstopplack ausser Minuspad (R2-W01 Nr. 2). Leitungen nur Innenlagen, >= 1.0 zur Kante (K-3). 2 x 100 kOhm im Elektronikraum (R2-A3). Schulter z 7.7...11.5 (45 Grad, Innenecke R 2) ohne Kupfer aussen. Plus-Pads z 7.15...30.25, Pad-Rand >= 0.5 zu beiden Vergusskanten (DRC).",
    "kicad_Y": [
     23.2,
-    46.0
+    46.7
    ]
   },
   {
@@ -398,14 +398,14 @@
     13.0
    ],
    "z": [
-    7.5,
+    6.8,
     30.3
    ],
    "hmax": 0.0,
    "rule": "Silkscreen Warnsymbol Dreieck >= 7 x 9 mm + \"CR2032 Verschluckgefahr\" (S3-W4, zweiter Ort). Keine Testpads (Fach wird geflutet, REQ-SAF-05).",
    "kicad_Y": [
     23.2,
-    46.0
+    46.7
    ]
   },
   {
@@ -416,14 +416,14 @@
     10.0
    ],
    "z": [
-    4.2,
-    7.5
+    3.5,
+    6.8
    ],
    "hmax": 0.0,
-   "rule": "Im Kragen-Verguss (Z5B freigegeben unter K-1...K-7). F: nur U3 TMP1075N + C24 im Feld x -9.0...-4.6, z 4.4...6.8 (K-2), Hoehe <= 0.7 (Tasche 1.2 tief, >= 0.5 mm Epoxid darueber); Vias nur in diesem Feld, tented oder gefuellt, >= 1.0 mm zur Platinenkante (K-2). Sonst keine Bauteile, keine Vias, kein Aussenkupfer. Ausnahme Rev C: Clip-Pads XBT1 ab z 7.50. B: frei. Abstand zur Mutter |x| >= 2.6.",
+   "rule": "Im Kragen-Verguss (Z5B freigegeben unter K-1...K-7). F: nur U3 TMP1075N + C24 im Feld x -9.0...-4.6, z 3.7...6.1 (K-2, V-K 0.7 tiefer), Hoehe <= 0.7 (Tasche 1.2 tief, >= 0.5 mm Epoxid darueber); Vias nur in diesem Feld, tented oder gefuellt, >= 1.0 mm zur Platinenkante (K-2). Sonst keine Bauteile, keine Vias, kein Aussenkupfer. B: frei. Abstand zur Mutter |x| >= 2.6. Innenlagen >= 1.0 zur Kante.",
    "kicad_Y": [
-    46.0,
-    49.3
+    46.7,
+    50.0
    ]
   },
   {
@@ -434,14 +434,14 @@
     10.0
    ],
    "z": [
-    1.5,
-    4.2
+    0.8,
+    3.5
    ],
    "hmax": 0.0,
-   "rule": "Sondendichtung (S3-K2, REQ-MECH-08/15), Vergusskante z 2.0: keine Bauteile, keine Vias, kein Kupfer auf Aussenlagen, Loetstopp geschlossen. Innenlagen nur GND/Guard und die Sondennetze (K-1); SENS_PWR, SDA, SCL enden ueber z 4.4.",
+   "rule": "Sondendichtung (S3-K2, REQ-MECH-08/15), Vergusskante z 1.3: keine Bauteile, keine Vias, kein Kupfer auf Aussenlagen, Loetstopp geschlossen. Innenlagen nur GND/Guard und die Sondennetze (K-1); SENS_PWR, SDA, SCL enden ueber z 3.7.",
    "kicad_Y": [
-    49.3,
-    52.0
+    50.0,
+    52.7
    ]
   },
   {
@@ -453,12 +453,12 @@
    ],
    "z": [
     -5.0,
-    1.5
+    0.8
    ],
    "hmax": 0.0,
-   "rule": "Zwischen Erde und Kragen: keine Elektroden (Luftanteil), Guard auf L2/L3 erlaubt (Feld Kap. 8), keine Vias (Feld: z 0...2 und nasser Bereich). Silkscreen Logo (F) und \"max\"/Revision (B).",
+   "rule": "Zwischen Erde und Kragen: keine Elektroden (Luftanteil), Guard auf L2/L3 erlaubt (Feld Kap. 8), keine Vias (nasser Bereich). Silkscreen Logo (F) und \"max\"/Revision (B).",
    "kicad_Y": [
-    52.0,
+    52.7,
     58.5
    ]
   },
@@ -526,19 +526,19 @@
    "rotation": "90 Grad: Einschub in x, geschlossenes Ende -x, offenes Ende +x",
    "cell_center_xz": [
     3.0,
-    19.05
+    18.7
    ],
    "kicad_XY": [
     3.0,
-    34.45
+    34.8
    ],
    "clip_x": [
     -4.4,
     11.7
    ],
    "clip_z": [
-    7.5,
-    30.6
+    7.15,
+    30.25
    ],
    "height": 4.1,
    "cell_x": [
@@ -548,12 +548,18 @@
    "pads_plus": {
     "span_z": 23.1,
     "z": [
-     7.5,
-     30.6
+     7.15,
+     30.25
     ],
+    "drc_min_edge_to_potting": 0.5,
+    "potting_edges_z": [
+     6.6,
+     30.8
+    ],
+    "margin_nominal": 0.55,
     "kicad_Y": [
-     22.9,
-     46.0
+     23.25,
+     46.35
     ],
     "size_xz": [
      5.08,
@@ -564,8 +570,8 @@
      5.54
     ],
     "kicad_pad_centers_Y": [
-     23.535,
-     45.365
+     23.885,
+     45.715
     ],
     "note": "Katalogminimum W 23.1 (Keystone_3034_Catalog_M65.pdf S.1 Fig. 1 Pad Layout); KiCad-Bibliothek 23.24 -> je Seite 0.07 kuerzen (LS-W1 a)"
    },
@@ -580,7 +586,7 @@
    "z_stop": 53.5,
    "fork_depth": 1.5,
    "fork_y": [
-    6.55,
+    6.6,
     8.35
    ],
    "note": "Kappe: Anschlag fuer die Platinenoberkante (Lage in z beim Schott-Verguss kopfueber) und Gabel (y). Platine dort ohne Bauteile (Z1), Kupfer erlaubt ausserhalb des Antennen-Keepouts."
@@ -593,13 +599,13 @@
     -4.6
    ],
    "z": [
-    4.6,
-    6.6
+    3.9,
+    5.9
    ],
    "height_max": 0.7,
    "kicad_Y": [
-    46.9,
-    48.9
+    47.6,
+    49.6
    ],
    "field_K2": {
     "x": [
@@ -607,12 +613,12 @@
      -4.6
     ],
     "z": [
-     4.4,
-     6.8
+     3.7,
+     6.1
     ],
     "kicad_Y": [
-     46.7,
-     49.1
+     47.4,
+     49.8
     ],
     "vias": "tented oder gefuellt, >= 1.0 mm zur Kante"
    },
@@ -626,8 +632,8 @@
      6.6
     ],
     "z": [
-     2.0,
-     6.8
+     1.3,
+     6.1
     ],
     "note": "unten offen (Verguss kopfueber, entlueftet)"
    },
@@ -668,18 +674,18 @@
    ]
   },
   "SCREW_NUT": {
-   "screw": "ISO 7045 M2x4 A2 PH1 (unverlierbar, Gewindefurch-Lippe Ø1.7 im Huelsenboden)",
+   "screw": "ISO 7045 M2x3 A2 PH1 (unverlierbar, Gewindefurch-Lippe Ø1.7 im Huelsenboden)",
    "nut": "ISO 4032 M2 A2 SW4 x 1.6, im Kragen eingegossen",
    "axis_xy": [
     0.0,
     4.199999999999999
    ],
    "nut_z": [
-    2.3,
-    3.9
+    1.6,
+    3.2
    ],
    "dist_to_pcb_F": 0.4,
-   "dist_to_antenna_z": 43.9
+   "dist_to_antenna_z": 44.6
   }
  },
  "seals": {
@@ -693,8 +699,8 @@
      33.7
     ],
     "collar_z": [
-     4.3,
-     6.7
+     3.6,
+     6.0
     ]
    },
    "gland": 1.35,
@@ -707,8 +713,8 @@
     32.0
    ],
    "kragen_z": [
-    2.0,
-    7.3
+    1.3,
+    6.6
    ],
    "material": "Epoxid 2K mineralisch gefuellt, Tg >= 80 C (FLOORPLAN_OPTIONS 2f; Typ ANNAHME, offen)"
   },
@@ -722,7 +728,7 @@
   "B": "0 (unbestueckt, Pads erlaubt im Band)"
  },
  "open_points": [
-  "Projektleitung: LS-W1 - Abstand Clip-Pad zu den Vergusskanten >= 0.3 inkl. Toleranz verlangt eine Fachverlaengerung um 0.7 mm (Vorschlag V-K: Huelsenboden 2.0 -> 1.3, Kragen und Kragenfeld 0.7 tiefer, Zelle 0.35 tiefer); ohne Entscheid gilt Rev C mit 0.20 nominal",
+  "Elektronik: Layout auf V-K nachfuehren (BT1 Zelle Y 34.80, Plus-Pads Spanne 23.1, U3/C24 0.7 mm tiefer, Zonen Z4/Z5A/Z5B/Z6, DRC Pad-Rand >= 0.5 zu den Vergusskanten)",
   "Elektronik: Kunststoff vor der Antenne (Stoessel, Kappe, Anschlag) bestaetigen; S11/RSSI im Gehaeuse (PROTOTYP-PRUEFUNG)",
   "Elektronik: Blockplan Kap. 4 ist ein Machbarkeitsnachweis (Faktor 1.5 ANNAHME), Layout darf umordnen, D1/SW1/Zonen nicht",
   "Mechanik: Verguss Kragen mit Tasche (Volumen, Entlueftung) am Muster pruefen (PROTOTYP-PRUEFUNG)"

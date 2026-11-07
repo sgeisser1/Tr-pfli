@@ -15,6 +15,8 @@ Konstruktion A1 (Kern + Huelse, M2 von unten) nach docs/reviews/phase3_sleeve_me
 Alle Masse: mechanical/gen/fluidi_params.py (Schnittstelle docs/interfaces/PCB_OUTLINE.md, Rev C).
 Rev C: Anschlag + Gabel fuer die Platinenoberkante in der Kappe (Lage in z), Clip 3034 nach Datenblatt (B 7.4),
 Antenne an der Layout-Lage. Pruefung mit dem KiCad-STEP: fluidi_pcb_collision.py -> collision_pcb_step.txt.
+V-K (D-023): Huelsenboden 1.3, Kragen/Tasche/Mutter/O-Ring-Nut 0.7 tiefer, Fach 24.2, Distanzlehre 24.2, Schraube M2x3.
+M-4 (D-023): Tastenhub 0.8, Zunge 0.25 vor SW1, F-Referenz an Gabel und Schottkeil, Quetschrippen (Gabel + Schott).
 
 Lauf:  freecadcmd mechanical/gen/fluidi_sensor.py
 Ausgabe: mechanical/sensor/fluidi_sensor.FCStd, fluidi_sensor_assembly.step, print/<Teil>.{step,stl,3mf},
@@ -35,6 +37,13 @@ from fluidi_cadlib import (V, prism, prism_xz, box, cyl, cyl_y, plan, rrect, rre
 H, PCB, Z, CAP, BTN = FP.HEAD, FP.PCB, FP.Z, FP.CAP, FP.BTN
 OUT = os.path.join(FP.REPO, 'mechanical', 'sensor')
 LOG = []
+RIBS = {}          # Quetschrippen (M-4): werden beim Einbau gequetscht -> in den Kollisionspruefungen getrennt ausgewiesen
+
+
+def prism_yz(poly_yz, x0, x1):
+    """Polygon in der y-z-Ebene, extrudiert in x von x0 nach x1."""
+    pts = [V(x0, y, z) for y, z in poly_yz] + [V(x0, poly_yz[0][0], poly_yz[0][1])]
+    return Part.Face(Part.makePolygon(pts)).extrude(V(x1 - x0, 0, 0))
 
 
 def log(*a):
@@ -120,7 +129,7 @@ def build():
 
     # ------------------------------------------------------------------ Schraube M2x4 (unverlierbar)
     scr = cyl(sc['HEAD_D'] / 2, -sc['HEAD_H'], 0.0, sc['X'], sc['Y']).fuse(cyl(sc['D'] / 2, 0.0, sc['L'], sc['X'], sc['Y']))
-    S['Schraube_M2x4'] = scr
+    S['Schraube_M2'] = scr
 
     # ------------------------------------------------------------------ O-Ringe (verpresst: radial = Einbauraum)
     SI = FP.SLEEVE_IN
@@ -160,12 +169,23 @@ def build():
     blk = blk.fuse(box(-8.0, 0.8, CAP['CAV_OFF'], PCB['Y_B'] + 0.6, BTN['BLOCK_Z0'] + 0.3, H['H'] - H['CEIL'] + 0.01))  # 0.7 ueber Oberkante
     blk = blk.fuse(cyl(BTN['TUBE_OD'] / 2, BTN['TUBE_Z0'], BTN['BLOCK_Z0'] + 0.01, ax, ay))
     tg = box(FP.TONGUE['X0'], FP.TONGUE['X1'], FP.TONGUE['Y0'], FP.TONGUE['Y1'], FP.TONGUE['Z_TIP'], BTN['BLOCK_Z0'] + 0.01)
-    # Rev C: Anschlag + Gabel fuer die Platinenoberkante (links der Antenne), definiert die Lage der Platine in z und y
+    # Rev C: Anschlag + Gabel fuer die Platinenoberkante (links der Antenne), definiert die Lage der Platine in z und y.
+    # M-4: vordere Wange = F-Referenz (Luft 0, Einlauffase), hintere Wange mit Quetschrippe (drueckt F an die vordere Wange)
     ps = FP.PSTOP
     yf0, yb1 = PCB['Y_F'] - ps['CLR_F'], PCB['Y_B'] + ps['CLR_B']
+    zb, zt = PCB['Z_TOP'] - ps['FORK'], PCB['Z_TOP'] + 0.01
     stop = box(ps['X0'], ps['X1'], yf0 - ps['T'], yb1 + ps['T'], PCB['Z_TOP'], BTN['BLOCK_Z0'] + 0.31)
-    stop = stop.fuse(box(ps['X0'], ps['X1'], yf0 - ps['T'], yf0, PCB['Z_TOP'] - ps['FORK'], PCB['Z_TOP'] + 0.01))
-    stop = stop.fuse(box(ps['X0'], ps['X1'], yb1, yb1 + ps['T'], PCB['Z_TOP'] - ps['FORK'], PCB['Z_TOP'] + 0.01))
+    stop = stop.fuse(prism_yz([(yf0 - ps['T'], zb), (yf0 - ps['LEAD'], zb), (yf0, zb + ps['LEAD']), (yf0, zt),
+                               (yf0 - ps['T'], zt)], ps['X0'], ps['X1']))
+    stop = stop.fuse(box(ps['X0'], ps['X1'], yb1, yb1 + ps['T'], zb, zt))
+    xr = (ps['X0'] + ps['X1']) / 2
+    rib_f = prism_yz([(yb1 + 0.01, zb), (yb1 + 0.01, zt), (ps['RIB_Y'], zt), (ps['RIB_Y'], zb + 0.5)],
+                     xr - ps['RIB_W'] / 2, xr + ps['RIB_W'] / 2)
+    # Quetschrippen an der Rueckwand des Schottschlitzes (y 8.4 -> 7.95), Einlauffase unten
+    bs = CAP['BULK_SLOT']
+    rib_s = [prism_yz([(bs['Y1'] + 0.01, Z['BULK0']), (bs['Y1'] + 0.01, Z['BULK1']), (bs['Y1'] - CAP['RIB_H'], Z['BULK1']),
+                       (bs['Y1'] - CAP['RIB_H'], Z['BULK0'] + CAP['RIB_H'])], xc - CAP['RIB_W'] / 2, xc + CAP['RIB_W'] / 2)
+             for xc in CAP['RIB_X']]
     cap = cap.fuse(blk).fuse(tg).fuse(stop).removeSplitter()
     # Tastentasche (sichtbar 9.8 x 6.8), Senkung fuer Membran + Klemmring, Bohrung Stoessel
     btn_poly = [(x + BTN['X'], y + BTN['Y']) for x, y in plan(BTN['W'], BTN['D'], BTN['CH'], BTN['CH'], 0.0)]
@@ -177,11 +197,15 @@ def build():
     z_cb = z_pf - 2.3                                                # Senkungsgrund 54.2
     cap = cap.cut(cyl(BTN['CB_D'] / 2, z_cb, z_pf + 0.01, ax, ay))
     cap = cap.cut(cyl(BTN['BORE_D'] / 2, BTN['TUBE_Z0'] - 1, z_cb + 0.01, ax, ay))
+    RIBS['Kappe_ohne_Rippen'] = cap
+    ribs = rib_f.fuse(rib_s[0]).fuse(rib_s[1])
+    RIBS['Rippen'] = ribs
+    cap = cap.fuse(ribs).removeSplitter()
     S['Kappe_blau'] = cap
-    # Schottkeil (fuellt den vorderen Durchfuehrungsspalt nach dem Einschieben)
+    # Schottkeil (fuellt den vorderen Durchfuehrungsspalt nach dem Einschieben); M-4: Rueckseite = F-Referenz
     kc = CAP['KEIL_CLR']
-    S['Schottkeil'] = box(-bs['X'] + kc, bs['X'] - kc, bs['Y0'] + kc, PCB['Y_F'] - kc, Z['BULK0'], Z['BULK1'])
-    S['Verguss_Schott'] = box(-bs['X'], bs['X'], bs['Y0'], bs['Y1'], Z['BULK0'], Z['BULK1']).cut(pcb).cut(S['Schottkeil'])
+    S['Schottkeil'] = box(-bs['X'] + kc, bs['X'] - kc, bs['Y0'] + kc, PCB['Y_F'] - CAP['KEIL_REAR'], Z['BULK0'], Z['BULK1'])
+    S['Verguss_Schott'] = box(-bs['X'], bs['X'], bs['Y0'], bs['Y1'], Z['BULK0'], Z['BULK1']).cut(pcb).cut(S['Schottkeil']).cut(ribs)
 
     # ------------------------------------------------------------------ Taste, Membran, Klemmring, Stoessel
     z_m0, z_m1 = z_cb, z_cb + BTN['MEMB_T']
@@ -247,15 +271,20 @@ def checks(S, sl_plain):
     log('=== fluidi Sensor P3, Schnittstelle Rev %s (%s) ===' % (FP.REV, FP.REV_DATE))
     allowed = {('PCB', 'Antenne_AN043'), ('Band_Huelle_F', 'D1_LED'), ('Band_Huelle_F', 'SW1_Taster'),
                ('Keystone3034', 'CR2032'),
-               ('Mutter_M2', 'Schraube_M2x4'),       # Gewindeeingriff (Nennmass-Zylinder)
-               ('Schraube_M2x4', 'Huelse_grau'),
+               ('Mutter_M2', 'Schraube_M2'),       # Gewindeeingriff (Nennmass-Zylinder)
+               ('Schraube_M2', 'Huelse_grau'),
                ('Mutter_M2', 'Verguss_Kragen'),
-               ('Band_Huelle_F', 'U3_TMP_Kragen')}       # Mutter eingegossen     # Furchlippe Ø1.7 im Boden (unverlierbar)
+               ('Band_Huelle_F', 'U3_TMP_Kragen'),        # Mutter eingegossen, Furchlippe Ø1.7 im Boden (unverlierbar)
+               ('PCB', 'Kappe_blau')}                    # Quetschrippen (M-4), unten getrennt geprueft
     log('1 Kollisionen montiert (Ruhe):')
     hits = collide(S, allowed)
     log('  -> %s' % ('keine' if not hits else '%d Kollisionen' % len(hits)))
     for a, b, v in hits:
         log('     %s / %s %.4f mm3' % (a, b, v))
+    v_rest = S['PCB'].common(RIBS['Kappe_ohne_Rippen']).Volume
+    v_rib = S['PCB'].common(RIBS['Rippen']).Volume
+    log('   Platine / Kappe: ohne Quetschrippen %.4f mm3; Rippen-Ueberdeckung %.3f mm3 (gewollt, 3 Rippen, Dicke 1.6: je '
+        '%.2f mm gequetscht)' % (v_rest, v_rib, PCB['Y_B'] - FP.PSTOP['RIB_Y']))
     # 2 Taste gedrueckt: Taste/Teller/Stoessel um Hub nach unten, Membran nicht modelliert (elastisch)
     st = BTN['STROKE']
     zg = (PCB['Y_F'] - FP.SW['H']) - FP.TONGUE['Y1']
@@ -279,6 +308,21 @@ def checks(S, sl_plain):
     log('   Keil 30 Grad: seitlicher Netto-Weg an der Zunge %.2f mm -> am Betaetiger x%.2f = %.2f mm; '
         'noetig %.2f (Spalt %.2f + Hub %.2f)' % (lat, ratio, lat * ratio, zg + FP.SW['TRAVEL'], zg, FP.SW['TRAVEL']))
     log('   Zunge-Taster Spalt in Ruhe: %.2f mm; Keil-Vorspalt %.2f mm' % (zg, T['WEDGE_GAP']))
+    # 2b Toleranzkette M-4: F liegt an Keil-Rueckseite und vorderer Gabelwange (Quetschrippen dahinter), F +-0.1 (FDM);
+    #    Tasterhoehe 2.0 +-0.1 (XUNPU S.1, Allgemeintoleranz), Zunge +-0.1 (FDM), Keilvorspalt +-0.1 (FDM, wirkt x Hebel),
+    #    Tasterhub bis Schaltpunkt 0.2 +-0.1 (XUNPU S.1)
+    have = lat * ratio
+    need = zg + FP.SW['TRAVEL']
+    res = have - need
+    rss = math.sqrt(3 * 0.1 ** 2 + (0.1 * ratio) ** 2 + 0.1 ** 2)
+    wc = 3 * 0.1 + 0.1 * ratio + 0.1
+    log('2b Toleranzkette Taster (M-4): Weg am Betaetiger %.2f, noetig %.2f (Spalt %.2f + Hub %.2f) -> Reserve nominal %.2f; '
+        'Toleranz F/H/Zunge je +-0.1, Keilvorspalt +-0.1 (x%.2f), Hub +-0.1: RSS +-%.2f -> Reserve %.2f (>= 0), worst +-%.2f -> %.2f'
+        % (have, need, zg, FP.SW['TRAVEL'], res, ratio, rss, res - rss, wc, res - wc))
+    g_min = zg - 3 * 0.1
+    log('   Spalt in Ruhe nominal %.2f, worst min %.2f, RSS min %.2f mm (Vorspannung < Mindesthub 0.1 -> kein Dauerbetaetigen); '
+        'Ueberhub nach Schaltpunkt nominal %.2f mm (Finger biegt aus, PROTOTYP-PRUEFUNG)'
+        % (zg, g_min, zg - math.sqrt(3) * 0.1, res))
     # 3 Huelse abziehen (vereinfacht ohne Logo/Text), O-Ringe gleiten (nicht geprueft)
     kern = ['PCB', 'Kragen', 'CR2032', 'Keystone3034', 'Kappe_blau', 'Mutter_M2', 'Fenster_transluzent',
             'Verguss_Kragen', 'Band_Huelle_F', 'U3_TMP_Kragen']
@@ -310,10 +354,9 @@ def checks(S, sl_plain):
     for d in range(60, -1, -1):
         for a_ in mov:
             m = S[a_].copy(); m.translate(V(0, 0, -d))
-            for b in ('Kappe_blau', 'Fenster_transluzent', 'Stoessel', 'Schottkeil'):
-                if b == 'Schottkeil':
-                    continue                                          # Keil wird erst nach dem Einschieben gesetzt
-                if m.BoundBox.intersect(S[b].BoundBox) and m.common(S[b]).Volume > 1e-3:
+            for b in ('Kappe_blau', 'Fenster_transluzent', 'Stoessel'):   # Keil wird erst nach dem Einschieben gesetzt
+                B_ = RIBS['Kappe_ohne_Rippen'] if b == 'Kappe_blau' else S[b]   # Rippen werden beim Einschieben gequetscht
+                if m.BoundBox.intersect(B_.BoundBox) and m.common(B_).Volume > 1e-3:
                     hitp = (d, a_, b); break
             if hitp: break
         if hitp: break
@@ -324,13 +367,19 @@ def checks(S, sl_plain):
     for i in range(0, 41):
         dz = 0.05 * i + 0.01
         m = S['PCB'].copy(); m.translate(V(0, 0, dz))
-        if m.common(S['Kappe_blau']).Volume > 1e-3:
+        if m.common(RIBS['Kappe_ohne_Rippen']).Volume > 1e-3:
             up = dz; break
     log('5b Platine in Endlage: freier Weg nach oben bis Anschlag %s (Rev B: 0.70 bis Tastenblock)'
         % ('%.2f mm' % (up - 0.01) if up is not None else '> 2 mm, KEIN ANSCHLAG'))
     pz0, pz1 = Z['CELL_C'] - FP.CLIP['W'] / 2, Z['CELL_C'] + FP.CLIP['W'] / 2
     log('   Clip-Pads (Spanne W %.2f): z %.2f ... %.2f -> Luft zum Kragen-Verguss (z %.2f) %.2f mm, zum Schott-Verguss (z %.2f) %.2f mm; '
         'Lagetoleranz Platine +-%.2f' % (FP.CLIP['W'], pz0, pz1, Z['COL1'], pz0 - Z['COL1'], Z['BULK0'], Z['BULK0'] - pz1, PCB['TOL_Z']))
+    sc = FP.SCREW
+    eng = min(sc['L'], Z['COL_NUT1']) - Z['COL_NUT0']
+    log('5c Schraube ISO 7045 M2x%g: Schaft z 0 ... %.1f, Mutter z %.1f ... %.1f -> Einschraubtiefe %.2f mm (%.1f Gaenge P 0.4), '
+        'Ueberstand ueber Mutter %.2f; Freibohrung bis z %.1f, O-Ring-Nut ab z %.1f (Abstand %.2f)'
+        % (sc['L'], sc['L'], Z['COL_NUT0'], Z['COL_NUT1'], eng, eng / 0.4, sc['L'] - Z['COL_NUT1'], sc['L'] + 0.3,
+           Z['COL_G0'], Z['COL_G0'] - (sc['L'] + 0.3)))
     # 6 Abstaende
     d_led = PCB['Y_F'] - FP.LED['H'] - FP.DROP['BOSS_Y1']
     log('6 LED-Oberseite bis Fenster-Lichtschaft: %.2f mm (Ziel 1.5-2.5)' % d_led)
@@ -340,7 +389,7 @@ def checks(S, sl_plain):
     log('   U3 (Kragen) - Kragen-ASA: %.2f mm, Epoxid ueber U3: %.2f mm (>= 0.5), U3 - Mutter: %.2f mm'
         % (S['U3_TMP_Kragen'].distToShape(S['Kragen'])[0], FP.KPOCKET['DEPTH'] - FP.TMP['H'],
            S['U3_TMP_Kragen'].distToShape(S['Mutter_M2'])[0]))
-    for k in ('Mutter_M2', 'Schraube_M2x4', 'CR2032', 'Keystone3034'):
+    for k in ('Mutter_M2', 'Schraube_M2', 'CR2032', 'Keystone3034'):
         log('   Abstand %-14s - Antenne: %.1f mm' % (k, S[k].distToShape(S['Antenne_AN043'])[0]))
     for k in ('Stoessel', 'Kappe_blau', 'Fenster_transluzent'):
         log('   Abstand Kunststoff %-20s - Antennenkupfer: %.2f mm' % (k, S[k].distToShape(S['Antenne_AN043'])[0]))
@@ -389,7 +438,7 @@ def checks(S, sl_plain):
     rho = {'ASA': 1.07e-3, 'FR4': 1.85e-3, 'Epoxid': 1.15e-3, 'Stahl': 7.9e-3, 'Silikon': 1.2e-3}
     mat = {'U3_TMP_Kragen': 'Epoxid', 'Kappe_blau': 'ASA', 'Huelse_grau': 'ASA', 'Kragen': 'ASA', 'Fenster_transluzent': 'ASA', 'Taste_blau': 'ASA',
            'Tastenteller': 'ASA', 'Klemmring': 'ASA', 'Stoessel': 'ASA', 'Schottkeil': 'ASA', 'PCB': 'FR4',
-           'Verguss_Kragen': 'Epoxid', 'Verguss_Schott': 'Epoxid', 'Mutter_M2': 'Stahl', 'Schraube_M2x4': 'Stahl',
+           'Verguss_Kragen': 'Epoxid', 'Verguss_Schott': 'Epoxid', 'Mutter_M2': 'Stahl', 'Schraube_M2': 'Stahl',
            'ORing_Kragen': 'Silikon', 'ORing_Zapfen': 'Silikon', 'Membran_Silikon': 'Silikon'}
     tot = 0
     log('8 Volumen / Masse (ASA 1.07, FR4 1.85, Epoxid 1.15, Stahl 7.9, Silikon 1.2 g/cm3; ANNAHME Dichten):')
@@ -415,7 +464,7 @@ def placeholder_collision(S):
     lines = ['Kollisionspruefung mit vereinfachtem PCB-Modell, fluidi Sensor (Schnittstelle Rev %s), erzeugt von fluidi_sensor.py' % FP.REV,
              'Modell: Kontur (Rev B = Rev C) + Bauteilhuellen je Zone + feste Bauteile. Pruefung mit dem KiCad-STEP: collision_pcb_step.txt (fluidi_pcb_collision.py).', '']
     housing = ['Kappe_blau', 'Huelse_grau', 'Kragen', 'Verguss_Kragen', 'Stoessel', 'Fenster_transluzent', 'Schottkeil', 'Mutter_M2',
-               'Schraube_M2x4', 'ORing_Kragen', 'ORing_Zapfen', 'Taste_blau', 'Klemmring', 'Membran_Silikon', 'Tastenteller']
+               'Schraube_M2', 'ORing_Kragen', 'ORing_Zapfen', 'Taste_blau', 'Klemmring', 'Membran_Silikon', 'Tastenteller']
     for name, src, key in rows:
         mins = []
         for h in housing:
@@ -456,14 +505,15 @@ def main():
     doc = App.newDocument('fluidi_sensor')
     for k, s in S.items():
         o = doc.addObject('Part::Feature', k); o.Shape = s
-    o = doc.addObject('Part::Feature', 'Distanzlehre_23p5'); o.Shape = lehre
+    LN = 'distanzlehre_%s' % ('%.1f' % (Z['BULK0'] - Z['COL1'])).replace('.', 'p')
+    o = doc.addObject('Part::Feature', LN.capitalize()); o.Shape = lehre
     doc.recompute()
     fc = os.path.join(OUT, 'fluidi_sensor.FCStd')
     doc.saveAs(fc)
-    Part.export([o for o in doc.Objects if o.Name != 'Distanzlehre_23p5'], os.path.join(OUT, 'fluidi_sensor_assembly.step'))
+    Part.export([o for o in doc.Objects if o.Name != LN.capitalize()], os.path.join(OUT, 'fluidi_sensor_assembly.step'))
     for k, (fn, rot, mtl) in PRINT.items():
         export_part(S[k], os.path.join(OUT, 'print', fn), rot)
-    export_part(lehre, os.path.join(OUT, 'print', 'distanzlehre_23p5'), [])
+    export_part(lehre, os.path.join(OUT, 'print', LN), [])
     # Passungsprobe: Huelse unten (Boden, Schlitz, Furchlippe, Kragensitz) und oben (Zapfensitz, Rand) -> mit Kragen
     # und O-Ring Gleitsitz, Verpressung und Schraube pruefen, bevor die ganze Huelse gedruckt wird
     probe = sl_plain.common(box(-20, 20, -5, 20, -1, 9.0))

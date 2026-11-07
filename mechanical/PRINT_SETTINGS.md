@@ -55,7 +55,7 @@ freecadcmd mechanical/gen/fluidi_gateway.py          # mechanical/gateway/print/
 | `tastenteller` | Teller (auf den Tastenhals gepresst) | Hellblau | flach | 0.4 mm dick = 3 Schichten | < 0.1 |
 | `stoessel` | Stössel mit Finger und 30°-Keil | beliebig | flach auf der D-Fläche | Finger 1.15 × 1.2 mm | < 0.1 |
 | `schottkeil` | Schottkeil | beliebig | flach | | < 0.1 |
-| `distanzlehre_23p5` | Montage-Lehre (2 Stück, wiederverwendbar) | beliebig | stehend | | |
+| `distanzlehre_24p2` | Montage-Lehre Kragen–Schott 24.2 mm (2 Stück, wiederverwendbar; V-K, D-023) | beliebig | stehend | | |
 | `passprobe_huelse_unten/_oben` | Passungsproben (vor der ersten Hülse) | Warmgrau | stehend | Gleitsitz Kragen/Zapfen, O-Ring-Verpressung, Furchlippe | |
 
 ASA pro Sensor ≈ **13 g** (Kopf V4, Rev B; Rev A ≈ 9 g) (≈ CHF 0.25, **ANNAHME** CHF 25/kg), kein AMS-Farbwechsel (jedes Teil einfarbig). Druckzeit-Schätzung nach Slicen eintragen.
