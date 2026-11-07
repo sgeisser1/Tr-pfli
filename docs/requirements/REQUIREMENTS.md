@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | Dokument | `docs/requirements/REQUIREMENTS.md` |
-| Version | **1.0** (freigegeben) |
+| Version | **1.1** (1.0 freigegeben; 1.1: REQ-MECH-10 präzisiert, D-016) |
 | Datum | 2026-11-06 |
 | Grundlagen | `PROJEKTAUFTRAG.md` (Original), `CLIENT_INPUT.md` (Antworten Phase 0), `DECISIONS.md` |
 | Prüfberichte | `docs/reviews/phase1_requirements_{redteam,sicherheit,firmware-energie}.md`, Antworten: `phase1_requirements_response.md` |
@@ -195,7 +195,7 @@ Sicherheitsanforderungen (Kap. 6 sowie REQ-FW-04, REQ-RF-05, REQ-RF-06) werden n
 | REQ-MECH-07 | Schnittkanten und Sonde versiegelt; Verfahren nach Vergleich (Conformal Coating, Epoxid, Schrumpfschlauch mit Kleber) gewählt, mit Anleitung. | Muss | I, T |
 | REQ-MECH-08 | Definierte Dichtlinie am Übergang Sonde/Gehäuse; kein Wasser kriecht entlang der Platine ins Gehäuse (Prüfung mit Feuchteindikator im Kopf). *(F-20)* | Muss | T |
 | REQ-MECH-09 | Masse-/Guard-Struktur zwischen Elektronik und Sonde. | Muss | I |
-| REQ-MECH-10 | Robustheit der Sonde, mit dokumentierter Lagerung im Kopf, Sicherheitsfaktor ≥ 2 gegen Bruch, keine bleibende Verformung: **axial 50 N** (Einstecken), **seitlich 10 N** an der Spitze, **Zug 30 N** (Herausziehen), **Fall aus 1 m** auf harten Boden (Kopf voran und flach). Lastwerte **ANNAHME**, Plausibilisierung am Prototyp. Anleitung empfiehlt Vorstechen in verdichteter Erde. *(F-10)* | Muss | S, T |
+| REQ-MECH-10 | Robustheit der Sonde, mit dokumentierter Lagerung im Kopf, Sicherheitsfaktor ≥ 2 gegen Bruch, keine bleibende Verformung: **axial 50 N** (Einstecken, **mit im Substrat geführter Spitze**; Anleitung: in fester Erde vorstechen – D-016), **seitlich 10 N** an der Spitze, **Zug 30 N** (Herausziehen), **Fall aus 1 m** auf harten Boden (Kopf voran und flach). Lastwerte **ANNAHME**, Plausibilisierung am Prototyp. Anleitung empfiehlt Vorstechen in verdichteter Erde. *(F-10)* | Muss | S, T |
 | REQ-MECH-11 | Leiterplattendicke festgelegt (1.6 oder 2.0 mm) und begründet; Elektrodengeometrie per Feldsimulation optimiert (Empfindlichkeit, Messvolumen, Isolationsdicke). *(F-18)* | Muss | A, S |
 | REQ-MECH-12 | Gehäuse FDM-druckbar auf Bambu Lab, Material feuchte- und UV-geeignet und Formbeständigkeit (HDT laut Materialdatenblatt) ≥ **80 °C**, damit bei 65 °C Kopftemperatur (RB-03) Reserve für REQ-SAF-01 bleibt (z. B. ASA; PETG nur mit Nachweis; kein PLA). *(F-13, Runde 2: S-W05)* | Muss | I |
 | REQ-MECH-13 | Spritzwasserschutz Kopf: kein Wassereintritt bei Giessen von oben (1 l Wasser aus 20 cm Höhe über den Kopf, 10 Wiederholungen; Anlehnung IPX4-Methode), **geprüft mit eingesetzter Energiequelle**, danach Öffnen und Sichtprüfung auf Feuchte/Kondensat. *(S-K01)* | Muss | T |

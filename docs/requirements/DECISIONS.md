@@ -149,3 +149,8 @@ Format: Nr. · Datum · Entscheid · Alternativen · Begründung · Quelle · St
 - **Gestaltung:** modern, „super cool“, einfach und intuitiv, Apple-Design als Vorbild; **hell/dunkel/automatisch**;
   primär Handy, aber auch am PC gut; Farbschema aus Referenzbildern übernehmbar (weiche Hellblau-Verläufe,
   Glas-Karten, schwebende untere Navigation; grüne Botanik-Referenzen) – eigene Vorschläge erwünscht.
+
+### D-016 · 2026-11-07 · Knicklast der Sonde (REQ-MECH-10)
+- **Entscheid (Auftraggeber):** Option a – REQ-MECH-10 axial 50 N gilt **mit geführter Spitze**; Anleitung: in fester Erde
+  vorstechen. FEM (simulation/fem/REPORT.md): Knicklast frei 29 N (SF 0.58), geführt 236 N (SF 4.7).
+- **Alternativen:** 2.0-mm-Platine (≈ +40–90 USD je Bestellung, Standard-PCBA), Versteifung/breitere Sonde (Designänderung).
