@@ -1,6 +1,6 @@
 # fluidi – Phase 3: Designvorschläge Sensorkopf, Gateway, Logo
 
-Stand 2026-11-07, Version 0.1 (Industriedesign), zur Auswahl durch den Auftraggeber.
+Stand 2026-11-07, Version 0.2 (Industriedesign): Auswahlrunde (Kap. 0–9, Version 0.1) und Verfeinerung 1 von P3 (neues Kapitel unten).
 Grundlage: D-006 (Konzept A-32), D-007 (Designvorgabe „schöne harte Formen, schlichte schöne einfache
 Logos, aber auch etwas verspielt“), `docs/requirements/REQUIREMENTS.md` v1.0, `docs/concepts/CONCEPTS.md` v0.3.
 
@@ -12,6 +12,32 @@ mm-genau. Neu erzeugen:
 blender -b --factory-startup --python renders/gen/batch_render.py -- p1 p2 p3 p4 family gateway
 python3 docs/design/logo/gen_logo.py      # Logo-SVGs
 ```
+
+---
+
+## P3 fluidi – Verfeinerung 1 (2026-11-07, neu)
+
+Der Auftraggeber hat **P3 „Stele“** gewählt, mit Änderungen (D-009), und den Namen **fluidi** festgelegt (D-008). Die Verfeinerung ist
+vollständig in **`docs/design/P3_FLUIDI.md`** beschrieben, PDF: **`docs/design/P3_fluidi_v1.pdf`**. Die Kapitel 0–9 unten
+sind der frühere Stand der Auswahlrunde (noch mit Batteriedeckel hinten und Logo „Tröpfli“) und bleiben als Verlauf erhalten.
+
+![P3 fluidi im Topf, Grau-Option 1 „Warmgrau hell“](../../renders/phase3_v2/p3v2_topf_grau1.png)
+![Grau-Option 2 „Kühlgrau mittel“](../../renders/phase3_v2/p3v2_topf_grau2.png)
+![RGB-LED im Tropfen: grün / blau / rot](../../renders/phase3_v2/p3v2_nah_led_triptychon.png)
+![Batteriewechsel: Hülse über die Sonde abziehen (Warnsymbol innen)](../../renders/phase3_v2/p3v2_batteriewechsel_explosion.png)
+![Unterseite mit unverlierbarer Schraube M2](../../renders/phase3_v2/p3v2_unterseite_schraube.png)
+![Gateway G1 grau/hellblau, Antenne innen](../../renders/phase3_v2/g1v2_gateway.png)
+![Familie: Gateway + 3 Sensoren](../../renders/phase3_v2/g1v2_familie_3sensoren.png)
+![Logo „fluidi“: Varianten A/B, Icons](../../renders/phase3_v2/logo_uebersicht.png)
+
+| | |
+|---|---|
+| Sensorkopf | **28 × 13 × 48 mm**, Sonde 20 mm (Konstruktion A1, `docs/reviews/phase3_sleeve_mechanik.md`). Die Hülse ist grau, Kappe und Taste sind hellblau. **Eine** Sichtfuge bei z = 37 mm (0.3 mm), Rückseite glatt, kein Aufdruck |
+| Batteriewechsel | Schraube M2 unten lösen (unverlierbar, unsichtbar), graue Hülse über die Sonde abziehen, Zelle seitlich aus dem Clip schieben. Das Warnsymbol ist **innen** vertieft (S3-W4) |
+| LED | Tropfenfenster (r 2.5 / 8.5 mm hoch) mit Diffusor auf der Fuge, RGB-LED: grün = ok, blau = giessen, rot = Batterie tief, gelb = Pairing (Vorschlag) |
+| Gateway | G1 62 × 40 × 20 mm, grau mit hellblauem Deckel, Status-Tropfen, FPC-Antenne innen, USB-C hinten |
+| Logo | „fluidi“ klein, i-Punkte als Tropfen. Variante A „Linie“ / B „Kräftig“, je Farbe/Mono/Negativ, Icons „fi“ und „Tropfen“ (`docs/design/logo/gen_logo_fluidi.py`) |
+| Offene Fragen | Grauton 1/2, Logo A/B, Icon, LED-Farbzuordnung, Logo-Relief aussen ja/nein, Höhe 48 mm / Sonde 20 mm bestätigen (Details `P3_FLUIDI.md` Kap. 6) |
 
 ---
 
