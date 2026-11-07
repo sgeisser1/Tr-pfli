@@ -3,36 +3,44 @@
 | | |
 |---|---|
 | Dokument | `docs/manuals/APP.md` |
-| Version | 0.2 (Prototyp Phase 4d + klickbare Stil-Entwürfe) |
+| Version | 0.3 (PWA final im Stil A „Frost“, Phase 4 Welle 2) |
 | Datum | 2026-11-07 |
-| Gilt für | `app/` (PWA, Mock-Gateway, Tests) |
+| Gilt für | `app/` (PWA, öffentliches Dashboard, Mock-Gateway, Tests) |
 
-Die PWA ist ein **funktionaler Prototyp**: alle Seiten und Abläufe sind bedienbar, Gestaltung und Funktionsumfang
-werden in einem eigenen Software-Konzeptschritt festgelegt. Schnittstelle: `docs/interfaces/GATEWAY_API.md`.
+Die PWA ist die produktive App im Stil A **„Frost“** (D-020): hell/dunkel/automatisch, Tropfen-Charakter überall,
+Android/Chrome zuerst (Pixel 10), Desktop gut. Schnittstelle: `docs/interfaces/GATEWAY_API.md`, `app/api/openapi.yaml`.
+Inbetriebnahme mit dem echten Gateway: `docs/manuals/GATEWAY_SETUP.md`.
 
 ## 1 Aufbau
 
 ```
 app/
-  index.html, manifest.webmanifest, sw.js     App-Shell, Manifest, Service Worker
-  css/app.css                                 Gestaltung (nur Systemschriften, keine Inline-Styles)
-  js/app.js, api.js, ui.js, chart.js          Router, API-Zugriff, DOM-Hilfen, Diagramm
-  js/calc.js                                  Rechenregeln (Feuchteindex, Plausibilität …), getestet
-  js/views/*.js                               Seiten
-  vendor/uplot/                               uPlot 1.6.32 (MIT), Herkunft/Prüfsummen in SOURCE.md
-  icons/, img/logo.svg                        App-Icon (D-012), Wortmarke v3a (D-011)
-  api/openapi.yaml                            API-Spezifikation (OpenAPI 3.1)
-  dev/mock_server.py, dev/fluidi_calc.py      Mock-Gateway (Python-Standardbibliothek)
-  dev/screenshots.sh                          Screenshots mit Edge headless
-  dev/fluidi_analysis.py                      Giess-Erkennung, Prognose, Stimmung
-  dev/concept_shots.sh, concept_compose.py    Screenshots/Vergleich der Stil-Entwürfe
-  concept/                                    klickbare Stil-Entwürfe (Frost, Botanik, Stele)
+  index.html, manifest.webmanifest, sw.js     App-Shell, Manifest (Frost-Farben, Shortcuts), Service Worker
+  dashboard.html                              öffentliches Dashboard (eigener HTTP-Port, nur lesen, D-020)
+  css/app.css                                 Frost: Struktur + Frost-Variablen + Produktiv-Ergänzungen
+  js/main.js, api.js, dom.js                  Shell/Router/Badge/SW, API (Login, elevate, Jobs, SSE), DOM-Hilfen
+  js/art.js, chart.js, comp.js, board.js      eigene SVG-Grafiken (Tropfen-Charakter, Pflanzen), Diagramme, Bausteine,
+                                              Dashboard-Darstellung (auch für dashboard.html)
+  js/home.js, plant.js, edit.js, room.js      Übersicht, Pflanze (Pflege-/Salzhinweis, „Gedüngt“), Profil (40 Arten), Raumplan
+  js/stats.js, settings.js, dash.js           Statistik (inkl. Raumklima), Einstellungen, Dashboard-Modus
+  js/login.js, pair.js, calibrate.js          Anmelden/Einrichten, Koppeln mit Farbfolge (SAS), Zwei-Punkt-Kalibrierung
+  js/sensors.js, data.js, system.js           Sensoren & Firmware, Export & Backup, System (Zeit, WLAN, Protokoll)
+  js/dashboard.js                             Einstieg öffentliches Dashboard (lädt nur GET /api/v1/dashboard)
+  js/calc.js                                  Rechenregeln (Feuchteindex …), getestet gegen tests/vectors
+  data/species.json                           40 Artenprofile (docs/software/PFLANZENPROFILE.md, D-021)
+  icons/, img/logo*.svg                       App-Icon (D-012), Wortmarke v3a hell/dunkel (D-011)
+  api/openapi.yaml                            API-Spezifikation (OpenAPI 3.1, normativ für Schemas)
+  dev/mock_server.py                          Mock-Gateway mit Testdaten (Entwicklung, Screenshots)
+  dev/fluidi_calc.py, fluidi_analysis.py      gemeinsamer Rechenkern (Mock UND echtes Gateway)
+  concept/                                    klickbare Stil-Entwürfe (Archiv der Stilwahl)
+  vendor/uplot/                               nicht mehr verwendet (Archiv; eigene SVG-Diagramme)
   tests/                                      Unit- und Konformitätstests
-  docs/screenshots/                           erzeugte Screenshots
 ```
 
 Kein Build-Schritt, keine npm-Abhängigkeiten, keine externen Ressourcen zur Laufzeit (REQ-APP-09).
-`app/package.json` dient nur dazu, `node --test` die ES-Module erkennen zu lassen.
+Echtes Gateway ohne Hardware (simulierte Sensoren über das echte Funkprotokoll):
+`cd firmware/gateway && python3 -m fluidi_gw sim --port 8080` → http://localhost:8080/ (Einrichtungscode steht in der
+Konsole), öffentliches Dashboard auf Port 8081 nach Freigabe in den Einstellungen.
 
 ## 2 Entwicklung lokal mit Mock
 
