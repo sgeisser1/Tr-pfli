@@ -1,8 +1,52 @@
-# fluidi – P3 „Stele“, Verfeinerung 2
+# fluidi – P3 „Stele“, Design freigegeben
 
-Stand 2026-11-07, Version 0.3 (Industriedesign), zur Durchsicht durch den Auftraggeber.
-Verfeinerung 2 (Kapitel V2, vorne) setzt die drei Änderungswünsche aus **D-010** um. Der Sensor ist freigegeben
-und bleibt unverändert. Die Kapitel 1–7 dahinter sind der Stand aus Verfeinerung 1, unverändert und zum Nachschlagen.
+Stand 2026-11-07, Version 0.4 (Industriedesign). Sensor, Gateway und Wortmarke sind freigegeben (D-010, D-011).
+Neu vorne: das finale **App-Icon** (Kapitel A). Die Kapitel V2 und 1–7 dahinter sind der Stand aus
+Verfeinerung 2 bzw. 1, unverändert und zum Nachschlagen.
+
+## Freigegebene Entscheide
+
+| Entscheid | Inhalt | Dateien |
+|---|---|---|
+| **D-010 Sensor** | P3 „Stele“ 28 × 13 × 48 mm, Sonde 20 mm, 5 mm Abstand zur Erde. Hülse **Warmgrau hell #B9B5AC**, Kappe und Taste **Hellblau**, RGB-LED im Tropfenfenster an der Farbfuge, Logo Ton in Ton als Relief. Batteriewechsel über die Hülse (Konstruktion A1) | `renders/gen/fluidi_p3v2.py`, `renders/phase3_v2/` |
+| **D-010 LED-Farben** | Grün = ok/Messung gesendet · Blau = giessen nötig (bei schwacher Zelle Gelb) · Rot = Batterie tief/Fehler · Gelb = Kopplung | Kap. 2 |
+| **D-011 Gateway** | G1 v3, 62 × 40 × 20 mm, Wanne Warmgrau hell, Deckel Hellblau, LED-Tropfen an der Farbfuge auf der 45°-Facette (gleiche Geometrie wie am Sensor), Antenne innen (FPC), keine Stabantenne | `renders/gen/render_p3v3.py`, `renders/phase3_v3/g1v3_*.png` |
+| **D-011 Wortmarke** | **v3a**: warmes Dunkelgrau #4F4B45, erster i-Punkt grau, letzter i-Punkt hellblau | `docs/design/logo/fluidi_logo_v3a*.svg` |
+| **D-011 App-Icon** | Fotorealistische Nahaufnahme des Sensors, quadratisch, blauer Tropfen gross in der Mitte, Fuge als Spalt (Umsetzung Kapitel A) | `app/icons/` |
+
+## A App-Icon (final)
+
+Vorgabe des Auftraggebers: „eigentlich einfach eine nahaufnahme aber hoch aufgelöst von dem sensor mit blauem tropfen …
+der tropfen soll gross und in der mitte sein und quadratisch aussen rum und der übergang von blau und grau soll wie hier
+als spalt gezeigt werden.“
+
+![App-Icon: alle Grössen 1:1 auf Hell und Dunkel, als Rundquadrat und Kreis maskiert; unten die maskable Fassung mit Sicherheitszone](../../renders/phase3_v3/app_icon_uebersicht.png)
+
+| | |
+|---|---|
+| Motiv | Rendering des **echten Sensormodells** (gleiche Geometrie und Materialien wie die freigegebenen Bilder), LED-Zustand Blau mit gleicher Stärke wie `p3v2_nah_led_blau` |
+| Ausschnitt | frontal, orthografische Kamera, 15.6 × 15.6 mm der Frontfläche (z 31.2–46.8 mm). Der Tropfen (8.5 mm hoch) füllt **54 %** der Bildhöhe und sitzt mittig. Die Fuge (0.3 mm Sichtspalt, z 36.7–37.0) läuft horizontal durch den Tropfenbauch. Kappe und Hülse füllen das Quadrat, es sind keine Gehäusekanten (obere Fase ab z 47) und kein Hintergrund im Bild |
+| Licht | grosse weiche Flächenleuchte frontal, 25° von oben (gibt der Fuge den dunklen Schattenstrich), schwache Aufhellung von unten, neutrale Welt. Helligkeit auf die Vorlage abgeglichen: Kappe, Grau und Tropfen liegen farblich bei der Vorlage |
+| Rendering | 2048 × 2048 px, Cycles CPU, **ohne Denoiser**, 1536 Samples (adaptiv, Schwelle 0.006, min. 256), Rechenzeit 30 min auf 16 Threads. Kein sichtbares Rauschen |
+| Nachbearbeitung | Nur im Glühbereich (Tropfen und blauer Lichtsaum, weich maskiert) Gauss-Weichzeichner 2 px gegen Restrauschen. Für 48/32/16 px ein engerer Ausschnitt (78 % der Breite) mit leichter Unschärfemaske, damit Tropfen und Fuge lesbar bleiben |
+| Maskable | `icon-maskable-512.png`: Motiv bis an den Rand, Tropfen inkl. Glühen bis 28 % der Kantenlänge von der Mitte (Sicherheitszone 40 %), Prüfung im Skript |
+| Kleine Grössen | Geprüft bei 48, 32 und 16 px (8-fach vergrössert): Tropfen, Farbkante und dunkle Fuge bleiben klar erkennbar; bei 16 px ist die Fuge nur noch als Kante zu sehen |
+
+Dateien in `app/icons/`: `icon-1024.png`, `icon-512.png`, `icon-192.png`, `icon-180.png` (Apple touch), `icon-96.png`,
+`icon-48.png`, `favicon-32.png`, `favicon-16.png`, `favicon.ico` (16 + 32), `icon-maskable-512.png`.
+Rohrender: `renders/phase3_v3/app_icon_render_2048.png` (+ `.blend`).
+
+Neu erzeugen:
+
+```
+blender -b --factory-startup --python renders/gen/render_app_icon.py --
+.venv/bin/python scripts/make_app_icons.py
+python3 scripts/md2pdf.py docs/design/P3_FLUIDI.md docs/design/P3_fluidi_v3.pdf
+```
+
+Die frühere flache Kachel (Kapitel V2.3) ist damit ersetzt.
+
+---
 
 ## V2 Verfeinerung 2 (D-010)
 
@@ -240,3 +284,5 @@ Die Icons haben 512 × 512 px, sind vollflächig und maskable: Das Motiv liegt i
 | `renders/gen/render_p3v3.py` | Verfeinerung 2: Gateway G1 v3 (Tropfen an der Fuge), Szenen Gateway/Familie |
 | `renders/phase3_v3/*.png`, `*.blend` | Bilder Verfeinerung 2, `logo_icon_uebersicht.png` |
 | `docs/design/logo/gen_logo_fluidi_v3.py` | Wortmarke v3a–d, Icon-Kacheln a/b, Übersicht, Kontrast, Mindestmasse |
+| `renders/gen/render_app_icon.py` | App-Icon (final): frontale Nahaufnahme, 2048 px, Cycles ohne Denoiser |
+| `scripts/make_app_icons.py` | Icon-Dateien `app/icons/*`, maskable Prüfung, `renders/phase3_v3/app_icon_uebersicht.png` |
