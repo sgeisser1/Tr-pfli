@@ -118,3 +118,10 @@ Format: Nr. · Datum · Entscheid · Alternativen · Begründung · Quelle · St
 - **App-Icon** (Sensor-Nahaufnahme, blauer Tropfen, `app/icons/`) vom Auftraggeber freigegeben. Design komplett:
   `docs/design/P3_FLUIDI.md` / `P3_fluidi_v3.pdf`. **Phase 3 freigegeben, Phase 4 gestartet** (Auftraggeber 2026-11-07).
 - Vorhandene Hardware beim Auftraggeber: Seeed XIAO nRF52840 Sense (Nutzung siehe Phase 4).
+
+### D-013 · 2026-11-07 · Pufferkondensatoren im Prototyp
+- **Entscheid (Projektleiter):** Prototyp-Los mit **4 × 100 µF bestückt** (C3/C4 nicht DNM). SPICE (simulation/spice/supply):
+  Advertising-Einbruch mit 2 × 100 µF pessimistisch 246 mV (> 0.2 V, REQ-ENE-06), mit 4 × 100 µF 143 mV.
+  Für die Serie wird nach Messung von DC-Bias und Leckstrom am Muster entschieden (2 oder 4); die pessimistische
+  Laufzeit mit 4 × 100 µF und Datenblatt-Leckgrenze liegt unter 12 Monaten (CONCEPTS v0.2: 11.9) – deshalb nur Prototyp.
+- **Status:** gültig bis Messung am Prototyp

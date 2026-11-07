@@ -1,0 +1,41 @@
+* fluidi osc_sim - erzeugt von osc_sim.py
+VDD vdd 0 DC 3.0
+RGPIO vdd sens 53
+C21 sens 0 100n IC=3.0
+C24 sens 0 100n IC=3.0
+EIN src 0 node 0 2
+RT1 src t1 1k
+T1 t1 0 t2 0 Z0=1k TD=3e-09
+RT2 t2 0 1k
+VONE one 0 DC 1
+RST one st 1k
+CST st 0 1f
+SHY st 0 t2 0 SWHY
+.model SWHY SW(VT=1.3155 VH=0.3445 RON=1 ROFF=1e9)
+VIS sens sensx DC 0
+SUP sensx yint st 0 SWOUT
+SDN yint 0 one st SWOUT
+.model SWOUT SW(VT=0.5 VH=0 RON=40 ROFF=1e9)
+CPD yint 0 22p
+RY yint y 1m
+CDIO24 y 0 6p
+CTP4 y 0 1p
+R3 y node 3300.0
+CNODE node 0 1e-11
+CX node 0 1e-10
+C22 node p1 2.2e-11
+Cp1 p1 0 6e-12
+RLp1 p1 0 100Meg
+C23 node p2 1e-10
+Cp2 p2 0 6e-12
+RLp2 p2 0 100Meg
+.ic v(node)=0
+.control
+set wr_singlescale
+set wr_vecnames
+option numdgt=7
+tran 0.1n 12u 0 0.1n uic
+wrdata osc_last.dat v(y) v(node) v(sens) i(VIS)
+quit
+.endc
+.end

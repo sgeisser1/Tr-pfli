@@ -1,0 +1,56 @@
+{
+  "_doc": "Gemeinsame Testvektoren für app/js/calc.js, app/dev/fluidi_calc.py und später die Gateway-Firmware (C). Erwartungswerte von Hand gerechnet (siehe Kommentare). Rohwerte sind Beispielzahlen (Zählerstand RC-Oszillator, ANNAHME), keine Messwerte.",
+  "version": 1,
+  "round1": [
+    {"x": 0.05, "y": 0.1},
+    {"x": -0.05, "y": -0.1},
+    {"x": 1.25, "y": 1.3},
+    {"x": -1.25, "y": -1.3},
+    {"x": 26.6666667, "y": 26.7},
+    {"x": 0, "y": 0}
+  ],
+  "evaluate": [
+    {"_c": "Trockenpunkt, Schwelle 30 -> dry", "raw": 41000, "temp_c": 21.0, "cal": {"dry": {"raw": 41000}, "wet": {"raw": 26000}, "temp_coeff_per_k": 0, "t_ref_c": 20}, "threshold": 30, "pct": 0.0, "unclamped": 0.0, "state": "dry"},
+    {"_c": "Nasspunkt", "raw": 26000, "temp_c": 21.0, "cal": {"dry": {"raw": 41000}, "wet": {"raw": 26000}, "temp_coeff_per_k": 0, "t_ref_c": 20}, "threshold": 30, "pct": 100.0, "unclamped": 100.0, "state": "ok"},
+    {"_c": "Mitte: (33500-41000)/(26000-41000) = 0.5", "raw": 33500, "temp_c": 21.0, "cal": {"dry": {"raw": 41000}, "wet": {"raw": 26000}, "temp_coeff_per_k": 0, "t_ref_c": 20}, "threshold": 30, "pct": 50.0, "unclamped": 50.0, "state": "ok"},
+    {"_c": "4000/15000 = 26.67 % < 30 -> dry", "raw": 37000, "temp_c": 21.0, "cal": {"dry": {"raw": 41000}, "wet": {"raw": 26000}, "temp_coeff_per_k": 0, "t_ref_c": 20}, "threshold": 30, "pct": 26.7, "unclamped": 26.7, "state": "dry"},
+    {"_c": "-13.3 % < -10 -> Sensor in Luft", "raw": 43000, "temp_c": 21.0, "cal": {"dry": {"raw": 41000}, "wet": {"raw": 26000}, "temp_coeff_per_k": 0, "t_ref_c": 20}, "threshold": 30, "pct": null, "unclamped": -13.3, "state": "air"},
+    {"_c": "-6.7 % liegt in der Toleranz -> 0 %, dry", "raw": 42000, "temp_c": 21.0, "cal": {"dry": {"raw": 41000}, "wet": {"raw": 26000}, "temp_coeff_per_k": 0, "t_ref_c": 20}, "threshold": 30, "pct": 0.0, "unclamped": -6.7, "state": "dry"},
+    {"_c": "113.3 % -> überflutet", "raw": 24000, "temp_c": 21.0, "cal": {"dry": {"raw": 41000}, "wet": {"raw": 26000}, "temp_coeff_per_k": 0, "t_ref_c": 20}, "threshold": 30, "pct": null, "unclamped": 113.3, "state": "flooded"},
+    {"_c": "106.7 % -> auf 100 begrenzt", "raw": 25000, "temp_c": 21.0, "cal": {"dry": {"raw": 41000}, "wet": {"raw": 26000}, "temp_coeff_per_k": 0, "t_ref_c": 20}, "threshold": 30, "pct": 100.0, "unclamped": 106.7, "state": "ok"},
+    {"_c": "Kompensation k=0.002/K bei 30 °C: 33500/1.02 = 32843.14 -> 54.38 %", "raw": 33500, "temp_c": 30.0, "cal": {"dry": {"raw": 41000}, "wet": {"raw": 26000}, "temp_coeff_per_k": 0.002, "t_ref_c": 20}, "threshold": 30, "pct": 54.4, "unclamped": 54.4, "state": "ok"},
+    {"_c": "Kompensation ohne Temperatur -> unverändert", "raw": 33500, "temp_c": null, "cal": {"dry": {"raw": 41000}, "wet": {"raw": 26000}, "temp_coeff_per_k": 0.002, "t_ref_c": 20}, "threshold": 30, "pct": 50.0, "unclamped": 50.0, "state": "ok"},
+    {"_c": "unplausibler Koeffizient (Faktor 7) -> keine Kompensation", "raw": 33500, "temp_c": 30.0, "cal": {"dry": {"raw": 41000}, "wet": {"raw": 26000}, "temp_coeff_per_k": 0.6, "t_ref_c": 20}, "threshold": 30, "pct": 50.0, "unclamped": 50.0, "state": "ok"},
+    {"_c": "Spanne 300/30300 < 2 % -> ungültig", "raw": 30100, "temp_c": 21.0, "cal": {"dry": {"raw": 30000}, "wet": {"raw": 30300}, "temp_coeff_per_k": 0, "t_ref_c": 20}, "threshold": 30, "pct": null, "unclamped": null, "state": "invalid"},
+    {"_c": "steigende Kennlinie", "raw": 2000, "temp_c": 21.0, "cal": {"dry": {"raw": 1000}, "wet": {"raw": 3000}, "temp_coeff_per_k": 0, "t_ref_c": 20}, "threshold": 30, "pct": 50.0, "unclamped": 50.0, "state": "ok"},
+    {"_c": "keine Kalibrierung", "raw": 2000, "temp_c": 21.0, "cal": null, "threshold": 30, "pct": null, "unclamped": null, "state": "uncalibrated"}
+  ],
+  "robust_mean": [
+    {"_c": "Ausreisser 150 wird verworfen", "x": [100, 101, 99, 100, 150], "mean": 100.0, "stddev": 0.816497, "n": 4, "outliers": 1},
+    {"x": [5, 5, 5], "mean": 5.0, "stddev": 0.0, "n": 3, "outliers": 0},
+    {"x": [], "mean": null, "stddev": null, "n": 0, "outliers": 0}
+  ],
+  "signal_quality": [
+    {"rssi": -65, "q": 4}, {"rssi": -70, "q": 4}, {"rssi": -75, "q": 3},
+    {"rssi": -85, "q": 2}, {"rssi": -90, "q": 1}, {"rssi": -96, "q": 0}
+  ],
+  "battery_bars": [
+    {"pct": 80, "bars": 4}, {"pct": 50, "bars": 3}, {"pct": 30, "bars": 2},
+    {"pct": 10, "bars": 1}, {"pct": 5, "bars": 0}
+  ],
+  "choose_resolution": [
+    {"days": 1, "per_day": 8, "res": "raw"},
+    {"days": 7, "per_day": 8, "res": "raw"},
+    {"days": 31, "per_day": 8, "res": "raw"},
+    {"days": 365, "per_day": 8, "res": "day"},
+    {"days": 7, "per_day": 96, "res": "raw"},
+    {"days": 31, "per_day": 96, "res": "hour"},
+    {"days": 365, "per_day": 96, "res": "day"}
+  ],
+  "is_stale": [
+    {"age_s": 40000, "per_day": 6, "stale": false},
+    {"age_s": 50000, "per_day": 6, "stale": true},
+    {"age_s": 5000, "per_day": 96, "stale": false},
+    {"age_s": 8000, "per_day": 96, "stale": true}
+  ]
+}

@@ -1,0 +1,1314 @@
+openapi: 3.1.0
+info:
+  title: fluidi Gateway API
+  version: 1.0.0-draft
+  summary: Lokale REST-API des fluidi-Gateways (ESP32-S3) für die PWA „fluidi“.
+  description: |
+    Normativ zusammen mit `docs/interfaces/GATEWAY_API.md` (Abläufe, Sicherheit, Fehlercodes, SSE).
+    Strikt lokal: Basis-URL `https://fluidi.local/api/v1`. Alle Zeitangaben in Objekten als
+    ISO-8601 UTC (`2026-11-07T14:03:00Z`), in Zeitreihen als Unix-Sekunden (UTC).
+    Schreibende Aufrufe (POST/PUT/PATCH/DELETE) brauchen eine Sitzung (Cookie `fluidi_sid`)
+    und den Header `X-CSRF-Token`. Aufrufe mit `x-fluidi-elevated: true` brauchen zusätzlich
+    eine frische Passwortbestätigung (`POST /auth/elevate`, gültig 5 min).
+    Lesende Aufrufe sind ohne Anmeldung erlaubt, solange `settings.public_read` = true
+    (Werkseinstellung, siehe GATEWAY_API.md Kap. 3.4); sonst ebenfalls Sitzung nötig.
+  license:
+    name: Projektintern
+servers:
+  - url: https://fluidi.local/api/v1
+    description: Gateway im LAN (mDNS)
+  - url: http://localhost:8080/api/v1
+    description: Mock-Server für die Entwicklung (app/dev/mock_server.py)
+tags:
+  - name: auth
+  - name: plants
+  - name: sensors
+  - name: calibration
+  - name: jobs
+  - name: pairing
+  - name: settings
+  - name: firmware
+  - name: data
+  - name: system
+security:
+  - session: []
+paths:
+  /auth/status:
+    get:
+      tags: [auth]
+      summary: Anmeldestatus, Ersteinrichtung nötig?, Sperre
+      security: []
+      responses:
+        '200':
+          description: Status
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/AuthStatus'}
+  /auth/setup:
+    post:
+      tags: [auth]
+      summary: Erstes Passwort setzen (nur solange setup_required)
+      description: |
+        Braucht den Einrichtungscode, den das Gateway nur über USB ausgibt
+        (Provisionierung bzw. Passwort-Reset UC-16). Danach ist man angemeldet.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [setup_code, password]
+              additionalProperties: false
+              properties:
+                setup_code: {type: string, pattern: '^[0-9]{3}-?[0-9]{3}$'}
+                password: {$ref: '#/components/schemas/NewPassword'}
+      responses:
+        '200': {$ref: '#/components/responses/Session'}
+        '400': {$ref: '#/components/responses/Error'}
+        '401': {$ref: '#/components/responses/Error'}
+        '409': {$ref: '#/components/responses/Error'}
+        '429': {$ref: '#/components/responses/Locked'}
+  /auth/login:
+    post:
+      tags: [auth]
+      summary: Anmelden
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [password]
+              additionalProperties: false
+              properties:
+                password: {type: string, minLength: 1, maxLength: 128}
+                remember: {type: boolean, default: false, description: 'true = Sitzung 30 Tage, sonst 12 h'}
+      responses:
+        '200': {$ref: '#/components/responses/Session'}
+        '401': {$ref: '#/components/responses/Error'}
+        '409': {$ref: '#/components/responses/Error'}
+        '429': {$ref: '#/components/responses/Locked'}
+  /auth/logout:
+    post:
+      tags: [auth]
+      summary: Abmelden (Sitzung löschen)
+      responses:
+        '204': {description: abgemeldet}
+  /auth/elevate:
+    post:
+      tags: [auth]
+      summary: Passwort erneut bestätigen für heikle Aktionen (5 min)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [password]
+              additionalProperties: false
+              properties:
+                password: {type: string, minLength: 1, maxLength: 128}
+      responses:
+        '200': {$ref: '#/components/responses/Session'}
+        '401': {$ref: '#/components/responses/Error'}
+        '429': {$ref: '#/components/responses/Locked'}
+  /auth/password:
+    post:
+      tags: [auth]
+      summary: Passwort ändern (beendet alle anderen Sitzungen)
+      x-fluidi-elevated: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [new_password]
+              additionalProperties: false
+              properties:
+                new_password: {$ref: '#/components/schemas/NewPassword'}
+      responses:
+        '204': {description: geändert}
+        '400': {$ref: '#/components/responses/Error'}
+        '403': {$ref: '#/components/responses/Error'}
+
+  /plants:
+    get:
+      tags: [plants]
+      summary: Übersicht aller Pflanzen mit letztem Messwert (REQ-APP-03)
+      security: [{}, {session: []}]
+      responses:
+        '200':
+          description: Liste
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: '#/components/schemas/Plant'}
+    post:
+      tags: [plants]
+      summary: Pflanze anlegen (ohne oder mit Sensor)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/PlantCreate'}
+      responses:
+        '201':
+          description: angelegt
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Plant'}
+        '400': {$ref: '#/components/responses/Error'}
+        '409': {$ref: '#/components/responses/Error'}
+  /plants/{plant_id}:
+    parameters: [{$ref: '#/components/parameters/PlantId'}]
+    get:
+      tags: [plants]
+      summary: Eine Pflanze
+      security: [{}, {session: []}]
+      responses:
+        '200':
+          description: Pflanze
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Plant'}
+        '404': {$ref: '#/components/responses/Error'}
+    patch:
+      tags: [plants]
+      summary: Pflanze bearbeiten (Name, Substrat, Schwelle, Giessen-LED) (REQ-APP-05, REQ-UI-07)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/PlantPatch'}
+      responses:
+        '200':
+          description: geändert
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Plant'}
+        '400': {$ref: '#/components/responses/Error'}
+        '404': {$ref: '#/components/responses/Error'}
+    delete:
+      tags: [plants]
+      summary: Pflanze löschen (Sensor wird frei, Messwerte bleiben beim Sensor)
+      responses:
+        '204': {description: gelöscht}
+        '404': {$ref: '#/components/responses/Error'}
+  /plants/{plant_id}/sensor:
+    parameters: [{$ref: '#/components/parameters/PlantId'}]
+    put:
+      tags: [plants]
+      summary: Sensor zuordnen, wechseln oder lösen (UC-11)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [sensor_id]
+              additionalProperties: false
+              properties:
+                sensor_id: {oneOf: [{$ref: '#/components/schemas/SensorId'}, {type: 'null'}]}
+                move_history:
+                  type: boolean
+                  default: false
+                  description: |
+                    false = bisherige Messwerte bleiben bei der bisherigen Pflanze (Normalfall).
+                    true = die bisherige Historie des Sensors wandert mit zu dieser Pflanze.
+      responses:
+        '200':
+          description: Zuordnung geändert
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Plant'}
+        '404': {$ref: '#/components/responses/Error'}
+        '409': {$ref: '#/components/responses/Error'}
+  /plants/{plant_id}/series:
+    parameters: [{$ref: '#/components/parameters/PlantId'}]
+    get:
+      tags: [plants]
+      summary: Messreihe einer Pflanze, optional aggregiert (REQ-APP-04)
+      security: [{}, {session: []}]
+      parameters:
+        - {name: from, in: query, required: true, schema: {type: integer, description: Unix-Sekunden}}
+        - {name: to, in: query, required: true, schema: {type: integer, description: Unix-Sekunden}}
+        - name: res
+          in: query
+          schema: {type: string, enum: [auto, raw, hour, day], default: auto}
+      responses:
+        '200':
+          description: Spaltenformat (direkt für uPlot nutzbar)
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Series'}
+        '400': {$ref: '#/components/responses/Error'}
+        '404': {$ref: '#/components/responses/Error'}
+  /plants/{plant_id}/measure:
+    parameters: [{$ref: '#/components/parameters/PlantId'}]
+    post:
+      tags: [plants]
+      summary: Manuelle Messung auslösen (asynchron, REQ-APP-06, REQ-SYS-05)
+      responses:
+        '202':
+          description: Auftrag angenommen; Fortschritt über GET /jobs/{id} oder SSE `job`
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Job'}
+        '404': {$ref: '#/components/responses/Error'}
+        '409': {$ref: '#/components/responses/Error'}
+
+  /sensors:
+    get:
+      tags: [sensors]
+      summary: Alle gekoppelten Sensoren
+      security: [{}, {session: []}]
+      responses:
+        '200':
+          description: Liste
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: '#/components/schemas/Sensor'}
+  /sensors/{sensor_id}:
+    parameters: [{$ref: '#/components/parameters/SensorIdParam'}]
+    get:
+      tags: [sensors]
+      summary: Ein Sensor
+      security: [{}, {session: []}]
+      responses:
+        '200':
+          description: Sensor
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Sensor'}
+        '404': {$ref: '#/components/responses/Error'}
+    patch:
+      tags: [sensors]
+      summary: Sensor-Einstellungen (Intervall-Übersteuerung, LED)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/SensorPatch'}
+      responses:
+        '200':
+          description: geändert (wird beim nächsten Kontakt an den Sensor übertragen)
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Sensor'}
+        '400': {$ref: '#/components/responses/Error'}
+        '404': {$ref: '#/components/responses/Error'}
+    delete:
+      tags: [sensors]
+      summary: Sensor entkoppeln (Schlüssel löschen; Messwerte bleiben)
+      responses:
+        '202':
+          description: Entkopplung läuft (Sensor wird beim nächsten Kontakt informiert)
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Job'}
+        '404': {$ref: '#/components/responses/Error'}
+  /sensors/{sensor_id}/identify:
+    parameters: [{$ref: '#/components/parameters/SensorIdParam'}]
+    post:
+      tags: [sensors]
+      summary: LED des Sensors kurz blinken lassen (Sensor im Raum finden)
+      responses:
+        '202':
+          description: Auftrag angenommen
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Job'}
+        '404': {$ref: '#/components/responses/Error'}
+  /sensors/{sensor_id}/calibration:
+    parameters: [{$ref: '#/components/parameters/SensorIdParam'}]
+    get:
+      tags: [calibration]
+      summary: Kalibrierungen des Sensors je Substrat (REQ-MES-09)
+      security: [{}, {session: []}]
+      responses:
+        '200':
+          description: je Substrat; `source` = default, wenn noch nicht kalibriert
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [erde, granulat]
+                properties:
+                  erde: {$ref: '#/components/schemas/Calibration'}
+                  granulat: {$ref: '#/components/schemas/Calibration'}
+  /sensors/{sensor_id}/calibration/{substrate}:
+    parameters:
+      - {$ref: '#/components/parameters/SensorIdParam'}
+      - {name: substrate, in: path, required: true, schema: {$ref: '#/components/schemas/Substrate'}}
+    put:
+      tags: [calibration]
+      summary: Kalibrierwerte direkt setzen (Fachmodus)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/CalibrationInput'}
+      responses:
+        '200':
+          description: gespeichert
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Calibration'}
+        '400': {$ref: '#/components/responses/Error'}
+    delete:
+      tags: [calibration]
+      summary: Auf Startkalibrierung zurücksetzen
+      responses:
+        '200':
+          description: zurückgesetzt
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Calibration'}
+  /sensors/{sensor_id}/calibration-runs:
+    parameters: [{$ref: '#/components/parameters/SensorIdParam'}]
+    post:
+      tags: [calibration]
+      summary: Geführte Zwei-Punkt-Kalibrierung starten (REQ-APP-07)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [substrate]
+              additionalProperties: false
+              properties:
+                substrate: {$ref: '#/components/schemas/Substrate'}
+                samples: {type: integer, minimum: 3, maximum: 20, default: 5}
+      responses:
+        '201':
+          description: Lauf angelegt
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/CalibrationRun'}
+        '404': {$ref: '#/components/responses/Error'}
+        '409': {$ref: '#/components/responses/Error'}
+  /calibration-runs/{run_id}:
+    parameters: [{name: run_id, in: path, required: true, schema: {type: string}}]
+    get:
+      tags: [calibration]
+      summary: Stand eines Kalibrierlaufs
+      responses:
+        '200':
+          description: Lauf
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/CalibrationRun'}
+        '404': {$ref: '#/components/responses/Error'}
+    delete:
+      tags: [calibration]
+      summary: Lauf abbrechen (nichts wird gespeichert)
+      responses:
+        '204': {description: abgebrochen}
+  /calibration-runs/{run_id}/capture:
+    parameters: [{name: run_id, in: path, required: true, schema: {type: string}}]
+    post:
+      tags: [calibration]
+      summary: Messpunkt „trocken“ oder „nass“ aufnehmen (mehrere Einzelmessungen)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [point]
+              additionalProperties: false
+              properties:
+                point: {type: string, enum: [dry, wet]}
+      responses:
+        '202':
+          description: Messauftrag läuft; Ergebnis landet im Lauf (`dry`/`wet`)
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Job'}
+        '404': {$ref: '#/components/responses/Error'}
+        '409': {$ref: '#/components/responses/Error'}
+  /calibration-runs/{run_id}/commit:
+    parameters: [{name: run_id, in: path, required: true, schema: {type: string}}]
+    post:
+      tags: [calibration]
+      summary: Kalibrierung übernehmen
+      responses:
+        '200':
+          description: gespeichert
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Calibration'}
+        '409': {$ref: '#/components/responses/Error'}
+        '422': {$ref: '#/components/responses/Error'}
+
+  /jobs/{job_id}:
+    parameters: [{name: job_id, in: path, required: true, schema: {type: string}}]
+    get:
+      tags: [jobs]
+      summary: Status eines asynchronen Auftrags
+      security: [{}, {session: []}]
+      responses:
+        '200':
+          description: Auftrag
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Job'}
+        '404': {$ref: '#/components/responses/Error'}
+
+  /pairing:
+    get:
+      tags: [pairing]
+      summary: Kopplungsmodus und gefundene Sensoren im Kopplungsmodus
+      responses:
+        '200':
+          description: Zustand
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/PairingState'}
+  /pairing/start:
+    post:
+      tags: [pairing]
+      summary: Kopplungsmodus des Gateways öffnen (max. 300 s)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                duration_s: {type: integer, minimum: 30, maximum: 300, default: 180}
+      responses:
+        '200':
+          description: geöffnet
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/PairingState'}
+  /pairing/stop:
+    post:
+      tags: [pairing]
+      summary: Kopplungsmodus schliessen
+      responses:
+        '200':
+          description: geschlossen
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/PairingState'}
+  /pairing/candidates/{device}/accept:
+    parameters: [{name: device, in: path, required: true, schema: {$ref: '#/components/schemas/SensorId'}}]
+    post:
+      tags: [pairing]
+      summary: Gefundenen Sensor bestätigen und koppeln (REQ-RF-05)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                plant_id: {type: integer, description: bestehende Pflanze ohne Sensor}
+                plant: {$ref: '#/components/schemas/PlantCreate'}
+      responses:
+        '202':
+          description: Schlüsselaustausch läuft; Job-Ergebnis enthält sensor_id und plant_id
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Job'}
+        '404': {$ref: '#/components/responses/Error'}
+        '409': {$ref: '#/components/responses/Error'}
+
+  /settings:
+    get:
+      tags: [settings]
+      summary: Systemweite Einstellungen
+      security: [{}, {session: []}]
+      responses:
+        '200':
+          description: Einstellungen (Passwortfelder nie enthalten)
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Settings'}
+    patch:
+      tags: [settings]
+      summary: Einstellungen ändern (teilweise)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/SettingsPatch'}
+      responses:
+        '200':
+          description: geändert
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Settings'}
+        '400': {$ref: '#/components/responses/Error'}
+  /settings/network:
+    get:
+      tags: [settings]
+      summary: WLAN-Verbindung (ohne Passwort)
+      responses:
+        '200':
+          description: WLAN
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Network'}
+    put:
+      tags: [settings]
+      summary: WLAN wechseln (UC-13); Rückfall auf alte Daten nach 120 s ohne Erfolg
+      x-fluidi-elevated: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ssid, password]
+              additionalProperties: false
+              properties:
+                ssid: {type: string, minLength: 1, maxLength: 32}
+                password: {type: string, minLength: 8, maxLength: 63, writeOnly: true}
+      responses:
+        '202':
+          description: Wechsel wird versucht
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Network'}
+
+  /firmware:
+    get:
+      tags: [firmware]
+      summary: Firmware-Stand Gateway, abgelegte Sensor-Abbilder, laufende Verteilung
+      responses:
+        '200':
+          description: Stand
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/FirmwareState'}
+  /firmware/sensor-images:
+    post:
+      tags: [firmware]
+      summary: Signiertes Sensor-Abbild hochladen (Gateway prüft Signatur und Version)
+      x-fluidi-elevated: true
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema: {type: string, format: binary}
+      responses:
+        '201':
+          description: abgelegt
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/SensorImage'}
+        '409': {$ref: '#/components/responses/Error'}
+        '413': {$ref: '#/components/responses/Error'}
+        '422': {$ref: '#/components/responses/Error'}
+  /firmware/sensor-images/{version}:
+    parameters: [{name: version, in: path, required: true, schema: {type: string}}]
+    delete:
+      tags: [firmware]
+      summary: Abgelegtes Sensor-Abbild löschen
+      responses:
+        '204': {description: gelöscht}
+        '404': {$ref: '#/components/responses/Error'}
+  /firmware/rollout:
+    post:
+      tags: [firmware]
+      summary: Sensor-Update verteilen (UC-08)
+      x-fluidi-elevated: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [version, sensor_ids]
+              additionalProperties: false
+              properties:
+                version: {type: string}
+                sensor_ids:
+                  type: array
+                  minItems: 1
+                  items: {$ref: '#/components/schemas/SensorId'}
+      responses:
+        '202':
+          description: Verteilung gestartet
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Rollout'}
+        '404': {$ref: '#/components/responses/Error'}
+        '409': {$ref: '#/components/responses/Error'}
+    delete:
+      tags: [firmware]
+      summary: Verteilung abbrechen (laufende Übertragungen werden sauber beendet)
+      responses:
+        '204': {description: abgebrochen}
+  /firmware/gateway:
+    post:
+      tags: [firmware]
+      summary: Gateway-Update (signiertes Abbild inkl. PWA), A/B mit Rückfall (REQ-GW-11)
+      x-fluidi-elevated: true
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema: {type: string, format: binary}
+      responses:
+        '202':
+          description: geprüft und geschrieben, Neustart folgt
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [version, reboot_in_s]
+                properties:
+                  version: {type: string}
+                  reboot_in_s: {type: integer}
+        '409': {$ref: '#/components/responses/Error'}
+        '422': {$ref: '#/components/responses/Error'}
+
+  /export.csv:
+    get:
+      tags: [data]
+      summary: CSV-Export (REQ-APP-08), Format `fluidi-csv` v1
+      security: [{}, {session: []}]
+      parameters:
+        - name: plant_ids
+          in: query
+          description: Kommagetrennte IDs; leer = alle
+          schema: {type: string, pattern: '^([0-9]+(,[0-9]+)*)?$'}
+        - {name: from, in: query, required: true, schema: {type: integer}}
+        - {name: to, in: query, required: true, schema: {type: integer}}
+        - {name: res, in: query, schema: {type: string, enum: [raw, hour, day], default: raw}}
+        - {name: sep, in: query, schema: {type: string, enum: [semicolon, comma], default: semicolon}}
+        - {name: decimal, in: query, schema: {type: string, enum: [point, comma], default: point}}
+      responses:
+        '200':
+          description: CSV, UTF-8 mit BOM, Kopfzeile `# fluidi-csv v1`
+          content:
+            text/csv:
+              schema: {type: string}
+        '400': {$ref: '#/components/responses/Error'}
+  /backup:
+    post:
+      tags: [data]
+      summary: Vollständiges Backup erzeugen (inkl. Kopplungsschlüssel, verschlüsselt) (REQ-GW-06)
+      x-fluidi-elevated: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [passphrase]
+              additionalProperties: false
+              properties:
+                passphrase: {type: string, minLength: 12, maxLength: 128, writeOnly: true}
+      responses:
+        '200':
+          description: Datei `fluidi-backup-<gateway>-<datum>.fbk`
+          content:
+            application/octet-stream:
+              schema: {type: string, format: binary}
+  /backup/restore:
+    post:
+      tags: [data]
+      summary: Backup einspielen (ersetzt alle Daten), danach Neustart (UC-14)
+      x-fluidi-elevated: true
+      parameters:
+        - {name: X-Backup-Passphrase, in: header, required: true, schema: {type: string, minLength: 12}}
+        - {name: dry_run, in: query, schema: {type: boolean, default: false}}
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema: {type: string, format: binary}
+      responses:
+        '202':
+          description: geprüft (und bei dry_run=false eingespielt)
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/RestoreResult'}
+        '422': {$ref: '#/components/responses/Error'}
+
+  /system:
+    get:
+      tags: [system]
+      summary: Systemstatus (Zeit, Speicher, WLAN, Zertifikat, Version)
+      security: [{}, {session: []}]
+      responses:
+        '200':
+          description: Status
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/SystemStatus'}
+  /system/time:
+    post:
+      tags: [system]
+      summary: Browserzeit übergeben (nur übernommen, wenn das Gateway keine gültige Zeit hat)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [epoch_ms]
+              additionalProperties: false
+              properties:
+                epoch_ms: {type: integer}
+                force: {type: boolean, default: false, description: 'true = auch bei gültiger Zeit übernehmen (nur mit elevate)'}
+      responses:
+        '200':
+          description: Zeitstatus nach dem Aufruf
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/TimeStatus'}
+        '403': {$ref: '#/components/responses/Error'}
+  /system/reboot:
+    post:
+      tags: [system]
+      summary: Gateway neu starten
+      responses:
+        '202': {description: Neustart in 2 s}
+  /system/events:
+    get:
+      tags: [system]
+      summary: Ereignisprotokoll (Sensorfehler, Neustarts, Anmeldefehler, Updates)
+      parameters:
+        - {name: limit, in: query, schema: {type: integer, minimum: 1, maximum: 200, default: 50}}
+        - {name: before, in: query, schema: {type: integer, description: 'Ereignis-ID, ältere als diese'}}
+      responses:
+        '200':
+          description: neueste zuerst
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: '#/components/schemas/EventLogEntry'}
+  /stream:
+    get:
+      tags: [system]
+      summary: Server-Sent Events (measurement, plant, job, pairing, rollout, system)
+      security: [{}, {session: []}]
+      responses:
+        '200':
+          description: 'text/event-stream; Ereignisdaten siehe GATEWAY_API.md Kap. 6'
+          content:
+            text/event-stream:
+              schema: {type: string}
+
+components:
+  securitySchemes:
+    session:
+      type: apiKey
+      in: cookie
+      name: fluidi_sid
+  parameters:
+    PlantId:
+      name: plant_id
+      in: path
+      required: true
+      schema: {type: integer, minimum: 1}
+    SensorIdParam:
+      name: sensor_id
+      in: path
+      required: true
+      schema: {$ref: '#/components/schemas/SensorId'}
+  responses:
+    Error:
+      description: Fehler
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/Error'}
+    Locked:
+      description: Zu viele Fehlversuche; Header Retry-After (s)
+      headers:
+        Retry-After: {schema: {type: integer}}
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/Error'}
+    Session:
+      description: Angemeldet; setzt Cookie `fluidi_sid` (HttpOnly, Secure, SameSite=Strict)
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/Session'}
+  schemas:
+    Timestamp: {type: string, format: date-time}
+    SensorId:
+      type: string
+      pattern: '^fluidi-[0-9A-F]{4}$'
+      description: REQ-SYS-08, XXXX aus Chip-ID (hex)
+    Substrate:
+      type: string
+      enum: [erde, granulat]
+    NewPassword:
+      type: string
+      minLength: 10
+      maxLength: 128
+      writeOnly: true
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              enum: [bad_request, validation, auth_required, auth_failed, csrf, elevation_required,
+                     locked, forbidden, not_found, conflict, setup_done, setup_required,
+                     signature_invalid, downgrade, too_large, sensor_unreachable, busy,
+                     calibration_span, time_invalid, internal]
+            message: {type: string, description: Deutsch, für die Anzeige}
+            field: {type: string}
+            retry_after_s: {type: integer}
+    AuthStatus:
+      type: object
+      required: [setup_required, logged_in, public_read, lockout]
+      properties:
+        setup_required: {type: boolean}
+        logged_in: {type: boolean}
+        elevated_until: {oneOf: [{$ref: '#/components/schemas/Timestamp'}, {type: 'null'}]}
+        session_expires: {oneOf: [{$ref: '#/components/schemas/Timestamp'}, {type: 'null'}]}
+        csrf: {type: ['string', 'null'], description: nur wenn angemeldet}
+        public_read: {type: boolean}
+        lockout:
+          type: object
+          required: [locked]
+          properties:
+            locked: {type: boolean}
+            retry_after_s: {type: integer}
+            failed_attempts: {type: integer}
+    Session:
+      type: object
+      required: [csrf, expires]
+      properties:
+        csrf: {type: string}
+        expires: {$ref: '#/components/schemas/Timestamp'}
+        elevated_until: {oneOf: [{$ref: '#/components/schemas/Timestamp'}, {type: 'null'}]}
+    Battery:
+      type: object
+      required: [mv, pct, state]
+      properties:
+        mv: {type: integer, description: Spannung unter Last (REQ-ENE-05)}
+        pct: {type: integer, minimum: 0, maximum: 100}
+        days_left: {type: ['integer', 'null'], description: Schätzung des Gateways}
+        state: {type: string, enum: [ok, low, critical]}
+    Signal:
+      type: object
+      required: [rssi_dbm, quality]
+      properties:
+        rssi_dbm: {type: integer, description: am Gateway empfangen}
+        quality: {type: integer, minimum: 0, maximum: 4}
+    Reading:
+      type: object
+      required: [t, moisture_pct, moisture_state, raw, temp_c, time_quality]
+      properties:
+        t: {$ref: '#/components/schemas/Timestamp'}
+        moisture_pct: {type: ['number', 'null'], description: 'Feuchteindex 0–100 %, 0.1 % Auflösung; null bei air/flooded'}
+        moisture_unclamped: {type: ['number', 'null']}
+        moisture_state: {type: string, enum: [ok, dry, air, flooded, uncalibrated, invalid]}
+        raw: {type: integer, description: Rohwert des Sensors}
+        temp_c: {type: ['number', 'null']}
+        time_quality: {type: string, enum: [ok, reconstructed, unsynced]}
+        source: {type: string, enum: [auto, manual, button, calibration]}
+    PlantStatus:
+      type: object
+      required: [needs_water, stale, battery_low, sensor_error]
+      properties:
+        needs_water: {type: boolean}
+        stale: {type: boolean, description: 'kein Wert seit > 3 Intervallen'}
+        battery_low: {type: boolean}
+        sensor_error: {type: ['string', 'null']}
+    Plant:
+      type: object
+      required: [id, name, substrate, threshold_pct, water_led, sensor_id, latest, status, calibration]
+      properties:
+        id: {type: integer}
+        name: {type: string, minLength: 1, maxLength: 40}
+        substrate: {$ref: '#/components/schemas/Substrate'}
+        threshold_pct: {type: integer, minimum: 0, maximum: 100}
+        water_led: {type: string, enum: [inherit, 'on', 'off'], description: Giessen-Hinweis an der LED (REQ-UI-07)}
+        notes: {type: string, maxLength: 200}
+        sensor_id: {oneOf: [{$ref: '#/components/schemas/SensorId'}, {type: 'null'}]}
+        latest: {oneOf: [{$ref: '#/components/schemas/Reading'}, {type: 'null'}]}
+        status: {$ref: '#/components/schemas/PlantStatus'}
+        battery: {oneOf: [{$ref: '#/components/schemas/Battery'}, {type: 'null'}]}
+        signal: {oneOf: [{$ref: '#/components/schemas/Signal'}, {type: 'null'}]}
+        calibration: {type: string, enum: [none, default, calibrated]}
+        created: {$ref: '#/components/schemas/Timestamp'}
+    PlantCreate:
+      type: object
+      required: [name, substrate]
+      additionalProperties: false
+      properties:
+        name: {type: string, minLength: 1, maxLength: 40}
+        substrate: {$ref: '#/components/schemas/Substrate'}
+        threshold_pct: {type: integer, minimum: 0, maximum: 100, default: 30}
+        water_led: {type: string, enum: [inherit, 'on', 'off'], default: inherit}
+        notes: {type: string, maxLength: 200}
+        sensor_id: {$ref: '#/components/schemas/SensorId'}
+    PlantPatch:
+      type: object
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        name: {type: string, minLength: 1, maxLength: 40}
+        substrate: {$ref: '#/components/schemas/Substrate'}
+        threshold_pct: {type: integer, minimum: 0, maximum: 100}
+        water_led: {type: string, enum: [inherit, 'on', 'off']}
+        notes: {type: string, maxLength: 200}
+    Sensor:
+      type: object
+      required: [id, plant_id, fw_version, last_seen, battery, signal, interval_per_day, effective_interval_per_day, pending_config, error]
+      properties:
+        id: {$ref: '#/components/schemas/SensorId'}
+        plant_id: {type: ['integer', 'null']}
+        hw_rev: {type: string}
+        fw_version: {type: string}
+        paired: {$ref: '#/components/schemas/Timestamp'}
+        last_seen: {oneOf: [{$ref: '#/components/schemas/Timestamp'}, {type: 'null'}]}
+        battery: {oneOf: [{$ref: '#/components/schemas/Battery'}, {type: 'null'}]}
+        signal: {oneOf: [{$ref: '#/components/schemas/Signal'}, {type: 'null'}]}
+        interval_per_day: {type: ['integer', 'null'], minimum: 1, maximum: 96, description: 'null = Systemwert'}
+        effective_interval_per_day: {type: integer, minimum: 1, maximum: 96}
+        led_enabled: {type: boolean}
+        pending_config: {type: boolean, description: Änderungen warten auf nächsten Kontakt}
+        buffered_records: {type: ['integer', 'null'], description: Werte im Sensorpuffer, noch nicht übertragen}
+        error: {type: ['object', 'null'], properties: {code: {type: string}, text: {type: string}, t: {$ref: '#/components/schemas/Timestamp'}}}
+        unpairing: {type: boolean}
+    SensorPatch:
+      type: object
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        interval_per_day: {type: ['integer', 'null'], minimum: 1, maximum: 96}
+        led_enabled: {type: boolean}
+    CalibrationPoint:
+      type: object
+      required: [raw, temp_c]
+      properties:
+        raw: {type: number, description: Mittelwert, temperaturkompensiert auf t_ref}
+        temp_c: {type: ['number', 'null']}
+        n: {type: integer}
+        stddev: {type: ['number', 'null']}
+        t: {$ref: '#/components/schemas/Timestamp'}
+    Calibration:
+      type: object
+      required: [substrate, source, dry, wet]
+      properties:
+        substrate: {$ref: '#/components/schemas/Substrate'}
+        source: {type: string, enum: [default, guided, manual]}
+        dry: {$ref: '#/components/schemas/CalibrationPoint'}
+        wet: {$ref: '#/components/schemas/CalibrationPoint'}
+        temp_coeff_per_k: {type: number, description: 'Platzhalter Temperaturkompensation (relativ, 1/K), Werk 0'}
+        t_ref_c: {type: number}
+        updated: {oneOf: [{$ref: '#/components/schemas/Timestamp'}, {type: 'null'}]}
+    CalibrationInput:
+      type: object
+      required: [dry_raw, wet_raw]
+      additionalProperties: false
+      properties:
+        dry_raw: {type: number}
+        wet_raw: {type: number}
+        temp_coeff_per_k: {type: number, minimum: -0.05, maximum: 0.05}
+    CalibrationRun:
+      type: object
+      required: [id, sensor_id, substrate, state, dry, wet]
+      properties:
+        id: {type: string}
+        sensor_id: {$ref: '#/components/schemas/SensorId'}
+        substrate: {$ref: '#/components/schemas/Substrate'}
+        samples: {type: integer}
+        state: {type: string, enum: [await_dry, measuring_dry, await_wet, measuring_wet, ready, committed, cancelled, failed]}
+        dry: {oneOf: [{$ref: '#/components/schemas/CalibrationPoint'}, {type: 'null'}]}
+        wet: {oneOf: [{$ref: '#/components/schemas/CalibrationPoint'}, {type: 'null'}]}
+        span_ok: {type: ['boolean', 'null']}
+        message: {type: ['string', 'null']}
+        expires: {$ref: '#/components/schemas/Timestamp'}
+    Job:
+      type: object
+      required: [id, kind, state, created]
+      properties:
+        id: {type: string}
+        kind: {type: string, enum: [measure, calibration_capture, pair, unpair, identify, config]}
+        state: {type: string, enum: [queued, waiting_for_sensor, running, done, failed, timeout, cancelled]}
+        sensor_id: {oneOf: [{$ref: '#/components/schemas/SensorId'}, {type: 'null'}]}
+        plant_id: {type: ['integer', 'null']}
+        created: {$ref: '#/components/schemas/Timestamp'}
+        deadline: {$ref: '#/components/schemas/Timestamp'}
+        progress: {type: ['number', 'null'], minimum: 0, maximum: 1}
+        message: {type: ['string', 'null']}
+        result: {type: ['object', 'null']}
+    PairingCandidate:
+      type: object
+      required: [device, rssi_dbm, first_seen]
+      properties:
+        device: {$ref: '#/components/schemas/SensorId'}
+        rssi_dbm: {type: integer}
+        fw_version: {type: string}
+        hw_rev: {type: string}
+        first_seen: {$ref: '#/components/schemas/Timestamp'}
+        known: {type: boolean, description: 'war früher gekoppelt (Neukopplung)'}
+    PairingState:
+      type: object
+      required: [active, candidates]
+      properties:
+        active: {type: boolean}
+        until: {oneOf: [{$ref: '#/components/schemas/Timestamp'}, {type: 'null'}]}
+        candidates:
+          type: array
+          items: {$ref: '#/components/schemas/PairingCandidate'}
+    TimeWindow:
+      type: object
+      required: [start, end]
+      properties:
+        start: {type: string, pattern: '^([01][0-9]|2[0-3]):[0-5][0-9]$'}
+        end: {type: string, pattern: '^([01][0-9]|2[0-3]):[0-5][0-9]$'}
+        weekdays:
+          type: array
+          items: {type: integer, minimum: 1, maximum: 7}
+          description: 1 = Montag … 7 = Sonntag
+    LedSettings:
+      type: object
+      required: [enabled, water_hint, water_window]
+      properties:
+        enabled: {type: boolean, description: Status-LED allgemein (Quittung, Fehler)}
+        water_hint: {type: boolean, description: Giessen-Hinweis an der LED (Werk ein)}
+        water_window: {$ref: '#/components/schemas/TimeWindow'}
+        brightness: {type: string, enum: [low, normal, high]}
+    MqttSettings:
+      type: object
+      required: [enabled]
+      properties:
+        enabled: {type: boolean}
+        host: {type: string}
+        port: {type: integer}
+        tls: {type: boolean}
+        username: {type: string}
+        password_set: {type: boolean, readOnly: true}
+        base_topic: {type: string}
+        discovery: {type: boolean}
+        discovery_prefix: {type: string}
+    Settings:
+      type: object
+      required: [interval_per_day, reaction_time_min, default_threshold_pct, led, time, public_read, mqtt]
+      properties:
+        interval_per_day: {type: integer, minimum: 1, maximum: 96, description: REQ-SYS-04, Werk 6}
+        reaction_time_min: {type: integer, minimum: 1, maximum: 5, description: REQ-SYS-05}
+        default_threshold_pct: {type: integer, minimum: 0, maximum: 100}
+        led: {$ref: '#/components/schemas/LedSettings'}
+        time:
+          type: object
+          required: [ntp_enabled, ntp_server, timezone]
+          properties:
+            ntp_enabled: {type: boolean}
+            ntp_server: {type: string}
+            timezone: {type: string, description: IANA-Name, z. B. Europe/Zurich}
+        public_read: {type: boolean, description: Lesen ohne Anmeldung im LAN}
+        mqtt: {$ref: '#/components/schemas/MqttSettings'}
+        storage_forecast_days: {type: ['integer', 'null'], readOnly: true}
+    SettingsPatch:
+      type: object
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        interval_per_day: {type: integer, minimum: 1, maximum: 96}
+        reaction_time_min: {type: integer, minimum: 1, maximum: 5}
+        default_threshold_pct: {type: integer, minimum: 0, maximum: 100}
+        led:
+          type: object
+          additionalProperties: false
+          properties:
+            enabled: {type: boolean}
+            water_hint: {type: boolean}
+            water_window: {$ref: '#/components/schemas/TimeWindow'}
+            brightness: {type: string, enum: [low, normal, high]}
+        time:
+          type: object
+          additionalProperties: false
+          properties:
+            ntp_enabled: {type: boolean}
+            ntp_server: {type: string, maxLength: 64}
+            timezone: {type: string, maxLength: 40}
+        public_read: {type: boolean}
+        mqtt:
+          type: object
+          additionalProperties: false
+          properties:
+            enabled: {type: boolean}
+            host: {type: string, maxLength: 64}
+            port: {type: integer, minimum: 1, maximum: 65535}
+            tls: {type: boolean}
+            username: {type: string, maxLength: 64}
+            password: {type: string, maxLength: 64, writeOnly: true}
+            base_topic: {type: string, maxLength: 32}
+            discovery: {type: boolean}
+            discovery_prefix: {type: string, maxLength: 32}
+    Network:
+      type: object
+      required: [ssid, connected, hostname]
+      properties:
+        ssid: {type: string}
+        connected: {type: boolean}
+        rssi_dbm: {type: ['integer', 'null']}
+        ip: {type: ['string', 'null']}
+        hostname: {type: string}
+        mdns: {type: boolean}
+        pending_change: {type: ['object', 'null'], properties: {ssid: {type: string}, deadline: {$ref: '#/components/schemas/Timestamp'}}}
+    SensorImage:
+      type: object
+      required: [version, size, sha256, signature_ok, uploaded]
+      properties:
+        version: {type: string}
+        security_counter: {type: integer, description: Anti-Rollback-Zähler aus dem Abbild-Kopf}
+        size: {type: integer}
+        sha256: {type: string, pattern: '^[0-9a-f]{64}$'}
+        signature_ok: {type: boolean}
+        hw_compat: {type: string}
+        uploaded: {$ref: '#/components/schemas/Timestamp'}
+    RolloutItem:
+      type: object
+      required: [sensor_id, state]
+      properties:
+        sensor_id: {$ref: '#/components/schemas/SensorId'}
+        state: {type: string, enum: [pending, waiting_for_sensor, transferring, verifying, rebooting, done, failed, skipped]}
+        progress: {type: number, minimum: 0, maximum: 1}
+        message: {type: ['string', 'null']}
+    Rollout:
+      type: object
+      required: [version, started, items]
+      properties:
+        version: {type: string}
+        started: {$ref: '#/components/schemas/Timestamp'}
+        finished: {oneOf: [{$ref: '#/components/schemas/Timestamp'}, {type: 'null'}]}
+        items:
+          type: array
+          items: {$ref: '#/components/schemas/RolloutItem'}
+    FirmwareState:
+      type: object
+      required: [gateway, sensor_images, rollout]
+      properties:
+        gateway:
+          type: object
+          required: [platform, version, update_slot, secure_boot, storage_encryption]
+          properties:
+            platform: {type: string, enum: [esp32-s3, rpi-zero2w, mock], description: Gateway-Plattform (offen, siehe ARCHITECTURE.md)}
+            version: {type: string}
+            build: {type: string}
+            update_slot: {type: string, description: 'aktive Update-Partition, z. B. ota_0 (ESP32) oder A (Pi, A/B-Root)'}
+            rollback_available: {type: boolean}
+            secure_boot: {type: boolean, description: 'nur signierte Gateway-Software startet'}
+            storage_encryption: {type: string, enum: ['off', 'development', 'release', 'luks'], description: 'Schutz der Schlüssel/Daten auf dem Speicher'}
+            pwa_version: {type: string}
+        sensor_images:
+          type: array
+          items: {$ref: '#/components/schemas/SensorImage'}
+        rollout: {oneOf: [{$ref: '#/components/schemas/Rollout'}, {type: 'null'}]}
+    RestoreResult:
+      type: object
+      required: [ok, dry_run]
+      properties:
+        ok: {type: boolean}
+        dry_run: {type: boolean}
+        gateway_id: {type: string}
+        created: {$ref: '#/components/schemas/Timestamp'}
+        plants: {type: integer}
+        sensors: {type: integer}
+        records: {type: integer}
+        reboot_in_s: {type: ['integer', 'null']}
+    TimeStatus:
+      type: object
+      required: [now, valid, source]
+      properties:
+        now: {$ref: '#/components/schemas/Timestamp'}
+        valid: {type: boolean}
+        source: {type: string, enum: [ntp, rtc, browser, none]}
+        last_sync: {oneOf: [{$ref: '#/components/schemas/Timestamp'}, {type: 'null'}]}
+        rtc_ok: {type: boolean}
+        timezone: {type: string}
+    SystemStatus:
+      type: object
+      required: [gateway_id, version, uptime_s, time, storage, network, certificate, sensors]
+      properties:
+        gateway_id: {type: string, description: 'z. B. fluidi-gw-3F9A (REQ-SYS-11)'}
+        version: {type: string}
+        uptime_s: {type: integer}
+        reset_reason: {type: string}
+        time: {$ref: '#/components/schemas/TimeStatus'}
+        storage:
+          type: object
+          required: [used_bytes, total_bytes, records, oldest]
+          properties:
+            used_bytes: {type: integer}
+            total_bytes: {type: integer}
+            records: {type: integer}
+            oldest: {oneOf: [{$ref: '#/components/schemas/Timestamp'}, {type: 'null'}]}
+            forecast_days: {type: ['integer', 'null'], description: 'Tage bis zur Verdichtung bei aktuellem Intervall'}
+        network: {$ref: '#/components/schemas/Network'}
+        certificate:
+          type: object
+          required: [not_after, days_left]
+          properties:
+            not_after: {$ref: '#/components/schemas/Timestamp'}
+            days_left: {type: integer}
+            fingerprint_sha256: {type: string}
+        sensors:
+          type: object
+          required: [paired, online]
+          properties:
+            paired: {type: integer}
+            online: {type: integer}
+        heap:
+          type: object
+          properties:
+            internal_free: {type: integer}
+            psram_free: {type: integer}
+    EventLogEntry:
+      type: object
+      required: [id, t, level, code, text]
+      properties:
+        id: {type: integer}
+        t: {$ref: '#/components/schemas/Timestamp'}
+        level: {type: string, enum: [info, warn, error]}
+        code: {type: string}
+        text: {type: string}
+        sensor_id: {oneOf: [{$ref: '#/components/schemas/SensorId'}, {type: 'null'}]}
+    Series:
+      type: object
+      required: [plant_id, from, to, res, t, moisture, temp_c]
+      properties:
+        plant_id: {type: integer}
+        from: {type: integer}
+        to: {type: integer}
+        res: {type: string, enum: [raw, hour, day]}
+        timezone: {type: string}
+        threshold_pct: {type: integer}
+        t: {type: array, items: {type: integer}}
+        moisture: {type: array, items: {type: ['number', 'null']}}
+        moisture_min: {type: array, items: {type: ['number', 'null']}, description: nur bei hour/day}
+        moisture_max: {type: array, items: {type: ['number', 'null']}, description: nur bei hour/day}
+        temp_c: {type: array, items: {type: ['number', 'null']}}
+        raw: {type: array, items: {type: ['integer', 'null']}, description: nur bei raw}
+        flags:
+          type: array
+          items: {type: integer}
+          description: 'nur bei raw; Bit 0 manuell, 1 Zeit rekonstruiert, 2 Zeit unsicher, 3 nachgeliefert, 4 Plausibilität'
+        events:
+          type: array
+          items:
+            type: object
+            required: [t, type]
+            properties:
+              t: {type: integer}
+              type: {type: string, enum: [calibration, sensor_change, gap]}
+              text: {type: string}

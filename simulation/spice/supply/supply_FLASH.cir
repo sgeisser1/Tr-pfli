@@ -1,0 +1,22 @@
+* fluidi supply_burst - erzeugt von supply_burst.py
+VOC ocv 0 DC 2.7
+RINT ocv vbat 100
+RHLD vbat vbat2 0.05
+RFET vbat2 vdd 0.085
+CB1 vdd cb1 8e-05 IC=2.7
+RESR1 cb1 0 5m
+CB2 vdd cb2 8e-05 IC=2.7
+RESR2 cb2 0 5m
+C5 vdd 0 5u IC=2.7
+VPDC pdc 0 PWL(0 1.15e-06 0.001 1.15e-06 0.001001 0.0026 0.00175 0.0026 0.001751 0.0022 0.00355 0.0022 0.003551 0.0083 0.0061 0.0083 0.006101 0.0026 0.00685 0.0026 0.006851 1.15e-06)
+VPLDO pldo 0 PWL(0 1.15e-06 0.001 1.15e-06 0.001001 0.0041 0.00175 0.0041 0.001751 0.0022 0.00355 0.0022 0.003551 0.0083 0.0061 0.0083 0.006101 0.0041 0.00685 0.0041 0.006851 1.15e-06)
+BLOAD vdd 0 I = (1/(1+exp(-(v(vdd)-2.2)/0.005))) * v(pdc)*3.0/max(v(vdd),1.0) + (1-1/(1+exp(-(v(vdd)-2.2)/0.005))) * v(pldo)
+.control
+set wr_singlescale
+set wr_vecnames
+option numdgt=7
+tran 2u 0.05685 uic
+wrdata supply_FLASH.dat v(vdd) v(vbat) i(VOC)
+quit
+.endc
+.end

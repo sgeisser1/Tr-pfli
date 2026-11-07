@@ -1,0 +1,414 @@
+{
+ "title": "fluidi Sensor P3 - Schnittstelle PCB-Kontur <-> Gehaeuse",
+ "revision": "A",
+ "date": "2026-11-07",
+ "status": "verbindlich fuer Layout Welle 2 (Aenderung nur ueber neue Revision)",
+ "generator": "mechanical/gen/fluidi_params.py",
+ "doc": "docs/interfaces/PCB_OUTLINE.md",
+ "units": "mm",
+ "coordinate_systems": {
+  "head": "x Breite (+ rechts von vorne), y Tiefe (0 = Front, + hinten), z Hoehe (0 = Kopfunterkante)",
+  "kicad": "X = x, Y = 44.0 - z (Ursprung Mitte Oberkante, Y nach unten), Top-View = Ansicht von vorne, F.Cu = bestueckte Seite zeigt zum Fenster (-y)"
+ },
+ "board": {
+  "thickness": 1.6,
+  "layers": 4,
+  "width": 20.0,
+  "length": 149.0,
+  "z_top": 44.0,
+  "z_tip": -105.0,
+  "tip": "45 Grad, flach 5.0 mm",
+  "y_front_F": 7.4,
+  "y_back_B": 9.0,
+  "assembly": "einseitig F (JLC Economic)",
+  "z_position_tol": 0.2,
+  "probe_max_incl_coating": {
+   "thickness": 2.0,
+   "width": 20.4
+  },
+  "outline_head_xz": [
+   [
+    -2.5,
+    -105.0
+   ],
+   [
+    2.5,
+    -105.0
+   ],
+   [
+    10.0,
+    -97.5
+   ],
+   [
+    10.0,
+    44.0
+   ],
+   [
+    -10.0,
+    44.0
+   ],
+   [
+    -10.0,
+    -97.5
+   ]
+  ],
+  "outline_kicad_XY": [
+   [
+    -2.5,
+    149.0
+   ],
+   [
+    2.5,
+    149.0
+   ],
+   [
+    10.0,
+    141.5
+   ],
+   [
+    10.0,
+    0.0
+   ],
+   [
+    -10.0,
+    0.0
+   ],
+   [
+    -10.0,
+    141.5
+   ]
+  ]
+ },
+ "markings": {
+  "max_insertion": {
+   "z": -5.0,
+   "kicad_Y": 49.0,
+   "sides": "F+B",
+   "silkscreen": "Linie 0.2 mm, x -9...9, Text \"max\" + Pfeil"
+  },
+  "logo_silkscreen": {
+   "side": "F",
+   "x": [
+    -9.0,
+    3.0
+   ],
+   "z": [
+    -4.4,
+    -0.8
+   ],
+   "file": "docs/design/logo/fluidi_logo_v3a_mono.svg",
+   "width": 10.0,
+   "note": "Strich 0.52 mm >= 0.2 (P3_FLUIDI.md Kap. 5)"
+  },
+  "revision_silkscreen": {
+   "side": "B",
+   "x": [
+    -9.0,
+    9.0
+   ],
+   "z": [
+    -4.4,
+    -0.8
+   ],
+   "text": "fluidi rev A"
+  },
+  "warning_silkscreen": {
+   "side": "B",
+   "x": [
+    -8.0,
+    8.0
+   ],
+   "z": [
+    9.0,
+    28.0
+   ],
+   "text": "Dreieck ! + CR2032 + Verschluckgefahr"
+  }
+ },
+ "zones": [
+  {
+   "id": "Z1_ANTENNE",
+   "side": "FB",
+   "x": [
+    -10.0,
+    10.0
+   ],
+   "z": [
+    38.3,
+    44.0
+   ],
+   "hmax": 0.0,
+   "rule": "AN043-IFA (15.2 x 5.7) inkl. Masse-Keepout nach AN043; keine Bauteile, kein Metall des Gehaeuses. Kunststoff vor der F-Seite: Stoesselrohr, Finger, Biegezunge (siehe Kap. 5) -> Elektronik bestaetigt.",
+   "kicad_Y": [
+    0.0,
+    5.7
+   ]
+  },
+  {
+   "id": "Z2_BAND_F",
+   "side": "F",
+   "x": [
+    -10.0,
+    10.0
+   ],
+   "z": [
+    32.7,
+    38.3
+   ],
+   "hmax": 2.0,
+   "rule": "Elektronikband. Bauteilhoehe <= 2.0 mm (Durchfuehrung durch das Schott beim Einschieben von unten). In Spalte x -7.8...-4.2 (Biegezunge) <= 1.5 mm. LED D1 und Taster SW1 fest (Kap. 4).",
+   "kicad_Y": [
+    5.7,
+    11.3
+   ]
+  },
+  {
+   "id": "Z2_BAND_B",
+   "side": "B",
+   "x": [
+    -10.0,
+    10.0
+   ],
+   "z": [
+    30.3,
+    44.0
+   ],
+   "hmax": 0.0,
+   "rule": "B-Seite unbestueckt (Economic PCBA einseitig). Freiraum 2.4 mm bis Kappe innen.",
+   "kicad_Y": [
+    0.0,
+    13.7
+   ]
+  },
+  {
+   "id": "Z3_SCHOTT",
+   "side": "FB",
+   "x": [
+    -10.0,
+    10.0
+   ],
+   "z": [
+    30.3,
+    32.7
+   ],
+   "hmax": 0.0,
+   "rule": "Schott-Verguss: keine Bauteile, keine Vias, kein Kupfer auf Aussenlagen, Loetstopplack geschlossen. Signale nur Innenlagen (M-03, S3-K1).",
+   "kicad_Y": [
+    11.3,
+    13.7
+   ]
+  },
+  {
+   "id": "Z4_FACH_F",
+   "side": "F",
+   "x": [
+    -10.0,
+    10.0
+   ],
+   "z": [
+    7.5,
+    30.3
+   ],
+   "hmax": 4.1,
+   "rule": "Zellfach: nur Keystone 3034 (gedreht, Ausschub +x), Minuspad, UART-/Testpads (Streifen x 6.6...9.5). Unter der Zelle nur Loetstopplack ausser Minuspad (R2-W01 Nr. 2). Keine Vias im Fach (S2-W03). 2 x 100 kOhm im Elektronikraum (R2-A3).",
+   "kicad_Y": [
+    13.7,
+    36.5
+   ]
+  },
+  {
+   "id": "Z4_FACH_B",
+   "side": "B",
+   "x": [
+    -10.0,
+    10.0
+   ],
+   "z": [
+    7.5,
+    30.3
+   ],
+   "hmax": 0.0,
+   "rule": "Silkscreen Warnsymbol Dreieck >= 7 x 9 mm + \"CR2032\" (S3-W4, zweiter Ort zusaetzlich zur Huelse).",
+   "kicad_Y": [
+    13.7,
+    36.5
+   ]
+  },
+  {
+   "id": "Z5_KRAGEN",
+   "side": "FB",
+   "x": [
+    -10.0,
+    10.0
+   ],
+   "z": [
+    1.5,
+    7.5
+   ],
+   "hmax": 0.0,
+   "rule": "Kragen-Verguss = Sondendichtung (S3-K2, REQ-MECH-08/15): keine Bauteile, keine Vias, kein Kupfer auf Aussenlagen. Mutter M2 liegt 0.2 mm vor der F-Seite (eingegossen).",
+   "kicad_Y": [
+    36.5,
+    42.5
+   ]
+  },
+  {
+   "id": "Z6_FREI",
+   "side": "FB",
+   "x": [
+    -10.0,
+    10.0
+   ],
+   "z": [
+    -5.0,
+    1.5
+   ],
+   "hmax": 0.0,
+   "rule": "Zwischen Erde und Kragen: keine Elektroden (Luftanteil), Silkscreen Logo (F) und \"max\"/Revision (B).",
+   "kicad_Y": [
+    42.5,
+    49.0
+   ]
+  },
+  {
+   "id": "Z7_SONDE",
+   "side": "FB",
+   "x": [
+    -10.0,
+    10.0
+   ],
+   "z": [
+    -105.0,
+    -5.0
+   ],
+   "hmax": 0.0,
+   "rule": "Sonde: Elektroden nur Innenlagen, Aussenlagen ohne Kupfer (REQ-MECH-04), Kupfer >= 1.0 mm zur Kontur (REQ-MECH-06), keine Vias (REQ-MECH-05). Spitze 45 Grad.",
+   "kicad_Y": [
+    49.0,
+    149.0
+   ]
+  }
+ ],
+ "components": {
+  "D1_LED": {
+   "part": "TUOZHAN P4-1615G2B2R4TS2-06T-001-24 (C7496855)",
+   "side": "F",
+   "center_xz": [
+    0.0,
+    37.4
+   ],
+   "kicad_XY": [
+    0.0,
+    6.6
+   ],
+   "height": 0.6,
+   "tol": 0.3,
+   "window_inner_face_y": 4.800000000000001,
+   "d_led_to_window": 2.0,
+   "note": "Leuchtflaeche zum Fenster (-y). Lichtschaft Ø3.0 des Fensters endet 2.0 mm vor der LED."
+  },
+  "SW1_TASTER": {
+   "part": "XKB TS-1187A-B-A-B (C318884)",
+   "side": "F",
+   "center_xz": [
+    -6.0,
+    35.6
+   ],
+   "kicad_XY": [
+    -6.0,
+    8.4
+   ],
+   "height": 1.5,
+   "tol": 0.2,
+   "pads": "laut Datenblatt S.1 (7.0 x 4.5 Rastermass), Anschluesse in x-Richtung",
+   "actuation": "Biegezunge der Kappe drueckt senkrecht (+y) auf den Betaetiger Ø2.0; Taste oben -> Membran -> Stoessel -> 30-Grad-Keil -> Zunge"
+  },
+  "XBT1_CLIP": {
+   "part": "Keystone 3034TR (C5213768)",
+   "side": "F",
+   "rotation": "90 Grad: Einschub in x, offenes Ende +x",
+   "cell_center_xz": [
+    0.0,
+    19.05
+   ],
+   "kicad_XY": [
+    0.0,
+    24.95
+   ],
+   "clip_x": [
+    -10.0,
+    6.100000000000001
+   ],
+   "clip_z": [
+    7.5,
+    30.6
+   ],
+   "height": 4.1,
+   "note": "Minuspad innerhalb der Minuskappe (R2-W01 Nr. 1); Zelle Ø20 schliesst buendig mit den Platinenkanten ab; Ausschub +x frei bei abgezogener Huelse"
+  },
+  "ANTENNA": {
+   "part": "AN043 IFA",
+   "zone": "Z1_ANTENNE",
+   "z": [
+    38.3,
+    44.0
+   ]
+  },
+  "SCREW_NUT": {
+   "screw": "ISO 7045 M2x4 A2 PH1 (unverlierbar, Gewindefurch-Lippe Ø1.7 im Huelsenboden)",
+   "nut": "ISO 4032 M2 A2 SW4 x 1.6, im Kragen eingegossen",
+   "axis_xy": [
+    0.0,
+    5.0
+   ],
+   "nut_z": [
+    2.3,
+    3.9
+   ],
+   "dist_to_pcb_F": 0.4,
+   "dist_to_antenna_z": 34.4
+  }
+ },
+ "seals": {
+  "oring": {
+   "type": "AS568-017",
+   "material": "Silikon oder EPDM ohne Russ (rot/transluzent), Silikonfett",
+   "qty": 2,
+   "places": {
+    "spigot_z": [
+     31.3,
+     33.7
+    ],
+    "collar_z": [
+     4.3,
+     6.7
+    ]
+   },
+   "gland": 1.35,
+   "squeeze_nom": 0.242
+  },
+  "potting": {
+   "schott_z": [
+    30.8,
+    32.0
+   ],
+   "kragen_z": [
+    2.0,
+    7.3
+   ],
+   "material": "Epoxid 2K, thixotrop am Schott (ANNAHME Typ, Phase 4b Welle 2)"
+  },
+  "window_glue_to_oring_groove": 1.2
+ },
+ "height_limits_summary": {
+  "F_band": 2.0,
+  "F_band_under_tongue": 1.5,
+  "F_fach": "nur 3034 (4.1)",
+  "B": "0 (unbestueckt)"
+ },
+ "open_points": [
+  "Elektronik: Platz im Band 20 x 5.6 mm (F) fuer alle Bauteile ausser Clip pruefen (S-01)",
+  "Elektronik: Kunststoffteile vor der Antenne (Stoesselrohr, Finger, Zunge, 0.6...2.5 mm vor F) bestaetigen",
+  "Elektronik: Lage SW1/LED gegen Layout bestaetigen (Pads SW1 x -9.5...-2.5)"
+ ]
+}

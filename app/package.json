@@ -1,0 +1,12 @@
+{
+  "name": "fluidi-pwa",
+  "private": true,
+  "version": "0.1.0",
+  "description": "PWA fluidi – kein Build-Schritt, keine Abhängigkeiten. Nur für node --test.",
+  "type": "module",
+  "license": "UNLICENSED",
+  "scripts": {
+    "test": "node --test tests/",
+    "mock": "python3 dev/mock_server.py"
+  }
+}

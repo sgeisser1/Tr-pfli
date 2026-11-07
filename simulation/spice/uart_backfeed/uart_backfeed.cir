@@ -1,0 +1,30 @@
+* fluidi uart_backfeed - erzeugt von uart_backfeed.py
+VCELL cellp 0 DC 0.0
+RINT cellp bat 10
+M1 bat 0 vdd vdd PFET W=1 L=1
+.model PFET PMOS(LEVEL=1 VTO=-0.9 KP=10)
+DBODY bat vdd DBD
+.model DBD D(IS=1e-12 N=1.0)
+RLEAK vdd 0 1e12
+.model DESD D(IS=1e-14 N=1.0)
+VTX padTX 0 DC 1.8
+RSTX padTX pinTXa 1e-3
+RTX_R10 pinTXa midTX 100000.0
+RTX_R9 midTX dio6 100000.0
+DESDTX dio6 vdd DESD
+DESDNTX 0 dio6 DESD
+VRX padRX 0 DC 1.8
+RSRX padRX pinRXa 1e-3
+RRX_R12 pinRXa midRX 100000.0
+RRX_R11 midRX dio20 0.001
+DESDRX dio20 vdd DESD
+DESDNRX 0 dio20 DESD
+.control
+set wr_singlescale
+set wr_vecnames
+option numdgt=7
+op
+wrdata uart_backfeed.dat i(VCELL) v(vdd) i(VTX) i(VRX)
+quit
+.endc
+.end

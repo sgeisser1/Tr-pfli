@@ -1,0 +1,23 @@
+Logo Gateway: Strich 1.14 mm
+=== fluidi Gateway G1 v3 ===
+1 Kollisionen montiert: keine
+2 Freiraum FPC-Antenne (Ziel >= 15 mm, Elektronikbericht 2.4):
+   XIAO_PCB         32.8 mm 
+   XIAO_Bauteile    34.0 mm 
+   USB_C            37.2 mm 
+   RTC_Modul        19.8 mm 
+   Schraube_M2p5_1  52.1 mm 
+   Schraube_M2p5_2  52.1 mm 
+   Einsatz_1        52.7 mm 
+   Einsatz_2        52.7 mm 
+   LED_Platine      44.8 mm 
+   USB-C-Stecker   36.0 mm
+3 FPC liegt innen an der Stirnwand: 100 % des FPC-Volumens im Innenraum
+4 LED-Fenster: LED 2.0 mm hinter der Fensterinnenflaeche (Lichtschacht Ø5.6)
+5 Fuge z 13.85 ... 14.15, Facette: Tropfen von 2.31 bis 10.81 mm schraeg ueber Facettenunterkante (Facette 12.73)
+6 Wanne_grau           9.7 cm3 -> 10.4 g ASA
+6 Deckel_blau          6.3 cm3 -> 6.7 g ASA
+6 Fenster_transluzent  0.1 cm3 -> 0.1 g ASA
+7 Verlustleistung 0.5 W: dT Gehaeuse ~ 8 K (h = 8 W/m2K, A = 0.0082 m2, ANNAHME)
+7 Verlustleistung 1.0 W: dT Gehaeuse ~ 15 K (h = 8 W/m2K, A = 0.0082 m2, ANNAHME)
+7 Verlustleistung 2.0 W: dT Gehaeuse ~ 30 K (h = 8 W/m2K, A = 0.0082 m2, ANNAHME)

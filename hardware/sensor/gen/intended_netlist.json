@@ -1,0 +1,245 @@
+{
+ "AE1": {
+  "1": "ANT_FEED",
+  "2": "GND"
+ },
+ "BT1": {
+  "1": "VBAT",
+  "2": "GND"
+ },
+ "C1": {
+  "1": "VDD",
+  "2": "GND"
+ },
+ "C10": {
+  "1": "VDDR",
+  "2": "GND"
+ },
+ "C11": {
+  "1": "VDDR",
+  "2": "GND"
+ },
+ "C12": {
+  "1": "VDDD",
+  "2": "GND"
+ },
+ "C13": {
+  "1": "RSTN",
+  "2": "GND"
+ },
+ "C14": {
+  "1": "X32P",
+  "2": "GND"
+ },
+ "C15": {
+  "1": "X32N",
+  "2": "GND"
+ },
+ "C16": {
+  "1": "RF_PIN",
+  "2": "GND"
+ },
+ "C17": {
+  "1": "RF_FILT",
+  "2": "GND"
+ },
+ "C18": {
+  "1": "RF_FILT",
+  "2": "RF_ANT_DC"
+ },
+ "C19": {
+  "1": "RF_ANT_DC",
+  "2": "GND"
+ },
+ "C2": {
+  "1": "VDD",
+  "2": "GND"
+ },
+ "C20": {
+  "1": "ANT_FEED",
+  "2": "GND"
+ },
+ "C21": {
+  "1": "SENS_PWR",
+  "2": "GND"
+ },
+ "C22": {
+  "1": "PROBE_SENSE",
+  "2": "CREF1_CTL"
+ },
+ "C23": {
+  "1": "PROBE_SENSE",
+  "2": "CREF2_CTL"
+ },
+ "C24": {
+  "1": "SENS_PWR",
+  "2": "GND"
+ },
+ "C3": {
+  "1": "VDD",
+  "2": "GND"
+ },
+ "C4": {
+  "1": "VDD",
+  "2": "GND"
+ },
+ "C5": {
+  "1": "VDD",
+  "2": "GND"
+ },
+ "C6": {
+  "1": "VDD",
+  "2": "GND"
+ },
+ "C7": {
+  "1": "VDD",
+  "2": "GND"
+ },
+ "C8": {
+  "1": "VDD",
+  "2": "GND"
+ },
+ "C9": {
+  "1": "VDDR",
+  "2": "GND"
+ },
+ "D1": {
+  "1": "VDD",
+  "2": "LED_R_K",
+  "3": "LED_G_K",
+  "4": "LED_B_K"
+ },
+ "E1": {
+  "1": "PROBE_SENSE",
+  "2": "GND"
+ },
+ "L1": {
+  "1": "DCDC_SW",
+  "2": "VDDR"
+ },
+ "L2": {
+  "1": "RF_PIN",
+  "2": "RF_FILT"
+ },
+ "Q1": {
+  "1": "GND",
+  "2": "VDD",
+  "3": "VBAT"
+ },
+ "R1": {
+  "1": "VDD",
+  "2": "RSTN"
+ },
+ "R10": {
+  "1": "UART_TX_MID",
+  "2": "UART_TX_PAD"
+ },
+ "R11": {
+  "1": "LED_B_UART_RX",
+  "2": "UART_RX_MID"
+ },
+ "R12": {
+  "1": "UART_RX_MID",
+  "2": "UART_RX_PAD"
+ },
+ "R2": {
+  "1": "RF_ANT_DC",
+  "2": "ANT_FEED"
+ },
+ "R3": {
+  "1": "PROBE_SENSE",
+  "2": "OSZ_OUT"
+ },
+ "R4": {
+  "1": "SENS_PWR",
+  "2": "I2C_SDA"
+ },
+ "R5": {
+  "1": "SENS_PWR",
+  "2": "I2C_SCL"
+ },
+ "R6": {
+  "1": "LED_R_UART_TX",
+  "2": "LED_R_K"
+ },
+ "R7": {
+  "1": "LED_G",
+  "2": "LED_G_K"
+ },
+ "R8": {
+  "1": "LED_B_UART_RX",
+  "2": "LED_B_K"
+ },
+ "R9": {
+  "1": "LED_R_UART_TX",
+  "2": "UART_TX_MID"
+ },
+ "SW1": {
+  "1": "BTN_BOOT_N",
+  "2": "GND"
+ },
+ "TP1": {
+  "1": "UART_TX_PAD"
+ },
+ "TP2": {
+  "1": "UART_RX_PAD"
+ },
+ "TP3": {
+  "1": "GND"
+ },
+ "TP4": {
+  "1": "OSZ_OUT"
+ },
+ "U1": {
+  "1": "RF_PIN",
+  "10": "BTN_BOOT_N",
+  "11": "VDD",
+  "12": "OSZ_OUT",
+  "13": "RSTN",
+  "14": "X32P",
+  "15": "X32N",
+  "16": "VDDD",
+  "17": "DCDC_SW",
+  "18": "VDD",
+  "19": "LED_R_UART_TX",
+  "2": "VDDR",
+  "20": "VDDR",
+  "21": "X48P",
+  "22": "X48N",
+  "23": "GND",
+  "24": "VDD",
+  "25": "GND",
+  "3": "CREF1_CTL",
+  "4": "CREF2_CTL",
+  "5": "SENS_PWR",
+  "6": "LED_G",
+  "7": "I2C_SDA",
+  "8": "I2C_SCL",
+  "9": "LED_B_UART_RX"
+ },
+ "U2": {
+  "2": "PROBE_SENSE",
+  "3": "GND",
+  "4": "OSZ_OUT",
+  "5": "SENS_PWR"
+ },
+ "U3": {
+  "1": "I2C_SDA",
+  "2": "I2C_SCL",
+  "4": "GND",
+  "5": "GND",
+  "6": "GND",
+  "7": "GND",
+  "8": "SENS_PWR"
+ },
+ "Y1": {
+  "1": "X48P",
+  "2": "GND",
+  "3": "X48N",
+  "4": "GND"
+ },
+ "Y2": {
+  "1": "X32P",
+  "2": "X32N"
+ }
+}

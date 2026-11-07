@@ -1,0 +1,5946 @@
+(export
+	(version "E")
+	(design
+		(source "/home/sgeisser/git/Tr-pfli/hardware/sensor/fluidi_sensor.kicad_sch")
+		(date "2026-11-07T15:49:01")
+		(tool "Eeschema 10.0.8-10.0.8~ubuntu24.04.1")
+		(textvar
+			(name "REV") "A")
+		(sheet
+			(number "1")
+			(name "/")
+			(tstamps "/")
+			(title_block
+				(title "fluidi Sensor - Schaltplan")
+				(company "fluidi (Projekt Tr-pfli)")
+				(rev "A")
+				(date "2026-11-07")
+				(source "fluidi_sensor.kicad_sch")
+				(comment
+					(number "1")
+					(value "Konzept A-32 (D-006): CC2340R52 + RC-Oszillator + TMP1075 + Panasonic CR2032")
+				)
+				(comment
+					(number "2")
+					(value "Generiert: hardware/sensor/gen/gen_schematic.py - nicht von Hand aendern")
+				)
+				(comment
+					(number "3")
+					(value "Revisionsstand Rev A, Silkscreen 'fluidi Rev A' im Layout")
+				)
+				(comment
+					(number "4")
+					(value "4 Lagen 1.6 mm, Economic PCBA, ENIG")
+				)
+				(comment
+					(number "5")
+					(value "")
+				)
+				(comment
+					(number "6")
+					(value "")
+				)
+				(comment
+					(number "7")
+					(value "")
+				)
+				(comment
+					(number "8")
+					(value "")
+				)
+				(comment
+					(number "9")
+					(value "")
+				)
+			)
+		)
+	)
+	(components
+		(comp
+			(ref "AE1")
+			(value "AN043_IFA")
+			(footprint "RF_Antenna:Texas_SWRA117D_2.4GHz_Left")
+			(datasheet "docs/appnotes/TI_AN043_SmallPCBAntenna_SWRA117D.pdf")
+			(description "nicht bestueckt; Leiterbahnantenne oben, Keepout nach AN043; Platzhalter-Footprint")
+			(fields
+				(field
+					(name "LCSC")
+				)
+				(field
+					(name "Hersteller") "-")
+				(field
+					(name "MPN") "Leiterplattenstruktur")
+				(field
+					(name "JLC") "-")
+				(field
+					(name "Footprint") "RF_Antenna:Texas_SWRA117D_2.4GHz_Left")
+				(field
+					(name "Datasheet") "docs/appnotes/TI_AN043_SmallPCBAntenna_SWRA117D.pdf")
+				(field
+					(name "Description") "nicht bestueckt; Leiterbahnantenne oben, Keepout nach AN043; Platzhalter-Footprint")
+			)
+			(libsource
+				(lib "fluidi")
+				(part "ANT_IFA_AN043")
+				(description "PCB-Antenne (Leiterbahn) nach TI AN043; Platzhalter-Footprint, Geometrie im Layout pruefen")
+			)
+			(property
+				(name "LCSC")
+				(value "")
+			)
+			(property
+				(name "Hersteller")
+				(value "-")
+			)
+			(property
+				(name "MPN")
+				(value "Leiterplattenstruktur")
+			)
+			(property
+				(name "JLC")
+				(value "-")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "exclude_from_bom")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "96cbe8d8-7a91-5444-a8cf-61485da36988")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "BT1")
+			(value "CR2032 / Keystone 3034TR")
+			(footprint "fluidi:BatteryHolder_Keystone_3034_1x20mm_NegPad4mm")
+			(datasheet "docs/datasheets/Keystone_3034_Catalog_M65.pdf")
+			(description "Halter CR2032 SMT (Zelle Panasonic CR2032 lokal); Clip = Plus, Minus = ENIG-Pad 4x4 mm (R2-W01); Zelle Panasonic CR2032 lokal; Halter 90 Grad gedreht (Mechanik S-01)")
+			(fields
+				(field
+					(name "LCSC") "C5213768")
+				(field
+					(name "Hersteller") "Keystone")
+				(field
+					(name "MPN") "3034TR")
+				(field
+					(name "JLC") "Extended")
+				(field
+					(name "Footprint") "fluidi:BatteryHolder_Keystone_3034_1x20mm_NegPad4mm")
+				(field
+					(name "Datasheet") "docs/datasheets/Keystone_3034_Catalog_M65.pdf")
+				(field
+					(name "Description") "Halter CR2032 SMT (Zelle Panasonic CR2032 lokal); Clip = Plus, Minus = ENIG-Pad 4x4 mm (R2-W01); Zelle Panasonic CR2032 lokal; Halter 90 Grad gedreht (Mechanik S-01)")
+			)
+			(libsource
+				(lib "Device")
+				(part "Battery_Cell")
+				(description "Single-cell battery")
+			)
+			(property
+				(name "LCSC")
+				(value "C5213768")
+			)
+			(property
+				(name "Hersteller")
+				(value "Keystone")
+			)
+			(property
+				(name "MPN")
+				(value "3034TR")
+			)
+			(property
+				(name "JLC")
+				(value "Extended")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "battery cell")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "83e1ca67-bc6b-5f3b-a541-6de743794ecc")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C1")
+			(value "100uF")
+			(footprint "Capacitor_SMD:C_1206_3216Metric")
+			(datasheet "docs/datasheets/Samsung_CL31A107MQHNNNE_Catalog_2015-11.pdf")
+			(description "MLCC 100 uF 6.3 V X5R 1206; Puffer E1, steifer Kopfbereich, Laengsachse parallel Biegelinie")
+			(fields
+				(field
+					(name "LCSC") "C15008")
+				(field
+					(name "Hersteller") "Samsung Electro-Mechanics")
+				(field
+					(name "MPN") "CL31A107MQHNNNE")
+				(field
+					(name "JLC") "Basic")
+				(field
+					(name "Footprint") "Capacitor_SMD:C_1206_3216Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/Samsung_CL31A107MQHNNNE_Catalog_2015-11.pdf")
+				(field
+					(name "Description") "MLCC 100 uF 6.3 V X5R 1206; Puffer E1, steifer Kopfbereich, Laengsachse parallel Biegelinie")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "LCSC")
+				(value "C15008")
+			)
+			(property
+				(name "Hersteller")
+				(value "Samsung Electro-Mechanics")
+			)
+			(property
+				(name "MPN")
+				(value "CL31A107MQHNNNE")
+			)
+			(property
+				(name "JLC")
+				(value "Basic")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "cba128c6-2b3a-566f-accc-5b91b215fc5b")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C2")
+			(value "100uF")
+			(footprint "Capacitor_SMD:C_1206_3216Metric")
+			(datasheet "docs/datasheets/Samsung_CL31A107MQHNNNE_Catalog_2015-11.pdf")
+			(description "MLCC 100 uF 6.3 V X5R 1206; Puffer E1")
+			(fields
+				(field
+					(name "LCSC") "C15008")
+				(field
+					(name "Hersteller") "Samsung Electro-Mechanics")
+				(field
+					(name "MPN") "CL31A107MQHNNNE")
+				(field
+					(name "JLC") "Basic")
+				(field
+					(name "Footprint") "Capacitor_SMD:C_1206_3216Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/Samsung_CL31A107MQHNNNE_Catalog_2015-11.pdf")
+				(field
+					(name "Description") "MLCC 100 uF 6.3 V X5R 1206; Puffer E1")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "LCSC")
+				(value "C15008")
+			)
+			(property
+				(name "Hersteller")
+				(value "Samsung Electro-Mechanics")
+			)
+			(property
+				(name "MPN")
+				(value "CL31A107MQHNNNE")
+			)
+			(property
+				(name "JLC")
+				(value "Basic")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "f3412478-770f-5603-acf8-4da15f46a965")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C3")
+			(value "100uF")
+			(footprint "Capacitor_SMD:C_1206_3216Metric")
+			(datasheet "docs/datasheets/Samsung_CL31A107MQHNNNE_Catalog_2015-11.pdf")
+			(description "MLCC 100 uF 6.3 V X5R 1206; Reserve-Footprint E1 (GLDO-Fall), DNM")
+			(fields
+				(field
+					(name "LCSC") "C15008")
+				(field
+					(name "Hersteller") "Samsung Electro-Mechanics")
+				(field
+					(name "MPN") "CL31A107MQHNNNE")
+				(field
+					(name "JLC") "Basic")
+				(field
+					(name "Footprint") "Capacitor_SMD:C_1206_3216Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/Samsung_CL31A107MQHNNNE_Catalog_2015-11.pdf")
+				(field
+					(name "Description") "MLCC 100 uF 6.3 V X5R 1206; Reserve-Footprint E1 (GLDO-Fall), DNM")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "LCSC")
+				(value "C15008")
+			)
+			(property
+				(name "Hersteller")
+				(value "Samsung Electro-Mechanics")
+			)
+			(property
+				(name "MPN")
+				(value "CL31A107MQHNNNE")
+			)
+			(property
+				(name "JLC")
+				(value "Basic")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "dnp")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "406da606-51f8-50ac-a960-26ce045bb89e")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C4")
+			(value "100uF")
+			(footprint "Capacitor_SMD:C_1206_3216Metric")
+			(datasheet "docs/datasheets/Samsung_CL31A107MQHNNNE_Catalog_2015-11.pdf")
+			(description "MLCC 100 uF 6.3 V X5R 1206; Reserve-Footprint E1, DNM")
+			(fields
+				(field
+					(name "LCSC") "C15008")
+				(field
+					(name "Hersteller") "Samsung Electro-Mechanics")
+				(field
+					(name "MPN") "CL31A107MQHNNNE")
+				(field
+					(name "JLC") "Basic")
+				(field
+					(name "Footprint") "Capacitor_SMD:C_1206_3216Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/Samsung_CL31A107MQHNNNE_Catalog_2015-11.pdf")
+				(field
+					(name "Description") "MLCC 100 uF 6.3 V X5R 1206; Reserve-Footprint E1, DNM")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "LCSC")
+				(value "C15008")
+			)
+			(property
+				(name "Hersteller")
+				(value "Samsung Electro-Mechanics")
+			)
+			(property
+				(name "MPN")
+				(value "CL31A107MQHNNNE")
+			)
+			(property
+				(name "JLC")
+				(value "Basic")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "dnp")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "dd4467d2-75d9-5976-abbc-7ce8dd338ff4")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C5")
+			(value "10uF")
+			(footprint "Capacitor_SMD:C_0402_1005Metric")
+			(datasheet "docs/datasheets/Samsung_CL05A106MQ5NUNC_Datasheet_LCSC-2022-08.pdf")
+			(description "MLCC 10 uF 6.3 V X5R 0402; VDDS-Eingang 10 uF (DS S.18 Fussnote 3 Slew-Rate Knopfzelle)")
+			(fields
+				(field
+					(name "LCSC") "C15525")
+				(field
+					(name "Hersteller") "Samsung Electro-Mechanics")
+				(field
+					(name "MPN") "CL05A106MQ5NUNC")
+				(field
+					(name "JLC") "Basic")
+				(field
+					(name "Footprint") "Capacitor_SMD:C_0402_1005Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/Samsung_CL05A106MQ5NUNC_Datasheet_LCSC-2022-08.pdf")
+				(field
+					(name "Description") "MLCC 10 uF 6.3 V X5R 0402; VDDS-Eingang 10 uF (DS S.18 Fussnote 3 Slew-Rate Knopfzelle)")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "LCSC")
+				(value "C15525")
+			)
+			(property
+				(name "Hersteller")
+				(value "Samsung Electro-Mechanics")
+			)
+			(property
+				(name "MPN")
+				(value "CL05A106MQ5NUNC")
+			)
+			(property
+				(name "JLC")
+				(value "Basic")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "024ce0ac-2bbe-5f99-b10c-b361ee542511")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C6")
+			(value "100nF")
+			(footprint "Capacitor_SMD:C_0402_1005Metric")
+			(datasheet "docs/datasheets/Samsung_CL05-Serie_Datasheet_LCSC-2023-04.pdf")
+			(description "MLCC 100 nF 16 V X7R 0402; an Pin 11 VDDS")
+			(fields
+				(field
+					(name "LCSC") "C1525")
+				(field
+					(name "Hersteller") "Samsung Electro-Mechanics")
+				(field
+					(name "MPN") "CL05B104KO5NNNC")
+				(field
+					(name "JLC") "Basic")
+				(field
+					(name "Footprint") "Capacitor_SMD:C_0402_1005Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/Samsung_CL05-Serie_Datasheet_LCSC-2023-04.pdf")
+				(field
+					(name "Description") "MLCC 100 nF 16 V X7R 0402; an Pin 11 VDDS")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "LCSC")
+				(value "C1525")
+			)
+			(property
+				(name "Hersteller")
+				(value "Samsung Electro-Mechanics")
+			)
+			(property
+				(name "MPN")
+				(value "CL05B104KO5NNNC")
+			)
+			(property
+				(name "JLC")
+				(value "Basic")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "647028ae-87c4-5046-9169-de13403980a1")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C7")
+			(value "100nF")
+			(footprint "Capacitor_SMD:C_0402_1005Metric")
+			(datasheet "docs/datasheets/Samsung_CL05-Serie_Datasheet_LCSC-2023-04.pdf")
+			(description "MLCC 100 nF 16 V X7R 0402; an Pin 18 VDDS")
+			(fields
+				(field
+					(name "LCSC") "C1525")
+				(field
+					(name "Hersteller") "Samsung Electro-Mechanics")
+				(field
+					(name "MPN") "CL05B104KO5NNNC")
+				(field
+					(name "JLC") "Basic")
+				(field
+					(name "Footprint") "Capacitor_SMD:C_0402_1005Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/Samsung_CL05-Serie_Datasheet_LCSC-2023-04.pdf")
+				(field
+					(name "Description") "MLCC 100 nF 16 V X7R 0402; an Pin 18 VDDS")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "LCSC")
+				(value "C1525")
+			)
+			(property
+				(name "Hersteller")
+				(value "Samsung Electro-Mechanics")
+			)
+			(property
+				(name "MPN")
+				(value "CL05B104KO5NNNC")
+			)
+			(property
+				(name "JLC")
+				(value "Basic")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "6000c561-053d-53ca-8123-61d4fe00bb49")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C8")
+			(value "100nF")
+			(footprint "Capacitor_SMD:C_0402_1005Metric")
+			(datasheet "docs/datasheets/Samsung_CL05-Serie_Datasheet_LCSC-2023-04.pdf")
+			(description "MLCC 100 nF 16 V X7R 0402; an Pin 24 VDDS")
+			(fields
+				(field
+					(name "LCSC") "C1525")
+				(field
+					(name "Hersteller") "Samsung Electro-Mechanics")
+				(field
+					(name "MPN") "CL05B104KO5NNNC")
+				(field
+					(name "JLC") "Basic")
+				(field
+					(name "Footprint") "Capacitor_SMD:C_0402_1005Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/Samsung_CL05-Serie_Datasheet_LCSC-2023-04.pdf")
+				(field
+					(name "Description") "MLCC 100 nF 16 V X7R 0402; an Pin 24 VDDS")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "LCSC")
+				(value "C1525")
+			)
+			(property
+				(name "Hersteller")
+				(value "Samsung Electro-Mechanics")
+			)
+			(property
+				(name "MPN")
+				(value "CL05B104KO5NNNC")
+			)
+			(property
+				(name "JLC")
+				(value "Basic")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "79835e20-3066-5c2c-a503-ae3fc8115104")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C9")
+			(value "10uF")
+			(footprint "Capacitor_SMD:C_0402_1005Metric")
+			(datasheet "docs/datasheets/Samsung_CL05A106MQ5NUNC_Datasheet_LCSC-2022-08.pdf")
+			(description "MLCC 10 uF 6.3 V X5R 0402; VDDR 10 uF nahe Pin 17 / L1")
+			(fields
+				(field
+					(name "LCSC") "C15525")
+				(field
+					(name "Hersteller") "Samsung Electro-Mechanics")
+				(field
+					(name "MPN") "CL05A106MQ5NUNC")
+				(field
+					(name "JLC") "Basic")
+				(field
+					(name "Footprint") "Capacitor_SMD:C_0402_1005Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/Samsung_CL05A106MQ5NUNC_Datasheet_LCSC-2022-08.pdf")
+				(field
+					(name "Description") "MLCC 10 uF 6.3 V X5R 0402; VDDR 10 uF nahe Pin 17 / L1")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "LCSC")
+				(value "C15525")
+			)
+			(property
+				(name "Hersteller")
+				(value "Samsung Electro-Mechanics")
+			)
+			(property
+				(name "MPN")
+				(value "CL05A106MQ5NUNC")
+			)
+			(property
+				(name "JLC")
+				(value "Basic")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "b36d61a4-0350-518b-9005-9bd40ad9ed2e")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C10")
+			(value "100nF")
+			(footprint "Capacitor_SMD:C_0402_1005Metric")
+			(datasheet "docs/datasheets/Samsung_CL05-Serie_Datasheet_LCSC-2023-04.pdf")
+			(description "MLCC 100 nF 16 V X7R 0402; an Pin 2 VDDR")
+			(fields
+				(field
+					(name "LCSC") "C1525")
+				(field
+					(name "Hersteller") "Samsung Electro-Mechanics")
+				(field
+					(name "MPN") "CL05B104KO5NNNC")
+				(field
+					(name "JLC") "Basic")
+				(field
+					(name "Footprint") "Capacitor_SMD:C_0402_1005Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/Samsung_CL05-Serie_Datasheet_LCSC-2023-04.pdf")
+				(field
+					(name "Description") "MLCC 100 nF 16 V X7R 0402; an Pin 2 VDDR")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "LCSC")
+				(value "C1525")
+			)
+			(property
+				(name "Hersteller")
+				(value "Samsung Electro-Mechanics")
+			)
+			(property
+				(name "MPN")
+				(value "CL05B104KO5NNNC")
+			)
+			(property
+				(name "JLC")
+				(value "Basic")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "e2d5e392-645a-551c-8be3-9e737d3fb0f1")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C11")
+			(value "100nF")
+			(footprint "Capacitor_SMD:C_0402_1005Metric")
+			(datasheet "docs/datasheets/Samsung_CL05-Serie_Datasheet_LCSC-2023-04.pdf")
+			(description "MLCC 100 nF 16 V X7R 0402; an Pin 20 VDDR")
+			(fields
+				(field
+					(name "LCSC") "C1525")
+				(field
+					(name "Hersteller") "Samsung Electro-Mechanics")
+				(field
+					(name "MPN") "CL05B104KO5NNNC")
+				(field
+					(name "JLC") "Basic")
+				(field
+					(name "Footprint") "Capacitor_SMD:C_0402_1005Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/Samsung_CL05-Serie_Datasheet_LCSC-2023-04.pdf")
+				(field
+					(name "Description") "MLCC 100 nF 16 V X7R 0402; an Pin 20 VDDR")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "LCSC")
+				(value "C1525")
+			)
+			(property
+				(name "Hersteller")
+				(value "Samsung Electro-Mechanics")
+			)
+			(property
+				(name "MPN")
+				(value "CL05B104KO5NNNC")
+			)
+			(property
+				(name "JLC")
+				(value "Basic")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "cf2595f4-d5fd-5951-b9e9-31c7c16cbb35")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C12")
+			(value "1uF")
+			(footprint "Capacitor_SMD:C_0402_1005Metric")
+			(datasheet "docs/datasheets/Samsung_CL05-Serie_Datasheet_LCSC-2023-04.pdf")
+			(description "MLCC 1 uF 25 V X5R 0402; VDDD 1 uF (HW-Guide S.5)")
+			(fields
+				(field
+					(name "LCSC") "C52923")
+				(field
+					(name "Hersteller") "Samsung Electro-Mechanics")
+				(field
+					(name "MPN") "CL05A105KA5NQNC")
+				(field
+					(name "JLC") "Basic")
+				(field
+					(name "Footprint") "Capacitor_SMD:C_0402_1005Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/Samsung_CL05-Serie_Datasheet_LCSC-2023-04.pdf")
+				(field
+					(name "Description") "MLCC 1 uF 25 V X5R 0402; VDDD 1 uF (HW-Guide S.5)")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "LCSC")
+				(value "C52923")
+			)
+			(property
+				(name "Hersteller")
+				(value "Samsung Electro-Mechanics")
+			)
+			(property
+				(name "MPN")
+				(value "CL05A105KA5NQNC")
+			)
+			(property
+				(name "JLC")
+				(value "Basic")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "1a1fed6c-4bdb-5f95-b485-8ced44fa8211")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C13")
+			(value "100nF")
+			(footprint "Capacitor_SMD:C_0402_1005Metric")
+			(datasheet "docs/datasheets/Samsung_CL05-Serie_Datasheet_LCSC-2023-04.pdf")
+			(description "MLCC 100 nF 16 V X7R 0402; RSTN (HW-Guide S.5 C92)")
+			(fields
+				(field
+					(name "LCSC") "C1525")
+				(field
+					(name "Hersteller") "Samsung Electro-Mechanics")
+				(field
+					(name "MPN") "CL05B104KO5NNNC")
+				(field
+					(name "JLC") "Basic")
+				(field
+					(name "Footprint") "Capacitor_SMD:C_0402_1005Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/Samsung_CL05-Serie_Datasheet_LCSC-2023-04.pdf")
+				(field
+					(name "Description") "MLCC 100 nF 16 V X7R 0402; RSTN (HW-Guide S.5 C92)")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "LCSC")
+				(value "C1525")
+			)
+			(property
+				(name "Hersteller")
+				(value "Samsung Electro-Mechanics")
+			)
+			(property
+				(name "MPN")
+				(value "CL05B104KO5NNNC")
+			)
+			(property
+				(name "JLC")
+				(value "Basic")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "d0389483-96d1-57aa-a767-67e074a81092")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C14")
+			(value "15pF")
+			(footprint "Capacitor_SMD:C_0402_1005Metric")
+			(datasheet "docs/datasheets/FH_0402CG-Serie_Datasheet_LCSC-2023-04.pdf")
+			(description "MLCC 15 pF C0G 0402; CL = C/2 + Cpar = 7.5 + 1.5 (ANNAHME) = 9 pF (HW-Guide S.11 Gl. 1)")
+			(fields
+				(field
+					(name "LCSC") "C1548")
+				(field
+					(name "Hersteller") "FH (Fenghua)")
+				(field
+					(name "MPN") "0402CG150J500NT")
+				(field
+					(name "JLC") "Basic")
+				(field
+					(name "Footprint") "Capacitor_SMD:C_0402_1005Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/FH_0402CG-Serie_Datasheet_LCSC-2023-04.pdf")
+				(field
+					(name "Description") "MLCC 15 pF C0G 0402; CL = C/2 + Cpar = 7.5 + 1.5 (ANNAHME) = 9 pF (HW-Guide S.11 Gl. 1)")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "LCSC")
+				(value "C1548")
+			)
+			(property
+				(name "Hersteller")
+				(value "FH (Fenghua)")
+			)
+			(property
+				(name "MPN")
+				(value "0402CG150J500NT")
+			)
+			(property
+				(name "JLC")
+				(value "Basic")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "2eec834f-f771-54f6-88f2-df3ba6a285f8")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C15")
+			(value "15pF")
+			(footprint "Capacitor_SMD:C_0402_1005Metric")
+			(datasheet "docs/datasheets/FH_0402CG-Serie_Datasheet_LCSC-2023-04.pdf")
+			(description "MLCC 15 pF C0G 0402; wie C14")
+			(fields
+				(field
+					(name "LCSC") "C1548")
+				(field
+					(name "Hersteller") "FH (Fenghua)")
+				(field
+					(name "MPN") "0402CG150J500NT")
+				(field
+					(name "JLC") "Basic")
+				(field
+					(name "Footprint") "Capacitor_SMD:C_0402_1005Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/FH_0402CG-Serie_Datasheet_LCSC-2023-04.pdf")
+				(field
+					(name "Description") "MLCC 15 pF C0G 0402; wie C14")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "LCSC")
+				(value "C1548")
+			)
+			(property
+				(name "Hersteller")
+				(value "FH (Fenghua)")
+			)
+			(property
+				(name "MPN")
+				(value "0402CG150J500NT")
+			)
+			(property
+				(name "JLC")
+				(value "Basic")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "ddee3dd0-8b04-50e8-933c-c0b8e01bf762")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C16")
+			(value "1.5pF")
+			(footprint "Capacitor_SMD:C_0402_1005Metric")
+			(datasheet "docs/datasheets/FH_0402CG-Serie_Datasheet_LCSC-2023-04.pdf")
+			(description "MLCC 1.5 pF C0G 0402; C33 Referenz")
+			(fields
+				(field
+					(name "LCSC") "C1552")
+				(field
+					(name "Hersteller") "FH (Fenghua)")
+				(field
+					(name "MPN") "0402CG1R5C500NT")
+				(field
+					(name "JLC") "Preferred")
+				(field
+					(name "Footprint") "Capacitor_SMD:C_0402_1005Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/FH_0402CG-Serie_Datasheet_LCSC-2023-04.pdf")
+				(field
+					(name "Description") "MLCC 1.5 pF C0G 0402; C33 Referenz")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "LCSC")
+				(value "C1552")
+			)
+			(property
+				(name "Hersteller")
+				(value "FH (Fenghua)")
+			)
+			(property
+				(name "MPN")
+				(value "0402CG1R5C500NT")
+			)
+			(property
+				(name "JLC")
+				(value "Preferred")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "8cecb217-4b56-58bb-8bc7-70a76953b300")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C17")
+			(value "1.5pF")
+			(footprint "Capacitor_SMD:C_0402_1005Metric")
+			(datasheet "docs/datasheets/FH_0402CG-Serie_Datasheet_LCSC-2023-04.pdf")
+			(description "MLCC 1.5 pF C0G 0402; C34 Referenz")
+			(fields
+				(field
+					(name "LCSC") "C1552")
+				(field
+					(name "Hersteller") "FH (Fenghua)")
+				(field
+					(name "MPN") "0402CG1R5C500NT")
+				(field
+					(name "JLC") "Preferred")
+				(field
+					(name "Footprint") "Capacitor_SMD:C_0402_1005Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/FH_0402CG-Serie_Datasheet_LCSC-2023-04.pdf")
+				(field
+					(name "Description") "MLCC 1.5 pF C0G 0402; C34 Referenz")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "LCSC")
+				(value "C1552")
+			)
+			(property
+				(name "Hersteller")
+				(value "FH (Fenghua)")
+			)
+			(property
+				(name "MPN")
+				(value "0402CG1R5C500NT")
+			)
+			(property
+				(name "JLC")
+				(value "Preferred")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "a32e4a19-4e97-5cac-8911-3dc175a32522")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C18")
+			(value "15pF")
+			(footprint "Capacitor_SMD:C_0402_1005Metric")
+			(datasheet "docs/datasheets/FH_0402CG-Serie_Datasheet_LCSC-2023-04.pdf")
+			(description "MLCC 15 pF C0G 0402; DC-Block CA2")
+			(fields
+				(field
+					(name "LCSC") "C1548")
+				(field
+					(name "Hersteller") "FH (Fenghua)")
+				(field
+					(name "MPN") "0402CG150J500NT")
+				(field
+					(name "JLC") "Basic")
+				(field
+					(name "Footprint") "Capacitor_SMD:C_0402_1005Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/FH_0402CG-Serie_Datasheet_LCSC-2023-04.pdf")
+				(field
+					(name "Description") "MLCC 15 pF C0G 0402; DC-Block CA2")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "LCSC")
+				(value "C1548")
+			)
+			(property
+				(name "Hersteller")
+				(value "FH (Fenghua)")
+			)
+			(property
+				(name "MPN")
+				(value "0402CG150J500NT")
+			)
+			(property
+				(name "JLC")
+				(value "Basic")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "1135e1e0-535c-550c-85c5-6def49bec163")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C19")
+			(value "DNM")
+			(footprint "Capacitor_SMD:C_0402_1005Metric")
+			(description "Footprint 0402, DNM; Pi-Netz Z60, Wert nach Antennenmessung")
+			(fields
+				(field
+					(name "LCSC")
+				)
+				(field
+					(name "Hersteller") "-")
+				(field
+					(name "MPN") "nicht bestueckt (Wert nach Abstimmung)")
+				(field
+					(name "JLC") "-")
+				(field
+					(name "Footprint") "Capacitor_SMD:C_0402_1005Metric")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Footprint 0402, DNM; Pi-Netz Z60, Wert nach Antennenmessung")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "LCSC")
+				(value "")
+			)
+			(property
+				(name "Hersteller")
+				(value "-")
+			)
+			(property
+				(name "MPN")
+				(value "nicht bestueckt (Wert nach Abstimmung)")
+			)
+			(property
+				(name "JLC")
+				(value "-")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "dnp")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "4ce8c190-d19b-5b13-b962-c23b297af813")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C20")
+			(value "DNM")
+			(footprint "Capacitor_SMD:C_0402_1005Metric")
+			(description "Footprint 0402, DNM; Pi-Netz Z62, Wert nach Antennenmessung")
+			(fields
+				(field
+					(name "LCSC")
+				)
+				(field
+					(name "Hersteller") "-")
+				(field
+					(name "MPN") "nicht bestueckt (Wert nach Abstimmung)")
+				(field
+					(name "JLC") "-")
+				(field
+					(name "Footprint") "Capacitor_SMD:C_0402_1005Metric")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Footprint 0402, DNM; Pi-Netz Z62, Wert nach Antennenmessung")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "LCSC")
+				(value "")
+			)
+			(property
+				(name "Hersteller")
+				(value "-")
+			)
+			(property
+				(name "MPN")
+				(value "nicht bestueckt (Wert nach Abstimmung)")
+			)
+			(property
+				(name "JLC")
+				(value "-")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "dnp")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "84416d80-a563-50ff-a8c5-23d4e4ba946d")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C21")
+			(value "100nF")
+			(footprint "Capacitor_SMD:C_0402_1005Metric")
+			(datasheet "docs/datasheets/Samsung_CL05-Serie_Datasheet_LCSC-2023-04.pdf")
+			(description "MLCC 100 nF 16 V X7R 0402; an U2 VCC")
+			(fields
+				(field
+					(name "LCSC") "C1525")
+				(field
+					(name "Hersteller") "Samsung Electro-Mechanics")
+				(field
+					(name "MPN") "CL05B104KO5NNNC")
+				(field
+					(name "JLC") "Basic")
+				(field
+					(name "Footprint") "Capacitor_SMD:C_0402_1005Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/Samsung_CL05-Serie_Datasheet_LCSC-2023-04.pdf")
+				(field
+					(name "Description") "MLCC 100 nF 16 V X7R 0402; an U2 VCC")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "LCSC")
+				(value "C1525")
+			)
+			(property
+				(name "Hersteller")
+				(value "Samsung Electro-Mechanics")
+			)
+			(property
+				(name "MPN")
+				(value "CL05B104KO5NNNC")
+			)
+			(property
+				(name "JLC")
+				(value "Basic")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "1eb28502-2851-5952-9853-8c45a2ce9b71")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C22")
+			(value "22pF")
+			(footprint "Capacitor_SMD:C_0402_1005Metric")
+			(datasheet "docs/datasheets/FH_0402CG-Serie_Datasheet_LCSC-2023-04.pdf")
+			(description "MLCC 22 pF C0G 0402; Cref1 C0G, per DIO8 low zugeschaltet")
+			(fields
+				(field
+					(name "LCSC") "C1555")
+				(field
+					(name "Hersteller") "FH (Fenghua)")
+				(field
+					(name "MPN") "0402CG220J500NT")
+				(field
+					(name "JLC") "Basic")
+				(field
+					(name "Footprint") "Capacitor_SMD:C_0402_1005Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/FH_0402CG-Serie_Datasheet_LCSC-2023-04.pdf")
+				(field
+					(name "Description") "MLCC 22 pF C0G 0402; Cref1 C0G, per DIO8 low zugeschaltet")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "LCSC")
+				(value "C1555")
+			)
+			(property
+				(name "Hersteller")
+				(value "FH (Fenghua)")
+			)
+			(property
+				(name "MPN")
+				(value "0402CG220J500NT")
+			)
+			(property
+				(name "JLC")
+				(value "Basic")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "a5ef2097-f586-5932-aef6-5939c1cbcc96")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C23")
+			(value "100pF")
+			(footprint "Capacitor_SMD:C_0402_1005Metric")
+			(datasheet "docs/datasheets/FH_0402CG-Serie_Datasheet_LCSC-2023-04.pdf")
+			(description "MLCC 100 pF C0G 0402; Cref2 C0G, per DIO11 low zugeschaltet (f2, Salzdiagnose)")
+			(fields
+				(field
+					(name "LCSC") "C1546")
+				(field
+					(name "Hersteller") "FH (Fenghua)")
+				(field
+					(name "MPN") "0402CG101J500NT")
+				(field
+					(name "JLC") "Basic")
+				(field
+					(name "Footprint") "Capacitor_SMD:C_0402_1005Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/FH_0402CG-Serie_Datasheet_LCSC-2023-04.pdf")
+				(field
+					(name "Description") "MLCC 100 pF C0G 0402; Cref2 C0G, per DIO11 low zugeschaltet (f2, Salzdiagnose)")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "LCSC")
+				(value "C1546")
+			)
+			(property
+				(name "Hersteller")
+				(value "FH (Fenghua)")
+			)
+			(property
+				(name "MPN")
+				(value "0402CG101J500NT")
+			)
+			(property
+				(name "JLC")
+				(value "Basic")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "1d28ed20-796d-5d7c-b2a6-02508479f8ea")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C24")
+			(value "100nF")
+			(footprint "Capacitor_SMD:C_0402_1005Metric")
+			(datasheet "docs/datasheets/Samsung_CL05-Serie_Datasheet_LCSC-2023-04.pdf")
+			(description "MLCC 100 nF 16 V X7R 0402; an U3 V+ (DS verlangt >= 0.01 uF)")
+			(fields
+				(field
+					(name "LCSC") "C1525")
+				(field
+					(name "Hersteller") "Samsung Electro-Mechanics")
+				(field
+					(name "MPN") "CL05B104KO5NNNC")
+				(field
+					(name "JLC") "Basic")
+				(field
+					(name "Footprint") "Capacitor_SMD:C_0402_1005Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/Samsung_CL05-Serie_Datasheet_LCSC-2023-04.pdf")
+				(field
+					(name "Description") "MLCC 100 nF 16 V X7R 0402; an U3 V+ (DS verlangt >= 0.01 uF)")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "LCSC")
+				(value "C1525")
+			)
+			(property
+				(name "Hersteller")
+				(value "Samsung Electro-Mechanics")
+			)
+			(property
+				(name "MPN")
+				(value "CL05B104KO5NNNC")
+			)
+			(property
+				(name "JLC")
+				(value "Basic")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "4253e06b-fd6b-57a3-9e3e-7a71085cbd4d")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "D1")
+			(value "RGB 1615")
+			(footprint "fluidi:LED_RGB_TUOZHAN_1615")
+			(datasheet "docs/datasheets/TUOZHAN_P4-1615G2B2R4TS2-06T-001-24_Datasheet_A0.pdf")
+			(description "RGB-LED 1615 gem. Anode; gem. Anode an VDD (Phase-3-Review 1.3)")
+			(fields
+				(field
+					(name "LCSC") "C7496855")
+				(field
+					(name "Hersteller") "TUOZHAN")
+				(field
+					(name "MPN") "P4-1615G2B2R4TS2-06T-001-24")
+				(field
+					(name "JLC") "Extended")
+				(field
+					(name "Footprint") "fluidi:LED_RGB_TUOZHAN_1615")
+				(field
+					(name "Datasheet") "docs/datasheets/TUOZHAN_P4-1615G2B2R4TS2-06T-001-24_Datasheet_A0.pdf")
+				(field
+					(name "Description") "RGB-LED 1615 gem. Anode; gem. Anode an VDD (Phase-3-Review 1.3)")
+			)
+			(libsource
+				(lib "Device")
+				(part "LED_ARGB")
+				(description "RGB LED, anode/red/green/blue")
+			)
+			(property
+				(name "LCSC")
+				(value "C7496855")
+			)
+			(property
+				(name "Hersteller")
+				(value "TUOZHAN")
+			)
+			(property
+				(name "MPN")
+				(value "P4-1615G2B2R4TS2-06T-001-24")
+			)
+			(property
+				(name "JLC")
+				(value "Extended")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "LED RGB diode")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "LED* LED_SMD:* LED_THT:*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "cb99d622-d8aa-599f-acee-d191d3977d65")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "2")
+						)
+						(pin
+							(num "3")
+						)
+						(pin
+							(num "4")
+						)
+						(pin
+							(num "1")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "E1")
+			(value "Sonde_Innenlagen")
+			(footprint "fluidi:SONDE_PLATZHALTER")
+			(description "nicht bestueckt; Elektroden Innenlagen; Gegenelektrode/Guard = GND-Band")
+			(fields
+				(field
+					(name "LCSC")
+				)
+				(field
+					(name "Hersteller") "-")
+				(field
+					(name "MPN") "Leiterplattenstruktur")
+				(field
+					(name "JLC") "-")
+				(field
+					(name "Footprint") "fluidi:SONDE_PLATZHALTER")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "nicht bestueckt; Elektroden Innenlagen; Gegenelektrode/Guard = GND-Band")
+			)
+			(libsource
+				(lib "fluidi")
+				(part "SONDE_ELEKTRODEN")
+				(description "Sondenelektroden auf Innenlagen (Teil der Leiterplatte); Geometrie aus Feldsimulation")
+			)
+			(property
+				(name "LCSC")
+				(value "")
+			)
+			(property
+				(name "Hersteller")
+				(value "-")
+			)
+			(property
+				(name "MPN")
+				(value "Leiterplattenstruktur")
+			)
+			(property
+				(name "JLC")
+				(value "-")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "exclude_from_bom")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "60052473-9539-5041-8769-961375fcec8e")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "L1")
+			(value "10uH")
+			(footprint "fluidi:L_Sunlord_WPN201610H")
+			(datasheet "docs/datasheets/Sunlord_WPN201610H100MT_Datasheet_LCSC-2023-10.pdf")
+			(description "Leistungsspule 10 uH 2016; DCDC-Spule nahe Pin 17 (DS S.18 Tab. 7.4 Fussnote 2)")
+			(fields
+				(field
+					(name "LCSC") "C89132")
+				(field
+					(name "Hersteller") "Sunlord")
+				(field
+					(name "MPN") "WPN201610H100MT")
+				(field
+					(name "JLC") "Extended")
+				(field
+					(name "Footprint") "fluidi:L_Sunlord_WPN201610H")
+				(field
+					(name "Datasheet") "docs/datasheets/Sunlord_WPN201610H100MT_Datasheet_LCSC-2023-10.pdf")
+				(field
+					(name "Description") "Leistungsspule 10 uH 2016; DCDC-Spule nahe Pin 17 (DS S.18 Tab. 7.4 Fussnote 2)")
+			)
+			(libsource
+				(lib "Device")
+				(part "L")
+				(description "Inductor")
+			)
+			(property
+				(name "LCSC")
+				(value "C89132")
+			)
+			(property
+				(name "Hersteller")
+				(value "Sunlord")
+			)
+			(property
+				(name "MPN")
+				(value "WPN201610H100MT")
+			)
+			(property
+				(name "JLC")
+				(value "Extended")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "inductor choke coil reactor magnetic")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "Choke_* *Coil* Inductor_* L_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "0e84e913-1937-5d85-9536-19e655987412")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "L2")
+			(value "2.7nH")
+			(footprint "Inductor_SMD:L_0402_1005Metric")
+			(datasheet "docs/datasheets/Sunlord_SDCL1005-Serie_Datasheet_LCSC-2023-10.pdf")
+			(description "HF-Spule 2.7 nH 0402; L33 Referenz 2.8 nH; 2.7 nH Basis-Wert (OP-K9 Abstimmung)")
+			(fields
+				(field
+					(name "LCSC") "C27123")
+				(field
+					(name "Hersteller") "Sunlord")
+				(field
+					(name "MPN") "SDCL1005C2N7STDF")
+				(field
+					(name "JLC") "Extended")
+				(field
+					(name "Footprint") "Inductor_SMD:L_0402_1005Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/Sunlord_SDCL1005-Serie_Datasheet_LCSC-2023-10.pdf")
+				(field
+					(name "Description") "HF-Spule 2.7 nH 0402; L33 Referenz 2.8 nH; 2.7 nH Basis-Wert (OP-K9 Abstimmung)")
+			)
+			(libsource
+				(lib "Device")
+				(part "L")
+				(description "Inductor")
+			)
+			(property
+				(name "LCSC")
+				(value "C27123")
+			)
+			(property
+				(name "Hersteller")
+				(value "Sunlord")
+			)
+			(property
+				(name "MPN")
+				(value "SDCL1005C2N7STDF")
+			)
+			(property
+				(name "JLC")
+				(value "Extended")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "inductor choke coil reactor magnetic")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "Choke_* *Coil* Inductor_* L_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "dda5e8ba-2a51-51da-86be-9f8a22958efe")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "Q1")
+			(value "AO3401A")
+			(footprint "Package_TO_SOT_SMD:SOT-23")
+			(datasheet "docs/datasheets/AOS_AO3401A_Datasheet_Rev3.1.pdf")
+			(description "P-MOSFET SOT-23; Verpolschutz: D = Zelle+, S = VDD, G = GND (CONCEPTS 2.10)")
+			(fields
+				(field
+					(name "LCSC") "C15127")
+				(field
+					(name "Hersteller") "Alpha & Omega")
+				(field
+					(name "MPN") "AO3401A")
+				(field
+					(name "JLC") "Basic")
+				(field
+					(name "Footprint") "Package_TO_SOT_SMD:SOT-23")
+				(field
+					(name "Datasheet") "docs/datasheets/AOS_AO3401A_Datasheet_Rev3.1.pdf")
+				(field
+					(name "Description") "P-MOSFET SOT-23; Verpolschutz: D = Zelle+, S = VDD, G = GND (CONCEPTS 2.10)")
+			)
+			(libsource
+				(lib "fluidi")
+				(part "AO3401A")
+				(description "P-MOSFET 30 V SOT-23; Pins 1 G, 2 S, 3 D (DS S.1 SOT23 Top View)")
+			)
+			(property
+				(name "LCSC")
+				(value "C15127")
+			)
+			(property
+				(name "Hersteller")
+				(value "Alpha & Omega")
+			)
+			(property
+				(name "MPN")
+				(value "AO3401A")
+			)
+			(property
+				(name "JLC")
+				(value "Basic")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "PMOS P-MOS")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "5adc0a30-c92a-51ae-a8fd-db92176a0690")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "3")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "R1")
+			(value "100k")
+			(footprint "Resistor_SMD:R_0402_1005Metric")
+			(datasheet "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf")
+			(description "R 100 kOhm 1 % 0402; RSTN-Pull-up, kein Pad (CONCEPTS 2.2)")
+			(fields
+				(field
+					(name "LCSC") "C25741")
+				(field
+					(name "Hersteller") "UNI-ROYAL")
+				(field
+					(name "MPN") "0402WGF1003TCE")
+				(field
+					(name "JLC") "Basic")
+				(field
+					(name "Footprint") "Resistor_SMD:R_0402_1005Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf")
+				(field
+					(name "Description") "R 100 kOhm 1 % 0402; RSTN-Pull-up, kein Pad (CONCEPTS 2.2)")
+			)
+			(libsource
+				(lib "Device")
+				(part "R")
+				(description "Resistor")
+			)
+			(property
+				(name "LCSC")
+				(value "C25741")
+			)
+			(property
+				(name "Hersteller")
+				(value "UNI-ROYAL")
+			)
+			(property
+				(name "MPN")
+				(value "0402WGF1003TCE")
+			)
+			(property
+				(name "JLC")
+				(value "Basic")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "R res resistor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "R_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "3808e51a-9bc4-563d-b895-ad58ae768e3c")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "R2")
+			(value "0R")
+			(footprint "Resistor_SMD:R_0402_1005Metric")
+			(datasheet "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf")
+			(description "R 0 Ohm 0402; Pi-Netz Z61")
+			(fields
+				(field
+					(name "LCSC") "C17168")
+				(field
+					(name "Hersteller") "UNI-ROYAL")
+				(field
+					(name "MPN") "0402WGF0000TCE")
+				(field
+					(name "JLC") "Basic")
+				(field
+					(name "Footprint") "Resistor_SMD:R_0402_1005Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf")
+				(field
+					(name "Description") "R 0 Ohm 0402; Pi-Netz Z61")
+			)
+			(libsource
+				(lib "Device")
+				(part "R")
+				(description "Resistor")
+			)
+			(property
+				(name "LCSC")
+				(value "C17168")
+			)
+			(property
+				(name "Hersteller")
+				(value "UNI-ROYAL")
+			)
+			(property
+				(name "MPN")
+				(value "0402WGF0000TCE")
+			)
+			(property
+				(name "JLC")
+				(value "Basic")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "R res resistor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "R_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "66117b5b-4c1f-5082-a7f6-7070495dad6f")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "R3")
+			(value "4.7k")
+			(footprint "Resistor_SMD:R_0402_1005Metric")
+			(datasheet "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf")
+			(description "R 4.7 kOhm 1 % 0402; Rueckkopplung (CONCEPTS 2.3)")
+			(fields
+				(field
+					(name "LCSC") "C25900")
+				(field
+					(name "Hersteller") "UNI-ROYAL")
+				(field
+					(name "MPN") "0402WGF4701TCE")
+				(field
+					(name "JLC") "Basic")
+				(field
+					(name "Footprint") "Resistor_SMD:R_0402_1005Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf")
+				(field
+					(name "Description") "R 4.7 kOhm 1 % 0402; Rueckkopplung (CONCEPTS 2.3)")
+			)
+			(libsource
+				(lib "Device")
+				(part "R")
+				(description "Resistor")
+			)
+			(property
+				(name "LCSC")
+				(value "C25900")
+			)
+			(property
+				(name "Hersteller")
+				(value "UNI-ROYAL")
+			)
+			(property
+				(name "MPN")
+				(value "0402WGF4701TCE")
+			)
+			(property
+				(name "JLC")
+				(value "Basic")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "R res resistor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "R_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "4d077ae6-adee-5b6c-a809-f4c655022ecc")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "R4")
+			(value "4.7k")
+			(footprint "Resistor_SMD:R_0402_1005Metric")
+			(datasheet "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf")
+			(description "R 4.7 kOhm 1 % 0402; I2C-Pull-up schaltbar")
+			(fields
+				(field
+					(name "LCSC") "C25900")
+				(field
+					(name "Hersteller") "UNI-ROYAL")
+				(field
+					(name "MPN") "0402WGF4701TCE")
+				(field
+					(name "JLC") "Basic")
+				(field
+					(name "Footprint") "Resistor_SMD:R_0402_1005Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf")
+				(field
+					(name "Description") "R 4.7 kOhm 1 % 0402; I2C-Pull-up schaltbar")
+			)
+			(libsource
+				(lib "Device")
+				(part "R")
+				(description "Resistor")
+			)
+			(property
+				(name "LCSC")
+				(value "C25900")
+			)
+			(property
+				(name "Hersteller")
+				(value "UNI-ROYAL")
+			)
+			(property
+				(name "MPN")
+				(value "0402WGF4701TCE")
+			)
+			(property
+				(name "JLC")
+				(value "Basic")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "R res resistor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "R_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "eb3f0af3-6b09-50cf-acf5-6c857acfcf3b")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "R5")
+			(value "4.7k")
+			(footprint "Resistor_SMD:R_0402_1005Metric")
+			(datasheet "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf")
+			(description "R 4.7 kOhm 1 % 0402; I2C-Pull-up schaltbar")
+			(fields
+				(field
+					(name "LCSC") "C25900")
+				(field
+					(name "Hersteller") "UNI-ROYAL")
+				(field
+					(name "MPN") "0402WGF4701TCE")
+				(field
+					(name "JLC") "Basic")
+				(field
+					(name "Footprint") "Resistor_SMD:R_0402_1005Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf")
+				(field
+					(name "Description") "R 4.7 kOhm 1 % 0402; I2C-Pull-up schaltbar")
+			)
+			(libsource
+				(lib "Device")
+				(part "R")
+				(description "Resistor")
+			)
+			(property
+				(name "LCSC")
+				(value "C25900")
+			)
+			(property
+				(name "Hersteller")
+				(value "UNI-ROYAL")
+			)
+			(property
+				(name "MPN")
+				(value "0402WGF4701TCE")
+			)
+			(property
+				(name "JLC")
+				(value "Basic")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "R res resistor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "R_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "fd11f6f2-3ed3-5068-989c-7f72554e0ab5")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "R6")
+			(value "470")
+			(footprint "Resistor_SMD:R_0402_1005Metric")
+			(datasheet "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf")
+			(description "R 470 Ohm 1 % 0402")
+			(fields
+				(field
+					(name "LCSC") "C25117")
+				(field
+					(name "Hersteller") "UNI-ROYAL")
+				(field
+					(name "MPN") "0402WGF4700TCE")
+				(field
+					(name "JLC") "Basic")
+				(field
+					(name "Footprint") "Resistor_SMD:R_0402_1005Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf")
+				(field
+					(name "Description") "R 470 Ohm 1 % 0402")
+			)
+			(libsource
+				(lib "Device")
+				(part "R")
+				(description "Resistor")
+			)
+			(property
+				(name "LCSC")
+				(value "C25117")
+			)
+			(property
+				(name "Hersteller")
+				(value "UNI-ROYAL")
+			)
+			(property
+				(name "MPN")
+				(value "0402WGF4700TCE")
+			)
+			(property
+				(name "JLC")
+				(value "Basic")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "R res resistor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "R_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "74d225e9-7f4d-50ba-8777-d7cd66c2658b")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "R7")
+			(value "200")
+			(footprint "Resistor_SMD:R_0402_1005Metric")
+			(datasheet "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf")
+			(description "R 200 Ohm 1 % 0402")
+			(fields
+				(field
+					(name "LCSC") "C25087")
+				(field
+					(name "Hersteller") "UNI-ROYAL")
+				(field
+					(name "MPN") "0402WGF2000TCE")
+				(field
+					(name "JLC") "Basic")
+				(field
+					(name "Footprint") "Resistor_SMD:R_0402_1005Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf")
+				(field
+					(name "Description") "R 200 Ohm 1 % 0402")
+			)
+			(libsource
+				(lib "Device")
+				(part "R")
+				(description "Resistor")
+			)
+			(property
+				(name "LCSC")
+				(value "C25087")
+			)
+			(property
+				(name "Hersteller")
+				(value "UNI-ROYAL")
+			)
+			(property
+				(name "MPN")
+				(value "0402WGF2000TCE")
+			)
+			(property
+				(name "JLC")
+				(value "Basic")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "R res resistor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "R_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "ae126f6b-740c-5755-89ca-0ad1b226213b")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "R8")
+			(value "100")
+			(footprint "Resistor_SMD:R_0402_1005Metric")
+			(datasheet "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf")
+			(description "R 100 Ohm 1 % 0402")
+			(fields
+				(field
+					(name "LCSC") "C25076")
+				(field
+					(name "Hersteller") "UNI-ROYAL")
+				(field
+					(name "MPN") "0402WGF1000TCE")
+				(field
+					(name "JLC") "Basic")
+				(field
+					(name "Footprint") "Resistor_SMD:R_0402_1005Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf")
+				(field
+					(name "Description") "R 100 Ohm 1 % 0402")
+			)
+			(libsource
+				(lib "Device")
+				(part "R")
+				(description "Resistor")
+			)
+			(property
+				(name "LCSC")
+				(value "C25076")
+			)
+			(property
+				(name "Hersteller")
+				(value "UNI-ROYAL")
+			)
+			(property
+				(name "MPN")
+				(value "0402WGF1000TCE")
+			)
+			(property
+				(name "JLC")
+				(value "Basic")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "R res resistor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "R_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "eb5a0bfd-0bd7-55d9-af31-9b2764712c36")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "R9")
+			(value "100k")
+			(footprint "Resistor_SMD:R_0402_1005Metric")
+			(datasheet "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf")
+			(description "R 100 kOhm 1 % 0402; Barriere 2a TX (R2-A3: Elektronikraum, getrennt von R10)")
+			(fields
+				(field
+					(name "LCSC") "C25741")
+				(field
+					(name "Hersteller") "UNI-ROYAL")
+				(field
+					(name "MPN") "0402WGF1003TCE")
+				(field
+					(name "JLC") "Basic")
+				(field
+					(name "Footprint") "Resistor_SMD:R_0402_1005Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf")
+				(field
+					(name "Description") "R 100 kOhm 1 % 0402; Barriere 2a TX (R2-A3: Elektronikraum, getrennt von R10)")
+			)
+			(libsource
+				(lib "Device")
+				(part "R")
+				(description "Resistor")
+			)
+			(property
+				(name "LCSC")
+				(value "C25741")
+			)
+			(property
+				(name "Hersteller")
+				(value "UNI-ROYAL")
+			)
+			(property
+				(name "MPN")
+				(value "0402WGF1003TCE")
+			)
+			(property
+				(name "JLC")
+				(value "Basic")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "R res resistor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "R_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "5d317da7-5c21-56ce-b575-c646990d2b6a")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "R10")
+			(value "100k")
+			(footprint "Resistor_SMD:R_0402_1005Metric")
+			(datasheet "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf")
+			(description "R 100 kOhm 1 % 0402; Barriere 2b TX (R2-A3: eigene Loetstoppoeffnung, Abstand zu R9)")
+			(fields
+				(field
+					(name "LCSC") "C25741")
+				(field
+					(name "Hersteller") "UNI-ROYAL")
+				(field
+					(name "MPN") "0402WGF1003TCE")
+				(field
+					(name "JLC") "Basic")
+				(field
+					(name "Footprint") "Resistor_SMD:R_0402_1005Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf")
+				(field
+					(name "Description") "R 100 kOhm 1 % 0402; Barriere 2b TX (R2-A3: eigene Loetstoppoeffnung, Abstand zu R9)")
+			)
+			(libsource
+				(lib "Device")
+				(part "R")
+				(description "Resistor")
+			)
+			(property
+				(name "LCSC")
+				(value "C25741")
+			)
+			(property
+				(name "Hersteller")
+				(value "UNI-ROYAL")
+			)
+			(property
+				(name "MPN")
+				(value "0402WGF1003TCE")
+			)
+			(property
+				(name "JLC")
+				(value "Basic")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "R res resistor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "R_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "370a2170-7cc1-5ef7-bd68-56790277cd0e")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "R11")
+			(value "100k")
+			(footprint "Resistor_SMD:R_0402_1005Metric")
+			(datasheet "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf")
+			(description "R 100 kOhm 1 % 0402; Barriere 2a RX (R2-A3)")
+			(fields
+				(field
+					(name "LCSC") "C25741")
+				(field
+					(name "Hersteller") "UNI-ROYAL")
+				(field
+					(name "MPN") "0402WGF1003TCE")
+				(field
+					(name "JLC") "Basic")
+				(field
+					(name "Footprint") "Resistor_SMD:R_0402_1005Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf")
+				(field
+					(name "Description") "R 100 kOhm 1 % 0402; Barriere 2a RX (R2-A3)")
+			)
+			(libsource
+				(lib "Device")
+				(part "R")
+				(description "Resistor")
+			)
+			(property
+				(name "LCSC")
+				(value "C25741")
+			)
+			(property
+				(name "Hersteller")
+				(value "UNI-ROYAL")
+			)
+			(property
+				(name "MPN")
+				(value "0402WGF1003TCE")
+			)
+			(property
+				(name "JLC")
+				(value "Basic")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "R res resistor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "R_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "319ab3a7-ccb5-5240-8dbf-7961270799a3")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "R12")
+			(value "100k")
+			(footprint "Resistor_SMD:R_0402_1005Metric")
+			(datasheet "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf")
+			(description "R 100 kOhm 1 % 0402; Barriere 2b RX (R2-A3)")
+			(fields
+				(field
+					(name "LCSC") "C25741")
+				(field
+					(name "Hersteller") "UNI-ROYAL")
+				(field
+					(name "MPN") "0402WGF1003TCE")
+				(field
+					(name "JLC") "Basic")
+				(field
+					(name "Footprint") "Resistor_SMD:R_0402_1005Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf")
+				(field
+					(name "Description") "R 100 kOhm 1 % 0402; Barriere 2b RX (R2-A3)")
+			)
+			(libsource
+				(lib "Device")
+				(part "R")
+				(description "Resistor")
+			)
+			(property
+				(name "LCSC")
+				(value "C25741")
+			)
+			(property
+				(name "Hersteller")
+				(value "UNI-ROYAL")
+			)
+			(property
+				(name "MPN")
+				(value "0402WGF1003TCE")
+			)
+			(property
+				(name "JLC")
+				(value "Basic")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "R res resistor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "R_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "83c4e5bf-c4a5-5894-adcd-20ab3758b841")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "SW1")
+			(value "TS-1187A")
+			(footprint "Button_Switch_SMD:SW_Push_1P1T_XKB_TS-1187A")
+			(datasheet "docs/datasheets/XKB_TS-1187A-B-A-B_Datasheet_LCSC-2023-04.pdf")
+			(description "Taster SMD 5.1x5.1; nach GND, interner Pull-up; beim Einschalten gedrueckt = ROM-Bootloader")
+			(fields
+				(field
+					(name "LCSC") "C318884")
+				(field
+					(name "Hersteller") "XKB Connection")
+				(field
+					(name "MPN") "TS-1187A-B-A-B")
+				(field
+					(name "JLC") "Basic")
+				(field
+					(name "Footprint") "Button_Switch_SMD:SW_Push_1P1T_XKB_TS-1187A")
+				(field
+					(name "Datasheet") "docs/datasheets/XKB_TS-1187A-B-A-B_Datasheet_LCSC-2023-04.pdf")
+				(field
+					(name "Description") "Taster SMD 5.1x5.1; nach GND, interner Pull-up; beim Einschalten gedrueckt = ROM-Bootloader")
+			)
+			(libsource
+				(lib "Switch")
+				(part "SW_Push")
+				(description "Push button switch, generic, two pins")
+			)
+			(property
+				(name "LCSC")
+				(value "C318884")
+			)
+			(property
+				(name "Hersteller")
+				(value "XKB Connection")
+			)
+			(property
+				(name "MPN")
+				(value "TS-1187A-B-A-B")
+			)
+			(property
+				(name "JLC")
+				(value "Basic")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "switch normally-open pushbutton push-button")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "b73a28c8-6f13-5406-aa9d-d651dcad830d")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "TP1")
+			(value "UART_TX")
+			(footprint "TestPoint:TestPoint_Pad_D1.5mm")
+			(description "nicht bestueckt; Pogo-Pad TX im Zellfach ausserhalb der Zellflaeche (R2-W01 Nr. 2)")
+			(fields
+				(field
+					(name "LCSC")
+				)
+				(field
+					(name "Hersteller") "-")
+				(field
+					(name "MPN") "Leiterplattenstruktur")
+				(field
+					(name "JLC") "-")
+				(field
+					(name "Footprint") "TestPoint:TestPoint_Pad_D1.5mm")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "nicht bestueckt; Pogo-Pad TX im Zellfach ausserhalb der Zellflaeche (R2-W01 Nr. 2)")
+			)
+			(libsource
+				(lib "Connector")
+				(part "TestPoint")
+				(description "test point")
+			)
+			(property
+				(name "LCSC")
+				(value "")
+			)
+			(property
+				(name "Hersteller")
+				(value "-")
+			)
+			(property
+				(name "MPN")
+				(value "Leiterplattenstruktur")
+			)
+			(property
+				(name "JLC")
+				(value "-")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "exclude_from_bom")
+			)
+			(property
+				(name "ki_keywords")
+				(value "test point tp")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "Pin* Test*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "0f8cfaa5-7663-55d7-bfe0-87a061fb3813")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "TP2")
+			(value "UART_RX")
+			(footprint "TestPoint:TestPoint_Pad_D1.5mm")
+			(description "nicht bestueckt; Pogo-Pad RX im Zellfach ausserhalb der Zellflaeche")
+			(fields
+				(field
+					(name "LCSC")
+				)
+				(field
+					(name "Hersteller") "-")
+				(field
+					(name "MPN") "Leiterplattenstruktur")
+				(field
+					(name "JLC") "-")
+				(field
+					(name "Footprint") "TestPoint:TestPoint_Pad_D1.5mm")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "nicht bestueckt; Pogo-Pad RX im Zellfach ausserhalb der Zellflaeche")
+			)
+			(libsource
+				(lib "Connector")
+				(part "TestPoint")
+				(description "test point")
+			)
+			(property
+				(name "LCSC")
+				(value "")
+			)
+			(property
+				(name "Hersteller")
+				(value "-")
+			)
+			(property
+				(name "MPN")
+				(value "Leiterplattenstruktur")
+			)
+			(property
+				(name "JLC")
+				(value "-")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "exclude_from_bom")
+			)
+			(property
+				(name "ki_keywords")
+				(value "test point tp")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "Pin* Test*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "34a4a319-a1b4-572e-855b-3cb72587c900")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "TP3")
+			(value "GND")
+			(footprint "TestPoint:TestPoint_Pad_D1.0mm")
+			(description "nicht bestueckt; Messpunkt GND")
+			(fields
+				(field
+					(name "LCSC")
+				)
+				(field
+					(name "Hersteller") "-")
+				(field
+					(name "MPN") "Leiterplattenstruktur")
+				(field
+					(name "JLC") "-")
+				(field
+					(name "Footprint") "TestPoint:TestPoint_Pad_D1.0mm")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "nicht bestueckt; Messpunkt GND")
+			)
+			(libsource
+				(lib "Connector")
+				(part "TestPoint")
+				(description "test point")
+			)
+			(property
+				(name "LCSC")
+				(value "")
+			)
+			(property
+				(name "Hersteller")
+				(value "-")
+			)
+			(property
+				(name "MPN")
+				(value "Leiterplattenstruktur")
+			)
+			(property
+				(name "JLC")
+				(value "-")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "exclude_from_bom")
+			)
+			(property
+				(name "ki_keywords")
+				(value "test point tp")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "Pin* Test*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "545be4df-ee63-5455-92e7-2dd5733cc12b")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "TP4")
+			(value "OSZ_OUT")
+			(footprint "TestPoint:TestPoint_Pad_D1.0mm")
+			(description "nicht bestueckt; Messpunkt Elektronikraum (nur messen)")
+			(fields
+				(field
+					(name "LCSC")
+				)
+				(field
+					(name "Hersteller") "-")
+				(field
+					(name "MPN") "Leiterplattenstruktur")
+				(field
+					(name "JLC") "-")
+				(field
+					(name "Footprint") "TestPoint:TestPoint_Pad_D1.0mm")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "nicht bestueckt; Messpunkt Elektronikraum (nur messen)")
+			)
+			(libsource
+				(lib "Connector")
+				(part "TestPoint")
+				(description "test point")
+			)
+			(property
+				(name "LCSC")
+				(value "")
+			)
+			(property
+				(name "Hersteller")
+				(value "-")
+			)
+			(property
+				(name "MPN")
+				(value "Leiterplattenstruktur")
+			)
+			(property
+				(name "JLC")
+				(value "-")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "exclude_from_bom")
+			)
+			(property
+				(name "ki_keywords")
+				(value "test point tp")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "Pin* Test*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "19888ec7-5a09-54bc-bf85-e30fa411b0dd")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "U1")
+			(value "CC2340R52E0RGER")
+			(footprint "Package_DFN_QFN:VQFN-24-1EP_4x4mm_P0.5mm_EP2.45x2.45mm")
+			(datasheet "docs/datasheets/TI_CC2340R5_Datasheet_SWRS272F.pdf")
+			(description "BLE-SoC 512 kB, VQFN-24 4x4")
+			(fields
+				(field
+					(name "LCSC") "C20416850")
+				(field
+					(name "Hersteller") "Texas Instruments")
+				(field
+					(name "MPN") "CC2340R52E0RGER")
+				(field
+					(name "JLC") "Extended")
+				(field
+					(name "Footprint") "Package_DFN_QFN:VQFN-24-1EP_4x4mm_P0.5mm_EP2.45x2.45mm")
+				(field
+					(name "Datasheet") "docs/datasheets/TI_CC2340R5_Datasheet_SWRS272F.pdf")
+				(field
+					(name "Description") "BLE-SoC 512 kB, VQFN-24 4x4")
+			)
+			(libsource
+				(lib "fluidi")
+				(part "CC2340R52E0RGER")
+				(description "BLE-SoC CC2340R52, VQFN-24 RGE; Pinbelegung DS S.7 Abb. 6-2, Tab. 6-1; EP = Pin 25 (GND, S.77)")
+			)
+			(property
+				(name "LCSC")
+				(value "C20416850")
+			)
+			(property
+				(name "Hersteller")
+				(value "Texas Instruments")
+			)
+			(property
+				(name "MPN")
+				(value "CC2340R52E0RGER")
+			)
+			(property
+				(name "JLC")
+				(value "Extended")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "a6e1bd78-7ee6-5ea4-8e34-da318d6beb38")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "11")
+						)
+						(pin
+							(num "18")
+						)
+						(pin
+							(num "24")
+						)
+						(pin
+							(num "2")
+						)
+						(pin
+							(num "20")
+						)
+						(pin
+							(num "17")
+						)
+						(pin
+							(num "16")
+						)
+						(pin
+							(num "13")
+						)
+						(pin
+							(num "21")
+						)
+						(pin
+							(num "22")
+						)
+						(pin
+							(num "14")
+						)
+						(pin
+							(num "15")
+						)
+						(pin
+							(num "23")
+						)
+						(pin
+							(num "25")
+						)
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "19")
+						)
+						(pin
+							(num "3")
+						)
+						(pin
+							(num "4")
+						)
+						(pin
+							(num "5")
+						)
+						(pin
+							(num "6")
+						)
+						(pin
+							(num "7")
+						)
+						(pin
+							(num "8")
+						)
+						(pin
+							(num "9")
+						)
+						(pin
+							(num "10")
+						)
+						(pin
+							(num "12")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "U2")
+			(value "SN74LVC1G14DCKR")
+			(footprint "Package_TO_SOT_SMD:SOT-353_SC-70-5")
+			(datasheet "docs/datasheets/TI_SN74LVC1G14_Datasheet_SCES218AA.pdf")
+			(description "Schmitt-Inverter SC-70-5; RC-Oszillator 2-6 MHz, VCC aus DIO12 (ratiometrisch)")
+			(fields
+				(field
+					(name "LCSC") "C35740")
+				(field
+					(name "Hersteller") "Texas Instruments")
+				(field
+					(name "MPN") "SN74LVC1G14DCKR")
+				(field
+					(name "JLC") "Extended")
+				(field
+					(name "Footprint") "Package_TO_SOT_SMD:SOT-353_SC-70-5")
+				(field
+					(name "Datasheet") "docs/datasheets/TI_SN74LVC1G14_Datasheet_SCES218AA.pdf")
+				(field
+					(name "Description") "Schmitt-Inverter SC-70-5; RC-Oszillator 2-6 MHz, VCC aus DIO12 (ratiometrisch)")
+			)
+			(libsource
+				(lib "74xGxx")
+				(part "74LVC1G14")
+				(description "Single Schmitt NOT Gate, Low-Voltage CMOS")
+			)
+			(property
+				(name "LCSC")
+				(value "C35740")
+			)
+			(property
+				(name "Hersteller")
+				(value "Texas Instruments")
+			)
+			(property
+				(name "MPN")
+				(value "SN74LVC1G14DCKR")
+			)
+			(property
+				(name "JLC")
+				(value "Extended")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "Single Gate NOT Schmitt LVC CMOS")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "SOT?23* SOT?553*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "0c55002b-8733-5674-8273-d0a621e3fc42")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "2")
+						)
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "5")
+						)
+						(pin
+							(num "3")
+						)
+						(pin
+							(num "4")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "U3")
+			(value "TMP1075DGKR")
+			(footprint "Package_SO:VSSOP-8_3x3mm_P0.65mm")
+			(datasheet "docs/datasheets/TI_TMP1075_Datasheet_SBOS854F.pdf")
+			(description "Temperatursensor I2C VSSOP-8; Adresse 0x48 (A2..A0 = GND, DS S.14 Tab. 7-2); an der Dichtlinie")
+			(fields
+				(field
+					(name "LCSC") "C2864807")
+				(field
+					(name "Hersteller") "Texas Instruments")
+				(field
+					(name "MPN") "TMP1075DGKR")
+				(field
+					(name "JLC") "Extended")
+				(field
+					(name "Footprint") "Package_SO:VSSOP-8_3x3mm_P0.65mm")
+				(field
+					(name "Datasheet") "docs/datasheets/TI_TMP1075_Datasheet_SBOS854F.pdf")
+				(field
+					(name "Description") "Temperatursensor I2C VSSOP-8; Adresse 0x48 (A2..A0 = GND, DS S.14 Tab. 7-2); an der Dichtlinie")
+			)
+			(libsource
+				(lib "Sensor_Temperature")
+				(part "TMP1075DGK")
+				(description "I2C-bus digital temperature sensor and thermal watchdog, VSSOP-8")
+			)
+			(property
+				(name "LCSC")
+				(value "C2864807")
+			)
+			(property
+				(name "Hersteller")
+				(value "Texas Instruments")
+			)
+			(property
+				(name "MPN")
+				(value "TMP1075DGKR")
+			)
+			(property
+				(name "JLC")
+				(value "Extended")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "temperature sensor I2C single channel")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "VSSOP*3x3mm*P0.65mm*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "43755a83-1a16-56b6-aeee-2feab72dc093")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "7")
+						)
+						(pin
+							(num "6")
+						)
+						(pin
+							(num "5")
+						)
+						(pin
+							(num "8")
+						)
+						(pin
+							(num "4")
+						)
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+						(pin
+							(num "3")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "Y1")
+			(value "48MHz 8pF")
+			(footprint "Crystal:Crystal_SMD_3225-4Pin_3.2x2.5mm")
+			(datasheet "docs/datasheets/HCI_XC32M4-48.000-F08NLDT_Datasheet_LCSC-2022-05.pdf")
+			(description "Quarz 48 MHz 8 pF 3225; interne Lastkapazitaet (DS S.26 Fussnote 1), keine externen C")
+			(fields
+				(field
+					(name "LCSC") "C2925606")
+				(field
+					(name "Hersteller") "HCI (Suzhou HangJing)")
+				(field
+					(name "MPN") "XC32M4-48.000-F08NLDT")
+				(field
+					(name "JLC") "Extended")
+				(field
+					(name "Footprint") "Crystal:Crystal_SMD_3225-4Pin_3.2x2.5mm")
+				(field
+					(name "Datasheet") "docs/datasheets/HCI_XC32M4-48.000-F08NLDT_Datasheet_LCSC-2022-05.pdf")
+				(field
+					(name "Description") "Quarz 48 MHz 8 pF 3225; interne Lastkapazitaet (DS S.26 Fussnote 1), keine externen C")
+			)
+			(libsource
+				(lib "Device")
+				(part "Crystal_GND24")
+				(description "Four pin crystal, GND on pins 2 and 4")
+			)
+			(property
+				(name "LCSC")
+				(value "C2925606")
+			)
+			(property
+				(name "Hersteller")
+				(value "HCI (Suzhou HangJing)")
+			)
+			(property
+				(name "MPN")
+				(value "XC32M4-48.000-F08NLDT")
+			)
+			(property
+				(name "JLC")
+				(value "Extended")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "quartz ceramic resonator oscillator")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "Crystal*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "3bcfb5c0-0e6f-5d0c-b122-f7aefe15b129")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+						(pin
+							(num "4")
+						)
+						(pin
+							(num "3")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "Y2")
+			(value "32.768kHz 9pF")
+			(footprint "Crystal:Crystal_SMD_3215-2Pin_3.2x1.5mm")
+			(datasheet "docs/datasheets/Epson_Q13FC13500003_Datasheet_LCSC-2018-10.pdf")
+			(description "Quarz 32.768 kHz 9 pF FC-135")
+			(fields
+				(field
+					(name "LCSC") "C99010")
+				(field
+					(name "Hersteller") "Seiko Epson")
+				(field
+					(name "MPN") "Q13FC13500003")
+				(field
+					(name "JLC") "Extended")
+				(field
+					(name "Footprint") "Crystal:Crystal_SMD_3215-2Pin_3.2x1.5mm")
+				(field
+					(name "Datasheet") "docs/datasheets/Epson_Q13FC13500003_Datasheet_LCSC-2018-10.pdf")
+				(field
+					(name "Description") "Quarz 32.768 kHz 9 pF FC-135")
+			)
+			(libsource
+				(lib "Device")
+				(part "Crystal")
+				(description "Two pin crystal")
+			)
+			(property
+				(name "LCSC")
+				(value "C99010")
+			)
+			(property
+				(name "Hersteller")
+				(value "Seiko Epson")
+			)
+			(property
+				(name "MPN")
+				(value "Q13FC13500003")
+			)
+			(property
+				(name "JLC")
+				(value "Extended")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_sensor")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_sensor.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "quartz ceramic resonator oscillator")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "Crystal*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "f75d5d50-b752-543d-9e90-488df78c4eea")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+	)
+	(groups)
+	(variants)
+	(libparts
+		(libpart
+			(lib "74xGxx")
+			(part "74LVC1G14")
+			(description "Single Schmitt NOT Gate, Low-Voltage CMOS")
+			(docs "https://www.ti.com/lit/sg/scyt129e/scyt129e.pdf")
+			(footprints
+				(fp "SOT?23*")
+				(fp "SOT?553*")
+			)
+			(fields
+				(field
+					(name "Reference") "U")
+				(field
+					(name "Value") "74LVC1G14")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet") "https://www.ti.com/lit/sg/scyt129e/scyt129e.pdf")
+				(field
+					(name "Description") "Single Schmitt NOT Gate, Low-Voltage CMOS")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "NC")
+					(type "no_connect")
+				)
+				(pin
+					(num "2")
+					(name "")
+					(type "input")
+				)
+				(pin
+					(num "3")
+					(name "GND")
+					(type "power_in")
+				)
+				(pin
+					(num "4")
+					(name "")
+					(type "output")
+				)
+				(pin
+					(num "5")
+					(name "VCC")
+					(type "power_in")
+				)
+			)
+		)
+		(libpart
+			(lib "Connector")
+			(part "TestPoint")
+			(description "test point")
+			(footprints
+				(fp "Pin*")
+				(fp "Test*")
+			)
+			(fields
+				(field
+					(name "Reference") "TP")
+				(field
+					(name "Value") "TestPoint")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "test point")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "1")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
+			(lib "Device")
+			(part "Battery_Cell")
+			(description "Single-cell battery")
+			(fields
+				(field
+					(name "Reference") "BT")
+				(field
+					(name "Value") "Battery_Cell")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Single-cell battery")
+				(field
+					(name "Sim.Device") "V")
+				(field
+					(name "Sim.Type") "DC")
+				(field
+					(name "Sim.Pins") "1=+ 2=-")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "+")
+					(type "passive")
+				)
+				(pin
+					(num "2")
+					(name "-")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
+			(lib "Device")
+			(part "C")
+			(description "Unpolarized capacitor")
+			(footprints
+				(fp "C_*")
+			)
+			(fields
+				(field
+					(name "Reference") "C")
+				(field
+					(name "Value") "C")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Unpolarized capacitor")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "")
+					(type "passive")
+				)
+				(pin
+					(num "2")
+					(name "")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
+			(lib "Device")
+			(part "Crystal")
+			(description "Two pin crystal")
+			(footprints
+				(fp "Crystal*")
+			)
+			(fields
+				(field
+					(name "Reference") "Y")
+				(field
+					(name "Value") "Crystal")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Two pin crystal")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "1")
+					(type "passive")
+				)
+				(pin
+					(num "2")
+					(name "2")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
+			(lib "Device")
+			(part "Crystal_GND24")
+			(description "Four pin crystal, GND on pins 2 and 4")
+			(footprints
+				(fp "Crystal*")
+			)
+			(fields
+				(field
+					(name "Reference") "Y")
+				(field
+					(name "Value") "Crystal_GND24")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Four pin crystal, GND on pins 2 and 4")
+				(field
+					(name "KLC_S3.3") "The rectangle is not a symbol body but a graphical element")
+				(field
+					(name "KLC_S4.1") "Some pins are on 50mil grid to make the symbol small")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "1")
+					(type "passive")
+				)
+				(pin
+					(num "2")
+					(name "G")
+					(type "passive")
+				)
+				(pin
+					(num "3")
+					(name "3")
+					(type "passive")
+				)
+				(pin
+					(num "4")
+					(name "G")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
+			(lib "Device")
+			(part "L")
+			(description "Inductor")
+			(footprints
+				(fp "Choke_*")
+				(fp "*Coil*")
+				(fp "Inductor_*")
+				(fp "L_*")
+			)
+			(fields
+				(field
+					(name "Reference") "L")
+				(field
+					(name "Value") "L")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Inductor")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "1")
+					(type "passive")
+				)
+				(pin
+					(num "2")
+					(name "2")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
+			(lib "Device")
+			(part "LED_ARGB")
+			(description "RGB LED, anode/red/green/blue")
+			(footprints
+				(fp "LED*")
+				(fp "LED_SMD:*")
+				(fp "LED_THT:*")
+			)
+			(fields
+				(field
+					(name "Reference") "D")
+				(field
+					(name "Value") "LED_ARGB")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "RGB LED, anode/red/green/blue")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "A")
+					(type "passive")
+				)
+				(pin
+					(num "2")
+					(name "RK")
+					(type "passive")
+				)
+				(pin
+					(num "3")
+					(name "GK")
+					(type "passive")
+				)
+				(pin
+					(num "4")
+					(name "BK")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
+			(lib "Device")
+			(part "R")
+			(description "Resistor")
+			(footprints
+				(fp "R_*")
+			)
+			(fields
+				(field
+					(name "Reference") "R")
+				(field
+					(name "Value") "R")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Resistor")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "")
+					(type "passive")
+				)
+				(pin
+					(num "2")
+					(name "")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
+			(lib "Sensor_Temperature")
+			(part "TMP1075DGK")
+			(description "I2C-bus digital temperature sensor and thermal watchdog, VSSOP-8")
+			(docs "https://www.ti.com/lit/gpn/tmp1075")
+			(footprints
+				(fp "VSSOP*3x3mm*P0.65mm*")
+			)
+			(fields
+				(field
+					(name "Reference") "U")
+				(field
+					(name "Value") "TMP1075DGK")
+				(field
+					(name "Footprint") "Package_SO:VSSOP-8_3x3mm_P0.65mm")
+				(field
+					(name "Datasheet") "https://www.ti.com/lit/gpn/tmp1075")
+				(field
+					(name "Description") "I2C-bus digital temperature sensor and thermal watchdog, VSSOP-8")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "SDA")
+					(type "bidirectional")
+				)
+				(pin
+					(num "2")
+					(name "SCL")
+					(type "input")
+				)
+				(pin
+					(num "3")
+					(name "ALERT")
+					(type "open_collector")
+				)
+				(pin
+					(num "4")
+					(name "GND")
+					(type "power_in")
+				)
+				(pin
+					(num "5")
+					(name "A2")
+					(type "input")
+				)
+				(pin
+					(num "6")
+					(name "A1")
+					(type "input")
+				)
+				(pin
+					(num "7")
+					(name "A0")
+					(type "input")
+				)
+				(pin
+					(num "8")
+					(name "V+")
+					(type "power_in")
+				)
+			)
+		)
+		(libpart
+			(lib "Switch")
+			(part "SW_Push")
+			(description "Push button switch, generic, two pins")
+			(fields
+				(field
+					(name "Reference") "SW")
+				(field
+					(name "Value") "SW_Push")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Push button switch, generic, two pins")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "1")
+					(type "passive")
+				)
+				(pin
+					(num "2")
+					(name "2")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
+			(lib "fluidi")
+			(part "ANT_IFA_AN043")
+			(description "PCB-Antenne (Leiterbahn) nach TI AN043; Platzhalter-Footprint, Geometrie im Layout pruefen")
+			(docs "docs/appnotes/TI_AN043_SmallPCBAntenna_SWRA117D.pdf")
+			(fields
+				(field
+					(name "Reference") "AE")
+				(field
+					(name "Value") "AN043_IFA")
+				(field
+					(name "Footprint") "RF_Antenna:Texas_SWRA117D_2.4GHz_Left")
+				(field
+					(name "Datasheet") "docs/appnotes/TI_AN043_SmallPCBAntenna_SWRA117D.pdf")
+				(field
+					(name "Description") "PCB-Antenne (Leiterbahn) nach TI AN043; Platzhalter-Footprint, Geometrie im Layout pruefen")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "FEED")
+					(type "passive")
+				)
+				(pin
+					(num "2")
+					(name "GND")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
+			(lib "fluidi")
+			(part "AO3401A")
+			(description "P-MOSFET 30 V SOT-23; Pins 1 G, 2 S, 3 D (DS S.1 SOT23 Top View)")
+			(docs "docs/datasheets/AOS_AO3401A_Datasheet_Rev3.1.pdf")
+			(fields
+				(field
+					(name "Reference") "Q")
+				(field
+					(name "Value") "AO3401A")
+				(field
+					(name "Footprint") "Package_TO_SOT_SMD:SOT-23")
+				(field
+					(name "Datasheet") "docs/datasheets/AOS_AO3401A_Datasheet_Rev3.1.pdf")
+				(field
+					(name "Description") "P-MOSFET 30 V SOT-23; Pins 1 G, 2 S, 3 D (DS S.1 SOT23 Top View)")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "G")
+					(type "input")
+				)
+				(pin
+					(num "2")
+					(name "S")
+					(type "passive")
+				)
+				(pin
+					(num "3")
+					(name "D")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
+			(lib "fluidi")
+			(part "CC2340R52E0RGER")
+			(description "BLE-SoC CC2340R52, VQFN-24 RGE; Pinbelegung DS S.7 Abb. 6-2, Tab. 6-1; EP = Pin 25 (GND, S.77)")
+			(docs "docs/datasheets/TI_CC2340R5_Datasheet_SWRS272F.pdf")
+			(fields
+				(field
+					(name "Reference") "U")
+				(field
+					(name "Value") "CC2340R52E0RGER")
+				(field
+					(name "Footprint") "Package_DFN_QFN:VQFN-24-1EP_4x4mm_P0.5mm_EP2.45x2.45mm")
+				(field
+					(name "Datasheet") "docs/datasheets/TI_CC2340R5_Datasheet_SWRS272F.pdf")
+				(field
+					(name "Description") "BLE-SoC CC2340R52, VQFN-24 RGE; Pinbelegung DS S.7 Abb. 6-2, Tab. 6-1; EP = Pin 25 (GND, S.77)")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "ANT")
+					(type "passive")
+				)
+				(pin
+					(num "2")
+					(name "VDDR")
+					(type "passive")
+				)
+				(pin
+					(num "3")
+					(name "DIO8")
+					(type "bidirectional")
+				)
+				(pin
+					(num "4")
+					(name "DIO11")
+					(type "bidirectional")
+				)
+				(pin
+					(num "5")
+					(name "DIO12")
+					(type "bidirectional")
+				)
+				(pin
+					(num "6")
+					(name "DIO13")
+					(type "bidirectional")
+				)
+				(pin
+					(num "7")
+					(name "DIO16_SWDIO")
+					(type "bidirectional")
+				)
+				(pin
+					(num "8")
+					(name "DIO17_SWDCK")
+					(type "bidirectional")
+				)
+				(pin
+					(num "9")
+					(name "DIO20_A11")
+					(type "bidirectional")
+				)
+				(pin
+					(num "10")
+					(name "DIO21_A10")
+					(type "bidirectional")
+				)
+				(pin
+					(num "11")
+					(name "VDDS")
+					(type "power_in")
+				)
+				(pin
+					(num "12")
+					(name "DIO24_A7")
+					(type "bidirectional")
+				)
+				(pin
+					(num "13")
+					(name "RSTN")
+					(type "input")
+				)
+				(pin
+					(num "14")
+					(name "DIO3_X32P")
+					(type "bidirectional")
+				)
+				(pin
+					(num "15")
+					(name "DIO4_X32N")
+					(type "bidirectional")
+				)
+				(pin
+					(num "16")
+					(name "VDDD")
+					(type "power_out")
+				)
+				(pin
+					(num "17")
+					(name "DCDC")
+					(type "power_out")
+				)
+				(pin
+					(num "18")
+					(name "VDDS")
+					(type "power_in")
+				)
+				(pin
+					(num "19")
+					(name "DIO6_A1")
+					(type "bidirectional")
+				)
+				(pin
+					(num "20")
+					(name "VDDR")
+					(type "passive")
+				)
+				(pin
+					(num "21")
+					(name "X48P")
+					(type "passive")
+				)
+				(pin
+					(num "22")
+					(name "X48N")
+					(type "passive")
+				)
+				(pin
+					(num "23")
+					(name "GND")
+					(type "power_in")
+				)
+				(pin
+					(num "24")
+					(name "VDDS")
+					(type "power_in")
+				)
+				(pin
+					(num "25")
+					(name "EP")
+					(type "power_in")
+				)
+			)
+		)
+		(libpart
+			(lib "fluidi")
+			(part "SONDE_ELEKTRODEN")
+			(description "Sondenelektroden auf Innenlagen (Teil der Leiterplatte); Geometrie aus Feldsimulation")
+			(fields
+				(field
+					(name "Reference") "E")
+				(field
+					(name "Value") "Sonde_Innenlagen")
+				(field
+					(name "Footprint") "fluidi:SONDE_PLATZHALTER")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Sondenelektroden auf Innenlagen (Teil der Leiterplatte); Geometrie aus Feldsimulation")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "SENSE")
+					(type "passive")
+				)
+				(pin
+					(num "2")
+					(name "GND_BAND")
+					(type "passive")
+				)
+			)
+		)
+	)
+	(libraries
+		(library
+			(logical "74xGxx")
+			(uri "${KICAD10_SYMBOL_DIR}/74xGxx.kicad_sym")
+		)
+		(library
+			(logical "Connector")
+			(uri "${KICAD10_SYMBOL_DIR}/Connector.kicad_sym")
+		)
+		(library
+			(logical "Device")
+			(uri "${KICAD10_SYMBOL_DIR}/Device.kicad_sym")
+		)
+		(library
+			(logical "Sensor_Temperature")
+			(uri "${KICAD10_SYMBOL_DIR}/Sensor_Temperature.kicad_sym")
+		)
+		(library
+			(logical "Switch")
+			(uri "${KICAD10_SYMBOL_DIR}/Switch.kicad_sym")
+		)
+		(library
+			(logical "fluidi")
+			(uri "${KIPRJMOD}/lib/fluidi.kicad_sym")
+		)
+	)
+	(nets
+		(net
+			(code "1")
+			(name "/ANT_FEED")
+			(class "Default")
+			(node
+				(ref "AE1")
+				(pin "1")
+				(pinfunction "FEED_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "C20")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "R2")
+				(pin "2")
+				(pintype "passive")
+			)
+		)
+		(net
+			(code "2")
+			(name "/BTN_BOOT_N")
+			(class "Default")
+			(node
+				(ref "SW1")
+				(pin "1")
+				(pinfunction "1_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "10")
+				(pinfunction "DIO21_A10_10")
+				(pintype "bidirectional")
+			)
+		)
+		(net
+			(code "3")
+			(name "/CREF1_CTL")
+			(class "Default")
+			(node
+				(ref "C22")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "3")
+				(pinfunction "DIO8_3")
+				(pintype "bidirectional")
+			)
+		)
+		(net
+			(code "4")
+			(name "/CREF2_CTL")
+			(class "Default")
+			(node
+				(ref "C23")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "4")
+				(pinfunction "DIO11_4")
+				(pintype "bidirectional")
+			)
+		)
+		(net
+			(code "5")
+			(name "/DCDC_SW")
+			(class "Default")
+			(node
+				(ref "L1")
+				(pin "1")
+				(pinfunction "1_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "17")
+				(pinfunction "DCDC_17")
+				(pintype "power_out")
+			)
+		)
+		(net
+			(code "6")
+			(name "/I2C_SCL")
+			(class "Default")
+			(node
+				(ref "R5")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "8")
+				(pinfunction "DIO17_SWDCK_8")
+				(pintype "bidirectional")
+			)
+			(node
+				(ref "U3")
+				(pin "2")
+				(pinfunction "SCL_2")
+				(pintype "input")
+			)
+		)
+		(net
+			(code "7")
+			(name "/I2C_SDA")
+			(class "Default")
+			(node
+				(ref "R4")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "7")
+				(pinfunction "DIO16_SWDIO_7")
+				(pintype "bidirectional")
+			)
+			(node
+				(ref "U3")
+				(pin "1")
+				(pinfunction "SDA_1")
+				(pintype "bidirectional")
+			)
+		)
+		(net
+			(code "8")
+			(name "/LED_B_K")
+			(class "Default")
+			(node
+				(ref "D1")
+				(pin "4")
+				(pinfunction "BK_4")
+				(pintype "passive")
+			)
+			(node
+				(ref "R8")
+				(pin "2")
+				(pintype "passive")
+			)
+		)
+		(net
+			(code "9")
+			(name "/LED_B_UART_RX")
+			(class "Default")
+			(node
+				(ref "R11")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "R8")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "9")
+				(pinfunction "DIO20_A11_9")
+				(pintype "bidirectional")
+			)
+		)
+		(net
+			(code "10")
+			(name "/LED_G")
+			(class "Default")
+			(node
+				(ref "R7")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "6")
+				(pinfunction "DIO13_6")
+				(pintype "bidirectional")
+			)
+		)
+		(net
+			(code "11")
+			(name "/LED_G_K")
+			(class "Default")
+			(node
+				(ref "D1")
+				(pin "3")
+				(pinfunction "GK_3")
+				(pintype "passive")
+			)
+			(node
+				(ref "R7")
+				(pin "2")
+				(pintype "passive")
+			)
+		)
+		(net
+			(code "12")
+			(name "/LED_R_K")
+			(class "Default")
+			(node
+				(ref "D1")
+				(pin "2")
+				(pinfunction "RK_2")
+				(pintype "passive")
+			)
+			(node
+				(ref "R6")
+				(pin "2")
+				(pintype "passive")
+			)
+		)
+		(net
+			(code "13")
+			(name "/LED_R_UART_TX")
+			(class "Default")
+			(node
+				(ref "R6")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "R9")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "19")
+				(pinfunction "DIO6_A1_19")
+				(pintype "bidirectional")
+			)
+		)
+		(net
+			(code "14")
+			(name "/OSZ_OUT")
+			(class "Default")
+			(node
+				(ref "R3")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "TP4")
+				(pin "1")
+				(pinfunction "1_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "12")
+				(pinfunction "DIO24_A7_12")
+				(pintype "bidirectional")
+			)
+			(node
+				(ref "U2")
+				(pin "4")
+				(pintype "output")
+			)
+		)
+		(net
+			(code "15")
+			(name "/PROBE_SENSE")
+			(class "Default")
+			(node
+				(ref "C22")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "C23")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "E1")
+				(pin "1")
+				(pinfunction "SENSE_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "R3")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "U2")
+				(pin "2")
+				(pintype "input")
+			)
+		)
+		(net
+			(code "16")
+			(name "/RF_ANT_DC")
+			(class "Default")
+			(node
+				(ref "C18")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "C19")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "R2")
+				(pin "1")
+				(pintype "passive")
+			)
+		)
+		(net
+			(code "17")
+			(name "/RF_FILT")
+			(class "Default")
+			(node
+				(ref "C17")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "C18")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "L2")
+				(pin "2")
+				(pinfunction "2_2")
+				(pintype "passive")
+			)
+		)
+		(net
+			(code "18")
+			(name "/RF_PIN")
+			(class "Default")
+			(node
+				(ref "C16")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "L2")
+				(pin "1")
+				(pinfunction "1_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "1")
+				(pinfunction "ANT_1")
+				(pintype "passive")
+			)
+		)
+		(net
+			(code "19")
+			(name "/RSTN")
+			(class "Default")
+			(node
+				(ref "C13")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "R1")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "13")
+				(pinfunction "RSTN_13")
+				(pintype "input")
+			)
+		)
+		(net
+			(code "20")
+			(name "/SENS_PWR")
+			(class "Default")
+			(node
+				(ref "C21")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "C24")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "R4")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "R5")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "5")
+				(pinfunction "DIO12_5")
+				(pintype "bidirectional")
+			)
+			(node
+				(ref "U2")
+				(pin "5")
+				(pinfunction "VCC_5")
+				(pintype "power_in")
+			)
+			(node
+				(ref "U3")
+				(pin "8")
+				(pinfunction "V+_8")
+				(pintype "power_in")
+			)
+		)
+		(net
+			(code "21")
+			(name "/UART_RX_MID")
+			(class "Default")
+			(node
+				(ref "R11")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "R12")
+				(pin "1")
+				(pintype "passive")
+			)
+		)
+		(net
+			(code "22")
+			(name "/UART_RX_PAD")
+			(class "Default")
+			(node
+				(ref "R12")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "TP2")
+				(pin "1")
+				(pinfunction "1_1")
+				(pintype "passive")
+			)
+		)
+		(net
+			(code "23")
+			(name "/UART_TX_MID")
+			(class "Default")
+			(node
+				(ref "R10")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "R9")
+				(pin "2")
+				(pintype "passive")
+			)
+		)
+		(net
+			(code "24")
+			(name "/UART_TX_PAD")
+			(class "Default")
+			(node
+				(ref "R10")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "TP1")
+				(pin "1")
+				(pinfunction "1_1")
+				(pintype "passive")
+			)
+		)
+		(net
+			(code "25")
+			(name "/VBAT")
+			(class "Default")
+			(node
+				(ref "BT1")
+				(pin "1")
+				(pinfunction "+_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "Q1")
+				(pin "3")
+				(pinfunction "D_3")
+				(pintype "passive")
+			)
+		)
+		(net
+			(code "26")
+			(name "/VDDD")
+			(class "Default")
+			(node
+				(ref "C12")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "16")
+				(pinfunction "VDDD_16")
+				(pintype "power_out")
+			)
+		)
+		(net
+			(code "27")
+			(name "/VDDR")
+			(class "Default")
+			(node
+				(ref "C10")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "C11")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "C9")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "L1")
+				(pin "2")
+				(pinfunction "2_2")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "2")
+				(pinfunction "VDDR_2")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "20")
+				(pinfunction "VDDR_20")
+				(pintype "passive")
+			)
+		)
+		(net
+			(code "28")
+			(name "/X32N")
+			(class "Default")
+			(node
+				(ref "C15")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "15")
+				(pinfunction "DIO4_X32N_15")
+				(pintype "bidirectional")
+			)
+			(node
+				(ref "Y2")
+				(pin "2")
+				(pinfunction "2_2")
+				(pintype "passive")
+			)
+		)
+		(net
+			(code "29")
+			(name "/X32P")
+			(class "Default")
+			(node
+				(ref "C14")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "14")
+				(pinfunction "DIO3_X32P_14")
+				(pintype "bidirectional")
+			)
+			(node
+				(ref "Y2")
+				(pin "1")
+				(pinfunction "1_1")
+				(pintype "passive")
+			)
+		)
+		(net
+			(code "30")
+			(name "/X48N")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "22")
+				(pinfunction "X48N_22")
+				(pintype "passive")
+			)
+			(node
+				(ref "Y1")
+				(pin "3")
+				(pinfunction "3_3")
+				(pintype "passive")
+			)
+		)
+		(net
+			(code "31")
+			(name "/X48P")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "21")
+				(pinfunction "X48P_21")
+				(pintype "passive")
+			)
+			(node
+				(ref "Y1")
+				(pin "1")
+				(pinfunction "1_1")
+				(pintype "passive")
+			)
+		)
+		(net
+			(code "32")
+			(name "GND")
+			(class "Default")
+			(node
+				(ref "AE1")
+				(pin "2")
+				(pinfunction "GND_2")
+				(pintype "passive")
+			)
+			(node
+				(ref "BT1")
+				(pin "2")
+				(pinfunction "-_2")
+				(pintype "passive")
+			)
+			(node
+				(ref "C1")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "C10")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "C11")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "C12")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "C13")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "C14")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "C15")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "C16")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "C17")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "C19")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "C2")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "C20")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "C21")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "C24")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "C3")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "C4")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "C5")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "C6")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "C7")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "C8")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "C9")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "E1")
+				(pin "2")
+				(pinfunction "GND_BAND_2")
+				(pintype "passive")
+			)
+			(node
+				(ref "Q1")
+				(pin "1")
+				(pinfunction "G_1")
+				(pintype "input")
+			)
+			(node
+				(ref "SW1")
+				(pin "2")
+				(pinfunction "2_2")
+				(pintype "passive")
+			)
+			(node
+				(ref "TP3")
+				(pin "1")
+				(pinfunction "1_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "23")
+				(pinfunction "GND_23")
+				(pintype "power_in")
+			)
+			(node
+				(ref "U1")
+				(pin "25")
+				(pinfunction "EP_25")
+				(pintype "power_in")
+			)
+			(node
+				(ref "U2")
+				(pin "3")
+				(pinfunction "GND_3")
+				(pintype "power_in")
+			)
+			(node
+				(ref "U3")
+				(pin "4")
+				(pinfunction "GND_4")
+				(pintype "power_in")
+			)
+			(node
+				(ref "U3")
+				(pin "5")
+				(pinfunction "A2_5")
+				(pintype "input")
+			)
+			(node
+				(ref "U3")
+				(pin "6")
+				(pinfunction "A1_6")
+				(pintype "input")
+			)
+			(node
+				(ref "U3")
+				(pin "7")
+				(pinfunction "A0_7")
+				(pintype "input")
+			)
+			(node
+				(ref "Y1")
+				(pin "2")
+				(pinfunction "G_2")
+				(pintype "passive")
+			)
+			(node
+				(ref "Y1")
+				(pin "4")
+				(pinfunction "G_4")
+				(pintype "passive")
+			)
+		)
+		(net
+			(code "33")
+			(name "VDD")
+			(class "Default")
+			(node
+				(ref "C1")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "C2")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "C3")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "C4")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "C5")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "C6")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "C7")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "C8")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "D1")
+				(pin "1")
+				(pinfunction "A_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "Q1")
+				(pin "2")
+				(pinfunction "S_2")
+				(pintype "passive")
+			)
+			(node
+				(ref "R1")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "11")
+				(pinfunction "VDDS_11")
+				(pintype "power_in")
+			)
+			(node
+				(ref "U1")
+				(pin "18")
+				(pinfunction "VDDS_18")
+				(pintype "power_in")
+			)
+			(node
+				(ref "U1")
+				(pin "24")
+				(pinfunction "VDDS_24")
+				(pintype "power_in")
+			)
+		)
+		(net
+			(code "34")
+			(name "unconnected-(U2-NC-Pad1)")
+			(class "Default")
+			(node
+				(ref "U2")
+				(pin "1")
+				(pinfunction "NC_1")
+				(pintype "no_connect")
+			)
+		)
+		(net
+			(code "35")
+			(name "unconnected-(U3-ALERT-Pad3)")
+			(class "Default")
+			(node
+				(ref "U3")
+				(pin "3")
+				(pinfunction "ALERT_3")
+				(pintype "open_collector+no_connect")
+			)
+		)
+	)
+)

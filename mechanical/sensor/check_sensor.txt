@@ -1,0 +1,63 @@
+Logo: Massstab 0.4134 mm/u -> Strich 0.83 mm (2.0 u)
+=== fluidi Sensor P3, Schnittstelle Rev A (2026-11-07) ===
+1 Kollisionen montiert (Ruhe):
+  -> keine
+2 Taste gedrueckt (Hub 0.6): Ueberdeckungen keine
+   Keil 30 Grad: seitlicher Netto-Weg an der Zunge 0.20 mm -> am Betaetiger x2.50 = 0.49 mm; noetig 0.45 (Spalt 0.20 + Hub 0.25)
+   Zunge-Taster Spalt in Ruhe: 0.20 mm; Keil-Vorspalt 0.15 mm
+3 Huelse 160 mm nach unten ueber die Sonde abziehen: frei
+4 Zelle seitlich 25 mm (+x) herausschieben (ohne Huelse): frei
+   Zelle in montierter Huelse: Weg bis Seitenwand 2.40 mm (Clip haelt Zelle, Ausschub begrenzt)
+5 Platine (mit Bauteilhuelle) 60 mm von unten durch das Schott einschieben: frei
+6 LED-Oberseite bis Fenster-Lichtschaft: 2.00 mm (Ziel 1.5-2.5)
+   Klebefuge Fenster (Tropfen-Unterkante z 34.90) bis O-Ring-Nut oben z 33.70: 1.20 mm (>= 1.0); Lichtschaft-Unterkante 2.20 mm
+   Abstand Mutter_M2      - Antenne: 34.4 mm
+   Abstand Schraube_M2x4  - Antenne: 34.3 mm
+   Abstand CR2032         - Antenne: 9.3 mm
+   Abstand Keystone3034   - Antenne: 7.7 mm
+   Abstand Kunststoff Stoessel             - Antennenkupfer: 1.27 mm
+   Abstand Kunststoff Kappe_blau           - Antennenkupfer: 0.54 mm
+   Abstand Kunststoff Fenster_transluzent  - Antennenkupfer: 2.56 mm
+   Abstand Mutter - Platine F: 0.40 mm; Mutter - O-Ring-Nut (Kragen): 0.05 mm
+7 O-Ring AS568-017: Nutgrundumfang 54.97 -> Dehnung 1.9 %
+   Einbauraum 1.25 (FDM -0.1) Schnur 1.70 -> Verpressung 26 %
+   Einbauraum 1.25 (FDM -0.1) Schnur 1.86 -> Verpressung 33 %
+   Einbauraum 1.35 (FDM +0.0) Schnur 1.70 -> Verpressung 21 %
+   Einbauraum 1.35 (FDM +0.0) Schnur 1.86 -> Verpressung 27 %
+   Einbauraum 1.45 (FDM +0.1) Schnur 1.70 -> Verpressung 15 %
+   Einbauraum 1.45 (FDM +0.1) Schnur 1.86 -> Verpressung 22 %
+   Nutfuellung 77 % (< 85 %)
+8 Volumen / Masse (ASA 1.07, FR4 1.85, Epoxid 1.15, Stahl 7.9, Silikon 1.2 g/cm3; ANNAHME Dichten):
+   Kappe_blau           ASA       2108.5 mm3   2.26 g
+   Huelse_grau          ASA       4944.2 mm3   5.29 g
+   Kragen               ASA        756.1 mm3   0.81 g
+   Fenster_transluzent  ASA         63.2 mm3   0.07 g
+   Taste_blau           ASA         68.6 mm3   0.07 g
+   Tastenteller         ASA          5.0 mm3   0.01 g
+   Klemmring            ASA         24.2 mm3   0.03 g
+   Stoessel             ASA         22.2 mm3   0.02 g
+   Schottkeil           ASA         45.8 mm3   0.05 g
+   PCB                  FR4       4678.0 mm3   8.65 g
+   Verguss_Kragen       Epoxid      43.1 mm3   0.05 g
+   Verguss_Schott       Epoxid      13.7 mm3   0.02 g
+   Mutter_M2            Stahl       19.0 mm3   0.15 g
+   Schraube_M2x4        Stahl       27.3 mm3   0.22 g
+   ORing_Kragen         Silikon    151.9 mm3   0.18 g
+   ORing_Zapfen         Silikon    151.9 mm3   0.18 g
+   Membran_Silikon      Silikon     15.9 mm3   0.02 g
+   + CR2032 2.9 g (ANNAHME), Clip 0.6 g, Bestueckung 0.5 g -> Sensor gesamt ca. 22.1 g
+Platzhalter-Kollisionspruefung fluidi Sensor (Schnittstelle Rev A), erzeugt von fluidi_sensor.py
+Echte Pruefung mit KiCad-STEP folgt in Welle 2.
+
+XBT1 Keystone 3034 (gedreht)                                           | Keystone_3034_Catalog_M65.pdf S.1: H 4.1, W 23.1, L 16.1
+    Kollision: keine | kleinster Abstand 0.20 mm zu Kappe_blau, 0.20 mm zu Schottkeil
+BT1 CR2032                                                             | Panasonic_CR2032_Datasheet_2026-02.pdf S.1: Ø20 x 3.2
+    Kollision: keine | kleinster Abstand 1.75 mm zu Kappe_blau, 1.75 mm zu Schottkeil
+D1 RGB 1615                                                            | Elektronikbericht 1.1 / TUOZHAN DS S.4: 1.6 x 1.5 x 0.6
+    Kollision: keine | kleinster Abstand 2.00 mm zu Fenster_transluzent, 2.80 mm zu Kappe_blau
+SW1 TS-1187A                                                           | XKB DS S.1: 5.1 x 5.1, H 1.5 (Code A), Hub 0.2-0.25
+    Kollision: keine | kleinster Abstand 0.20 mm zu Kappe_blau, 1.05 mm zu Schottkeil
+Band F (CC2340 QFN 4x4, Quarze 3.2x2.5, L 2.0x1.6, C 1206, 0402)       | Huelle 20 x 5.6 x 2.0 (ANNAHME groesste Bauteilhoehe 1206/Quarz <= 2.0)
+    Kollision: keine | kleinster Abstand 0.20 mm zu Kappe_blau, 0.60 mm zu Fenster_transluzent
+AN043-Antenne                                                          | INDEX ANT-AN043: 15.2 x 5.7, Kupfer
+    Kollision: keine | kleinster Abstand 0.54 mm zu Kappe_blau, 0.70 mm zu Membran_Silikon
