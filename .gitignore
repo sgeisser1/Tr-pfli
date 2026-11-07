@@ -12,3 +12,4 @@ simulation/**/work/
 *.dat
 *.sta
 *.cvg
+docs/design/references/
