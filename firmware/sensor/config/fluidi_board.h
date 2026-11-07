@@ -50,7 +50,8 @@
 #define FLUIDI_MUX_MEAS_CLK_T3C0 3  /* DIO24 Mux 3 = LGPT3 C0 */
 
 /* ---- Peripherie ---- */
-#define FLUIDI_TMP1075_I2C_ADDR 0x48 /* A2..A0 = GND, TI_TMP1075_Datasheet_SBOS854F.pdf S.14 Tab. 7-2 */
+#define FLUIDI_TMP1075_I2C_ADDR 0x48 /* TMP1075N (SOT-563, nur A0): A0 = GND (U3 Pin 4, Netzliste Rev B),
+                                        TI_TMP1075_Datasheet_SBOS854F.pdf S.14 Tab. 7-3 */
 
 /* ---- Zeiten (ANNAHME, am Muster messen -> PROTOTYP-PRUEFUNG) ---- */
 #define FLUIDI_SENS_PWR_SETTLE_US   1000u  /* PINMAP Rev B DIO12: >= 1 ms nach SENS_PWR ein */

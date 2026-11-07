@@ -30,11 +30,11 @@ Gegenprobe: `charge_uc` aus `GET_INFO` zu Beginn/Ende vs. gemessene Ladung (Abwe
 
 | Nr | Fall (Firmware-Zustand) | Aufbau | Erwartung (Modell, Quelle) | Kriterium / Ergebnis traegt in |
 |---|---|---|---|---|
-| E1 | Ruhestrom ungekoppelt (kein Advertising, LEDs aus, FW-8) bei 3.0 V und 25 °C | C | 0.74 µA Standby LFXT DCDC (`TI_CC2340R5_Datasheet_SWRS272F.pdf` S.19 Tab. 7.9) + Leck ≈ 0.2 µA (ANNAHME `energy_budget.py` oth.real) | ≤ 1.5 µA; > 10 µA → Pin-Zustand pruefen (SWD-Pull an DIO16 ≈ 66 µA, PINMAP FW-6) |
-| E2 | wie E1, Taster dauernd gedrueckt > 30 s | C | vor Abschaltung 39–109 µA (DS S.31), danach Pull-up aus | nach 30 s wieder ≈ E1 (PROTOCOL 10.3) |
+| E1 | Ruhestrom ungekoppelt (kein Advertising, LEDs aus, FW-8) bei 3.0 V und 25 °C | C | Rev B real 1.03 µA: 0.74 µA Standby LFXT DCDC (`TI_CC2340R5_Datasheet_SWRS272F.pdf` S.19 Tab. 7.9) + Puffer 4 × 100 µF 0.2 µA + Q1/Q2/Leiterplatte ≈ 0.1 µA (ANNAHMEN, `energy_budget.py --revb` Tab. 1; Datenblattgrenzen: C1–C4 12 µA, Q2 IDSS 1 µA) | ≤ 1.5 µA (REQ-ENE-09 ≤ 3 µA); Einzelbeitraege: Messung mit C3/C4 abgeloetet wiederholen (Puffer-Leck, D-013), > 10 µA → Pin-Zustand pruefen (SWD-Pull-up an DIO16 ueber R4 in den abgeschalteten TMP: Pull-up-Strom 39–109 µA bei 1.8 V, bis 170–393 µA bei 3.8 V, DS S.31–32; PINMAP FW-6) |
+| E2 | wie E1, Taster dauernd gedrueckt > 30 s | C | vor Abschaltung Pull-up-Strom: DS S.31 39–109 µA bei VDDS 1.8 V, S.32 170–393 µA bei 3.8 V → bei 3.0 V dazwischen (ANNAHME ≈ 100–300 µA), danach Pull-up aus | nach 30 s wieder ≈ E1 (PROTOCOL 10.3); Wert bei 3.0 V notieren |
 | E3 | Advertising-Ereignis (gekoppelt, 27.5 s, 0 dBm) | A, B | 16.2 µC real / 40.9 µC pess (`energy_budget.py` `adv_event_charge`) | Ladung; VDD-Einbruch an B ≤ 0.2 V (REQ-ENE-06) |
 | E4 | Datensitzung (HELLO, TIME_SET, READ 1–2 Datensaetze, ACK, Trennen) | A, B | 299 µC real / 767 µC pess (`conn_charge`, 50 ms ANNAHME) | Dauer und Ladung → `T_CONN`; Anzahl Verbindungsereignisse ≤ 12 (PROTOCOL 2.5) |
-| E5 | Messung (Taster kurz, gekoppelt ohne Gateway) | A, B | 4 Bursts × 0.6 ms × 12.8 mA ≈ 31 µC + TMP-Wandlung/I²C ≈ 10–20 µC (README Kap. 4; PINMAP FW-2) | **Burst ≤ 0.6 ms, Pause ≥ 30 ms, max. 4** (Kanal 2 an DIO11 statt VDD); Einbruch an B ≤ 0.2 V; ersetzt `Q_MEAS` |
+| E5 | Messung (Taster kurz, gekoppelt ohne Gateway) | A, B | Rev B real ≈ 37 µC je Messung: Kette 7.3 mA (Cpd-Rechnung, 24 MHz) + CPU 2.6 mA, 4 × 0.6 ms ≈ 24 µC + TMP1075N/I²C ≈ 5 µC + CPU/Flash ≈ 8 µC; pess. 289 µC, falls in den Pausen nur Idle statt Standby (`energy_budget.py --revb` Tab. 2; PINMAP FW-2) | **Burst ≤ 0.6 ms, Pause ≥ 30 ms, max. 4** (Kanal 2 an DIO11 statt VDD); Einbruch an B ≤ 0.2 V; ersetzt `Q_MEAS` |
 | E6 | LED-Muster L8 (Giessen, 5 ms), L1 (2 × 30 ms), L3 (20 ms) bei 3.0 und 2.6 V | A, B | ≤ 3 mA × Dauer (PROTOCOL 10.2): L8 15 µC | Strom je Farbe ≤ 3 mA; bei 2.6 V Gelb statt Blau; Einbruch an B |
 | E7 | Kopplung (Taster 4 s, Advertising 500 ms, ECDH, SAS) | A | ≈ 0.03 mAh (PROTOCOL 12; ECDH ≤ 3 s × 2.6 mA ANNAHME) | ECDH-Rechenzeit (FW-P3/PP-6) |
 | E8 | Schnelles Advertising nach Tastendruck (20 × 100 ms) | A | 0.32 mC real (PROTOCOL 12) | Ladung |
@@ -54,7 +54,7 @@ Jede Messung bei **3.0 V** (frische Zelle) und **2.4 V** (Abschaltschwelle), E3/
 3. Messfall ausloesen (Taster, Gateway-Befehl oder Wartezeit), 10 Wiederholungen aufzeichnen (Oszilloskop-Bilder ablegen
    unter `docs/reviews/phase5_energie_messung/`, ASCII-Export der Kurven).
 4. Tabelle je Fall: Ladung (µC) Mittel/Min/Max, Dauer, Spitzenstrom, VDD-Minimum, Temperatur.
-5. Werte in `scripts/energy_budget.py` eintragen (Parameter `ble.t_cpu`, `prof.t_conn`, `prof.q_meas`, `led.i`, Standby)
+5. Werte in `scripts/energy_budget.py` eintragen (Parameter `ble.t_cpu`, `prof.t_conn`, `led.i`, Rev B: `rb.*` z. B. `rb.mlcc_real`, `rb.q2_real`, `rb.t_cpu_meas`, Standby), Ergebnis mit `--revb --out hardware/sensor/out/ENERGIE_REV_B.md` neu erzeugen
    und Laufzeit real/pessimistisch neu berechnen; Ergebnis vom Pruefer nachrechnen lassen (CLAUDE.md Pruefregeln).
 6. Firmware-Konstanten (`core/fl_app.c`) und Schwellen (2.55 V Batterie tief, 2.7 V OTA, 2.6 V Wiederanlauf: FW-P6)
    anhand der Entladekennlinie unter Pulslast festlegen.

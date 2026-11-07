@@ -56,6 +56,62 @@ def check_layout():
     return errs
 
 
+# QFN24 (RGE): Gehaeusepin -> DIO, TI_CC2340R5_Datasheet_SWRS272F.pdf S.9-12 Tab. 6-1 (Spalte "RGE PIN")
+RGE_PIN_DIO = {3: 8, 4: 11, 5: 12, 6: 13, 7: 16, 8: 17, 9: 20, 10: 21, 12: 24, 14: 3, 15: 4, 19: 6}
+NETLIST = os.path.join(REPO, "hardware", "sensor", "out", "fluidi_sensor.net")
+
+
+def netlist_pins(path, ref="U1"):
+    """KiCad-Netzliste (S-Ausdruck) -> {Pin: Netzname ohne '/'} fuer ein Bauteil."""
+    tok = re.findall(r'\(|\)|"(?:[^"\\]|\\.)*"|[^\s()]+', open(path).read())
+    stack, cur = [], []
+    for t in tok:
+        if t == "(":
+            stack.append(cur)
+            cur = []
+        elif t == ")":
+            done, cur = cur, stack.pop()
+            cur.append(done)
+        else:
+            cur.append(t.strip('"'))
+    pins = {}
+
+    def walk(node):
+        if not isinstance(node, list) or not node:
+            return
+        if node[0] == "net":
+            name = next(x[1] for x in node if isinstance(x, list) and x and x[0] == "name")
+            for nd in node:
+                if isinstance(nd, list) and nd and nd[0] == "node":
+                    d = {x[0]: x[1] for x in nd[1:] if isinstance(x, list) and len(x) > 1}
+                    if d.get("ref") == ref:
+                        pins[int(d["pin"])] = name.lstrip("/")
+            return
+        for x in node:
+            walk(x)
+    walk(cur)
+    return pins
+
+
+def check_netlist(pm):
+    """PINMAP Kap. 1 (Pin, DIO, Netz) gegen Datenblatt-Pinliste und KiCad-Netzliste (U1)."""
+    errs = []
+    if not os.path.exists(NETLIST):
+        print("[check] Hinweis: %s fehlt, Netzlisten-Abgleich uebersprungen" % NETLIST)
+        return errs
+    net = netlist_pins(NETLIST)
+    rows = re.findall(r"^\|\s*(\d+)\s*\|\s*DIO(\d+)\w*\s*\|\s*`([A-Z0-9_]+)`", pm, re.M)
+    if len(rows) < len(RGE_PIN_DIO):
+        errs.append("PINMAP Kap. 1: nur %d GPIO-Zeilen gefunden" % len(rows))
+    for pin, dio, name in rows:
+        pin, dio = int(pin), int(dio)
+        if RGE_PIN_DIO.get(pin) != dio:
+            errs.append("PINMAP Pin %d = DIO%d, Datenblatt RGE: DIO%s" % (pin, dio, RGE_PIN_DIO.get(pin)))
+        if net.get(pin) != name:
+            errs.append("PINMAP Pin %d Netz %s != Netzliste U1 Pin %d: %s" % (pin, name, pin, net.get(pin)))
+    return errs
+
+
 def check_pins():
     B = defs(rd("config/fluidi_board.h"), "FLUIDI_DIO_")
     app = rd("syscfg/fluidi_sensor.syscfg")
@@ -76,6 +132,7 @@ def check_pins():
                "FLUIDI_PIN_I2C_SDA": "FLUIDI_DIO_I2C_SDA", "FLUIDI_PIN_I2C_SCL": "FLUIDI_DIO_I2C_SCL",
                "FLUIDI_PIN_LED_R": "FLUIDI_DIO_LED_R", "FLUIDI_PIN_LED_G": "FLUIDI_DIO_LED_G",
                "FLUIDI_PIN_LED_B": "FLUIDI_DIO_LED_B", "FLUIDI_PIN_BUTTON": "FLUIDI_DIO_BUTTON"}
+    errs += check_netlist(pm)
     for pin, d in mapping.items():
         if pin not in table:
             errs.append("PINMAP: %s nicht gefunden" % pin)

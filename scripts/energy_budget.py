@@ -3,6 +3,8 @@
 
 Aufruf:   .venv/bin/python scripts/energy_budget.py            (alle Tabellen, Markdown)
           .venv/bin/python scripts/energy_budget.py --params   (nur Parametertabelle)
+          .venv/bin/python scripts/energy_budget.py --revb --out hardware/sensor/out/ENERGIE_REV_B.md
+                                                               (Rev B: bauteilgenaues Budget, Phase 4 Welle 3)
 
 Nur Standardbibliothek. Alle Zahlen stehen in PARAMS mit Quelle; Werte ohne Datenblatt sind
 als ANNAHME markiert. Seitenangaben = PDF-Seite.
@@ -288,9 +290,304 @@ def print_params():
         print(f"| {k} | {vs} | {u} | {src} |")
 
 
+# ============================================================================================
+# Rev B: Bauteil-genaues Budget fuer das fertige Layout (hardware/sensor, Phase 4, Welle 3)
+# Aufruf: .venv/bin/python scripts/energy_budget.py --revb [--out hardware/sensor/out/ENERGIE_REV_B.md]
+# Die Phase-2-Tabellen oben bleiben unveraendert (scripts/concept_energy.py baut darauf auf).
+# Zusaetzliche Quellen-Kuerzel (lokal):
+#   [TMP]  docs/datasheets/TI_TMP1075_Datasheet_SBOS854F.pdf
+#   [G14]  docs/datasheets/TI_SN74LVC1G14_Datasheet_SCES218AA.pdf
+#   [G80]  docs/datasheets/TI_SN74LVC1G80_Datasheet_SCES221T.pdf
+#   [SAM]  docs/datasheets/Samsung_CL31A107MQHNNNE_Catalog_2015-11.pdf (C1-C4, LCSC C15008)
+#   [S10]  docs/datasheets/Samsung_CL05A106MQ5NUNC_Datasheet_LCSC-2022-08.pdf (C5, C9, LCSC C15525)
+#   [LED]  docs/datasheets/TUOZHAN_P4-1615G2B2R4TS2-06T-001-24_Datasheet_A0.pdf (D1)
+#   [PAN]  docs/datasheets/Panasonic_CR2032_Datasheet_2026-02.pdf (Zelle laut BOM-Extra, D-006)
+#   [NET]  hardware/sensor/out/fluidi_sensor.net (Rev B), [PIN] docs/interfaces/PINMAP_SENSOR.md Rev B
+#   [FW]   firmware/sensor (config/fluidi_board.h, core/fl_settings.c, core/fl_app.c, platform/cc23/fl_hw.c)
+# ============================================================================================
+VDD_NOM = P("rb.vdd", 3.0, "V", "Nennspannung CR2032 [PAN] S.1 (Rechenwert fuer Leck-/Laststroeme)")
+
+# ---- Ruhestrom (Schlaf, FW-8) je Bauteil: (real, pess A, pess DS) ----------------------------------------
+# pess A = REQ-ENE-08 mit ANNAHME fuer Teile ohne Typwert; pess DS = jedes Teil an seiner Datenblattgrenze
+# (REQ-ENE-08 "oder Maximalwert"; Nachweisfall REQ-ENE-02).
+CC_SLEEP_PESS = SOCS["CC2340R5"]["sleep_ldo"] * PESS_SLEEP * SLEEP_TEMP_FACTOR
+RB_SLEEP = {
+    "U1 CC2340R52 Standby (LFXT, RAM, RTC)": (
+        SOCS["CC2340R5"]["sleep"], CC_SLEEP_PESS, CC_SLEEP_PESS,
+        "[CC] S.19 Tab. 7.9 0.74 uA (DCDC) real; pess. GLDO 1.15 uA (S.20) x1.5 x Sonnenprofil "
+        f"{SLEEP_TEMP_FACTOR:.3f} (S.35 Fig. 7-7); DS nennt keinen Max-Wert"),
+    "Q1 AO3401A Verpolschutz (leitend, VGS = -VDD)": (
+        P("rb.q1_real", 0.02e-6, "A", "ANNAHME 20 % der IGSS-Grenze bei |VGS| 3 V statt 12 V"),
+        I_PFET_PESS, I_PFET_PESS, "[AO] S.2 IGSS <= 100 nA @ VGS +-12 V"),
+    "Q2 AO3401A Messkette aus (VGS = 0, VDS = -VDD)": (
+        P("rb.q2_real", 0.01e-6, "A", "ANNAHME IDSS bei VDS -3 V (DS nur bei -30 V)"),
+        P("rb.q2_pa", 0.1e-6, "A", "ANNAHME 10 % der DS-Grenze (VDS -3 V statt -30 V)"),
+        P("rb.q2_ds", ((24 - SUN_H) * 1e-6 + SUN_H * 5e-6) / 24, "A",
+          "[AO] S.2 IDSS <= 1 uA (TJ 25 C) / 5 uA (TJ 55 C) @ VDS -30 V, Sonnenprofil 4 h/Tag bei 55 C"),
+        "[AO] S.2; Leckstrom fliesst ueber OSC_PWR in U2/U4-U6 (ICC), zaehlt nur einmal"),
+    "C1-C4 4 x 100 uF X5R 6.3 V (Puffer, D-013)": (
+        P("rb.mlcc_real", 4 * 0.05e-6, "A", "ANNAHME 0.05 uA je 100 uF (wie oben mlcc.real), PROTOTYP-PRUEFUNG"),
+        P("rb.mlcc_pa", 0.5e-6, "A", "ANNAHME pess. A gesamt (wie concept_energy.py MLCC_PESSA)"),
+        P("rb.mlcc_ds", 4 * 3.0 / (100.0 / 100e-6), "A",
+          "[SAM] S.53 IR >= 100 MOhm*uF (markierte Hochkapazitaetstypen) -> 1 MOhm je 100 uF -> 3 uA @3 V, x4"),
+        "[SAM] S.53 Insulation Resistance; Messung bei Nennspannung 6.3 V, bei 3 V real deutlich kleiner"),
+    "C5 10 uF (VDD) + C9 10 uF (VDDR)": (
+        P("rb.c10_real", 0.01e-6, "A", "ANNAHME"),
+        P("rb.c10_pa", 0.05e-6, "A", "ANNAHME"),
+        P("rb.c10_ds", 3.0 / 5e6 + 1.8 / 5e6, "A",
+          "[S10] S.2 IR >= 50 MOhm*uF -> 5 MOhm je 10 uF; C5 @3.0 V + C9 @VDDR <= 1.8 V (ANNAHME VDDR)"),
+        "[S10] S.2; 100 nF/1 uF-Typen (C6-C8, C10-C13, C21, C24, C25) < 1 nA je Stueck (500 MOhm*uF), vernachlaessigt"),
+    "U2 SN74LVC1G14 + U4-U6 SN74LVC1G80 (OSC_PWR = 0)": (
+        0.0, 0.0, 0.0,
+        "unversorgt (Q2 aus); Eingang U2 an PROBE_SENSE ohne Quelle (DIO8 hochohmig), Ausgang U6 an DIO24 Puffer aus "
+        "-> keine Spannung an Ioff-Pins ([G14] S.7, [G80] S.6 Ioff <= 10 uA nur bei angelegter Spannung)"),
+    "U3 TMP1075N + R4/R5 4.7k + C24 (SENS_PWR low)": (
+        0.0, 0.0, 0.0,
+        "unversorgt: DIO12 low, DIO16/17 Ausgang low (FW-1/FW-8) -> 0 V an R4/R5 und U3; "
+        "ISD 0.15/0.35 uA [TMP] S.7 Tab. 6.6 entfaellt"),
+    "R13 100k (Gate Q2), R1 100k (RSTN), D1 RGB, SW1": (
+        0.0, 0.0, 0.0,
+        "beide Enden auf VDD: DIO11 high, RSTN high, LED-Kathoden high (FW-8); Taster offen, Pull-up stromlos"),
+    "R9-R12 UART-Barriere zu TP1/TP2 (Zellfach)": (
+        P("rb.uart_real", 0.0, "A", "Pads offen"),
+        P("rb.uart_pa", 2 * VDD_NOM / 100e6, "A", "ANNAHME Oberflaechenisolation TP1/TP2-TP3 >= 100 MOhm"),
+        P("rb.uart_ds", 2 * VDD_NOM / 100e6, "A", "wie pess. A (kein DS-Wert)"),
+        "Fehlerfall Feuchte im Zellfach: <= 3 V / 200 kOhm = 15 uA je Pad (nicht im Budget, Sicherheit/Dichtung)"),
+    "GPIO-Leck U1, Leiterplatte, Flussmittel": (
+        P("rb.board_real", 0.05e-6, "A", "ANNAHME (concept_energy.py BOARD)"),
+        P("rb.board_pa", 0.2e-6, "A", "ANNAHME (concept_energy.py BOARD)"),
+        0.2e-6, "kein DS-Wert fuer Pad-Leckstrom in [CC] Tab. 7.21.4.1 (S.31-32) -> ANNAHME"),
+}
+
+# ---- Messung Rev B (FW-1, FW-2; fl_hw.c fl_port_measure) ----------------------------------------------
+CPD_G14 = P("rb.cpd14", 22e-12, "F", "[G14] S.8 Tab. 5.8 Cpd 22 pF @3.3 V, f 10 MHz")
+CPD_G80 = P("rb.cpd80", 25e-12, "F", "[G80] S.8 Tab. 5.11 Cpd 25 pF @3.3 V, f 10 MHz")
+F_OSC = (P("rb.fosc_real", 24.2e6, "Hz", "simulation/spice/README.md (b): f_osc typ trocken, R3 1 kOhm"),
+         P("rb.fosc_pess", 36.1e6, "Hz", "MESSKETTE_SALZ Kap. 5 D3: Luft 36.1 MHz (= 8 x 4.51 MHz, schnelle Ecke)"))
+C_NODE = P("rb.c_node", 5e-12, "F", "ANNAHME Last je Teilerknoten (CIN ~3-5 pF + Bahn)")
+C_MEASCLK = P("rb.c_measclk", 15e-12, "F", "ANNAHME DIO24 (C_pin 5-7 pF, [CC] S.32) + TP4 + Bahn")
+C_PROBE = P("rb.c_probe", 30e-12, "F", "ANNAHME C_Sonde + Cpar (MESSKETTE_SALZ Kap. 5: 22.7-44.1 pF)")
+DV_HYST = P("rb.dv_hyst", 1.0, "V", "ANNAHME Schmitt-Hysterese LVC1G14 bei 3 V (DS-Tabelle VT+/VT-, gerundet)")
+I_SHOOT = P("rb.i_shoot", 1.0e-3, "A", "ANNAHME Querstrom U2, Eingang laeuft dauernd durch die Schwellen")
+T_BURST = P("rb.t_burst", 0.6e-3, "s", "FW-2 Grenze (fluidi_board.h: 50 us + 2 x 250 us + Rest)")
+N_BURST = P("rb.n_burst", 4, "-", "FW-2 FLUIDI_BURST_MAX")
+T_PAUSE = P("rb.t_pause", 3 * 30e-3 + 15e-3, "s", "FW-2 3 Pausen x 30 ms + FW-1 tCONV 15 ms ([TMP] S.7 Tab. 6.6)")
+I_IDLE = (P("rb.idle", 0.8e-3, "A", "[CC] S.19 Tab. 7.9 Idle, Flash aus, DCDC"),
+          P("rb.idle_ldo", 1.2e-3, "A", "[CC] S.20 Tab. 7.9 Idle, Flash aus, GLDO"))
+T_TMP_SETTLE = P("rb.t_tmp_settle", 1e-3, "s", "fluidi_board.h FLUIDI_SENS_PWR_SETTLE_US (Busy-Wait, CPU aktiv)")
+T_I2C = P("rb.t_i2c", 0.8e-3, "s", "2 Transaktionen 100 kHz (Schreiben 3 B, Zeiger + Lesen 2 B) ~ 80 Takte")
+I_TMP_CONV = (P("rb.tmp_conv", 52e-6, "A", "[TMP] S.7 Tab. 6.5 TMP1075 'during active conversion' typ "
+                "(TMP1075N Tab. 6.6 nennt nur IDD_AVG 4.8/7.5 uA) -> ANNAHME fuer N"),
+              P("rb.tmp_conv_max", 85e-6, "A", "[TMP] S.7 Tab. 6.5 max (ANNAHME fuer N)"))
+R_PULLUP = P("rb.r_i2c", 4.7e3, "Ohm", "[NET] R4/R5 4.7 kOhm nach SENS_PWR")
+C_SENS = P("rb.c24", 100e-9, "F", "[NET] C24 100 nF an SENS_PWR (je Messung umgeladen)")
+R_GATE = P("rb.r13", 100e3, "Ohm", "[NET] R13 100 kOhm VDD-OSC_EN_N, Strom nur bei Kette ein")
+T_CPU_MEAS = (P("rb.t_cpu_meas", 3e-3, "s", "ANNAHME Auswertung, Datensatz, Planung (CPU aktiv)"),
+              P("rb.t_cpu_meas_p", 6e-3, "s", "ANNAHME pess."))
+Q_FLASH_REC = P("rb.q_flash_rec", FLASH_Q_PER_2K * 24 / 2048, "C",
+                "24-B-Datensatz anteilig an [CC] S.21 Tab. 7.11 (2 kB), fl_ringlog.c")
+
+
+def rb_chain_current(f, v=VDD_NOM):
+    """Messkette U2 + U4-U6 bei Oszillatorfrequenz f: Cpd*V*f je Stufe + Knotenlasten + Sonde + Querstrom."""
+    cpd = (CPD_G14 + CPD_G80 * (1 + 1 / 2 + 1 / 4)) * v * f
+    load = v * f * (C_NODE + C_NODE / 2 + C_NODE / 4 + C_MEASCLK / 8)
+    probe = C_PROBE * DV_HYST * f
+    return cpd + load + probe + I_SHOOT
+
+
+def rb_meas_charge(case):
+    """Ladung je Messung (ohne Funk): TMP1075N + 4 Bursts + CPU + Flash; pess: Idle statt Standby in Pausen."""
+    pess = case != "real"
+    k = 1 if pess else 0
+    s = SOCS["CC2340R5"]
+    icpu = s["cpu_ldo"] if pess else s["cpu"]
+    i_chain = rb_chain_current(F_OSC[k])
+    q = {}
+    q["Kette (4 Bursts)"] = N_BURST * T_BURST * (i_chain + icpu + VDD_NOM / R_GATE)
+    q["TMP1075N + I2C"] = (T_TMP_SETTLE * icpu + T_I2C * (I_IDLE[k] + VDD_NOM / R_PULLUP)  # ~50 % low je Leitung
+                           + I_TMP_CONV[k] * (T_PAUSE - 3 * 30e-3 + T_TMP_SETTLE + T_I2C) + C_SENS * VDD_NOM)
+    q["Pausen (Standby real / Idle pess)"] = T_PAUSE * I_IDLE[k] if pess else 0.0
+    q["CPU + Flash"] = T_CPU_MEAS[k] * icpu + Q_FLASH_REC
+    f = PESS_EVENT if pess else 1.0
+    return {kk: v * f for kk, v in q.items()}, i_chain
+
+
+# ---- Funk und LED Rev B ---------------------------------------------------------------------------
+ADV_IV = P("rb.adv_iv", 27.5, "s", "[FW] fl_settings.c adv_interval_ms 27500 (= reach_interval(1 min))")
+N_FAST_ADV = P("rb.fast_adv", 2000 / 100, "1/Taste", "[FW] fl_app.c FAST_ADV_MS 2000 / FAST_ADV_INT_MS 100")
+I_LED = P("rb.i_led", 3e-3, "A", "FW-4 / PROTOCOL 10.1 Obergrenze 3 mA (Rechnung D1 + R6/R7/R8 siehe Bericht)")
+T_LED_AUTO = P("rb.led_l3", 20e-3, "s", "PROTOCOL 10.2 L3 Gruen 1 x 20 ms je automatischer Messung (heartbeat_led = 1)")
+T_LED_MAN = P("rb.led_l1", 2 * 30e-3, "s", "PROTOCOL 10.2 L1 Gruen 2 x 30 ms je Tastendruck")
+T_LED_WATER = P("rb.led_l8", 12 * 60 * 5e-3, "s/Tag", "PROTOCOL 10.2 L8 1/min x 5 ms, 12 h (nur pess.)")
+N_MAN_RB = P("rb.n_man", 2, "1/Tag", "REQ-ENE-04 Standardprofil")
+C_BUF_RB = P("rb.c_buf", 4 * 100e-6, "F", "D-013 Prototyp 4 x 100 uF (C1-C4)")
+CUTOFF_RB = P("rb.cutoff", 0.90, "-", "concept_energy.py CUTOFF_FACTOR: Abschaltung 2.4 V unter Last (E1, FW-5), "
+              "[PAN] S.1 Entladekurve abgelesen")
+
+
+def rb_daily(n_auto, case, c_buf=C_BUF_RB):
+    pess = case != "real"
+    k = {"real": 0, "pessA": 1, "pessDS": 2}[case]
+    s = SOCS["CC2340R5"]
+    parts = {}
+    for name, v in RB_SLEEP.items():
+        i = v[k]
+        if name.startswith("C1-C4"):
+            i = i * c_buf / C_BUF_RB
+        parts["Schlaf: " + name] = i * DAY
+    n_meas = n_auto + N_MAN_RB
+    qm, _ = rb_meas_charge(case)
+    parts["Messung (TMP, Kette, CPU)"] = n_meas * sum(qm.values())
+    parts["Advertising 27.5 s"] = DAY / ADV_IV * adv_event_charge(s, pess)
+    parts["Schnelles Advertising nach Taste"] = N_MAN_RB * N_FAST_ADV * adv_event_charge(s, pess)
+    parts["Datensitzung je Messung"] = n_meas * conn_charge(s, pess)
+    parts["LED"] = I_LED * (n_auto * T_LED_AUTO + N_MAN_RB * T_LED_MAN + (T_LED_WATER if pess else 0.0))
+    parts["OTA 1/Jahr"] = ota_charge(s, pess) / YEAR_D
+    tot = sum(parts.values()) * (PESS_TOTAL if pess else 1.0)
+    return tot, parts
+
+
+def rb_lifetime_months(q_day, case):
+    cell = CELLS["CR2032 (Renata)"]
+    k = 0 if case == "real" else 1
+    cap = cell["cap"]
+    usable = cap * cell["util"][k] * CUTOFF_RB * mAh
+    sd_day = cap * cell["sd"][k] * mAh / YEAR_D
+    return usable / (q_day + sd_day) / MONTH_D
+
+
+def rb_pulse_drop(i, t, n=1, pause=0.0, r=R_CELL_EOL, c=C_BUF_RB * DCBIAS * 0.8):
+    """Einbruch an VDD (RC-Modell Zelle R_int + Puffer C_eff) fuer n Rechteckpulse i, Dauer t, Pause pause."""
+    import math
+    tau = r * c
+    dv = 0.0
+    worst = 0.0
+    for j in range(n):
+        dv = i * r + (dv - i * r) * math.exp(-t / tau)
+        worst = max(worst, dv)
+        if j + 1 < n:
+            dv *= math.exp(-pause / tau)
+    return worst
+
+
+def revb_report():
+    L = []
+    w = L.append
+    w("# fluidi Sensor Rev B - Energiebudget (erzeugt von scripts/energy_budget.py --revb)\n")
+    w("| | |\n|---|---|")
+    w("| Grundlage | Layout/Netzliste Rev B (`hardware/sensor/out/fluidi_sensor.net`), BOM `fluidi_sensor_bom_jlc.csv`, "
+      "PINMAP Rev B (FW-1..10), Firmware `firmware/sensor` (Einstellungen, Burst-Konstanten) |")
+    w("| Zelle | CR2032 225 mAh ([RC32] S.1 / [PAN] S.1), nutzbar real 90 % / pess 75 % (REQ-ENE-08) x 0.90 "
+      "(Abschaltung 2.4 V unter Last, E1) |")
+    w("| Faelle | **real** = Typwerte, DCDC; **pess. A** = REQ-ENE-08 (Typ x1.5, Ereignisse x1.5, +20 %), Teile ohne "
+      "Typwert mit ANNAHME; **pess. DS** = jedes Leck an der Datenblattgrenze (REQ-ENE-08 'Maximalwert', "
+      "Nachweisfall REQ-ENE-02) |")
+    w("| Profil | n automatische Messungen/Tag + 2 manuelle (REQ-ENE-04), Advertising 27.5 s (Reaktionszeit 1 min), "
+      "Datensitzung je Messung, LED L3/L1 (pess. + L8 12 h), OTA 1/Jahr |")
+    w("")
+    w("## 1 Ruhestrom (Schlaf, FW-8) je Bauteil [uA]\n")
+    w("| Bauteil / Pfad | real | pess. A | pess. DS | Quelle / Begruendung |")
+    w("|---|---|---|---|---|")
+    tot = [0.0, 0.0, 0.0]
+    for name, v in RB_SLEEP.items():
+        for j in range(3):
+            tot[j] += v[j]
+        w(f"| {name} | {v[0]*1e6:.3f} | {v[1]*1e6:.3f} | {v[2]*1e6:.3f} | {v[3]} |")
+    w(f"| **Summe Schlaf** | **{tot[0]*1e6:.2f}** | **{tot[1]*1e6:.2f}** | **{tot[2]*1e6:.2f}** | "
+      "REQ-ENE-09 Schlaf <= 3 uA (am Prototyp gemessen, ENERGIEMESSUNG E1) |")
+    w("")
+    w("## 2 Messung Rev B (je Messung, ohne Funk) [uC]\n")
+    qr, ir = rb_meas_charge("real")
+    qp, ip = rb_meas_charge("pessA")
+    w(f"Messkettenstrom (U2 + U4-U6, Cpd + Lasten + Sonde + Querstrom): real {ir*1e3:.1f} mA bei "
+      f"{F_OSC[0]/1e6:.1f} MHz, pess. {ip*1e3:.1f} mA bei {F_OSC[1]/1e6:.1f} MHz "
+      "(MESSKETTE_SALZ Kap. 5: 10.2 mA). Dazu CPU und R13 (30 uA) waehrend des Bursts.\n")
+    w("| Anteil | real | pess. (x1.5) |")
+    w("|---|---|---|")
+    for kk in qr:
+        w(f"| {kk} | {qr[kk]*1e6:.1f} | {qp[kk]*1e6:.1f} |")
+    w(f"| **Summe** | **{sum(qr.values())*1e6:.1f}** | **{sum(qp.values())*1e6:.1f}** |")
+    w("")
+    w("## 3 Tagesbudget und Laufzeit CR2032 (4 x 100 uF, D-013)\n")
+    w("| Messungen/Tag (auto + 2 manuell) | Fall | Mittelstrom [uA] | davon Schlaf [uA] | Laufzeit [Monate] | "
+      "Laufzeit [Jahre] | >= 12 Monate |")
+    w("|---|---|---|---|---|---|---|")
+    res = {}
+    for n in (4, 5, 6):
+        for case in ("real", "pessA", "pessDS"):
+            q, p = rb_daily(n, case)
+            sl = sum(v for kk, v in p.items() if kk.startswith("Schlaf")) / DAY * 1e6
+            m = rb_lifetime_months(q, case)
+            res[(n, case)] = m
+            ok = "ja" if m >= 12 else "**nein**"
+            w(f"| {n} + 2 | {case} | {q/DAY*1e6:.2f} | {sl:.2f} | {m:.1f} | {m/12:.1f} | {ok} |")
+    w("")
+    w("Laufzeiten ueber ca. 120 Monate sind rechnerisch; begrenzend ist dann die Lagerfaehigkeit/Alterung der Zelle "
+      "(kein Wert in [PAN]/[RC32], ANNAHME ~10 Jahre).")
+    w("")
+    w("### 3b Serienoption 2 x 100 uF (C3/C4 DNM, D-013)\n")
+    w("| Messungen/Tag | real | pess. A | pess. DS |")
+    w("|---|---|---|---|")
+    for n in (4, 5, 6):
+        row = [f"{rb_lifetime_months(rb_daily(n, c, 200e-6)[0], c):.1f}" for c in ("real", "pessA", "pessDS")]
+        w(f"| {n} + 2 | {row[0]} | {row[1]} | **{row[2]}** |")
+    w("")
+    w("### 3c Budgetanteile 6 + 2 Messungen/Tag (vor +20 %-Zuschlag) [mC/Tag]\n")
+    w("| Posten | real | pess. A | pess. DS |")
+    w("|---|---|---|---|")
+    ps = [rb_daily(6, c)[1] for c in ("real", "pessA", "pessDS")]
+    for kk in ps[0]:
+        w(f"| {kk} | {ps[0][kk]*1e3:.2f} | {ps[1][kk]*1e3:.2f} | {ps[2][kk]*1e3:.2f} |")
+    w("")
+    w("## 4 Pulslast (REQ-ENE-06: <= 0.2 V bei R_int 100 Ohm)\n")
+    c_eff = C_BUF_RB * DCBIAS * 0.8
+    w(f"RC-Modell: R_int {R_CELL_EOL:.0f} Ohm, C_eff = 4 x 100 uF x {DCBIAS} (DC-Bias, ANNAHME) x 0.8 (Toleranz) "
+      f"= {c_eff*1e6:.0f} uF, tau = {R_CELL_EOL*c_eff*1e3:.0f} ms. Vollstaendige Rechnung mit DCDC und "
+      "Ereignisformen: `simulation/spice/supply/supply_report.txt`.\n")
+    s = SOCS["CC2340R5"]
+    i_burst_p = ip + s["cpu_ldo"] + VDD_NOM / R_GATE
+    rows = [
+        ("Messung FW-2: 4 x 0.6 ms, Pause 30 ms (pess.)", i_burst_p, T_BURST, 4, 30e-3),
+        ("Messung ohne FW-2: 16 x 0.6 ms am Stueck (pess.)", i_burst_p, 16 * T_BURST, 1, 0.0),
+        ("TX 0 dBm GLDO, 3 Kanaele ~0.38 ms (pess.)", s["tx_ldo"], T_ADV_TX, 3, T_RX_WIN + T_CH),
+        ("LED 3 mA, 5 ms (L8)", I_LED, 5e-3, 1, 0.0),
+        ("LED 3 mA, 30 ms (L1)", I_LED, 30e-3, 1, 0.0),
+    ]
+    w("| Ereignis | Strom [mA] | Einbruch [mV] | <= 200 mV |")
+    w("|---|---|---|---|")
+    for name, i, t, n, pz in rows:
+        dv = rb_pulse_drop(i, t, n, pz)
+        w(f"| {name} | {i*1e3:.1f} | {dv*1e3:.0f} | {'ja' if dv <= 0.2 else '**nein**'} |")
+    w("")
+    w("Die LED-Ereignisse > 5 ms ueberschreiten 0.2 V bei 100 Ohm (wie SPICE): FW-4 (Pulse <= 5 ms mit Pausen, "
+      "Blink nur bei ausreichender Last-Spannung). Zelltemperatur: CR2032 -30...+85 C ([PAN] S.1); "
+      "Kapazitaet bei Kaelte nicht gesondert reduziert (Innenraum, ANNAHME), Innenwiderstand bei Kaelte ueber "
+      "R_int 100 Ohm EOL abgedeckt (REQ-ENE-06).")
+    w("")
+    w("## 5 Parameter (Auszug Rev B)\n")
+    w("| Schluessel | Wert | Einheit | Quelle |")
+    w("|---|---|---|---|")
+    for kk, (v, u, src) in PARAMS.items():
+        if kk.startswith("rb."):
+            vs = f"{v:.4g}" if isinstance(v, float) else str(v)
+            w(f"| {kk} | {vs} | {u} | {src} |")
+    return "\n".join(L) + "\n", res
+
+
 def main():
     if "--params" in sys.argv:
         print_params()
+        return
+    if "--revb" in sys.argv:
+        txt, _ = revb_report()
+        if "--out" in sys.argv:
+            path = sys.argv[sys.argv.index("--out") + 1]
+            with open(path, "w", encoding="utf-8") as fh:
+                fh.write(txt)
+            print(f"geschrieben: {path}")
+        else:
+            print(txt)
         return
     print("# fluidi Energiebudget - Ausgabe scripts/energy_budget.py\n")
     print(f"Sonnenprofil: Ruhestrom-Temperaturfaktor (Tagesmittel) = {SLEEP_TEMP_FACTOR:.3f}")
