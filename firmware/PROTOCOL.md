@@ -745,6 +745,8 @@ Ladung je Muster = 3 mA × Leuchtdauer (Obergrenze nach der 3-mA-Regel).
 | L16 | IDENTIFY (PWA „Sensor finden“) | Grün/Blau abwechselnd 200 ms, `seconds` lang | auf Befehl | ≤ 90 mC |
 | L17 | OTA erfolgreich bestätigt / Rückfall | Grün 3 × 50 ms / Rot 3 × 50 ms | einmalig | < 0.5 mC |
 
+**Ausgabe nach FW-4** (`docs/interfaces/PINMAP_SENSOR.md`, `core/fl_ui.c`): Jede Leuchtphase besteht aus Pulsen ≤ 5 ms mit ≥ 5 ms Pause (Software-Takt, Standby dazwischen; LGPT-PWM würde den Chip im Idle halten). Phasen ≤ 50 ms behalten die Lichtmenge (z. B. 30 ms → 6 × 5 ms in 55 ms, folgende Pause um 25 ms kürzer, gleiche Helligkeit); längere Phasen behalten die Dauer bei 50 % Tastgrad. Die Ladungen der Tabelle (3 mA × Leuchtdauer) gelten für Phasen ≤ 50 ms unverändert, für längere halbiert.
+
 Vorrang bei periodischen Anzeigen: Fehler > Batterie tief > Giessen nötig; pro Minute höchstens
 **eine** periodische Anzeige (REQ-UI-03: nicht häufiger als 1×/min). Keine LED in Unterspannung ausser
 auf Tastendruck (Rot 1 × 30 ms).
@@ -765,7 +767,7 @@ Zuständen auf und sind nicht Teil des Standardprofils.
 | 3 – 8 s (**lang**) | **Kopplungsmodus** (L4) | L12 bei Erreichen von 3 s; REQ-UI-04 lang |
 | 8 – 10 s | keine | Trennbereich |
 | ≥ 10 s (**sehr lang**) | Werkseinstellung **scharf** (L13), Ausführung nur, wenn innert 5 s nach dem Loslassen ein **kurzer** Druck folgt → L14 | REQ-UI-04 sehr lang; Bestätigung = REQ-UI-06 (Wasser/Anstossen erzeugt kein „lang–loslassen–kurz“) |
-| > 30 s ununterbrochen | **Taster klemmt**: Pull-up aus, Prüfung alle 60 s (Pull-up 1 ms ein), Fehler `0x53`, keine Aktion | Pull-up zieht gedrückt 39–109 µA (CONCEPTS 1, DS S. 31) |
+| > 30 s ununterbrochen | **Taster klemmt**: Pull-up aus, Prüfung alle 60 s (Pull-up 1 ms ein), Fehler `0x53`, keine Aktion | Pull-up zieht gedrückt bis **393 µA** (Rechenwert; DS `TI_CC2340R5_Datasheet_SWRS272F.pdf` S. 31: 39–109 µA bei VDDS 1.8 V, S. 32: 170–393 µA bei VDDS 3.8 V) → 30 s ≤ 11.8 mC |
 
 **Werkseinstellung** löscht: `K_link`, `gateway_id`, Einstellungen, Ringspeicher-Inhalt, Fehlerprotokoll.
 Behält: `seq`-Zähler, `boot_id`, Firmware. Danach ungekoppelt (kein Advertising).

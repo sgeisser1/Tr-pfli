@@ -104,8 +104,9 @@ bool fl_port_button_pressed(void)
 /* ======================= LED ======================= */
 void fl_port_led(uint8_t col, uint8_t level)
 {
-    /* aktiv low. PWM-Dimmung (led_level < 100) ueber LGPT0/1 ist noch nicht umgesetzt: offener Punkt FW-O3
-     * (Vorwiderstaende begrenzen bereits auf <= 3 mA bei 3.0 V). */
+    /* aktiv low. FW-4-Pulse (<= 5 ms an, >= 5 ms aus) erzeugt core/fl_ui.c im Software-Takt; dazwischen Standby.
+     * Keine LGPT-PWM: LGPT liegt im MCU-Bereich und laeuft im Standby nicht (TRM SWCU193A S.262 Kap. 6.4.5), PWM
+     * hielte den Chip im Idle (0.8 mA, DS S.19). Dimmung led_level < 100 weiterhin offen (FW-O3). */
     (void)level;
     GPIO_write(FLUIDI_DIO_LED_R, (col & 1) ? 0 : 1);
     GPIO_write(FLUIDI_DIO_LED_G, (col & 2) ? 0 : 1);

@@ -307,6 +307,54 @@ static void test_nvstore(void)
 }
 
 /* ---------------- LED / Taster ---------------- */
+/* FW-4: jedes Muster nur in Pulsen <= 5 ms mit >= 5 ms Pause; kurze Schritte (<= 50 ms) gleiche Lichtmenge,
+ * lange Schritte gleiche Dauer bei 50 % Tastgrad; Musterdauer der kurzen Muster hoechstens um die Verlaengerung laenger */
+static void led_run(fl_led_pattern_t p, uint32_t max_ms, uint32_t *lit, uint32_t *max_on, uint32_t *min_off, uint32_t *dur)
+{
+    fl_led_t l; fl_led_init(&l);
+    uint32_t t0 = 5000, run = 0, dark = 0; bool seen = false;
+    *lit = 0; *max_on = 0; *min_off = 0xFFFFFFFFu; *dur = 0;
+    fl_led_play(&l, p, t0, 2900, 0);
+    for (uint32_t ms = 0; ms < max_ms; ms++) {
+        fl_led_tick(&l, t0 + ms);
+        if (l.out) {
+            if (seen && dark && dark < *min_off) *min_off = dark;
+            seen = true; dark = 0; run++; (*lit)++; if (run > *max_on) *max_on = run;
+        } else { run = 0; if (seen) dark++; }
+        if (!fl_led_busy(&l)) { *dur = ms; break; }
+    }
+}
+
+static void test_led_fw4(void)
+{
+    puts("[ui] FW-4: LED-Pulse <= 5 ms, Pause >= 5 ms, Lichtmenge/Dauer");
+    static const struct { fl_led_pattern_t p; uint32_t lit, dur_max; } T[] = {
+        /* Lichtmenge [ms] wie PROTOCOL 10.2 (L12 100 ms: langer Schritt, 50 %); Dauer <= Original + Verlaengerung */
+        {FL_LED_L1_SENT, 60, 30 + 150 + 55},  {FL_LED_L2_BUFFERED, 30, 55}, {FL_LED_L3_HEARTBEAT, 20, 35},
+        {FL_LED_L8_WATER, 5, 5},              {FL_LED_L9_BATT_LOW, 20, 10 + 150 + 15},
+        {FL_LED_L10_ERROR, 30, 10 + 150 + 10 + 150 + 15}, {FL_LED_L12_3S, 50, 100},
+        {FL_LED_L11_UNPAIRED, 100, 50 + 150 + 95},        {FL_LED_L17_OTA_OK, 150, 50 + 100 + 50 + 100 + 95},
+    };
+    for (unsigned i = 0; i < sizeof T / sizeof T[0]; i++) {
+        uint32_t lit, mon, moff, dur;
+        led_run(T[i].p, 10000, &lit, &mon, &moff, &dur);
+        CHECK(mon <= FL_LED_PULSE_MS);
+        CHECK(moff >= FL_LED_PAUSE_MS || moff == 0xFFFFFFFFu);
+        CHECK(lit == T[i].lit);
+        CHECK(dur > 0 && dur <= T[i].dur_max);
+    }
+    /* lange Schritte: Dauer gleich, 50 % Tastgrad (L6 Gruen 1 s, L14 Rot 1 s, L7 Rot 3 x 100 ms) */
+    uint32_t lit, mon, moff, dur;
+    led_run(FL_LED_L6_CONNECTED, 5000, &lit, &mon, &moff, &dur);
+    CHECK(mon <= 5 && moff >= 5 && lit == 500 && dur == 1000);
+    led_run(FL_LED_L7_PAIR_FAIL, 5000, &lit, &mon, &moff, &dur);
+    CHECK(mon <= 5 && moff >= 5 && lit == 150 && dur == 500);
+    /* Statistik led_ms zaehlt die tatsaechliche Leuchtzeit */
+    fl_led_t l; fl_led_init(&l); fl_led_play(&l, FL_LED_L1_SENT, 0, 2900, 0);
+    for (uint32_t ms = 0; ms < 400; ms++) fl_led_tick(&l, ms);
+    CHECK(l.on_ms_total == 60);
+}
+
 static void test_ui(void)
 {
     fl_led_t l;
@@ -316,14 +364,15 @@ static void test_ui(void)
     CHECK(fl_led_play(&l, FL_LED_L1_SENT, t, 2900, 0));
     uint32_t on = 0;
     for (uint32_t ms = 0; ms < 400; ms++) { fl_led_tick(&l, t + ms); if (l.out) { on++; CHECK(l.out == FL_COL_GREEN); } }
-    CHECK(on == 60 && !fl_led_busy(&l));                                     /* 2 x 30 ms */
+    CHECK(on == 60 && !fl_led_busy(&l));                                     /* 2 x 30 ms Lichtmenge (FW-4 gepulst) */
     fl_led_play(&l, FL_LED_L8_WATER, t, 2900, 0); fl_led_tick(&l, t); CHECK(l.out == FL_COL_BLUE);
     fl_led_play(&l, FL_LED_L8_WATER, t, 2600, 0); fl_led_tick(&l, t); CHECK(l.out == FL_COL_YELLOW);   /* schwache Zelle */
     fl_led_tick(&l, t + 5); CHECK(l.out == FL_COL_OFF);                       /* FW-4: Puls <= 5 ms */
     CHECK(!fl_led_play(&l, FL_LED_L3_HEARTBEAT, t, 2350, 0));                /* Unterspannung: keine LED */
     CHECK(fl_led_play(&l, FL_LED_UV_BTN, t, 2350, 0));
     fl_led_play(&l, FL_LED_L4_PAIRING, t, 2900, 0);
-    on = 0; { uint8_t prev = 0; for (uint32_t ms = 0; ms < 130000; ms += 10) { fl_led_tick(&l, t + ms); if (l.out && !prev) on++; prev = l.out; } }
+    on = 0; { uint32_t dark = 1000; for (uint32_t ms = 0; ms < 130000; ms++) { fl_led_tick(&l, t + ms);
+        if (l.out) { if (dark >= 20) on++; dark = 0; } else dark++; } }       /* Blinkgruppe = Licht nach >= 20 ms dunkel */
     CHECK(!fl_led_busy(&l) && on >= 119 && on <= 121);                       /* 1 Hz waehrend 120 s */
     uint8_t d[5] = {0, 1, 2, 2, 0};
     fl_led_play_sas(&l, d, t, 60000);
@@ -781,6 +830,7 @@ int main(void)
     test_meas();
     test_ringlog();
     test_nvstore();
+    test_led_fw4();
     test_ui();
     test_ota();
     test_app();

@@ -39,15 +39,15 @@ Messkettenstrom (U2 + U4-U6, Cpd + Lasten + Sonde + Querstrom): real 7.3 mA bei 
 
 | Messungen/Tag (auto + 2 manuell) | Fall | Mittelstrom [uA] | davon Schlaf [uA] | Laufzeit [Monate] | Laufzeit [Jahre] | >= 12 Monate |
 |---|---|---|---|---|---|---|
-| 4 + 2 | real | 1.66 | 1.03 | 130.2 | 10.9 | ja |
-| 4 + 2 | pessA | 5.46 | 2.84 | 34.8 | 2.9 | ja |
-| 4 + 2 | pessDS | 22.24 | 16.81 | 9.2 | 0.8 | **nein** |
+| 4 + 2 | real | 1.66 | 1.03 | 130.2 | 10.8 | ja |
+| 4 + 2 | pessA | 5.48 | 2.84 | 34.7 | 2.9 | ja |
+| 4 + 2 | pessDS | 22.25 | 16.81 | 9.1 | 0.8 | **nein** |
 | 5 + 2 | real | 1.67 | 1.03 | 129.9 | 10.8 | ja |
-| 5 + 2 | pessA | 5.48 | 2.84 | 34.7 | 2.9 | ja |
-| 5 + 2 | pessDS | 22.25 | 16.81 | 9.1 | 0.8 | **nein** |
-| 6 + 2 | real | 1.67 | 1.03 | 129.6 | 10.8 | ja |
-| 6 + 2 | pessA | 5.49 | 2.84 | 34.6 | 2.9 | ja |
-| 6 + 2 | pessDS | 22.27 | 16.81 | 9.1 | 0.8 | **nein** |
+| 5 + 2 | pessA | 5.50 | 2.84 | 34.6 | 2.9 | ja |
+| 5 + 2 | pessDS | 22.27 | 16.81 | 9.1 | 0.8 | **nein** |
+| 6 + 2 | real | 1.67 | 1.03 | 129.5 | 10.8 | ja |
+| 6 + 2 | pessA | 5.51 | 2.84 | 34.6 | 2.9 | ja |
+| 6 + 2 | pessDS | 22.28 | 16.81 | 9.1 | 0.8 | **nein** |
 
 Laufzeiten ueber ca. 120 Monate sind rechnerisch; begrenzend ist dann die Lagerfaehigkeit/Alterung der Zelle (kein Wert in [PAN]/[RC32], ANNAHME ~10 Jahre).
 
@@ -55,9 +55,9 @@ Laufzeiten ueber ca. 120 Monate sind rechnerisch; begrenzend ist dann die Lagerf
 
 | Messungen/Tag | real | pess. A | pess. DS |
 |---|---|---|---|
-| 4 + 2 | 137.4 | 36.7 | **13.4** |
-| 5 + 2 | 137.0 | 36.6 | **13.4** |
-| 6 + 2 | 136.7 | 36.5 | **13.4** |
+| 4 + 2 | 137.3 | 36.6 | **13.4** |
+| 5 + 2 | 137.0 | 36.5 | **13.4** |
+| 6 + 2 | 136.6 | 36.4 | **13.3** |
 
 ### 3c Budgetanteile 6 + 2 Messungen/Tag (vor +20 %-Zuschlag) [mC/Tag]
 
@@ -77,7 +77,7 @@ Laufzeiten ueber ca. 120 Monate sind rechnerisch; begrenzend ist dann die Lagerf
 | Advertising 27.5 s | 50.76 | 128.40 | 128.40 |
 | Schnelles Advertising nach Taste | 0.65 | 1.63 | 1.63 |
 | Datensitzung je Messung | 2.39 | 6.14 | 6.14 |
-| LED | 0.72 | 11.52 | 11.52 |
+| LED | 0.77 | 12.72 | 12.72 |
 | OTA 1/Jahr | 0.56 | 0.59 | 0.59 |
 
 ## 4 Pulslast (REQ-ENE-06: <= 0.2 V bei R_int 100 Ohm)
@@ -90,9 +90,12 @@ RC-Modell: R_int 100 Ohm, C_eff = 4 x 100 uF x 0.5 (DC-Bias, ANNAHME) x 0.8 (Tol
 | Messung ohne FW-2: 16 x 0.6 ms am Stueck (pess.) | 14.5 | 654 | **nein** |
 | TX 0 dBm GLDO, 3 Kanaele ~0.38 ms (pess.) | 9.0 | 60 | ja |
 | LED 3 mA, 5 ms (L8) | 3.0 | 81 | ja |
-| LED 3 mA, 30 ms (L1) | 3.0 | 254 | **nein** |
+| LED 3 mA, 30 ms am Stueck (ohne FW-4) | 3.0 | 254 | **nein** |
+| LED L1 nach FW-4: 6 x 5 ms, Pause 5 ms | 3.0 | 169 | ja |
+| LED 1 s (L6/L14) nach FW-4: 100 x 5 ms, Pause 5 ms | 3.0 | 173 | ja |
+| LED Blau 3.5 mA (nur bei VDD > 3.1 V, frische Zelle) 100 x 5 ms, mit R_int 100 Ohm gerechnet | 3.5 | 202 | **nein** |
 
-Die LED-Ereignisse > 5 ms ueberschreiten 0.2 V bei 100 Ohm (wie SPICE): FW-4 (Pulse <= 5 ms mit Pausen, Blink nur bei ausreichender Last-Spannung). Zelltemperatur: CR2032 -30...+85 C ([PAN] S.1); Kapazitaet bei Kaelte nicht gesondert reduziert (Innenraum, ANNAHME), Innenwiderstand bei Kaelte ueber R_int 100 Ohm EOL abgedeckt (REQ-ENE-06).
+LED nach FW-4 (core/fl_ui.c): Pulse <= 5 ms, Pause >= 5 ms. Schritte <= 50 ms behalten die Lichtmenge (gleiche Helligkeit, Folge laenger), laengere Schritte die Dauer bei 50 % Tastgrad. Software-Takt statt LGPT-PWM: PWM haelt den Chip im Idle (0.8 mA, [CC] S.19), fuer L1 188 uC zusaetzlich; Software-Takt 24 Flanken x 0.52 uC = 12 uC (LED selbst 180 uC). Ohne FW-4 ueberschreiten LED-Ereignisse > 5 ms 0.2 V bei 100 Ohm (wie SPICE). Zelltemperatur: CR2032 -30...+85 C ([PAN] S.1); Kapazitaet bei Kaelte nicht gesondert reduziert (Innenraum, ANNAHME), Innenwiderstand bei Kaelte ueber R_int 100 Ohm EOL abgedeckt (REQ-ENE-06).
 
 ## 5 Parameter (Auszug Rev B)
 
@@ -144,6 +147,9 @@ Die LED-Ereignisse > 5 ms ueberschreiten 0.2 V bei 100 Ohm (wie SPICE): FW-4 (Pu
 | rb.led_l3 | 0.02 | s | PROTOCOL 10.2 L3 Gruen 1 x 20 ms je automatischer Messung (heartbeat_led = 1) |
 | rb.led_l1 | 0.06 | s | PROTOCOL 10.2 L1 Gruen 2 x 30 ms je Tastendruck |
 | rb.led_l8 | 3.6 | s/Tag | PROTOCOL 10.2 L8 1/min x 5 ms, 12 h (nur pess.) |
+| rb.led_pulse | 0.005 | s | FW-4 / core/fl_ui.c FL_LED_PULSE_MS (Pause FL_LED_PAUSE_MS gleich) |
+| rb.q_led_wake | 5.2e-07 | C | ANNAHME je Schaltflanke: Wecken aus Standby + fl_app_process 0.2 ms bei CPU 2.6 mA ([CC] S.19) |
+| rb.t_pwm_l1 | 0.235 | s | Vergleich LGPT-PWM: Idle waehrend L1 (Pulsfolgen 2 x 55 ms + Pause), LGPT im MCU-Bereich, im Standby aus (TRM SWCU193A S.262 Kap. 6.4.5) |
 | rb.n_man | 2 | 1/Tag | REQ-ENE-04 Standardprofil |
 | rb.c_buf | 0.0004 | F | D-013 Prototyp 4 x 100 uF (C1-C4) |
 | rb.cutoff | 0.9 | - | concept_energy.py CUTOFF_FACTOR: Abschaltung 2.4 V unter Last (E1, FW-5), [PAN] S.1 Entladekurve abgelesen |

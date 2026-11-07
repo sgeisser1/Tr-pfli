@@ -420,6 +420,12 @@ I_LED = P("rb.i_led", 3e-3, "A", "FW-4 / PROTOCOL 10.1 Obergrenze 3 mA (Rechnung
 T_LED_AUTO = P("rb.led_l3", 20e-3, "s", "PROTOCOL 10.2 L3 Gruen 1 x 20 ms je automatischer Messung (heartbeat_led = 1)")
 T_LED_MAN = P("rb.led_l1", 2 * 30e-3, "s", "PROTOCOL 10.2 L1 Gruen 2 x 30 ms je Tastendruck")
 T_LED_WATER = P("rb.led_l8", 12 * 60 * 5e-3, "s/Tag", "PROTOCOL 10.2 L8 1/min x 5 ms, 12 h (nur pess.)")
+LED_PULSE = P("rb.led_pulse", 5e-3, "s", "FW-4 / core/fl_ui.c FL_LED_PULSE_MS (Pause FL_LED_PAUSE_MS gleich)")
+Q_LED_WAKE = P("rb.q_led_wake", 0.2e-3 * 2.6e-3, "C",
+               "ANNAHME je Schaltflanke: Wecken aus Standby + fl_app_process 0.2 ms bei CPU 2.6 mA ([CC] S.19)")
+T_IDLE_PWM_L1 = P("rb.t_pwm_l1", 2 * 55e-3 + 125e-3, "s",
+                  "Vergleich LGPT-PWM: Idle waehrend L1 (Pulsfolgen 2 x 55 ms + Pause), LGPT im MCU-Bereich, "
+                  "im Standby aus (TRM SWCU193A S.262 Kap. 6.4.5)")
 N_MAN_RB = P("rb.n_man", 2, "1/Tag", "REQ-ENE-04 Standardprofil")
 C_BUF_RB = P("rb.c_buf", 4 * 100e-6, "F", "D-013 Prototyp 4 x 100 uF (C1-C4)")
 CUTOFF_RB = P("rb.cutoff", 0.90, "-", "concept_energy.py CUTOFF_FACTOR: Abschaltung 2.4 V unter Last (E1, FW-5), "
@@ -442,7 +448,9 @@ def rb_daily(n_auto, case, c_buf=C_BUF_RB):
     parts["Advertising 27.5 s"] = DAY / ADV_IV * adv_event_charge(s, pess)
     parts["Schnelles Advertising nach Taste"] = N_MAN_RB * N_FAST_ADV * adv_event_charge(s, pess)
     parts["Datensitzung je Messung"] = n_meas * conn_charge(s, pess)
-    parts["LED"] = I_LED * (n_auto * T_LED_AUTO + N_MAN_RB * T_LED_MAN + (T_LED_WATER if pess else 0.0))
+    t_led = n_auto * T_LED_AUTO + N_MAN_RB * T_LED_MAN + (T_LED_WATER if pess else 0.0)
+    n_edges = 2 * (n_auto * T_LED_AUTO + N_MAN_RB * T_LED_MAN + (T_LED_WATER if pess else 0.0)) / LED_PULSE
+    parts["LED"] = I_LED * t_led + n_edges * Q_LED_WAKE * (PESS_EVENT if pess else 1.0)
     parts["OTA 1/Jahr"] = ota_charge(s, pess) / YEAR_D
     tot = sum(parts.values()) * (PESS_TOTAL if pess else 1.0)
     return tot, parts
@@ -552,7 +560,10 @@ def revb_report():
         ("Messung ohne FW-2: 16 x 0.6 ms am Stueck (pess.)", i_burst_p, 16 * T_BURST, 1, 0.0),
         ("TX 0 dBm GLDO, 3 Kanaele ~0.38 ms (pess.)", s["tx_ldo"], T_ADV_TX, 3, T_RX_WIN + T_CH),
         ("LED 3 mA, 5 ms (L8)", I_LED, 5e-3, 1, 0.0),
-        ("LED 3 mA, 30 ms (L1)", I_LED, 30e-3, 1, 0.0),
+        ("LED 3 mA, 30 ms am Stueck (ohne FW-4)", I_LED, 30e-3, 1, 0.0),
+        ("LED L1 nach FW-4: 6 x 5 ms, Pause 5 ms", I_LED, LED_PULSE, 6, LED_PULSE),
+        ("LED 1 s (L6/L14) nach FW-4: 100 x 5 ms, Pause 5 ms", I_LED, LED_PULSE, 100, LED_PULSE),
+        ("LED Blau 3.5 mA (nur bei VDD > 3.1 V, frische Zelle) 100 x 5 ms, mit R_int 100 Ohm gerechnet", 3.5e-3, LED_PULSE, 100, LED_PULSE),
     ]
     w("| Ereignis | Strom [mA] | Einbruch [mV] | <= 200 mV |")
     w("|---|---|---|---|")
@@ -560,8 +571,12 @@ def revb_report():
         dv = rb_pulse_drop(i, t, n, pz)
         w(f"| {name} | {i*1e3:.1f} | {dv*1e3:.0f} | {'ja' if dv <= 0.2 else '**nein**'} |")
     w("")
-    w("Die LED-Ereignisse > 5 ms ueberschreiten 0.2 V bei 100 Ohm (wie SPICE): FW-4 (Pulse <= 5 ms mit Pausen, "
-      "Blink nur bei ausreichender Last-Spannung). Zelltemperatur: CR2032 -30...+85 C ([PAN] S.1); "
+    w("LED nach FW-4 (core/fl_ui.c): Pulse <= 5 ms, Pause >= 5 ms. Schritte <= 50 ms behalten die Lichtmenge "
+      "(gleiche Helligkeit, Folge laenger), laengere Schritte die Dauer bei 50 % Tastgrad. Software-Takt statt LGPT-PWM: "
+      f"PWM haelt den Chip im Idle ({I_IDLE[0]*1e3:.1f} mA, [CC] S.19), fuer L1 "
+      f"{T_IDLE_PWM_L1*I_IDLE[0]*1e6:.0f} uC zusaetzlich; Software-Takt 24 Flanken x {Q_LED_WAKE*1e6:.2f} uC = "
+      f"{24*Q_LED_WAKE*1e6:.0f} uC (LED selbst {I_LED*T_LED_MAN*1e6:.0f} uC). "
+      "Ohne FW-4 ueberschreiten LED-Ereignisse > 5 ms 0.2 V bei 100 Ohm (wie SPICE). Zelltemperatur: CR2032 -30...+85 C ([PAN] S.1); "
       "Kapazitaet bei Kaelte nicht gesondert reduziert (Innenraum, ANNAHME), Innenwiderstand bei Kaelte ueber "
       "R_int 100 Ohm EOL abgedeckt (REQ-ENE-06).")
     w("")

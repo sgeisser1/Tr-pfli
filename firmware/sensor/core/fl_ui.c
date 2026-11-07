@@ -63,7 +63,7 @@ bool fl_led_play(fl_led_t *l, fl_led_pattern_t p, uint32_t now_ms, uint16_t vdd_
     uint8_t n = pt->n > 4 ? 4 : pt->n;
     for (uint8_t i = 0; i < n; i++) { l->buf[i] = pt->s[i]; l->buf[i].col = map_col(pt->s[i].col, vdd_mv); }
     if (p == FL_LED_L16_IDENTIFY && vdd_mv < VDD_BLUE_MIN_MV) l->buf[1].col = FL_COL_OFF;
-    l->steps = l->buf; l->n = n; l->idx = 0; l->on = false;
+    l->steps = l->buf; l->n = n; l->idx = 0; l->on = false; l->lit = false;
     l->repeats = pt->repeats; l->gap_ms = pt->gap;
     uint16_t lim = duration_s ? duration_s : pt->limit_s;
     l->t_end = lim ? now_ms + lim * 1000u : 0;
@@ -76,7 +76,7 @@ void fl_led_play_sas(fl_led_t *l, const uint8_t d[5], uint32_t now_ms, uint32_t 
     static const uint8_t cmap[3] = {FL_COL_RED, FL_COL_GREEN, FL_COL_YELLOW};
     for (int i = 0; i < 5; i++) { l->sas[i].col = cmap[d[i] % 3]; l->sas[i].on_ms = 300; l->sas[i].off_ms = 300; }
     l->sas[4].off_ms = 2000;                       /* Wiederholung nach 2 s */
-    l->steps = l->sas; l->n = 5; l->idx = 0; l->on = false;
+    l->steps = l->sas; l->n = 5; l->idx = 0; l->on = false; l->lit = false;
     l->repeats = 0xFFFF; l->gap_ms = 0;
     l->t_end = now_ms + max_ms; l->t_next = now_ms; l->active = FL_LED_L5_SAS; l->out = FL_COL_OFF;
 }
@@ -84,23 +84,44 @@ void fl_led_play_sas(fl_led_t *l, const uint8_t d[5], uint32_t now_ms, uint32_t 
 void fl_led_stop(fl_led_t *l) { l->steps = NULL; l->active = FL_LED_NONE; l->out = FL_COL_OFF; l->t_next = 0; }
 bool fl_led_busy(const fl_led_t *l) { return l->steps != NULL; }
 
+/* Beginn eines Schritts: Dauer der Pulsfolge und Restpause bestimmen (FW-4, siehe fl_ui.h) */
+static void step_begin(fl_led_t *l, const fl_led_step_t *s)
+{
+    uint32_t span = s->on_ms, ext = 0;
+    if (s->col && s->on_ms && s->on_ms <= FL_LED_BLOCH_MS) {
+        uint32_t n = (s->on_ms + FL_LED_PULSE_MS - 1u) / FL_LED_PULSE_MS;         /* Pulse fuer gleiche Lichtmenge */
+        span = s->on_ms + (n - 1u) * FL_LED_PAUSE_MS;                           /* letzter Puls ggf. kuerzer */
+        ext = span - s->on_ms;
+    }
+    l->span_end = l->t_next + span;
+    l->off_eff = (uint16_t)(s->off_ms > ext ? s->off_ms - ext : (s->off_ms ? FL_LED_PAUSE_MS : 0u));
+    l->on = true; l->lit = false;
+}
+
 uint32_t fl_led_tick(fl_led_t *l, uint32_t now)
 {
     if (!l->steps) return 0;
     if (l->t_end && (int32_t)(now - l->t_end) >= 0) { fl_led_stop(l); return 0; }
     while (l->steps && (int32_t)(now - l->t_next) >= 0) {
         const fl_led_step_t *s = &l->steps[l->idx];
-        if (!l->on) {
-            l->on = true; l->out = s->col; l->t_next += s->on_ms;
-            if (s->col) l->on_ms_total += s->on_ms;
-        } else {
-            l->on = false; l->out = FL_COL_OFF; l->t_next += s->off_ms;
+        if (!l->on) { step_begin(l, s); continue; }
+        if ((int32_t)(l->t_next - l->span_end) >= 0 || !s->col) {
+            if (!s->col) l->t_next = l->span_end;                               /* Schritt "aus" */
+            l->on = false; l->lit = false; l->out = FL_COL_OFF; l->t_next += l->off_eff;
             if (++l->idx >= l->n) {
                 l->idx = 0;
                 if (l->repeats == 0) { fl_led_stop(l); return 0; }
                 if (l->repeats != 0xFFFF) l->repeats--;
                 l->t_next += l->gap_ms;
             }
+        } else if (!l->lit) {
+            uint32_t e = l->t_next + FL_LED_PULSE_MS;
+            if ((int32_t)(e - l->span_end) > 0) e = l->span_end;
+            l->lit = true; l->out = s->col; l->on_ms_total += e - l->t_next; l->t_next = e;
+        } else {
+            uint32_t e = l->t_next + FL_LED_PAUSE_MS;
+            if ((int32_t)(e - l->span_end) > 0) e = l->span_end;
+            l->lit = false; l->out = FL_COL_OFF; l->t_next = e;
         }
     }
     return l->steps ? l->t_next : 0;

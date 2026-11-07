@@ -114,3 +114,32 @@ Nach der Aenderung von `fluidi_board.h` neu gebaut und geprueft (gleiches Ergebn
 - `firmware/sensor/tools/check_config.py` – Netzlisten-/Datenblatt-Abgleich in `check-pins`
 - `docs/manuals/ENERGIEMESSUNG.md` – Erwartungen E1, E2, E5 auf Rev B, Schritt 5 (`rb.*`)
 - `firmware/sensor/build/` – neu gebaut (nicht versioniert)
+
+## 6 Nachtrag (Auftrag Projektleitung): EP-2 und EP-3 umgesetzt
+
+**EP-2 – LED nach FW-4 (`core/fl_ui.c`, `core/fl_ui.h`):** Jede Leuchtphase besteht aus Pulsen ≤ 5 ms mit ≥ 5 ms Pause.
+- Wahl **Software-Takt** statt LGPT-PWM: LGPT liegt im MCU-Bereich, der im Standby abgeschaltet ist
+  (`TI_CC23xx_TechnicalReferenceManual_SWCU193A.pdf` S.262 Kap. 6.4.5). PWM hielte den Chip die ganze Phase im Idle
+  (0.8 mA, DS S.19): fuer L1 +188 µC bei 180 µC LED-Ladung. Software-Takt: Standby zwischen den Flanken,
+  24 Flanken × ≈ 0.5 µC (ANNAHME) ≈ 12 µC.
+- Pause 5 ms: RC-Modell (100 Ω, 160 µF) 5/5 ms Dauerfolge 173 mV bei 3 mA (≤ 0.2 V); 5/3 ms 205 mV, 5/2 ms 227 mV.
+- Helligkeit: Phasen ≤ 50 ms (L1, L2, L3, L4, L8, L9, L10, L11-Gelb, L13-gedimmt, L17, UV) behalten die
+  **Lichtmenge** (Summe der Pulse = alte Leuchtdauer); das Auge summiert so kurze Blitze zeitlich
+  (ANNAHME kritische Dauer ≥ 50 ms) → gleiche wahrgenommene Helligkeit. Die Folge wird laenger (30 ms → 55 ms),
+  die folgende Pause entsprechend kuerzer, der Rhythmus der Muster bleibt. Phasen > 50 ms (L5 300 ms, L6/L14 1 s,
+  L7/L10B/L11-Rot/L12/L13 100 ms, L11-Gruen/L15/L16 200 ms) behalten die **Dauer** bei 50 % Tastgrad: die
+  Leuchtdichte halbiert sich. **Gleiche Helligkeit ist dort mit den festen Vorwiderstaenden und FW-4 physikalisch nicht
+  moeglich** (Spitzenstrom fest, Tastgrad ≤ 50 %); wahrgenommen ≈ 70–80 % (ANNAHME Potenzgesetz Exponent 0.33–0.5).
+  Alternativen: Vorwiderstaende verkleinern (Spitzenstrom ↑, Einbruch ↑) oder Abweichung akzeptieren – Entscheid
+  Projektleitung. PROTOTYP-PRUEFUNG E6.
+- Tests: `test_led_fw4` (alle kurzen Muster: Puls ≤ 5 ms, Pause ≥ 5 ms, Lichtmenge exakt, Dauer ≤ alt + Verlaengerung;
+  L6/L7 Dauer gleich, 50 %; Statistik `led_ms` = tatsaechliche Leuchtzeit); L4-Test zaehlt Blinkgruppen.
+- Energie: LED-Tagesladung real 0.72 → 0.77 mC (Weckflanken), pess. 12.7 mC; Laufzeiten unveraendert bis auf
+  Rundung (6 + 2: 129.5 / 34.6 / 9.1 Mt.; 2 × 100 µF pess. DS 13.3 Mt.). Einbruch L1 254 → 169 mV, 1 s-Phase 173 mV.
+  `ENERGIE_REV_B.md` Kap. 4 neu erzeugt.
+
+**EP-3:** PINMAP (DIO16, DIO21) und PROTOCOL 10.3 nennen den Pull-up-Strom jetzt mit DS S.31 (39–109 µA @1.8 V) und
+S.32 (170–393 µA @3.8 V), Rechenwert 393 µA. Noch alt: `docs/concepts/CONCEPTS.md` Z. 68 (Phase-2-Dokument, nicht geaendert).
+
+**Build/Tests nach Umsetzung:** `make clean && make` 0 Fehler (nur #10325), Slot 0 206 948 B (90 %), Slot 1 207 381 B
+(90 %), RAM 33 666 B (91 %); `make check` Layout/Pins ok, 1542 C-Pruefungen bestanden, 17 + 3 Python-Tests ok.

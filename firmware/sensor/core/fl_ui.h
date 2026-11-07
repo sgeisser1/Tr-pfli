@@ -20,6 +20,14 @@ typedef enum {
     FL_LED_COUNT
 } fl_led_pattern_t;
 
+/* FW-4 (PINMAP Rev B): LED nur in Pulsen <= 5 ms mit >= 5 ms Pause (Software-Takt, Standby dazwischen).
+ * Schritte bis FL_LED_BLOCH_MS: gleiche Lichtmenge (Summe der Pulse = on_ms, Folge laenger, Pause danach kuerzer)
+ * -> gleiche wahrgenommene Helligkeit (Zeitsummation des Auges, ANNAHME kritische Dauer >= 50 ms).
+ * Laengere Schritte: gleiche Dauer, Tastgrad 50 %. */
+#define FL_LED_PULSE_MS 5u
+#define FL_LED_PAUSE_MS 5u
+#define FL_LED_BLOCH_MS 50u
+
 typedef struct {
     uint8_t  col;
     uint16_t on_ms;
@@ -29,7 +37,10 @@ typedef struct {
 typedef struct {
     const fl_led_step_t *steps;
     uint8_t  n, idx;
-    bool     on;
+    bool     on;             /* Schritt in der Leuchtphase (Pulsfolge laeuft) */
+    bool     lit;            /* LED gerade an (Puls <= FL_LED_PULSE_MS, FW-4) */
+    uint16_t off_eff;        /* Pause nach der Pulsfolge (um die Verlaengerung gekuerzt) */
+    uint32_t span_end;       /* Ende der Pulsfolge des aktuellen Schritts */
     uint16_t repeats;        /* verbleibende Wiederholungen (0xFFFF = bis Stopp) */
     uint16_t gap_ms;         /* Pause zwischen Wiederholungen */
     uint32_t t_next;         /* naechster Schaltzeitpunkt */
