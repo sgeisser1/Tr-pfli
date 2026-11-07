@@ -36,6 +36,10 @@ def main():
                 continue
             actual.setdefault(ref, {})[pin] = name
     want = json.load(open(os.path.join(HERE, "intended_netlist.json")))
+    # Symbole "nicht auf Platine" fehlen in der exportierten Netzliste: E1 (Sonde = Innenlagen-Zonen im Layout,
+    # Netze PROBE_SENSE/GND dort ueber Zonen; gen_pcb.py)
+    for ref in ("E1",):
+        want.pop(ref, None)
     errs = []
     for ref, pins in want.items():
         for pin, netname in pins.items():

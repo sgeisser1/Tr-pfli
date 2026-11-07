@@ -165,7 +165,7 @@ def sym_antenna():
     pins = [pin("passive", -5.08, 0, 0, "FEED", "1"), pin("passive", 0, -5.08, 90, "GND", "2")]
     # Leitung FEED -> Antennenfuss
     g.append(polyline([(-2.54, 0), (0, 0)]))
-    return symbol("ANT_IFA_AN043", "AE", "AN043_IFA", "RF_Antenna:Texas_SWRA117D_2.4GHz_Left",
+    return symbol("ANT_IFA_AN043", "AE", "AN043_IFA", "RF_Antenna:Texas_SWRA117D_2.4GHz_Right",
                   "docs/appnotes/TI_AN043_SmallPCBAntenna_SWRA117D.pdf",
                   "PCB-Antenne (Leiterbahn) nach TI AN043; Platzhalter-Footprint, Geometrie im Layout pruefen",
                   g, pins)

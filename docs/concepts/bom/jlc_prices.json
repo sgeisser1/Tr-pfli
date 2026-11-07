@@ -73,6 +73,43 @@
    ]
   ]
  },
+ "C11702": {
+  "brand": "UNI-ROYAL(Uniroyal Elec)",
+  "describe": "-55℃~+155℃ 1kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+  "least": 20,
+  "library": "base",
+  "loss": 10,
+  "model": "0402WGF1001TCE",
+  "package": "0402",
+  "preferred": false,
+  "stock": 33763989,
+  "tiers": [
+   [
+    1,
+    0.0013
+   ],
+   [
+    1000,
+    0.0011
+   ],
+   [
+    3000,
+    0.001
+   ],
+   [
+    10000,
+    0.0009
+   ],
+   [
+    50000,
+    0.0009
+   ],
+   [
+    50200,
+    0.0009
+   ]
+  ]
+ },
  "C148209": {
   "brand": "Littelfuse",
   "describe": "-65℃~+150℃ 12.3A@10/1000us 1uA 20V 24.5V 32.4V 400W@10/1000us IEC 61000-4-2 TVS Unidirectional DO-214AC(SMA) ESD and Surge Protection (TVS/ESD) ROHS",
@@ -119,23 +156,23 @@
   "model": "CL31A107MQHNNNE",
   "package": "1206",
   "preferred": false,
-  "stock": 1603434,
+  "stock": 1598455,
   "tiers": [
    [
     1,
-    0.1091
+    0.109
    ],
    [
     100,
-    0.086
+    0.0859
    ],
    [
     300,
-    0.0742
+    0.0741
    ],
    [
     2000,
-    0.0644
+    0.0643
    ],
    [
     4000,
@@ -143,7 +180,7 @@
    ],
    [
     10000,
-    0.0587
+    0.0586
    ]
   ]
  },
@@ -156,11 +193,11 @@
   "model": "AO3401A",
   "package": "SOT-23",
   "preferred": false,
-  "stock": 1701682,
+  "stock": 1677333,
   "tiers": [
    [
     1,
-    0.0829
+    0.0828
    ],
    [
     50,
@@ -168,15 +205,15 @@
    ],
    [
     150,
-    0.0567
+    0.0566
    ],
    [
     500,
-    0.0495
+    0.0494
    ],
    [
     3000,
-    0.0469
+    0.0468
    ],
    [
     6000,
@@ -193,7 +230,7 @@
   "model": "CL05B104KO5NNNC",
   "package": "0402",
   "preferred": false,
-  "stock": 34703955,
+  "stock": 34323347,
   "tiers": [
    [
     1,
@@ -267,7 +304,7 @@
   "model": "0402CG150J500NT",
   "package": "0402",
   "preferred": false,
-  "stock": 1220594,
+  "stock": 1205885,
   "tiers": [
    [
     1,
@@ -304,7 +341,7 @@
   "model": "0402CG1R5C500NT",
   "package": "0402",
   "preferred": true,
-  "stock": 171054,
+  "stock": 170449,
   "tiers": [
    [
     1,
@@ -341,11 +378,11 @@
   "model": "CL05A106MQ5NUNC",
   "package": "0402",
   "preferred": false,
-  "stock": 9187111,
+  "stock": 9180890,
   "tiers": [
    [
     1,
-    0.0258
+    0.0257
    ],
    [
     1000,
@@ -378,7 +415,7 @@
   "model": "0402CG220J500NT",
   "package": "0402",
   "preferred": false,
-  "stock": 1720386,
+  "stock": 1709165,
   "tiers": [
    [
     1,
@@ -415,11 +452,11 @@
   "model": "0402WGF0000TCE",
   "package": "0402",
   "preferred": false,
-  "stock": 14179220,
+  "stock": 17023832,
   "tiers": [
    [
     1,
-    0.0011
+    0.0012
    ],
    [
     1000,
@@ -427,7 +464,7 @@
    ],
    [
     3000,
-    0.0007
+    0.0008
    ],
    [
     10000,
@@ -435,11 +472,11 @@
    ],
    [
     50000,
-    0.0005
+    0.0006
    ],
    [
     50200,
-    0.0005
+    0.0006
    ]
   ]
  },
@@ -567,27 +604,27 @@
   "tiers": [
    [
     1,
-    1.5864
+    1.4703
    ],
    [
     10,
-    1.3375
+    1.2217
    ],
    [
     30,
-    1.2016
+    1.0844
    ],
    [
     100,
-    1.0461
+    0.9306
    ],
    [
     500,
-    0.9774
+    0.8619
    ],
    [
     1000,
-    0.9463
+    0.8309
    ]
   ]
  },
@@ -665,6 +702,80 @@
    ]
   ]
  },
+ "C25076": {
+  "brand": "UNI-ROYAL(Uniroyal Elec)",
+  "describe": "-55℃~+155℃ 100Ω 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+  "least": 20,
+  "library": "base",
+  "loss": 15,
+  "model": "0402WGF1000TCE",
+  "package": "0402",
+  "preferred": false,
+  "stock": 11744878,
+  "tiers": [
+   [
+    1,
+    0.0012
+   ],
+   [
+    1000,
+    0.001
+   ],
+   [
+    3000,
+    0.0009
+   ],
+   [
+    10000,
+    0.0008
+   ],
+   [
+    50000,
+    0.0007
+   ],
+   [
+    50200,
+    0.0007
+   ]
+  ]
+ },
+ "C25087": {
+  "brand": "UNI-ROYAL(Uniroyal Elec)",
+  "describe": "-55℃~+155℃ 200Ω 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+  "least": 20,
+  "library": "base",
+  "loss": 10,
+  "model": "0402WGF2000TCE",
+  "package": "0402",
+  "preferred": false,
+  "stock": 1751217,
+  "tiers": [
+   [
+    1,
+    0.0029
+   ],
+   [
+    1000,
+    0.0022
+   ],
+   [
+    3000,
+    0.0018
+   ],
+   [
+    10000,
+    0.0017
+   ],
+   [
+    50000,
+    0.0014
+   ],
+   [
+    50200,
+    0.0014
+   ]
+  ]
+ },
  "C25117": {
   "brand": "UNI-ROYAL(Uniroyal Elec)",
   "describe": "-55℃~+155℃ 470Ω 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
@@ -674,7 +785,7 @@
   "model": "0402WGF4700TCE",
   "package": "0402",
   "preferred": false,
-  "stock": 3072093,
+  "stock": 3010858,
   "tiers": [
    [
     1,
@@ -711,11 +822,11 @@
   "model": "0402WGF1003TCE",
   "package": "0402",
   "preferred": false,
-  "stock": 8423441,
+  "stock": 8786232,
   "tiers": [
    [
     1,
-    0.0013
+    0.0012
    ],
    [
     1000,
@@ -723,11 +834,11 @@
    ],
    [
     3000,
-    0.0009
+    0.0008
    ],
    [
     10000,
-    0.0008
+    0.0007
    ],
    [
     50000,
@@ -822,7 +933,7 @@
   "model": "0402WGF4701TCE",
   "package": "0402",
   "preferred": false,
-  "stock": 15882040,
+  "stock": 15759286,
   "tiers": [
    [
     1,
@@ -970,7 +1081,7 @@
   "model": "SDCL1005C2N7STDF",
   "package": "0402",
   "preferred": false,
-  "stock": 110991,
+  "stock": 110791,
   "tiers": [
    [
     1,
@@ -1085,15 +1196,15 @@
   "tiers": [
    [
     1,
-    0.0993
+    0.0992
    ],
    [
     50,
-    0.0796
+    0.0795
    ],
    [
     150,
-    0.0698
+    0.0697
    ],
    [
     500,
@@ -1105,7 +1216,7 @@
    ],
    [
     6000,
-    0.0536
+    0.0535
    ]
   ]
  },
@@ -1229,19 +1340,19 @@
   "model": "SN74LVC1G14DCKR",
   "package": "SC-70-5",
   "preferred": false,
-  "stock": 98074,
+  "stock": 98060,
   "tiers": [
    [
     1,
-    0.0567
+    0.0566
    ],
    [
     100,
-    0.0441
+    0.044
    ],
    [
     300,
-    0.0379
+    0.0378
    ],
    [
     3000,
@@ -1249,11 +1360,48 @@
    ],
    [
     6000,
-    0.0294
+    0.0293
    ],
    [
     9000,
     0.0274
+   ]
+  ]
+ },
+ "C3663690": {
+  "brand": "Texas Instruments",
+  "describe": "-40℃~+125℃ 1.62V~3.6V 10uA 12bit 26ms Factory temperature calibration、Temperature threshold monitoring、Configurable temperature output I2C、SMBus ±1℃ SOT-563 Temperature Sensors ROHS",
+  "least": 2,
+  "library": "expand",
+  "loss": 0,
+  "model": "TMP1075NDRLR",
+  "package": "SOT-563",
+  "preferred": false,
+  "stock": 20063,
+  "tiers": [
+   [
+    1,
+    0.5414
+   ],
+   [
+    10,
+    0.4563
+   ],
+   [
+    30,
+    0.4138
+   ],
+   [
+    100,
+    0.3762
+   ],
+   [
+    500,
+    0.3664
+   ],
+   [
+    1000,
+    0.3599
    ]
   ]
  },
@@ -1451,23 +1599,23 @@
   "model": "3034TR",
   "package": "-",
   "preferred": false,
-  "stock": 664,
+  "stock": 654,
   "tiers": [
    [
     1,
-    0.3913
+    0.3909
    ],
    [
     10,
-    0.3618
+    0.3615
    ],
    [
     200,
-    0.3618
+    0.3615
    ],
    [
     1000,
-    0.3618
+    0.3615
    ]
   ]
  },
@@ -1480,7 +1628,7 @@
   "model": "CL05A105KA5NQNC",
   "package": "0402",
   "preferred": false,
-  "stock": 11682710,
+  "stock": 11554517,
   "tiers": [
    [
     1,
@@ -1534,6 +1682,80 @@
    [
     5000,
     0.1069
+   ]
+  ]
+ },
+ "C720477": {
+  "brand": "XUNPU",
+  "describe": "-30℃~+80℃ 1.6N 100,000 cycles 12V 2mm 3.9mm 3mm 50mA Black Round Button SMD(SMT) Tab SPST Surface Mount,Vertical Without Bracket SMD,4x3mm Tactile Switches ROHS",
+  "least": 5,
+  "library": "base",
+  "loss": 4,
+  "model": "TS-1088-AR02016",
+  "package": "SMD,4x3mm",
+  "preferred": false,
+  "stock": 744554,
+  "tiers": [
+   [
+    1,
+    0.0527
+   ],
+   [
+    100,
+    0.0427
+   ],
+   [
+    300,
+    0.0375
+   ],
+   [
+    1000,
+    0.0332
+   ],
+   [
+    4000,
+    0.031
+   ],
+   [
+    8000,
+    0.0298
+   ]
+  ]
+ },
+ "C7496855": {
+  "brand": "TUOZHAN",
+  "describe": "-40℃~+85℃ 0.6mm 1.5mm 1.6mm 120° Common Anode G:2000V、B:2000V、R:2500V R:1.8V~2.2V、G:2.5V~2.9V、B:2.6V~3.0V R:60mW、G:90mW、B:90mW R:620nm~625nm、G:526nm~529nm、B:466nm~469nm R:70mcd~90mcd、G:250mcd~350mcd、B:60mcd~80mcd SMD-4P,1.6x1.5mm RGB LEDs ROHS",
+  "least": 10,
+  "library": "expand",
+  "loss": 5,
+  "model": "F.1615.00026/P4-1615G2B2R4TS2-06T-001-24",
+  "package": "SMD-4P,1.6x1.5mm",
+  "preferred": false,
+  "stock": 74324,
+  "tiers": [
+   [
+    1,
+    0.0131
+   ],
+   [
+    500,
+    0.0114
+   ],
+   [
+    1500,
+    0.0104
+   ],
+   [
+    4000,
+    0.0098
+   ],
+   [
+    24000,
+    0.0093
+   ],
+   [
+    48000,
+    0.009
    ]
   ]
  },
@@ -1620,7 +1842,7 @@
   "model": "WPN201610H100MT",
   "package": "0806",
   "preferred": false,
-  "stock": 5075,
+  "stock": 4839,
   "tiers": [
    [
     1,
@@ -1640,7 +1862,7 @@
    ],
    [
     4000,
-    0.0235
+    0.0234
    ],
    [
     10000,
@@ -1805,33 +2027,33 @@
   "model": "Q13FC13500003",
   "package": "SMD3215-2P",
   "preferred": false,
-  "stock": 33692,
+  "stock": 33668,
   "tiers": [
    [
     1,
-    0.204
+    0.2038
    ],
    [
     50,
-    0.1629
+    0.1628
    ],
    [
     150,
-    0.1453
+    0.1451
    ],
    [
     500,
-    0.1233
+    0.1232
    ],
    [
     3000,
-    0.096
+    0.0959
    ],
    [
     6000,
-    0.0901
+    0.09
    ]
   ]
  },
- "_abruf": "2026-11-06"
+ "_abruf": "2026-11-07"
 }

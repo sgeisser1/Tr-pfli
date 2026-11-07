@@ -156,7 +156,7 @@ add("C19", "Device:C", "DNM", FP_C, "DNM", 128, 24, 0, {"1": "RF_ANT_DC", "2": "
 add("R2", "Device:R", "0R", FP_R, "R0", 135, 14, 90, {"1": "RF_ANT_DC", "2": "ANT_FEED"}, note="Pi-Netz Z61")
 add("C20", "Device:C", "DNM", FP_C, "DNM", 143, 24, 0, {"1": "ANT_FEED", "2": "GND"}, dnp=True,
     note="Pi-Netz Z62, Wert nach Antennenmessung")
-add("AE1", "fluidi:ANT_IFA_AN043", "AN043_IFA", "RF_Antenna:Texas_SWRA117D_2.4GHz_Left", "PCB", 155, 24, 0,
+add("AE1", "fluidi:ANT_IFA_AN043", "AN043_IFA", "RF_Antenna:Texas_SWRA117D_2.4GHz_Right", "PCB", 155, 24, 0,
     {"1": "ANT_FEED", "2": "GND"}, note="Leiterbahnantenne oben, Keepout nach AN043; Platzhalter-Footprint")
 
 # ---------------- Messkette D3 (unten links/Mitte): Lastschalter, RC-Oszillator 17-36 MHz, Teiler /8

@@ -1,0 +1,30 @@
+** Drc report for fluidi_sensor.kicad_pcb **
+** Created on 2026-11-07T23:28:37 **
+** Report includes: Errors, Warnings, Exclusions **
+
+** Found 4 DRC violations **
+[lib_footprint_mismatch]: Footprint "SOT-353_SC-70-5" stimmt nicht mit Kopie in Bibliothek "Package_TO_SOT_SMD" überein.
+    Local override; warning
+    @(147.4000 mm, 46.4000 mm): Footprint U2
+[lib_footprint_mismatch]: Footprint "SOT-353_SC-70-5" stimmt nicht mit Kopie in Bibliothek "Package_TO_SOT_SMD" überein.
+    Local override; warning
+    @(143.1000 mm, 45.1500 mm): Footprint U6
+[lib_footprint_mismatch]: Footprint "SOT-353_SC-70-5" stimmt nicht mit Kopie in Bibliothek "Package_TO_SOT_SMD" überein.
+    Local override; warning
+    @(139.2000 mm, 44.2500 mm): Footprint U4
+[lib_footprint_mismatch]: Footprint "SOT-353_SC-70-5" stimmt nicht mit Kopie in Bibliothek "Package_TO_SOT_SMD" überein.
+    Local override; warning
+    @(139.2000 mm, 41.6000 mm): Footprint U5
+
+** Found 0 unconnected pads **
+
+** Found 0 Footprint errors **
+
+** Ignored checks **
+    - Footprint has no courtyard defined
+    - Track endpoint not centered on via
+    - Tuning profile track geometries
+    - Footprint doesn't match symbol's footprint filters
+    - Footprint component type doesn't match footprint pads
+
+** End of Report **

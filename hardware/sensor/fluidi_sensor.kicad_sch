@@ -2179,7 +2179,7 @@
 					)
 				)
 			)
-			(property "Footprint" "RF_Antenna:Texas_SWRA117D_2.4GHz_Left"
+			(property "Footprint" "RF_Antenna:Texas_SWRA117D_2.4GHz_Right"
 				(at 0 -5.08 0)
 				(hide yes)
 				(effects
@@ -10433,7 +10433,7 @@
 				)
 			)
 		)
-		(property "Footprint" "RF_Antenna:Texas_SWRA117D_2.4GHz_Left"
+		(property "Footprint" "RF_Antenna:Texas_SWRA117D_2.4GHz_Right"
 			(at 393.7 60.96 0)
 			(effects
 				(font
@@ -11742,7 +11742,7 @@
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom no)
-		(on_board yes)
+		(on_board no)
 		(dnp no)
 		(uuid "60052473-9539-5041-8769-961375fcec8e")
 		(property "Reference" "E1"

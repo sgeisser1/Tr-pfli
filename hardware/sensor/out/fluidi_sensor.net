@@ -2,7 +2,7 @@
 	(version "E")
 	(design
 		(source "/home/sgeisser/git/Tr-pfli/hardware/sensor/fluidi_sensor.kicad_sch")
-		(date "2026-11-07T19:42:48")
+		(date "2026-11-07T21:27:16")
 		(tool "Eeschema 10.0.8-10.0.8~ubuntu24.04.1")
 		(textvar
 			(name "REV") "B")
@@ -59,7 +59,7 @@
 		(comp
 			(ref "AE1")
 			(value "AN043_IFA")
-			(footprint "RF_Antenna:Texas_SWRA117D_2.4GHz_Left")
+			(footprint "RF_Antenna:Texas_SWRA117D_2.4GHz_Right")
 			(datasheet "docs/appnotes/TI_AN043_SmallPCBAntenna_SWRA117D.pdf")
 			(description "nicht bestueckt; Leiterbahnantenne oben, Keepout nach AN043; Platzhalter-Footprint")
 			(fields
@@ -73,7 +73,7 @@
 				(field
 					(name "JLC") "-")
 				(field
-					(name "Footprint") "RF_Antenna:Texas_SWRA117D_2.4GHz_Left")
+					(name "Footprint") "RF_Antenna:Texas_SWRA117D_2.4GHz_Right")
 				(field
 					(name "Datasheet") "docs/appnotes/TI_AN043_SmallPCBAntenna_SWRA117D.pdf")
 				(field
@@ -2163,80 +2163,6 @@
 						)
 						(pin
 							(num "1")
-						)
-					)
-				)
-			)
-		)
-		(comp
-			(ref "E1")
-			(value "Sonde_Innenlagen")
-			(footprint "fluidi:SONDE_PLATZHALTER")
-			(description "nicht bestueckt; Elektroden Innenlagen L2/L3 (REPORT Kap. 8); Gegenelektrode/Guard = GND")
-			(fields
-				(field
-					(name "LCSC")
-				)
-				(field
-					(name "Hersteller") "-")
-				(field
-					(name "MPN") "Leiterplattenstruktur")
-				(field
-					(name "JLC") "-")
-				(field
-					(name "Footprint") "fluidi:SONDE_PLATZHALTER")
-				(field
-					(name "Datasheet")
-				)
-				(field
-					(name "Description") "nicht bestueckt; Elektroden Innenlagen L2/L3 (REPORT Kap. 8); Gegenelektrode/Guard = GND")
-			)
-			(libsource
-				(lib "fluidi")
-				(part "SONDE_ELEKTRODEN")
-				(description "Sondenelektroden auf Innenlagen (Teil der Leiterplatte); Geometrie aus Feldsimulation")
-			)
-			(property
-				(name "LCSC")
-				(value "")
-			)
-			(property
-				(name "Hersteller")
-				(value "-")
-			)
-			(property
-				(name "MPN")
-				(value "Leiterplattenstruktur")
-			)
-			(property
-				(name "JLC")
-				(value "-")
-			)
-			(property
-				(name "Sheetname")
-				(value "fluidi_sensor")
-			)
-			(property
-				(name "Sheetfile")
-				(value "fluidi_sensor.kicad_sch")
-			)
-			(property
-				(name "exclude_from_bom")
-			)
-			(sheetpath
-				(names "/")
-				(tstamps "/")
-			)
-			(tstamps "60052473-9539-5041-8769-961375fcec8e")
-			(units
-				(unit
-					(name "A")
-					(pins
-						(pin
-							(num "1")
-						)
-						(pin
-							(num "2")
 						)
 					)
 				)
@@ -5212,7 +5138,7 @@
 				(field
 					(name "Value") "AN043_IFA")
 				(field
-					(name "Footprint") "RF_Antenna:Texas_SWRA117D_2.4GHz_Left")
+					(name "Footprint") "RF_Antenna:Texas_SWRA117D_2.4GHz_Right")
 				(field
 					(name "Datasheet") "docs/appnotes/TI_AN043_SmallPCBAntenna_SWRA117D.pdf")
 				(field
@@ -5909,12 +5835,6 @@
 				(pintype "passive")
 			)
 			(node
-				(ref "E1")
-				(pin "1")
-				(pinfunction "SENSE_1")
-				(pintype "passive")
-			)
-			(node
 				(ref "R3")
 				(pin "1")
 				(pintype "passive")
@@ -6382,12 +6302,6 @@
 			(node
 				(ref "C9")
 				(pin "2")
-				(pintype "passive")
-			)
-			(node
-				(ref "E1")
-				(pin "2")
-				(pinfunction "GND_BAND_2")
 				(pintype "passive")
 			)
 			(node

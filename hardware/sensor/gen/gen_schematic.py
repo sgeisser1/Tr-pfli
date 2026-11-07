@@ -212,7 +212,8 @@ class Sheet:
                  ("MPN", pdb[1], X, Y, True, None), ("JLC", pdb[3], X, Y, True, None)]
         sym = ["symbol", ["lib_id", Q(c["lib"])], ["at", f(X), f(Y), str(rot)], ["unit", "1"],
                ["exclude_from_sim", "no"], ["in_bom", "no" if c["key"] == "PCB" else "yes"],
-               ["on_board", "yes"], ["dnp", "yes" if c["dnp"] else "no"], ["uuid", Q(uid("s", c["ref"]))]]
+               ["on_board", "no" if c["ref"] == "E1" else "yes"], ["dnp", "yes" if c["dnp"] else "no"],
+               ["uuid", Q(uid("s", c["ref"]))]]
         for k, v, x, y, hide, j in props:
             sym.append(["property", Q(k), Q(v), ["at", f(x), f(y), "0"], font(1.27, j, hide)])
         for p in pins:

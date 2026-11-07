@@ -1,5 +1,5 @@
 Designator,Value,Footprint,LCSC,Grund
-AE1,AN043_IFA,RF_Antenna:Texas_SWRA117D_2.4GHz_Left,,Leiterplattenstruktur/Pad (nicht in BOM)
+AE1,AN043_IFA,RF_Antenna:Texas_SWRA117D_2.4GHz_Right,,Leiterplattenstruktur/Pad (nicht in BOM)
 C19,DNM,Capacitor_SMD:C_0402_1005Metric,,DNP
 C20,DNM,Capacitor_SMD:C_0402_1005Metric,,DNP
 E1,Sonde_Innenlagen,fluidi:SONDE_PLATZHALTER,,Leiterplattenstruktur/Pad (nicht in BOM)
