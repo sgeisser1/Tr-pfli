@@ -1,0 +1,434 @@
+/*
+ * fluidi – CC2340R52 (QFN24 RGE): Hardware-Port fuer core/fl_port.h.
+ * Pins ausschliesslich aus config/fluidi_board.h (PINMAP_SENSOR.md Rev B), Flash aus config/fluidi_flash_layout.h.
+ * Alles, was nur am Muster nachweisbar ist, ist mit PROTOTYP-PRUEFUNG markiert.
+ */
+#include <string.h>
+#include <FreeRTOS.h>
+#include <task.h>
+#include <timers.h>
+#include <ti/drivers/GPIO.h>
+#include <ti/drivers/I2C.h>
+#include <ti/drivers/NVS.h>
+#include <ti/drivers/Power.h>
+#include <ti/drivers/power/PowerCC23X0.h>
+#include <ti/drivers/Watchdog.h>
+#include <ti/drivers/RNG.h>
+#include <ti/drivers/AESECB.h>
+#include <ti/drivers/ECDH.h>
+#include <ti/drivers/BatteryMonitor.h>
+#include <ti/drivers/cryptoutils/cryptokey/CryptoKeyPlaintext.h>
+#include <ti/drivers/cryptoutils/ecc/ECCParams.h>
+#include <ti/devices/DeviceFamily.h>
+#include DeviceFamily_constructPath(inc/hw_memmap.h)
+#include DeviceFamily_constructPath(inc/hw_types.h)
+#include DeviceFamily_constructPath(inc/hw_lgpt.h)
+#include DeviceFamily_constructPath(inc/hw_systim.h)
+#include DeviceFamily_constructPath(driverlib/pmctl.h)
+#include "ti_drivers_config.h"
+#include "ti/ble/app_util/framework/bleapputil_api.h"
+#include "ti/ble/app_util/framework/bleapputil_timers.h"
+#include "sysflash/sysflash.h"
+#include "bootutil/bootutil_public.h"
+#include "bootutil/image.h"
+#include "fl_app.h"
+#include "fl_port.h"
+#include "fl_nvstore.h"
+#include "fl_platform.h"
+#include "../../config/fluidi_board.h"
+#include "../../config/fluidi_flash_layout.h"
+
+/* ======================= Zeit ======================= */
+uint32_t fl_port_ms(void) { return (uint32_t)(xTaskGetTickCount() * portTICK_PERIOD_MS); }
+void fl_port_uptime(uint32_t *s, uint16_t *frac)
+{
+    uint32_t ms = fl_port_ms();
+    *s = ms / 1000u;
+    *frac = (uint16_t)((ms % 1000u) * 65536u / 1000u);
+}
+static uint32_t systim_us(void) { return HWREG(SYSTIM_BASE + SYSTIM_O_TIME1U); }
+static void delay_us(uint32_t us) { uint32_t t0 = systim_us(); while (systim_us() - t0 < us) { } }
+static void sleep_ms(uint32_t ms) { vTaskDelay(pdMS_TO_TICKS(ms)); }   /* Task schlaeft -> Standby */
+
+/* ======================= Pins / Ruhezustand ======================= */
+static void pins_sleep_state(void)
+{
+    /* FW-8: DIO11 high (Kette aus), DIO12 low, DIO16/17 low (FW-1/FW-6), DIO8 + DIO24 Puffer aus, LEDs high */
+#if FLUIDI_HAS_OSC_FET
+    GPIO_setConfig(FLUIDI_DIO_OSC_EN_N, GPIO_CFG_OUTPUT | GPIO_CFG_OUT_HIGH);
+#endif
+    GPIO_setConfig(FLUIDI_DIO_SENS_PWR, GPIO_CFG_OUTPUT | GPIO_CFG_OUT_STR_HIGH | GPIO_CFG_OUT_LOW);
+    GPIO_setConfig(FLUIDI_DIO_I2C_SDA, GPIO_CFG_OUTPUT | GPIO_CFG_OUT_LOW);
+    GPIO_setConfig(FLUIDI_DIO_I2C_SCL, GPIO_CFG_OUTPUT | GPIO_CFG_OUT_LOW);
+    GPIO_setConfig(FLUIDI_DIO_CREF1, GPIO_CFG_NO_DIR);
+#if FLUIDI_HAS_CREF2
+    GPIO_setConfig(FLUIDI_DIO_CREF2, GPIO_CFG_NO_DIR);
+#endif
+    GPIO_setConfig(FLUIDI_DIO_MEAS_CLK, GPIO_CFG_NO_DIR);
+    GPIO_setConfig(FLUIDI_DIO_LED_R, GPIO_CFG_OUTPUT | GPIO_CFG_OUT_HIGH);
+    GPIO_setConfig(FLUIDI_DIO_LED_G, GPIO_CFG_OUTPUT | GPIO_CFG_OUT_HIGH);
+    GPIO_setConfig(FLUIDI_DIO_LED_B, GPIO_CFG_OUTPUT | GPIO_CFG_OUT_HIGH);
+}
+
+/* ======================= Taster (DIO21) ======================= */
+static void btn_in_ctx(char *p) { (void)p; fl_app_on_button(GPIO_read(FLUIDI_DIO_BUTTON) == 0); fl_platform_reschedule(); }
+static void btn_pend(void *a, uint32_t b) { (void)a; (void)b; BLEAppUtil_invokeFunction(btn_in_ctx, NULL); }
+static void btn_isr(uint_least8_t idx)
+{
+    (void)idx;
+    BaseType_t woken = pdFALSE;
+    xTimerPendFunctionCallFromISR(btn_pend, NULL, 0, &woken);   /* ISR -> Task-Kontext -> BLEAppUtil-Kontext */
+    portYIELD_FROM_ISR(woken);
+}
+static bool s_pullup = true;
+void fl_port_button_pullup(bool on)
+{
+    s_pullup = on;
+    GPIO_setConfig(FLUIDI_DIO_BUTTON, (on ? GPIO_CFG_IN_PU : GPIO_CFG_IN_NOPULL) | GPIO_CFG_IN_INT_BOTH_EDGES);
+    GPIO_setCallback(FLUIDI_DIO_BUTTON, btn_isr);
+    GPIO_enableInt(FLUIDI_DIO_BUTTON);
+}
+bool fl_port_button_pressed(void)
+{
+    bool was = s_pullup;
+    if (!was) GPIO_setConfig(FLUIDI_DIO_BUTTON, GPIO_CFG_IN_PU);
+    delay_us(1000);                                               /* Pull-up 1 ms ein (PROTOCOL 10.3) */
+    bool p = GPIO_read(FLUIDI_DIO_BUTTON) == 0;
+    if (!was) fl_port_button_pullup(false);
+    return p;
+}
+
+/* ======================= LED ======================= */
+void fl_port_led(uint8_t col, uint8_t level)
+{
+    /* aktiv low. PWM-Dimmung (led_level < 100) ueber LGPT0/1 ist noch nicht umgesetzt: offener Punkt FW-O3
+     * (Vorwiderstaende begrenzen bereits auf <= 3 mA bei 3.0 V). */
+    (void)level;
+    GPIO_write(FLUIDI_DIO_LED_R, (col & 1) ? 0 : 1);
+    GPIO_write(FLUIDI_DIO_LED_G, (col & 2) ? 0 : 1);
+    GPIO_write(FLUIDI_DIO_LED_B, (col & 4) ? 0 : 1);
+}
+
+/* ======================= Batterie ======================= */
+static uint16_t s_conn_vmin = 0xFFFF;
+/* FW-9 (DS S.19 Tab. 7.7). Nach einer Verbindung liefert der erste Aufruf das Minimum waehrend der Verbindung (FW-5). */
+uint16_t fl_port_vbat_mv(void)
+{
+    uint16_t v = (uint16_t)BatteryMonitor_getVoltage();
+    if (s_conn_vmin != 0xFFFF && s_conn_vmin < v) v = s_conn_vmin;
+    s_conn_vmin = 0xFFFF;
+    return v;
+}
+
+void fl_platform_conn_vbat_reset(void) { s_conn_vmin = 0xFFFF; }
+void fl_platform_conn_vbat_sample(void)
+{
+    uint16_t v = (uint16_t)BatteryMonitor_getVoltage();
+    if (v && v < s_conn_vmin) s_conn_vmin = v;
+}
+
+/* ======================= Messkette (FW-1, FW-2, FW-3) ======================= */
+static int tmp1075_read(int16_t *t_c100)
+{
+    /* FW-1: SENS_PWR an -> One-Shot -> >= 15 ms schlafen -> lesen -> TMP in Shutdown (SD bleibt 1) -> SENS_PWR aus,
+     * SDA/SCL low. Register: Konfiguration 0x01, nur Einzelbyte-Schreiben (TMP1075N), OS = Bit 15, SD = Bit 8;
+     * Temperatur 0x00, T[11:0] in Bit 15:4, 0.0625 degC/LSB (SBOS854F S.21-22 Tab. 7-8). */
+    int rc = -1;
+    GPIO_write(FLUIDI_DIO_SENS_PWR, 1);
+    delay_us(FLUIDI_SENS_PWR_SETTLE_US);
+    GPIO_setConfigAndMux(FLUIDI_DIO_I2C_SDA, GPIO_CFG_INPUT, GPIO_MUX_GPIO);   /* Freigabe fuer den I2C-Treiber */
+    GPIO_setConfigAndMux(FLUIDI_DIO_I2C_SCL, GPIO_CFG_INPUT, GPIO_MUX_GPIO);
+    I2C_Params p; I2C_Params_init(&p); p.bitRate = I2C_100kHz;                 /* PINMAP: 100 kHz empfohlen */
+    I2C_Handle h = I2C_open(CONFIG_I2C_TMP, &p);
+    if (h) {
+        uint8_t wr[2] = {0x01, 0x81}, ptr = 0x00, rd[2];
+        I2C_Transaction t = {0};
+        t.targetAddress = FLUIDI_TMP1075_I2C_ADDR;
+        t.writeBuf = wr; t.writeCount = 2; t.readBuf = NULL; t.readCount = 0;
+        if (I2C_transfer(h, &t)) {
+            sleep_ms(FLUIDI_TMP_CONV_MS);
+            t.writeBuf = &ptr; t.writeCount = 1; t.readBuf = rd; t.readCount = 2;
+            if (I2C_transfer(h, &t)) {
+                int16_t raw = (int16_t)((rd[0] << 8) | rd[1]) >> 4;
+                *t_c100 = (int16_t)((int32_t)raw * 625 / 100);
+                rc = 0;
+            }
+        }
+        I2C_close(h);
+    }
+    GPIO_write(FLUIDI_DIO_SENS_PWR, 0);
+    GPIO_setConfig(FLUIDI_DIO_I2C_SDA, GPIO_CFG_OUTPUT | GPIO_CFG_OUT_LOW);
+    GPIO_setConfig(FLUIDI_DIO_I2C_SCL, GPIO_CFG_OUTPUT | GPIO_CFG_OUT_LOW);
+    return rc;
+}
+
+#define LG(o) HWREG(LGPT3_BASE + (o))
+
+static void lgpt3_start(void)
+{
+    /* Periodenmessung auf T3C0 (DIO24, Mux 3), 48 MHz, Zaehler startet bei jeder steigenden Flanke neu
+     * (TRM 10.3.6.1, Tab. 10-1 CCACT 8). Mittelung vieler Perioden mit Zufallsphase -> Aufloesung << 1 Takt. */
+    LG(LGPT_O_CTL) = LGPT_CTL_MODE_DIS;
+    LG(LGPT_O_PRECFG) = 0;
+    LG(LGPT_O_TGT) = 0xFFFFu;
+    LG(LGPT_O_C0CFG) = LGPT_C0CFG_INPUT_IO | LGPT_C0CFG_EDGE_RISE | LGPT_C0CFG_CCACT_PER_PULSE_WIDTH_MEAS;
+    LG(LGPT_O_ICLR) = LGPT_ICLR_C0CC;
+    LG(LGPT_O_CTL) = LGPT_CTL_MODE_UP_PER;
+}
+static void lgpt3_stop(void) { LG(LGPT_O_CTL) = LGPT_CTL_MODE_DIS; LG(LGPT_O_C0CFG) = 0; }
+
+/* Perioden fuer dur_us sammeln; Rueckgabe Mittel Q16 (0 = keine Flanken) */
+static uint32_t sample_block(uint32_t dur_us)
+{
+    uint32_t t0 = systim_us(), n = 0;
+    uint64_t sum = 0;
+    LG(LGPT_O_ICLR) = LGPT_ICLR_C0CC;
+    while (systim_us() - t0 < dur_us) {
+        if (LG(LGPT_O_RIS) & LGPT_RIS_C0CC) {
+            uint32_t v = LG(LGPT_O_C0CC) & 0xFFFFFFu;
+            LG(LGPT_O_ICLR) = LGPT_ICLR_C0CC;
+            if (n++ == 0) continue;                    /* erste Periode nach Umschalten verwerfen */
+            sum += v;
+        }
+    }
+    if (n < 3) return 0;
+    return (uint32_t)((sum << 16) / (n - 1));
+}
+
+int fl_port_measure(fl_meas_raw_t *raw, uint8_t n_blocks, bool with_t2)
+{
+    memset(raw, 0, sizeof *raw);
+    if (n_blocks > FL_MEAS_BLOCKS_MAX_FW2) n_blocks = FL_MEAS_BLOCKS_MAX_FW2;
+    uint8_t per_burst = (uint8_t)((n_blocks + FLUIDI_BURST_MAX - 1) / FLUIDI_BURST_MAX);
+    if (per_burst == 0) per_burst = 1;
+    uint32_t blk_us = FLUIDI_BURST_CFG_US / per_burst;
+    (void)with_t2;                                             /* Rev B: kein Cref2 (PINMAP Rev B Kap. 0) */
+
+    /* FW-1: Temperatur zuerst, I2C danach still */
+    raw->temp_ok = tmp1075_read(&raw->temp_c100) == 0;
+    /* FW-3: VDD ohne Funk-/LED-Last vor dem ersten Burst */
+    raw->vdd_ref_mv = (uint16_t)BatteryMonitor_getVoltage();
+    fl_port_led(0, 0);
+
+    Power_setDependency(PowerLPF3_PERIPH_LGPT3);
+    GPIO_setConfigAndMux(FLUIDI_DIO_MEAS_CLK, GPIO_CFG_IN_NOPULL, FLUIDI_MUX_MEAS_CLK_T3C0);
+    uint8_t k = 0;
+    uint16_t vmin = 0xFFFF;
+    for (uint8_t b = 0; b < FLUIDI_BURST_MAX && k < n_blocks; b++) {
+        /* FW-2: ein Burst <= 0.6 ms: Kette ein, 50 us, f0, f1, Kette aus. Kein Flash-Schreiben/LED im Burst.
+         * Funkereignisse koennen hier nicht hart ausgeschlossen werden -> PROTOTYP-PRUEFUNG (Einbruch messen). */
+        uint32_t tb = systim_us();
+#if FLUIDI_HAS_OSC_FET
+        GPIO_write(FLUIDI_DIO_OSC_EN_N, 0);
+#else
+        GPIO_write(FLUIDI_DIO_SENS_PWR, 1);
+#endif
+        delay_us(FLUIDI_OSC_SETTLE_US);
+        lgpt3_start();
+        GPIO_setConfig(FLUIDI_DIO_CREF1, GPIO_CFG_NO_DIR);                    /* f0: Cref1 aus, Puffer aus */
+        for (uint8_t i = 0; i < per_burst && k + i < n_blocks; i++) raw->t0_q16[k + i] = sample_block(blk_us);
+        GPIO_setConfig(FLUIDI_DIO_CREF1, GPIO_CFG_OUTPUT | GPIO_CFG_OUT_LOW);  /* f1: Cref1 wirkt */
+        for (uint8_t i = 0; i < per_burst && k + i < n_blocks; i++) raw->t1_q16[k + i] = sample_block(blk_us);
+        uint16_t v = (uint16_t)BatteryMonitor_getVoltage();                   /* Spannung unter Messlast */
+        if (v && v < vmin) vmin = v;
+        lgpt3_stop();
+        GPIO_setConfig(FLUIDI_DIO_CREF1, GPIO_CFG_NO_DIR);
+#if FLUIDI_HAS_OSC_FET
+        GPIO_write(FLUIDI_DIO_OSC_EN_N, 1);
+#else
+        GPIO_write(FLUIDI_DIO_SENS_PWR, 0);
+#endif
+        (void)tb;   /* Burstdauer am Muster mit Oszilloskop an DIO11 pruefen (<= 0.6 ms, ENERGIEMESSUNG.md) */
+        for (uint8_t i = 0; i < per_burst && k < n_blocks; i++, k++)
+            if (raw->t0_q16[k] == 0 || raw->t1_q16[k] == 0) raw->osc_timeout = true;
+        if (b + 1u < FLUIDI_BURST_MAX && k < n_blocks) sleep_ms(FLUIDI_BURST_PAUSE_MS);   /* FW-2: >= 30 ms Pause */
+    }
+    raw->n = k;
+    GPIO_setConfig(FLUIDI_DIO_MEAS_CLK, GPIO_CFG_NO_DIR);
+    Power_releaseDependency(PowerLPF3_PERIPH_LGPT3);
+    raw->vbat_load_mv = vmin == 0xFFFF ? raw->vdd_ref_mv : vmin;
+    return raw->osc_timeout ? -1 : 0;
+}
+
+/* ======================= Krypto ======================= */
+static RNG_Handle s_rng;
+static AESECB_Handle s_aes;
+static ECDH_Handle s_ecdh;
+
+int fl_port_rng(uint8_t *buf, size_t len)
+{
+    if (!s_rng) s_rng = RNG_open(CONFIG_RNG_FLUIDI, NULL);
+    if (!s_rng) return -1;
+    return RNG_getRandomBits(s_rng, buf, len * 8u) == RNG_STATUS_SUCCESS ? 0 : -1;
+}
+
+int fl_aes128_encrypt_block(const uint8_t key[16], const uint8_t in[16], uint8_t out[16])
+{
+    CryptoKey k;
+    AESECB_Operation op;
+    uint8_t kb[16];
+    if (!s_aes) s_aes = AESECB_open(CONFIG_AESECB_FLUIDI, NULL);
+    if (!s_aes) return -1;
+    memcpy(kb, key, 16);
+    CryptoKeyPlaintext_initKey(&k, kb, 16);
+    AESECB_Operation_init(&op);
+    op.key = &k; op.input = (uint8_t *)in; op.output = out; op.inputLength = 16;
+    int rc = AESECB_oneStepEncrypt(s_aes, &op) == AESECB_STATUS_SUCCESS ? 0 : -1;
+    memset(kb, 0, sizeof kb);
+    return rc;
+}
+
+/* ECDH P-256 in Software (ECDHLPF3SW). Schluesselformat big-endian 0x04||X||Y (PROTOCOL 5.2: X||Y ohne 0x04).
+ * Rechenzeit/Energie: PROTOTYP-PRUEFUNG (ANNAHME <= 3 s). */
+int fl_port_ecdh_keygen(uint8_t priv[32], uint8_t pub[64])
+{
+    uint8_t pubm[65];
+    CryptoKey kp, kq;
+    ECDH_OperationGeneratePublicKey op;
+    if (!s_ecdh) s_ecdh = ECDH_open(CONFIG_ECDH_FLUIDI, NULL);
+    if (!s_ecdh) return -1;
+    for (int tries = 0; tries < 4; tries++) {
+        if (fl_port_rng(priv, 32)) return -1;
+        CryptoKeyPlaintext_initKey(&kp, priv, 32);
+        CryptoKeyPlaintext_initBlankKey(&kq, pubm, sizeof pubm);
+        ECDH_OperationGeneratePublicKey_init(&op);
+        op.curve = &ECCParams_NISTP256; op.myPrivateKey = &kp; op.myPublicKey = &kq;
+        if (ECDH_generatePublicKey(s_ecdh, &op) == ECDH_STATUS_SUCCESS) { memcpy(pub, pubm + 1, 64); return 0; }
+    }
+    return -1;
+}
+
+int fl_port_ecdh_shared(const uint8_t priv[32], const uint8_t peer[64], uint8_t z[32])
+{
+    uint8_t pk[32], their[65], sec[65];
+    CryptoKey kp, kt, ks;
+    ECDH_OperationComputeSharedSecret op;
+    if (!s_ecdh) return -1;
+    memcpy(pk, priv, 32);
+    their[0] = 0x04; memcpy(their + 1, peer, 64);
+    CryptoKeyPlaintext_initKey(&kp, pk, 32);
+    CryptoKeyPlaintext_initKey(&kt, their, sizeof their);
+    CryptoKeyPlaintext_initBlankKey(&ks, sec, sizeof sec);
+    ECDH_OperationComputeSharedSecret_init(&op);
+    op.curve = &ECCParams_NISTP256; op.myPrivateKey = &kp; op.theirPublicKey = &kt; op.sharedSecret = &ks;
+    int rc = ECDH_computeSharedSecret(s_ecdh, &op) == ECDH_STATUS_SUCCESS ? 0 : -1;   /* ungueltiger Punkt -> Fehler */
+    if (rc == 0) memcpy(z, sec + 1, 32);                                              /* Z = x-Koordinate */
+    memset(pk, 0, sizeof pk); memset(sec, 0, sizeof sec);
+    return rc;
+}
+
+/* ======================= Flash (NVS-Treiber) ======================= */
+typedef struct { uint_least8_t idx; NVS_Handle h; } nvs_dev_t;
+static nvs_dev_t d_flnv = {CONFIG_NVS_FLNV, NULL}, d_log = {CONFIG_NVS_LOG, NULL}, d_slot1 = {CONFIG_NVS_SLOT1, NULL};
+
+static NVS_Handle dev(nvs_dev_t *d)
+{
+    if (!d->h) { NVS_Params p; NVS_Params_init(&p); d->h = NVS_open(d->idx, &p); }
+    return d->h;
+}
+static int f_read(void *c, uint32_t off, void *buf, size_t len) { NVS_Handle h = dev(c); return h && NVS_read(h, off, buf, len) == NVS_STATUS_SUCCESS ? 0 : -1; }
+static int f_write(void *c, uint32_t off, const void *buf, size_t len)
+{
+    NVS_Handle h = dev(c);
+    return h && NVS_write(h, off, (void *)buf, len, NVS_WRITE_POST_VERIFY) == NVS_STATUS_SUCCESS ? 0 : -1;
+}
+static int f_erase(void *c, uint32_t off) { NVS_Handle h = dev(c); return h && NVS_erase(h, off & ~(FL_FLASH_SECTOR - 1u), FL_FLASH_SECTOR) == NVS_STATUS_SUCCESS ? 0 : -1; }
+
+static const fl_flash_t fl_nv_flash = {f_read, f_write, f_erase, &d_flnv, FL_NV_SIZE, FL_FLASH_SECTOR};
+static const fl_flash_t fl_log_dev = {f_read, f_write, f_erase, &d_log, FL_LOG_SIZE, FL_FLASH_SECTOR};
+static const fl_flash_t fl_slot1_dev = {f_read, f_write, f_erase, &d_slot1, FL_SLOT1_SIZE, FL_FLASH_SECTOR};
+const fl_flash_t *fl_port_log_flash(void) { return &fl_log_dev; }
+const fl_flash_t *fl_port_slot1_flash(void) { return &fl_slot1_dev; }
+
+static fl_nvs_t s_nvs;
+static bool s_nvs_ok;
+static void nvs_ready(void) { if (!s_nvs_ok) s_nvs_ok = fl_nvs_init(&s_nvs, &fl_nv_flash) == 0; }
+int fl_port_nv_read(uint8_t id, void *buf, uint16_t len) { nvs_ready(); return s_nvs_ok ? fl_nvs_read(&s_nvs, id, buf, len) : -1; }
+int fl_port_nv_write(uint8_t id, const void *buf, uint16_t len) { nvs_ready(); return s_nvs_ok ? fl_nvs_write(&s_nvs, id, buf, len) : -1; }
+int fl_port_nv_delete(uint8_t id) { nvs_ready(); return s_nvs_ok ? fl_nvs_delete(&s_nvs, id) : -1; }
+
+/* ======================= MCUboot ======================= */
+int fl_port_ota_request_test(void) { return boot_set_pending(0); }      /* Test-Swap, Rueckfall ohne Bestaetigung */
+int fl_port_ota_confirm(void) { return boot_set_confirmed(); }
+bool fl_port_image_confirmed(void)
+{
+    struct boot_swap_state st;
+    if (boot_read_swap_state_by_id(FLASH_AREA_IMAGE_PRIMARY(0), &st) != 0) return true;
+    return st.image_ok == BOOT_FLAG_SET || st.magic != BOOT_MAGIC_GOOD;   /* Werks-Image (--confirm) */
+}
+void fl_port_fw_version(uint8_t v[4], uint32_t *b)
+{
+    const struct image_header *h = (const struct image_header *)FL_SLOT0_BASE;
+    if (h->ih_magic == IMAGE_MAGIC) {
+        v[0] = h->ih_ver.iv_major; v[1] = h->ih_ver.iv_minor;
+        v[2] = (uint8_t)h->ih_ver.iv_revision; v[3] = (uint8_t)(h->ih_ver.iv_revision >> 8);
+        *b = h->ih_ver.iv_build_num;
+    } else { memset(v, 0, 4); *b = 0; }
+}
+
+/* ======================= System ======================= */
+static Watchdog_Handle s_wdt;
+void fl_port_wdt_kick(void) { if (s_wdt) Watchdog_clear(s_wdt); }
+
+uint8_t fl_port_reset_reason(void)
+{
+    uint32_t r = PMCTLGetResetReason();
+    if (r == PMCTL_RESET_WATCHDOG) return FL_RR_WATCHDOG;
+    if (r == PMCTL_RESET_SYSTEM || r == PMCTL_RESET_CPU) return FL_RR_SOFTWARE;
+    if (r == PMCTL_RESET_LOCKUP) return FL_RR_HARDFAULT;
+    if (r == PMCTL_RESET_PIN) return FL_RR_PIN;
+    if (r == PMCTL_RESET_VDDS || r == PMCTL_RESET_VDDR) return FL_RR_BROWNOUT;
+    return FL_RR_POWER_ON;
+}
+void fl_port_reboot(void) { PMCTLResetSystem(); }
+void fl_port_shutdown(void)
+{
+    /* Unterspannung (FW-5): alles aus, Wecken nur ueber Taster (Shutdown-Wakeup low an DIO21) */
+    pins_sleep_state();
+    GPIO_setConfig(FLUIDI_DIO_BUTTON, GPIO_CFG_IN_PU | GPIO_CFG_SHUTDOWN_WAKE_LOW);
+    Power_shutdown(0, 0);
+}
+
+/* ======================= Zeitplanung ======================= */
+static BLEAppUtil_timerHandle s_timer = BLEAPPUTIL_TIMER_INVALID_HANDLE;
+static bool s_started;
+
+static void timer_cb(BLEAppUtil_timerHandle h, BLEAppUtil_timerTermReason_e r, void *p)
+{
+    (void)h; (void)p;
+    if (r == BLEAPPUTIL_TIMER_TIMEOUT) { s_timer = BLEAPPUTIL_TIMER_INVALID_HANDLE; fl_platform_reschedule(); }
+}
+
+void fl_platform_reschedule(void)
+{
+    if (!s_started) return;
+    fl_app_on_tx_ready();
+    uint32_t d = fl_app_process();
+    if (g_fl.txq_n && d > 20) d = 20;
+    if (d == 0) d = 1;
+    if (s_timer != BLEAPPUTIL_TIMER_INVALID_HANDLE) BLEAppUtil_abortTimer(s_timer);
+    s_timer = BLEAppUtil_startTimer(timer_cb, d, false, NULL);
+}
+
+void fl_platform_start_app(void)
+{
+    Watchdog_Params wp;
+    Watchdog_Params_init(&wp);
+    wp.resetMode = Watchdog_RESET_ON;
+    s_wdt = Watchdog_open(CONFIG_WATCHDOG_0, &wp);       /* uebernimmt von MCUboot (60 s) -> 10 min (syscfg) */
+    fl_port_button_pullup(true);
+    fl_app_init();
+    s_started = true;
+    fl_platform_reschedule();
+}
+
+void fl_platform_early_init(void)
+{
+    /* FW-6: SWDIO (DIO16, Pull-up) / SWDCK (DIO17, Pull-down) sofort als Ausgang low -> keine Pulls, kein Strom
+     * ueber R4/R5 in den abgeschalteten TMP. Serie: SWD zusaetzlich per CCFG sperren (README). */
+    GPIO_init();
+    pins_sleep_state();
+    BatteryMonitor_init();
+}
+
+void fl_platform_fatal(uint8_t code) { (void)code; PMCTLResetSystem(); }

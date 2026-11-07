@@ -781,7 +781,7 @@ Ereignis mit Shunt/Power-Profiler messen (Energiemessplan folgt), Modellwerte `T
 
 ## 14 Testvektoren und Prüfung (für beide Seiten)
 
-- Python-Referenz (`firmware/tools/fluidi_proto.py`, folgt): erzeugt und prüft alle Frames, HKDF/CCM-
+- Python-Referenz (`firmware/tools/fluidi_proto.py`, vorhanden seit Welle 2): erzeugt und prüft alle Frames, HKDF/CCM-
   Testvektoren (RFC 5869 Testfall 1 für HKDF-SHA-256, RFC 3610 Paket 1 bzw. NIST SP 800-38C für CCM),
   SAS-Berechnung. Beide Firmwares MÜSSEN diese Vektoren in Unit-Tests bestehen.
 - Interop-Test: Sensor-Muster ↔ Gateway: Koppeln, 1000 Sitzungen, Trennung in jeder Phase (Duplikat-/
@@ -825,3 +825,20 @@ Ereignis mit Shunt/Power-Profiler messen (Energiemessplan folgt), Modellwerte `T
 | FW-P6 | OTA-Schwellen 2700 mV / 25 % und „Batterie tief“-Rückfall 2.55 V an der Entladekennlinie unter Pulslast festlegen | Firmware, Elektronik |
 | FW-P7 | Company-ID 0xFFFF: Zulässigkeit für Eigengebrauch bestätigen | Sicherheit/Orchestrator |
 | FW-P8 | P_MISS aus Koexistenztest (OP-K12) → `adv_interval`-Werkseinstellung | Software, Prototyp |
+
+## 17 Präzisierungen aus der Implementierung (Firmware Welle 2, 2026-11-07 – zur Prüfung durch Software- und Sicherheits-Agent)
+
+Kompatible Ergänzungen bzw. Festlegungen bisher offener Details; die Protokollversion bleibt 1.
+Umsetzung: `firmware/sensor/` (Kern `core/`, Host-Tests gegen `firmware/tools/fluidi_proto.py`).
+
+| Nr | Punkt | Festlegung |
+|---|---|---|
+| P-1 | Byte-Reihenfolge `sensor_addr` (PAIR_RSP, HKDF-info, CCM-Nonce) | **LSB zuerst** wie im BLE-Link-Layer (TI-Stack, NimBLE, BlueZ-Rohdaten): 80:6F:B0:12:AB:CD → `CD AB 12 B0 6F 80` |
+| P-2 | Werkskalibrierung Messkette (Rev B, D-018, PINMAP FW-3) | neue TLV-ids in SET/GET_SETTINGS: `0x10 cref_eff` u16 0.01 pF (Start 1729), `0x11 cpar` u16 0.01 pF (1521), `0x12 td0_ps` u16 (0), `0x13 td_kv` i16 ps/V (0), `0x14 td_kt` i16 ps/K (0), `0x15 c_kv` i16 0.01 pF/V (533 = 5.33 pF/V), `0x16 c_kt` i16 0.001 pF/K (0). Bleiben bei Werkseinstellung/UNPAIR erhalten. Startwerte: `simulation/spice/osc/osc_report.txt` |
+| P-3 | `c_diag` (Rev B) | immer `0xFFFF` (Cref2 entfällt, PINMAP Rev B); `diag_f2` wird ignoriert |
+| P-4 | Ringspeicher (6.3) | interne Ablage 24 Byte/Eintrag (Datensatz + CRC16), ein Sektor stets frei: `log_capacity` = **840** (garantiert, bis 924) |
+| P-5 | Flash-Aufteilung (6.4) | 0x77800 BLE-Stack-NV 4 kB, 0x78800 fluidi-NV 4 kB (statt 8 kB gemeinsam); übrige Bereiche unverändert |
+| P-6 | `ERROR` bei falscher Frame-Version | 3 Byte `vt=0x1F · 0x08 · 1` (detail = unterstützte Version), danach Trennen |
+| P-7 | Nach `PAIR_DONE` | Verbindung bleibt offen, bis das Gateway trennt (3 s ohne Frame → Sensor trennt); `HELLO` ist in dieser Verbindung erlaubt |
+| P-8 | `MEASURE.led = 1` | Quittung Grün 1 × 30 ms (L2-Muster) **nach** dem Trennen (keine LED während Funk) |
+| P-9 | Images prüfen | `firmware/sensor/tools/verify_image.py` (Kopf, SHA-256-TLV, ECDSA-P256, Sicherheitszähler) – Vorlage für das Gateway; imgtool 2.2.0rc1 `verify` ist defekt |

@@ -1,0 +1,41 @@
+/*
+ * fluidi Sensor – MCUboot (Bootloader im internen Flash ab 0x0)
+ * Chip CC2340R52E0RGER -> SysConfig-Device CC2340R5RGE (kein LaunchPad).
+ * Flash-Aufteilung: firmware/PROTOCOL.md Kap. 6.4 und config/fluidi_flash_layout.h (MUSS uebereinstimmen,
+ * `make check-layout` prueft das).
+ * Modus Swap-using-Move (Test/Bestaetigung + Rueckfall, REQ-FW-03), ECDSA-P256 (REQ-FW-04),
+ * Anti-Rollback-Sicherheitszaehler im letzten MCUboot-Sektor (BIMINFO, security_cnt.c).
+ * Grundlage: SDK examples/nortos/LP_EM_CC2340R5/mcuboot/mcuboot/mcuboot.syscfg (SDK 9.23.00.27).
+ */
+// @cliArgs --device CC2340R5RGE --package RGE --part Default --rtos nortos
+
+const Board = scripting.addModule("/ti/drivers/Board");  /* liefert -DDeviceFamily_CC23X0R5 */
+const mcuboot = scripting.addModule("/ti/common/mcuboot");
+mcuboot.mode = "swapUsingMove";
+mcuboot.antiRollbackProtection = true;
+mcuboot.watchdogTimeoutMs = 60000;
+mcuboot.bootloaderBaseAddress = 0x00000;
+mcuboot.bootloaderSize = 0x06000;
+mcuboot.primaryBase1 = 0x06000;
+mcuboot.primarySize1 = 0x39000;
+mcuboot.secondaryBase1 = 0x3F000;
+mcuboot.secondarySize1 = 0x38800;
+
+const CCFG = scripting.addModule("/ti/devices/CCFG");
+const ccfgSettings = system.getScript("/ti/common/lprf_ccfg_settings.js").ccfgSettings;
+for (var setting in ccfgSettings) {
+    CCFG[setting] = ccfgSettings[setting];
+}
+/* Boot (TRM S.460 Tab. 8-35): pAppVtor = MCUboot (0x0), pBldrVtor = UNDEF -> ROM-Seriell-Bootloader mit
+ * CCFG-Parametern. ENTWICKLUNGSZUSTAND: Bootloader aktiv, nur bei gedruecktem Taster DIO21 (aktiv low) beim
+ * Start (TRM S.465 Kap. 8.5.2), UART RX DIO20 / TX DIO6 (serialIoCfgIndex 0, TRM Tab. 8-38).
+ * SERIE: scripts/flash_sensor.py --lock schreibt eine CCFG mit pBldrVtor = FORBID, bldrEnabled = 0,
+ * SWD verboten (README Kap. Sicherheit; CONCEPTS 2.8). */
+CCFG.bldrSetting = "Default FCFG bootloader, with CCFG settings";
+CCFG.bldrEnabled = true;
+CCFG.serialIoCfgIndex = 0;
+CCFG.pinTriggerEnabled = true;
+CCFG.pinTriggerDio = 21;
+CCFG.pinTriggerLevel = "LOW";
+CCFG.srcClkLF = "LF XOSC";
+CCFG.ccfgTemplate.$name = "ti_devices_CCFG_CCFGCC26XXTemplate0";

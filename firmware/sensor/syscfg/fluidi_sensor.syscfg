@@ -1,0 +1,104 @@
+/*
+ * fluidi Sensor – SysConfig (Anwendung, BLE Peripheral, FreeRTOS)
+ * Chip: CC2340R52E0RGER (QFN24 RGE) -> SysConfig-Device "CC2340R5RGE", KEIN LaunchPad-Board.
+ * Pins werden NICHT hier vergeben, sondern zur Laufzeit aus config/fluidi_board.h (zentrale Pinliste),
+ * damit Aenderungen der Pinbelegung (PINMAP_SENSOR.md Rev A/B) an genau einer Stelle nachgezogen werden.
+ * Grundlage: SDK-Beispiel examples/rtos/LP_EM_CC2340R5/ble/basic_ble/freertos/basic_ble.syscfg (SDK 9.23.00.27).
+ */
+// @cliArgs --device CC2340R5RGE --package RGE --part Default --rtos freertos
+
+/* ======== BLE ======== */
+var ble = scripting.addModule("/ti/ble/ble");
+ble.deviceRole = "PERIPHERAL_CFG";
+ble.basicBLE = true;
+ble.maxConnNum = 1;
+ble.deviceName = "fluidi";
+/* Oeffentliche Adresse aus FCFG = Sensor-ID (PROTOCOL.md 2.3); kein BLE-Pairing/Bonding (PROTOCOL.md 3/4.1) */
+ble.addressMode = "ADDRMODE_PUBLIC";
+ble.bondPairing = "GAPBOND_PAIRING_MODE_NO_PAIRING";
+ble.numOfAdvSets = 1;
+ble.advSet1.advData1.GAP_ADTYPE_FLAGS = true;
+ble.advSet1.advData1.advertisingFlags = ["GAP_ADTYPE_FLAGS_BREDR_NOT_SUPPORTED","GAP_ADTYPE_FLAGS_GENERAL"];
+
+/* ======== RCL ======== */
+const RCL = scripting.addModule("/ti/drivers/RCL");
+
+/* ======== POWER ======== */
+var Power = scripting.addModule("/ti/drivers/Power");
+
+/* ======== RNG ======== */
+var RNG = scripting.addModule("/ti/drivers/RNG");
+RNG.rngReturnBehavior = "RNG_RETURN_BEHAVIOR_BLOCKING";
+var rngF = RNG.addInstance();
+rngF.$name = "CONFIG_RNG_FLUIDI";
+
+/* ======== Krypto-Treiber (Hardware-AES fuer CCM, ECDH P-256 in Software) ======== */
+var AESECB = scripting.addModule("/ti/drivers/AESECB");
+var aesecb = AESECB.addInstance();
+aesecb.$name = "CONFIG_AESECB_FLUIDI";
+var ECDH = scripting.addModule("/ti/drivers/ECDH");
+var ecdh = ECDH.addInstance();
+ecdh.$name = "CONFIG_ECDH_FLUIDI";
+
+/* ======== Watchdog ======== */
+var Watchdog = scripting.addModule("/ti/drivers/Watchdog");
+var wdt = Watchdog.addInstance();
+wdt.$name = "CONFIG_WATCHDOG_0";
+wdt.period = 600000;   /* 10 min; Anwendung wacht spaetestens alle 5 min (core/fl_app.c) */
+
+/* ======== I2C (TMP1075) – Pins: DIO16 SDA / DIO17 SCL (PINMAP_SENSOR.md) ======== */
+var I2C = scripting.addModule("/ti/drivers/I2C");
+var i2c = I2C.addInstance();
+i2c.$name = "CONFIG_I2C_TMP";
+i2c.i2c.sdaPin.$assign = "DIO16_SWDIO";
+i2c.i2c.sclPin.$assign = "DIO17_SWDCK";
+
+/* ======== GPIO-Treiber (Pins werden in fluidi_board.h zur Laufzeit konfiguriert) ======== */
+var GPIO = scripting.addModule("/ti/drivers/GPIO");
+
+/* ======== RF Design ======== */
+var rfDesign = scripting.addModule("ti/devices/radioconfig/rfdesign");
+const rfDesignSettings = system.getScript("/ti/common/lprf_rf_design_settings.js").rfDesignSettings;
+for(var setting in rfDesignSettings)
+{
+    rfDesign[setting] = rfDesignSettings[setting];
+}
+
+/* ======== Device / CCFG ======== */
+var device = scripting.addModule("ti/devices/CCFG");
+const ccfgSettings = system.getScript("/ti/common/lprf_ccfg_settings.js").ccfgSettings;
+for(var setting in ccfgSettings)
+{
+    device[setting] = ccfgSettings[setting];
+}
+/* 32.768-kHz-Quarz Y2 (LFXT) an DIO3/DIO4 (PINMAP_SENSOR.md 1) */
+device.srcClkLF = "LF XOSC";
+
+/* ======== FreeRTOS ======== */
+const FreeRTOS = scripting.addModule("/freertos/FreeRTOS");
+const Settings = scripting.addModule("/ti/posix/freertos/Settings");
+const bleCommon = system.getScript("/ti/ble/.meta/ble_common.js");
+FreeRTOS.heapSize = 0x00004D50;
+FreeRTOS.maxPriorities = 10;
+bleCommon.configureTimerTaskPriority(FreeRTOS);
+FreeRTOS.timerStackSize = 0x00000190;
+FreeRTOS.idleStackSize = 0x00000130;
+
+/* ======== NVS (Flash-Aufteilung: config/fluidi_flash_layout.h, PROTOCOL.md 6.4) ======== */
+var NVS = scripting.addModule("/ti/drivers/NVS");
+var nvs = NVS.addInstance();           /* Index 0: BLE-Stack-NV (nvocmp, NVOCMP_NVPAGES=2) */
+nvs.$name = "CONFIG_NVSINTERNAL";
+nvs.internalFlash.regionBase = 0x77800;
+nvs.internalFlash.regionSize = 0x1000;
+var nvsFl = NVS.addInstance();         /* fluidi-NV (core/fl_nvstore.c) */
+nvsFl.$name = "CONFIG_NVS_FLNV";
+nvsFl.internalFlash.regionBase = 0x78800;
+nvsFl.internalFlash.regionSize = 0x1000;
+var nvsLog = NVS.addInstance();        /* Ringspeicher Datensaetze (core/fl_ringlog.c) */
+nvsLog.$name = "CONFIG_NVS_LOG";
+nvsLog.internalFlash.regionBase = 0x79800;
+nvsLog.internalFlash.regionSize = 0x6000;
+var nvsSlot1 = NVS.addInstance();      /* MCUboot Slot 1 (OTA-Ziel) */
+nvsSlot1.$name = "CONFIG_NVS_SLOT1";
+nvsSlot1.internalFlash.regionBase = 0x3F000;
+nvsSlot1.internalFlash.regionSize = 0x38800;

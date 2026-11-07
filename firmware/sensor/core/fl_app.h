@@ -1,0 +1,125 @@
+/*
+ * fluidi – Anwendungslogik Sensor (plattformneutral): Zustandsautomat, Sitzung/Kopplung nach PROTOCOL.md,
+ * Messplan, Ringspeicher, LED/Taster, Unterspannung, Ladungsschaetzung, OTA-Bestaetigung.
+ * Die Plattform ruft die fl_app_on_*-Funktionen aus EINEM Task auf und schlaeft bis zur gelieferten Frist.
+ */
+#ifndef FL_APP_H
+#define FL_APP_H
+#include <stdint.h>
+#include <stdbool.h>
+#include "fl_settings.h"
+#include "fl_ringlog.h"
+#include "fl_ui.h"
+#include "fl_ota.h"
+
+typedef enum { FL_MODE_UNPAIRED = 0, FL_MODE_PAIRING, FL_MODE_NORMAL, FL_MODE_UNDERVOLTAGE } fl_mode_t;
+
+typedef enum {
+    FL_SESS_NONE = 0, FL_SESS_WAIT_HELLO, FL_SESS_SECURE_WAIT, FL_SESS_SECURE,
+    FL_SESS_PAIR_RSP_SENT, FL_SESS_PAIR_SHOWING, FL_SESS_CLOSING
+} fl_sess_state_t;
+
+/* nichtfluechtige Zaehler (FL_NV_COUNTERS) */
+typedef struct {
+    uint16_t boot_id;
+    uint16_t wdt_resets, brownouts, auth_fail, button_stuck;
+    uint8_t  last_error, ota_result;
+    uint8_t  ota_expect;                 /* 1 = Update angestossen, Ergebnis beim naechsten Start bewerten */
+    uint8_t  pad;
+    uint8_t  ota_ver[4];
+    uint32_t ota_build;
+} fl_counters_t;
+
+/* Kopplungsdaten (FL_NV_PAIR); Schluesselbereich mit Zufallsbyte aufgefuellt (PROTOCOL.md 4.6) */
+typedef struct {
+    uint8_t paired;
+    uint8_t gateway_id[8];
+    uint8_t k_link[16];
+    uint8_t fill[39];
+} fl_pairing_t;
+
+typedef struct { uint8_t code, detail; uint16_t boot_id; uint32_t uptime_s; } fl_diag_entry_t;
+typedef struct { uint8_t head, count; uint8_t pad[2]; fl_diag_entry_t e[16]; } fl_diag_t;
+
+typedef struct {
+    /* Konfiguration / Persistenz */
+    fl_settings_t set;
+    fl_pairing_t pair;
+    fl_counters_t cnt;
+    fl_diag_t diag;
+    fl_log_meta_t logmeta;
+    fl_log_t log;
+    uint8_t addr[6];
+    uint8_t fw_ver[4];
+    uint32_t fw_build;
+    uint8_t reset_reason;
+
+    /* Zustand */
+    fl_mode_t mode, mode_before_pairing;
+    uint32_t pairing_until;
+    bool locked; uint32_t locked_until;
+    uint8_t fail_streak;
+    bool error_active, batt_low, water;
+    uint8_t low_count, uv_count;
+    uint16_t vbat_load, vbat_rest;
+    bool last_meas_ok, tmp_ok;
+    uint32_t last_contact_ms; bool had_contact;
+    uint32_t fast_adv_until;
+    uint32_t next_meas_ms, next_minute_ms, minute_counter;
+    uint32_t meas_count, adv_count, conn_count;
+    uint32_t charge_uc, charge_ref_ms;
+    bool image_test; uint32_t test_deadline_ms; bool ota_confirmed_now;
+    uint32_t reboot_at; bool reboot_pending;
+    bool stuck; uint32_t stuck_check_ms;
+
+    /* Zeit */
+    bool time_valid; int64_t unix_offset_ms; int16_t tz_min; uint32_t time_set_ms;
+
+    /* Taster-Messung: Anzeige "gesendet/gepuffert" */
+    bool btn_wait; uint32_t btn_seq; uint32_t btn_deadline;
+    fl_led_pattern_t after_disc_led;
+
+    /* Advertising (zuletzt gesetzt) */
+    uint8_t adv_state_set; uint16_t adv_vbat_set; uint32_t adv_seq_set, adv_int_set;
+    bool adv_conn_set, adv_on_set, adv_valid;
+
+    /* Verbindung / Sitzung */
+    bool connected;
+    fl_sess_state_t sess;
+    uint32_t t_conn, t_last_rx, sess_deadline;
+    uint8_t k_s[16];
+    uint32_t ctr_rx, ctr_tx;
+    bool authed, ota_in_session;
+    /* Datensatzstrom */
+    bool stream; uint8_t stream_rid; uint32_t stream_next; uint32_t stream_left;
+    uint8_t txq[3][247]; uint16_t txq_len[3]; uint8_t txq_n;      /* Frames, die auf freien BLE-Puffer warten */
+    /* Kopplung */
+    uint8_t pr_req[88], pr_rsp[91], transcript[32], k_link_new[16], k_conf[16], gw_id_new[8];
+    uint8_t sas[5];
+    bool pair_user_ok, pair_gw_ok;
+    uint32_t pair_deadline;
+
+    fl_led_t led;
+    fl_btn_t btn;
+    fl_ota_t ota;
+} fl_app_t;
+
+extern fl_app_t g_fl;
+
+void     fl_app_init(void);
+void     fl_app_on_connect(void);
+void     fl_app_on_disconnect(void);
+void     fl_app_on_rx(const uint8_t *data, uint16_t len);
+void     fl_app_on_button(bool pressed);
+void     fl_app_on_tx_ready(void);
+void     fl_app_on_adv_event(void);
+/* Faellige Arbeit erledigen; Rueckgabe: ms bis zur naechsten Frist (Plattform schlaeft so lange oder bis Ereignis) */
+uint32_t fl_app_process(void);
+
+/* fuer Tests */
+int      fl_app_measure(uint8_t cause, fl_record_t *rec);
+void     fl_app_factory_reset(void);
+uint8_t  fl_app_state_bits(void);
+size_t   fl_app_session_info(uint8_t *out, bool extended);
+
+#endif
