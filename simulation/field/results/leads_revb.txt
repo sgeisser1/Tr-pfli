@@ -1,0 +1,99 @@
+## 1 Zuleitungen aus der Platine (pcbnew, hardware/sensor/fluidi_sensor.kicad_pcb)
+- L2: x -8.000 mm, Breite 0.300, Kanal (Abstand zum Guard) 0.300, Y 20.50 ... 64.00 (Laenge 43.50 mm)
+- L3: x -7.000 mm, Breite 0.300, Kanal (Abstand zum Guard) 0.300, Y 20.50 ... 64.00 (Laenge 43.50 mm)
+- Querschnitt Y 30.0: Kante -13.00/+13.00; F S [] G []...; L2 S [(-8.15, -7.85)] G [(-11.95, -8.4505), (-7.5495, 11.95)]...; L3 S [(-7.15, -6.85)] G [(-11.95, -7.4505), (-6.5495, -0.4005)]...
+- Querschnitt Y 47.9: Kante -10.00/+10.00; F S [] G [(-7.9607, -7.065), (-6.765, -6.615), (-6.315, -5.64)]...; L2 S [(-8.15, -7.85)] G [(-8.75, -8.4505), (-7.5495, -5.4127), (-4.5873, 8.75)]...; L3 S [(-7.15, -6.85)] G [(-8.75, -7.4505), (-6.5495, -5.4127)]...
+- Querschnitt Y 48.95: Kante -10.00/+10.00; F S [] G [(-8.525, -4.79)]...; L2 S [(-8.15, -7.85)] G [(-8.75, -8.4505), (-7.5495, -5.5225), (-5.21, -4.79), (-4.4775, 8.75)]...; L3 S [(-7.15, -6.85)] G [(-8.75, -7.4505), (-6.5495, -5.5225), (-5.21, 1.2606)]...
+- Querschnitt Y 55.0: Kante -10.00/+10.00; F S [] G []...; L2 S [(-8.15, -7.85)] G [(-8.75, -8.4505), (-7.5495, 8.75)]...; L3 S [(-7.15, -6.85)] G [(-8.75, -7.4505), (-6.5495, 8.75)]...
+- Querschnitt Y 60.0: Kante -10.00/+10.00; F S [] G []...; L2 S [(-8.15, -7.85)] G [(-8.75, -8.4505), (-7.5495, 8.75)]...; L3 S [(-7.15, -6.85)] G [(-8.75, -7.4505), (-6.5495, 8.75)]...
+
+## 2 Abschnitte (Y 20.80 ... 61.5, Raster 0.05 mm): 196 verschiedene Querschnitte
+
+| Zone | Y | Laenge [mm] | C [pF] bei Aussen-eps 1 / 4 / 25 / 80 / leitend | FR4 +10 % [pF] (eps 1) |
+|---|---|---|---|---|
+| schott | 20.78-23.2 | 2.40 | 0.429 / 0.473 / 0.564 / 0.605 / 0.641 | 0.040 |
+| fach | 23.2-46.0 | 22.80 | 4.125 / 4.538 / 5.384 / 5.771 / 6.103 | 0.387 |
+| kragen | 46.0-51.5 | 5.50 | 1.053 / 1.141 / 1.319 / 1.402 / 1.475 | 0.100 |
+| frei | 51.5-58.5 | 7.00 | 1.262 / 1.384 / 1.634 / 1.755 / 1.862 | 0.119 |
+| erde | 58.5-61.5 | 3.00 | 0.541 / 0.593 / 0.700 / 0.752 / 0.798 | 0.051 |
+
+Belag C' [pF/m] synthetisch (Guard ohne U3-Feld), Aussen-eps 1 / 4 / 25 / 80 / leitend:
+- revb  sonde: 180.2 / 197.6 / 233.4 / 250.6 / 265.9   (Kopplung nach aussen eps 1 -> 80: +70.4 pF/m)
+- revb  fach : 180.8 / 199.0 / 236.2 / 253.1 / 267.4   (Kopplung nach aussen eps 1 -> 80: +72.3 pF/m)
+- alt   sonde: 170.4 / 188.8 / 226.5 / 243.6 / 257.3   (Kopplung nach aussen eps 1 -> 80: +73.2 pF/m)
+- alt   fach : 170.4 / 188.8 / 226.9 / 244.3 / 258.5   (Kopplung nach aussen eps 1 -> 80: +73.9 pF/m)
+- kap8  sonde: 92.5 / 101.5 / 120.0 / 128.5 / 135.9   (Kopplung nach aussen eps 1 -> 80: +36.0 pF/m)
+- kap8  fach : 92.5 / 101.5 / 120.1 / 128.7 / 136.2   (Kopplung nach aussen eps 1 -> 80: +36.1 pF/m)
+- schmal sonde: 175.9 / 183.9 / 199.0 / 205.6 / 211.3   (Kopplung nach aussen eps 1 -> 80: +29.7 pF/m)
+- schmal fach : 176.1 / 184.3 / 199.8 / 206.5 / 211.8   (Kopplung nach aussen eps 1 -> 80: +30.4 pF/m)
+
+## 3 Ganze Zuleitung bis Guard-Ende (Y 20.8 ... 61.5) [pF]: Rev B / alt (x -4.875, L2+L3) / Kap. 8 (L2 -4.9) / Option schmal (Rev-B-Lage, 0.15 mm, Kanal 0.2; synthetisch)
+| Fall | Rev B | alt | Kap. 8 | schmal |
+|---|---|---|---|---|
+| Betrieb, Erde Luft | 7.543 | 7.080 | 3.836 | 7.227 |
+| Betrieb, Erde trocken (4) | 7.595 | 7.136 | 3.863 | 7.251 |
+| Betrieb, Erde nass (25) | 7.702 | 7.249 | 3.919 | 7.296 |
+| Betrieb, Erde Wasser (80) | 7.754 | 7.300 | 3.944 | 7.316 |
+| Oberflaeche nass: frei+Erde 25 | 8.074 | 7.642 | 4.111 | 7.457 |
+| ueberflutet bis Verguss: frei+Erde 80 | 8.247 | 7.812 | 4.196 | 7.524 |
+| Wasser leitend bis Verguss | 8.399 | 7.949 | 4.270 | 7.581 |
+| Fach geflutet (80), sonst trocken | 9.241 | 8.821 | 4.687 | 7.944 |
+| Fach geflutet leitend, sonst trocken | 9.573 | 9.144 | 4.859 | 8.066 |
+| Verguss eps 3 / 6 (trocken) | 7.559 / 7.652 | 7.096 / 7.199 | 3.844 / 3.894 | 7.234 / 7.277 |
+
+Band: /PROBE_SENSE F 7.2 mm, B 3.5 mm, 4 Vias; Mikrostreifen 83.5 pF/m -> 0.89 pF (ohne Vias/Pads)
+
+## 4 3D-Vollmodell (Elmer, Kopf z_f -15...0 Luft wie REPORT Kap. 6) [pF]
+| Fall | alt h1.4 | alt h1 | revb h1.4 | revb h1 | revb-alt h1.0 | revb-alt h1.4 |
+|---|---|---|---|---|---|---|
+| air | 9.853 | 9.278 | 10.106 | 9.518 | +0.240 | +0.253 |
+| dry | 14.972 | 14.316 | 15.207 | 14.538 | +0.222 | +0.234 |
+| e10 | 23.343 | 22.573 | 23.554 | 22.773 | +0.200 | +0.210 |
+| wet | 38.598 | 37.661 | 38.782 | 37.838 | +0.177 | +0.184 |
+| water | 67.291 | 66.111 | 67.467 | 66.286 | +0.175 | +0.177 |
+| air_fr4wet | 10.602 | 9.977 | 10.883 | 10.243 | +0.266 | +0.281 |
+| water_fr4wet | 70.751 | 69.487 | 70.947 | 69.681 | +0.194 | +0.196 |
+| wet_flood | 39.649 | 38.687 | 39.779 | 38.809 | +0.122 | +0.130 |
+| water_flood | 69.451 | 68.239 | 69.559 | 68.345 | +0.107 | +0.108 |
+| dry_flood | 15.182 | 14.516 | 15.406 | 14.727 | +0.210 | +0.224 |
+| fill010.0 | 36.730 | 35.841 | 36.974 | 36.076 | +0.235 | +0.244 |
+| fill090.0 | 9.976 | 9.399 | 10.231 | 9.640 | +0.241 | +0.254 |
+
+Sonde (Messfeld + Zuleitung ab z_f -15) extrapoliert: alt / neu [pF] (Differenz aus h 1):
+- air  : 8.690 / 8.930  (+0.240)
+- dry  : 13.634 / 13.855  (+0.222)
+- wet  : 36.666 / 36.843  (+0.177)
+- water: 64.866 / 65.040  (+0.175)
+- Spanne trocken->nass: 23.033 / 22.988 pF (-0.19 %)
+- h 1 wet_flood: Zusatz gegen Erde ab z_f 5: alt +1.026 pF (+4.4 % Spanne), neu +0.971 pF (+4.2 % Spanne)
+- h 1 water_flood: Zusatz gegen Erde ab z_f 5: alt +2.127 pF (+9.1 % Spanne), neu +2.059 pF (+8.8 % Spanne)
+- h 1 dry_flood: Zusatz gegen Erde ab z_f 5: alt +0.200 pF (+0.9 % Spanne), neu +0.189 pF (+0.8 % Spanne)
+- h 1 Wasser/Erde bis Vergusskante (z_f -2), eps 25: 3D z_f 0...5 +0.971 + Zuleitung z_f -2...0 (2D) +0.106 = +1.078 pF (+4.6 % Spanne)
+- h 1 Wasser/Erde bis Vergusskante (z_f -2), eps 80: 3D z_f 0...5 +2.059 + Zuleitung z_f -2...0 (2D) +0.141 = +2.200 pF (+9.4 % Spanne)
+- h 1 Wasser/Erde bis Vergusskante (z_f -2), leitend: 3D z_f 0...5 +2.059 + Zuleitung z_f -2...0 (2D) +0.171 = +2.230 pF (+9.6 % Spanne)
+- h 1 FR4 +10 %: Luft alt/neu 2.99/3.11 % Spanne, Wasser 14.46/14.57 % Spanne
+- h 1 REQ-MES-08 Anteil 10-90 mm: alt 93.2 %, neu 93.3 %
+- h 1.4 wet_flood: Zusatz gegen Erde ab z_f 5: alt +1.051 pF (+4.5 % Spanne), neu +0.997 pF (+4.2 % Spanne)
+- h 1.4 water_flood: Zusatz gegen Erde ab z_f 5: alt +2.160 pF (+9.1 % Spanne), neu +2.091 pF (+8.9 % Spanne)
+- h 1.4 dry_flood: Zusatz gegen Erde ab z_f 5: alt +0.209 pF (+0.9 % Spanne), neu +0.199 pF (+0.8 % Spanne)
+- h 1.4 Wasser/Erde bis Vergusskante (z_f -2), eps 25: 3D z_f 0...5 +0.997 + Zuleitung z_f -2...0 (2D) +0.106 = +1.103 pF (+4.7 % Spanne)
+- h 1.4 Wasser/Erde bis Vergusskante (z_f -2), eps 80: 3D z_f 0...5 +2.091 + Zuleitung z_f -2...0 (2D) +0.141 = +2.232 pF (+9.5 % Spanne)
+- h 1.4 Wasser/Erde bis Vergusskante (z_f -2), leitend: 3D z_f 0...5 +2.091 + Zuleitung z_f -2...0 (2D) +0.171 = +2.262 pF (+9.6 % Spanne)
+- h 1.4 FR4 +10 %: Luft alt/neu 3.17/3.29 % Spanne, Wasser 14.64/14.76 % Spanne
+- h 1.4 REQ-MES-08 Anteil 10-90 mm: alt 93.1 %, neu 93.3 %
+- Ersatzschaltbild neu: C0 7.297 (alt 7.049), Ci 99.13 (alt 99.00), Cg 1.7114 (alt 1.7189) pF, Fit max 1.12 %
+- Knotenanteil ausserhalb 3D: (a) Zuleitung Y 20.8...38.5 (z_f < -15) 3.245 pF, (b+c) Y 38.5...53.5 Breite 26 mm/Verguss statt 3D-Kopf +0.156 pF
+- gleicher Anteil mit alter Zuleitung (x -4.875, L2+L3): 3.063 pF
+
+## 5 Messkette D3 (ngspice, osc_sim.py-Netzliste): Knoten alt 10.50 pF, neu 9.89 pF; C0 alt 7.049 / neu 7.297 pF
+| Sonde | Ecke | VDD | Cref | R3 | f_osc alt [MHz] | f_osc neu [MHz] | MEAS_CLK neu [MHz] | Aenderung |
+|---|---|---|---|---|---|---|---|---|
+| Luft | typ | 3.0 | f0 | 1 k | 27.43 | 27.72 | 3.465 | +1.1 % |
+| trocken | typ | 3.0 | f0 | 1 k | 24.24 | 24.47 | 3.059 | +1.0 % |
+| Mitte Leitung | typ | 3.0 | f0 | 1 k | 20.25 | 20.43 | 2.554 | +0.9 % |
+| nass Leitung | typ | 3.0 | f0 | 1 k | 14.91 | 15.02 | 1.877 | +0.7 % |
+| Wasser Leitung | typ | 3.0 | f0 | 1 k | 9.75 | 9.80 | 1.224 | +0.5 % |
+| Luft | hyst_min | 3.0 | f0 | 1 k | 36.05 | 36.44 | 4.555 | +1.1 % |
+| nass gedüngt normal | hyst_max | 2.4 | f1 | 1 k | 4.75 | 4.76 | 0.595 | +0.2 % |
+| Luft | hyst_min | 3.0 | f0 | 10 k | 5.18 | 5.26 | 0.657 | +1.4 % |
+| nass gedüngt normal | hyst_max | 2.4 | f1 | 10 k | 0.52 | 0.52 | 0.065 | +0.2 % |

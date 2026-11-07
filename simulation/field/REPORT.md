@@ -124,3 +124,88 @@ Schnittstelle zum Schaltplan: `docs/interfaces/PROBE_CAPACITANCE.md`. Skizze: `p
 - Purdue HO-237 (https://ag.purdue.edu/department/hla/extension/extension-publications-library/ext-pubs/ho-237-w.html)
 - `docs/references/MGChemicals_4200UV_TDS.pdf`; Kizito et al. 2008 (siehe `docs/concepts/research_elektronik.md` [L1])
 - Register: INDEX.csv REF-FLD1…4
+
+## 11 Nachtrag Layout Rev B – S-Zuleitungen (Befund L-3)
+
+Bearbeiter: Elektronik, 2026-11-08. Status: Entwurf zur Prüfung. Anlass: `hardware/sensor/out/LAYOUT_REV_B.md` Kap. 3/9 (L-3, L-6).
+**Reproduktion:** `.venv/bin/python simulation/field/probe3d_revb.py --var {alt,revb} --h {1.4,1.0}` (Elmer über
+`scripts/elmer.sh`, je 2.5 bzw. ≈ 8 min), danach `.venv/bin/python simulation/field/leads_revb.py` (≈ 7 min inkl. ngspice)
+→ `results/leads_revb.txt` (alle Tabellen), `results/leads_revb.json`, `results/probe3d_revb_*.json`.
+
+### 11.1 Geometrie aus der Platine (pcbnew, nicht aus dem Bericht)
+- Zuleitungen /PROBE_SENSE: **L2 (In1) x −8.000, L3 (In2) x −7.000**, je 0.300 breit, Kanal zum Guard 0.300,
+  Y 20.50 (Band-Via) … 64.00 (in der S-Fläche), je 43.5 mm. Elektroden, Guard (±8.75 bis Y 61.5), Steg unverändert wie Kap. 8.
+- Querschnitte alle 0.05 mm aus den gefüllten Zonen, Bahnen, Pads und Vias (alle Netze ausser PROBE_SENSE = AC-Masse,
+  **ANNAHME**: niederohmig während der Messung; U3 ALERT schwebend, nicht modelliert): 196 verschiedene Querschnitte
+  zwischen Bandkante und Guard-Ende. Im Fach Guard als Fläche bis ±11.95 (L-6), im Kragenfeld GND-/SENS_PWR-Kupfer
+  von U3/C24 auf F über der L2-Zuleitung (SENS_PWR kreuzt bei Y 48.95), Kragen-Vias x −5.0/−8.7.
+- Jede Zuleitung liegt seitlich im GND-Kanal, zur anderen Innenlage hin unter/über voller GND-Fläche, **zur Aussenfläche
+  hin aber nur unter 0.21 mm Prepreg + Lack** (Aussenlagen sind in Schott/Fach/Kragen/Sonde kupferfrei). Das war im
+  bisherigen 3D-Modell genauso: Das Halbmodell (Spiegelung an der Kernmitte) enthielt die Zuleitung bei x −4.875 auf
+  **L2 und L3**, nicht „nur L2“ wie in der Tabelle Kap. 8.
+
+### 11.2 Methode und Kontrolle
+- 2D (xsec2d, P2) je Querschnitt: C' der Zuleitung(en) für Aussenmedium ε 1/3/4/6/10/25/80 und „leitend“ (ε 1e4, schwebend),
+  dazu FR4-Empfindlichkeit. Medien je Zone: Schott Y 20.8–23.2 (Verguss), Fach 23.2–46.0 (Luft), Kragen 46.0–51.5
+  (Verguss ε 4, **ANNAHME**, Typ offen INDEX EP-K, Band 3–6), frei 51.5–58.5 (z_f −2…5), Erde 58.5–61.5 (Guard im Substrat).
+- 3D-**Vollmodell** (`probe3d_revb.py`, ohne Symmetrie in der Dicke, sonst Netz/Fälle wie `probe3d.py`): Variante `alt`
+  reproduziert das Halbmodell Kap. 6 (h 1.4: Luft 9.853 statt 9.852, nass 38.598 statt 38.593 pF). Neue Werte =
+  Richardson-Werte Kap. 6 + Differenz revb − alt bei h 1.0 (h 1.4 und 1.0 stimmen auf ≤ 0.015 pF überein).
+- Anteile ausserhalb des 3D-Modells (Kopf z_f < −15, reale Breite 26 mm, Verguss) aus 2D → Knotenkapazität.
+
+### 11.3 Ergebnisse alt vs. neu
+| Grösse | bisher | Rev B | Bemerkung |
+|---|---|---|---|
+| C' beide Zuleitungen im Guard, Luft [pF/m] | 170.4 (Modell L2+L3 x −4.875); 92.5 (Kap. 8, nur L2) | **180.2** (Fach 180.8) | 2D |
+| Kopplung nach aussen ε 1 → 80 [pF/m] | 73.2 (Modell); 36.0 (Kap. 8) | **70.4** | Mass für Fehlerquelle 11.4 |
+| Zuleitung Y 20.8–61.5, Betrieb (Fach Luft, Verguss ε 4) [pF] | 7.08 (Modell-Lage); 3.84 (Kap. 8) | **7.54** | Verguss ε 3/6: 7.56/7.65 |
+| Sonde C Luft / trocken / nass / Wasser [pF] (ab z_f −15) | 8.69 / 13.63 / 36.67 / 64.87 | **8.93 / 13.86 / 36.84 / 65.04** | +0.18…0.24 pF |
+| Spanne trocken → nass [pF] | 23.03 | **22.99 (−0.2 %)** | |
+| Ersatzschaltbild C0 / Ci / Cg [pF] | 7.05 / 99.0 / 1.719 | **7.30 / 99.1 / 1.711** | Fit max 1.1 % |
+| REQ-MES-08 Anteil 10–90 mm (h 1.0) | 93.2 % | **93.3 %** | ✅ |
+| FR4 +10 %: Luft / Wasser [% Spanne] (h 1.0) | 2.99 / 14.46 | 3.11 / 14.57 | Kap. 7 unverändert |
+| Knoten PROBE_SENSE [pF] | 10.5 (U2 4.5 + Leiterbahn/Durchführung 5.5 **ANNAHME** + TP5 0.5) | **9.9** = U2 4.5 + TP5 0.5 + Band-Bahnen 0.89 (2D, 10.7 mm) + 4 Vias 0.6 (**ANNAHME** 0.15 je Via) + Zuleitung z_f < −15 3.25 + Breite/Verguss 0.16 | Zuleitung alte Lage dort 3.06 |
+| Anteil Zuleitungen (Y 20.8–61.5) an der Gesamt-C Knoten+Sonde | – | **40 % Luft, 32 % trocken, 16 % nass** (7.5 von 18.8 / 23.7 / 46.7 pF) | konstant → Offset, Kalibrierung |
+
+**Messkette D3** (`osc_sim.py`-Netzliste mit neuem C0/Ci/Cg und Knoten 9.9 pF, ngspice; Repo-Dateien unverändert):
+| Fall (R3 1 kΩ) | f_osc bisher [MHz] | f_osc Rev B [MHz] | MEAS_CLK Rev B [MHz] |
+|---|---|---|---|
+| Luft / trocken / Mitte / nass / Wasser (typ, 3.0 V, Leitungswasser) | 27.43 / 24.24 / 20.25 / 14.91 / 9.75 | **27.72 / 24.47 / 20.43 / 15.02 / 9.80** | 3.47 … 1.22 |
+| schnellste Ecke Luft (hyst_min, 3.0 V) | 36.05 | **36.44** | **4.56** |
+| langsamste Ecke (nass gedüngt normal, hyst_max, 2.4 V, mit Cref1) | 4.75 | **4.76** | **0.595** |
+| R3 10 kΩ: Luft schnell / gedüngt langsam | 5.18 / 0.52 | 5.26 / 0.52 | 0.657 / 0.065 |
+
+Alles im zählbaren Bereich: Firmware-Plausibilität 0.048–12 MHz am Pin (`firmware/sensor/core/fl_meas.h`, `fl_meas.c`),
+Zählgrenze ≈ 10–12 MHz (**ANNAHME**, PINMAP), LVC1G80 fclock ≤ 160 MHz. Die Frequenz steigt leicht (+0.2…+1.4 %), weil die
+gerechneten Band-/Fach-Anteile kleiner sind als die bisherige 5.5-pF-Annahme. Startkalibrierung (D-022, 13.3/40 pF)
+verschiebt sich um ≈ −0.4 pF (≈ 2 % der Spanne), REQ-MES-07 nicht berührt.
+
+### 11.4 Feldkopplung der Zuleitungen ausserhalb der Messzone (Fehlerquelle)
+| Fall | Zusatz-C Rev B | % Spanne | bisheriges Modell |
+|---|---|---|---|
+| Erde nass im Guardbereich z_f 5–8 (normal gesteckt), nur Zuleitung | +0.11 pF (ε 4 → 25) | 0.5 | gleich |
+| Zu tief gesteckt / Erde nass bis Vergusskante (z_f −2…5, ε 25), gesamt | +1.08 pF (davon Zuleitung z_f −2…0: 0.11; Zuleitung z_f −2…5 ≈ 0.37) | 4.7 | 4.4 (nur z_f 0…5) |
+| Wasser stehend bis Vergusskante (ε 80 / leitend), gesamt | +2.20 / +2.23 pF (Zuleitung z_f −2…5 ≈ 0.49 / 0.60) | 9.4 / 9.6 | 9.1 (nur z_f 0…5) |
+| Kragen: Verguss ε 3 … 6 (Typ offen) | ±0.05 pF, konstant | – | – |
+| **Fach geflutet** (REQ-SAF-05 Einzelfehler), Wasser / leitend | **+1.65 / +1.98 pF** | **7.2 / 8.6** | +1.69 / +2.02 |
+| Kopf-FR4 Feuchte (Zuleitung Schott/Fach/Kragen) je +10 % Dk | +0.53 pF | 2.3 | – |
+
+- Die Zuleitungen verlaufen nirgends ausserhalb des Guards, ausser im Spalt Guard-Ende → S-Elektrode (z_f 8–10), der zum
+  Messfeld gehört (im 3D enthalten, REQ-MES-08 93.3 %). Aussenfeld koppeln sie aber über die kupferfreie Aussenfläche
+  ein: 70 pF/m für ε 1 → 80. Das ist **gleich wie im bisherigen Modell** (73 pF/m), aber doppelt so viel wie die Tabelle
+  Kap. 8 („nur L2“) unterstellte. Die zweite Zuleitung ist ohne Via im nassen Bereich nicht vermeidbar.
+- Bewertung: Oberflächenwasser/Überflutung bis zur Vergusskante ist ein Bedienfehler mit +5…10 % Spanne, davon ≈ ¼ aus den
+  Zuleitungen; die Überflutungserkennung (REQ-MES-12, über Nasspunkt) bleibt möglich. Fach geflutet zeigt ≈ +7…9 % „nasser“ –
+  Einzelfehlerfall, nur im Testplan vermerken. Kopf-FR4-Feuchte: bei Raumklima nur ein Bruchteil der Sättigung
+  (**ANNAHME**) → ≤ 1 % Spanne, **PROTOTYP-PRÜFUNG** Luftpunkt bei 30/60 % rF.
+- SENS_PWR/C24/U3 über der L2-Zuleitung (Kragenfeld): Kopplung konstant, weil SENS_PWR in den Bursts statisch low ist
+  (`firmware/sensor/platform/cc23/fl_hw.c` Burstschleife, Rev B). Diese Regel beibehalten.
+- **Option Rev C** (nicht nötig): Zuleitungen 0.15 mm mit Kanal 0.2 mm (JLC ≥ 0.10) senken die Aussenkopplung auf
+  30 pF/m (−58 %), C' 176 pF/m; Fach geflutet +0.69 statt +1.65 pF, Zuleitungsanteil bei Wasser bis zur Vergusskante 0.21 statt 0.49 pF (−58 %).
+
+### 11.5 Bewertung
+**Layout Rev B ist aus Feldsicht in Ordnung, keine Layoutänderung nötig.** Spanne −0.2 %, Empfindlichkeit (Cg) −0.4 %,
+Messvolumen unverändert, Frequenzbereich der Messkette im zählbaren Bereich. Der Guard als Fläche im Fach (L-6) schirmt
+die Zuleitungen seitlich vollständig; feldseitig kein Nachteil. Nachzuführen (klein): `docs/interfaces/PROBE_CAPACITANCE.md`
+C0 7.0 → 7.3 pF und Knoten 10 → ≈ 9.9 pF (Zuleitung im Fach getrennt ausweisen), `simulation/spice/osc/osc_sim.py` C_NODE,
+Tabelle Kap. 8 („S-Zuleitung“: Rev B = L2 x −8.0 + L3 x −7.0, je im Kanal 0.3).
