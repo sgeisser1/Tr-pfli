@@ -106,3 +106,10 @@ Format: Nr. · Datum · Entscheid · Alternativen · Begründung · Quelle · St
 - **Änderungswünsche:** (1) Gateway-LED als Tropfen, der wie beim Sensor aus dem blauen Teil „heraustropft“.
   (2) Wortmarke: zwei blaue Tropfen sind zu viel, Schwarz ist zu hart → neue Varianten. (3) App-Icon als Kachel im
   Sensor-Look: oben Blau, unten Warmgrau, grün leuchtender Tropfen an der Grenze.
+
+### D-011 · 2026-11-07 · Design Verfeinerung 2 (Auftraggeber)
+- **Gateway freigegeben** (G1 v3: Warmgrau hell/Hellblau, Tropfen-LED an der Farbkante, Antenne innen).
+- **Wortmarke: Variante v3a** – warmes Dunkelgrau #4F4B45, erster i-Punkt grau, letzter i-Punkt hellblau
+  (`docs/design/logo/fluidi_logo_v3a*.svg`).
+- **App-Icon:** hochaufgelöste fotorealistische **Nahaufnahme des Sensors**: quadratisch, leuchtender **blauer Tropfen
+  gross in der Mitte**, oben Hellblau, unten Warmgrau, Übergang als sichtbarer **Spalt** (Vorlage: Screenshot des Auftraggebers).
