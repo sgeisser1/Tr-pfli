@@ -1,0 +1,21 @@
+* fluidi: blaue LED an DIO20 (UART RX) waehrend Programmierung, erzeugt von led_rgb_drive.py
+.include led_models.inc
+VDD vdd 0 DC 3.3
+D1 vdd a1 DB
+VO1 a1 b1 DC {OFF_B_MIN}
+RS1 b1 pin1 100
+RP1 pin1 0 200k
+D2 vdd a2 DB
+VO2 a2 b2 DC {OFF_B_MID}
+RS2 b2 pin2 100
+RP2 pin2 0 200k
+D3 vdd a3 DB
+VO3 a3 b3 DC {OFF_B_MAX}
+RS3 b3 pin3 100
+RP3 pin3 0 200k
+.control
+set width=200
+dc VDD 1.8 3.3 0.1
+print v(pin1) v(pin2) v(pin3)
+.endc
+.end
