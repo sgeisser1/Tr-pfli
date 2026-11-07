@@ -10,10 +10,8 @@ Lokale Teile wie hardware/sensor/gen/floorplan_options.py (LOKAL), dazu ASA-Mehr
 Szenarien: Prototyp 5 PCB / 5 bestueckt (4 x 100 uF, D-013); Serie 20 PCB / 16 bestueckt / 15 Sensoren mit 4 bzw.
 2 x 100 uF (Entscheid nach Messung, D-013). 4 Lagen 1.6 mm, ENIG (A-32 Minuspad), Economic PCBA, GSDL.
 Layout Rev B (Commit 425174d): Via-in-Pad im Zellfach (Befund L-1) und im EP von U1 -> Via-Behandlung "Epoxy Filled &
-Capped" (POFV) fuer die ganze Platine; Aufpreis 4 L [JLC-RECHNER 2026-11-06, Auftraggeber, docs/requirements/
-CLIENT_INPUT.md]: 5 Stk ENIG 44.2 -> ENIG + Epoxy filled & capped 64.5 USD (+20.3). Mengen-/Flaechenabhaengigkeit des
-Aufpreises nicht abgelesen -> ANNAHME fix pro Bestellung (D-005: Einmalkosten); Sensitivitaet "mengenproportional"
-als Zusatzszenario (DFM-Pruefung 2026-11-07, docs/reviews/phase4_layout_revb_dfm.md).
+Capped" (POFV) fuer die ganze Platine; PCB-Preis aus dem JLC-Angebot 2026-11-08 (Auftraggeber,
+docs/requirements/CLIENT_INPUT.md): 5 Stk 65.21 / 20 Stk 76.30 USD inkl. ENIG + POFV.
 Aufruf: .venv/bin/python hardware/sensor/gen/cost_rev_b.py   -> hardware/sensor/out/COSTS_REV_B.md
 """
 import copy
@@ -34,13 +32,15 @@ PRICES = json.load(open(os.path.join(ROOT, "docs", "concepts", "bom", "jlc_price
 KICAD_FP = "/usr/share/kicad/footprints"
 PRJ_FP = os.path.join(HERE, "..", "lib", "fluidi.pretty")
 
-# PCB-Grenzkosten: cost_model rechnet mit 22 x 150 mm (JLC-Rechner 2026-11-06). Rev B: Kontur 26.0 x 158.5 mm
-# (Edge.Cuts in out/gerber/fluidi_sensor-Edge_Cuts.gm1; JLC rechnet mit dem umschreibenden Rechteck [ANNAHME]).
-# ANNAHME: Grenzkosten proportional zur Rechteckflaeche, Fixanteil unveraendert -> vor der Bestellung im JLC-Rechner
-# mit 26 x 158.5 mm, 4 L, 1.6 mm, ENIG, Epoxy Filled & Capped bei 5 und 20 Stk ablesen und hier ersetzen.
+# PCB-Preis Rev B: JLC-Rechner, vom Auftraggeber abgelesen 2026-11-08 (Konversation, docs/requirements/CLIENT_INPUT.md):
+# 26 x 158.5 mm, 4 L, 1.6 mm, ENIG, Epoxy Filled & Capped: 5 Stk 65.21 USD, 20 Stk 76.30 USD.
+# Lineares Modell durch beide Punkte: Grenzkosten 0.7393 USD/Platine, Fixanteil inkl. ENIG+POFV 61.51 USD/Bestellung.
+# Damit sind die Aufpreise ENIG/POFV ueberwiegend fix (Befund DFM W-2 erledigt; Grenzfall "mengenproportional" entfaellt).
+QUOTE_USD = {5: 65.21, 20: 76.30}
+PCB_VAR_QUOTE = (QUOTE_USD[20] - QUOTE_USD[5]) / 15.0
+PCB_FIX_QUOTE = QUOTE_USD[5] - 5 * PCB_VAR_QUOTE   # inkl. ENIG + POFV
 PCB_W, PCB_L = 26.0, 158.5
 POFV = True   # Layout Rev B: Via-in-Pad (Zellfach, U1-EP) -> Epoxy Filled & Capped zwingend
-AREA_FACTOR = (PCB_W * PCB_L) / (cm.BOARD_W_MM * cm.BOARD_L_MM)
 # ASA: Rev A 11 g + 4 g AMS-Spuelung (concept_costs.housing(11)). Kopf V4 34 x 13 x 57.5 statt 28 x 13 x 48 mm:
 # Oberflaechenverhaeltnis 6289/4664 = 1.35 -> +3.8 g (ANNAHME, Masse liefert die Mechanik)
 ASA_EXTRA_G = 11.0 * (2 * (34 * 13 + 13 * 57.5 + 34 * 57.5)) / (2 * (28 * 13 + 13 * 48 + 28 * 48)) - 11.0
@@ -85,27 +85,24 @@ def load_bom():
     return lines
 
 
-def run(bom, pcb_qty, pcba_qty, sensors, surcharge_prop=False):
-    """surcharge_prop=True: Sensitivitaet - ENIG- und POFV-Aufpreis (abgelesen bei 5 Stk, 22 x 150 mm) nicht fix,
-    sondern proportional zu Platinenzahl und Flaeche (ANNAHME, oberer Grenzfall) -> in die Grenzkosten je Platine."""
-    var_bak = dict(cm.PCB_VAR_USD)
-    enig_bak, pofv_bak = dict(cm.SURCHARGE_ENIG_USD), dict(cm.SURCHARGE_EPOXY_VIA_USD)
+def run(bom, pcb_qty, pcba_qty, sensors):
+    """PCB-Preis aus dem JLC-Angebot (QUOTE_USD): Fixanteil so gesetzt, dass Fix + ENIG + POFV = PCB_FIX_QUOTE."""
+    fix_bak, var_bak = dict(cm.PCB_FIX_USD), dict(cm.PCB_VAR_USD)
     try:
-        cm.PCB_VAR_USD[(4, 1.6)] = var_bak[(4, 1.6)] * AREA_FACTOR
-        if surcharge_prop:
-            per_board = (enig_bak[4] + (pofv_bak[4] if POFV else 0.0)) / 5.0 * AREA_FACTOR
-            cm.PCB_VAR_USD[(4, 1.6)] += per_board
-            cm.SURCHARGE_ENIG_USD[4] = 0.0
-            cm.SURCHARGE_EPOXY_VIA_USD[4] = 0.0
+        assert POFV
+        cm.PCB_FIX_USD[(4, 1.6)] = PCB_FIX_QUOTE - cm.SURCHARGE_ENIG_USD[4] - cm.SURCHARGE_EPOXY_VIA_USD[4]
+        cm.PCB_VAR_USD[(4, 1.6)] = PCB_VAR_QUOTE
+        for q, usd in QUOTE_USD.items():   # Selbstpruefung: Fix (inkl. ENIG+POFV) + q x Grenzkosten = Angebot
+            got = (cm.PCB_FIX_USD[(4, 1.6)] + cm.SURCHARGE_ENIG_USD[4] + cm.SURCHARGE_EPOXY_VIA_USD[4]
+                   + cm.SURCHARGE_COLOR_USD + q * cm.PCB_VAR_USD[(4, 1.6)])
+            assert abs(got - usd) < 0.01, (q, got, usd)
         return cm.compute(bom + copy.deepcopy(LOKAL), 4, 1.6, pcb_qty, pcba_qty, ship="GSDL", pcba="economic",
                           enig=True, epoxy_vias=POFV, sensors=sensors)
     finally:
+        cm.PCB_FIX_USD.clear()
+        cm.PCB_FIX_USD.update(fix_bak)
         cm.PCB_VAR_USD.clear()
         cm.PCB_VAR_USD.update(var_bak)
-        cm.SURCHARGE_ENIG_USD.clear()
-        cm.SURCHARGE_ENIG_USD.update(enig_bak)
-        cm.SURCHARGE_EPOXY_VIA_USD.clear()
-        cm.SURCHARGE_EPOXY_VIA_USD.update(pofv_bak)
 
 
 def main():
@@ -118,13 +115,12 @@ def main():
             ("Serie 20 PCB / 16 bestueckt / 15 Sensoren, 4 x 100 uF", bom4, 20, 16, 15),
             ("Serie 20 PCB / 16 bestueckt / 15 Sensoren, 2 x 100 uF", bom2, 20, 16, 15)]
     res = [(n, run(b, *q)) for n, b, *q in scen]
-    sens = [("Sensitivitaet: Serie 20/16/15, 4 x 100 uF, ENIG+POFV mengenproportional (ANNAHME Grenzfall)",
-             run(bom4, 20, 16, 15, surcharge_prop=True))]
+    sens = []
     md = io.StringIO()
     w = md.write
     w("# fluidi Sensor Rev B – Kosten aus der Schaltplan-BOM\n\n")
     w("| | |\n|---|---|\n")
-    w("| Stand | 2026-11-07, Schaltplan Rev B (`hardware/sensor/fluidi_sensor.kicad_sch`), Layout Rev B (Commit 425174d), "
+    w("| Stand | 2026-11-08 (PCB-Preis aus JLC-Angebot), Schaltplan Rev B (`hardware/sensor/fluidi_sensor.kicad_sch`), Layout Rev B (Commit 425174d), "
       "nachgeführt in der DFM-Prüfung (`docs/reviews/phase4_layout_revb_dfm.md`) |\n")
     w("| Skript | `.venv/bin/python hardware/sensor/gen/cost_rev_b.py` (erzeugt diese Datei) |\n")
     w(f"| Modell | `scripts/cost_model.compute` (D-005), USD→CHF {cm.USD_TO_CHF:.4f} + {cm.FX_CARD_MARKUP*100:.1f} % Karte; "
@@ -143,10 +139,9 @@ def main():
           f"{r['full_chf']:.2f} |\n")
     ser = res[2][1]
     w(f"\nREQ-FAB-04 (< 10 CHF Stückkosten bei 10–15 Stück): Serie **{res[1][1]['unit_chf']:.2f} / "
-      f"{ser['unit_chf']:.2f} CHF** (4 / 2 × 100 µF) → erfüllt, **sofern** die Aufpreise ENIG und POFV fix pro "
-      f"Bestellung sind. Wenn sie mit der Platinenzahl wachsen (Grenzfall, Sensitivität): "
-      f"{sens[0][1]['unit_chf']:.2f} CHF → **nicht** erfüllt. BESTELL-PRÜFUNG: Aufpreise im JLC-Rechner bei 5 und 20 Stk "
-      f"(26 × 158.5 mm) ablesen.\n\n")
+      f"{ser['unit_chf']:.2f} CHF** (4 / 2 × 100 µF) → **erfüllt**. PCB-Preis aus dem JLC-Angebot (5 Stk "
+      f"{QUOTE_USD[5]:.2f} USD, 20 Stk {QUOTE_USD[20]:.2f} USD): Aufpreise ENIG/POFV sind überwiegend fix "
+      f"(Befund DFM W-2 erledigt).\n\n")
     n_ext = len({b.part for b in bom4 if b.category == 'extended'})
     n_pref = len({b.part for b in bom4 if b.category == 'preferred'})
     n_bas = len({b.part for b in bom4 if b.category == 'basic'})
@@ -154,13 +149,12 @@ def main():
       f"{sum(b.qty_per_board for b in bom4):g} Bauteile, "
       f"{sum(b.qty_per_board * b.joints for b in bom4):g} Lötstellen je Board.\n\n")
     w("## 2 Annahmen\n\n")
-    w(f"- **ANNAHME PCB:** Grenzkosten je Platine × {AREA_FACTOR:.2f} (Rechteck {PCB_W:g} × {PCB_L:g} mm laut "
-      f"Edge.Cuts statt {cm.BOARD_W_MM:g} × {cm.BOARD_L_MM:g} mm im JLC-Rechner); Fixanteil unverändert. Vor der "
-      f"Bestellung im JLC-Rechner ersetzen.\n")
-    w(f"- **POFV (Epoxy Filled & Capped):** +{cm.SURCHARGE_EPOXY_VIA_USD[4]:.1f} USD pro Bestellung "
-      f"[JLC-Rechner 2026-11-06, Auftraggeber, 4 L 1.6 mm 5 Stk, `docs/requirements/CLIENT_INPUT.md`]; gilt für "
-      f"die ganze Platine (alle Vias), daher gleich für 5 oder 2 Via-in-Pad im Zellfach (Befund L-1). "
-      f"**ANNAHME:** fix pro Bestellung, Kombination mit Economic PCBA zulässig.\n")
+    w(f"- **PCB (Angebot):** JLC-Rechner, abgelesen vom Auftraggeber 2026-11-08: {PCB_W:g} × {PCB_L:g} mm, 4 L, "
+      f"1.6 mm, ENIG, Epoxy Filled & Capped (POFV) → 5 Stk {QUOTE_USD[5]:.2f} USD, 20 Stk {QUOTE_USD[20]:.2f} USD "
+      f"(`docs/requirements/CLIENT_INPUT.md`). Linear: Fixanteil {PCB_FIX_QUOTE:.2f} USD/Bestellung (D-005, einmalig), "
+      f"Grenzkosten {PCB_VAR_QUOTE:.4f} USD/Platine. Andere Mengen interpoliert (ANNAHME linear).\n")
+    w("- **POFV** gilt für die ganze Platine (alle Vias), daher gleich für 4 oder 2 Via-in-Pad im Zellfach "
+      "(L-1, D-023). **ANNAHME:** Kombination mit Economic PCBA zulässig (BESTELL-PRÜFUNG).\n")
     w(f"- **ANNAHME Gehäuse:** Kopf V4 (D-019) braucht ≈ {ASA_EXTRA_G:.1f} g ASA mehr (Oberflächenverhältnis), "
       f"0.035 CHF/g; Masse aus dem CAD der Mechanik übernehmen.\n")
     w("- Lokale Teile wie FLOORPLAN_OPTIONS (Zelle Panasonic CR2032 1.38 CHF, Dichtungen, Versiegelung, Schraube), "

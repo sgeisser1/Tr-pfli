@@ -32,3 +32,5 @@ Ergänzt die ursprüngliche Projektbeschreibung. Gilt als Grundlage für Phase 1
   4 L 1.6 mm 5 Stk ENIG 44.2, ENIG + Epoxy filled & capped 64.5.
 - **Versand CH** (JLC): DHL Express 23.44 USD, UPS 25.36, FedEx 31.15, Global Standard Direct Line 7.63 USD
   (10–12 Tage, max. 1.5 kg und Warenwert ≤ 65 USD).
+- **JLC-Angebot Rev B** (Rechner, abgelesen vom Auftraggeber 2026-11-08): 26 × 158.5 mm, 4 L, 1.6 mm, ENIG,
+  Epoxy Filled & Capped: **5 Stk 65.21 USD, 20 Stk 76.30 USD** (gesamt, ohne Versand/PCBA).
