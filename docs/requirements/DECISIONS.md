@@ -169,3 +169,18 @@ Format: Nr. · Datum · Entscheid · Alternativen · Begründung · Quelle · St
 ### Info Auftraggeber · 2026-11-07 · Pi Zero 2 W Masszeichnung
 - 65 × 30 mm, Eckradius 3.0 mm, 4 × M2.5-Bohrungen Ø 2.75 ± 0.05 mm, Lochabstand 58 × 23 mm (Lochmitte 3.5 mm vom Rand).
   Höhen (Platinendicke, Bauteile, Micro-USB) noch am Board zu messen.
+
+### D-019 · 2026-11-07 · Kopfproportion V4
+- **Entscheid (Auftraggeber):** Sensorkopf **V4 ≈ 34 × 13 × 57.5 mm** (Überschlag ±2 mm), blaue Kappe 14 mm (≈ 24 %),
+  Fuge/Tropfen bei z ≈ 43.5 mm (graue Hülse als Sichtschale über dem dichten Kern), Platine im Kopf ≈ 26 mm breit,
+  einseitig bestückt (Economic PCBA). Genaue Masse aus Layout (Welle 2). Ersetzt die Masse aus D-010 (28 × 13 × 48).
+- **Quelle:** docs/design/PROPORTIONEN.md/.pdf, hardware/sensor/out/FLOORPLAN_OPTIONS.md (Option f: Temperatursensor im Kragen).
+
+### D-020 · 2026-11-07 · Software-Entscheide (F-1 … F-8)
+- **Stil A „Frost“** (allein, ohne Mischung). Tropfen-Charakter mit Gesicht **überall**.
+- **Benachrichtigungen strikt lokal** für den Start (In-App, Badge, Sensor-LED, Dashboard); Auftraggeber nutzt ein
+  **Google Pixel 10 (Android)**, kein iPhone. Push (via Google FCM) evtl. später als Option. **Keine E-Mail-Hinweise.**
+- **Dashboard** für Kollegen als Nur-Lese-Seite ohne Login (HTTP-Port im LAN, abschaltbar).
+- **Feuchteprofile:** drei Klassen trocken / mittel / feucht, ergänzt um eine recherchierte Artenliste mit
+  **Giessverhalten** (z. B. „gut durchgiessen, dann abtrocknen lassen bis …“ vs. „gleichmässig feucht halten“) mit Quellen.
+- **Raumplan:** ein Raum für Rev A; der Auftraggeber liefert später einen genaueren Plan.
