@@ -159,3 +159,13 @@ Format: Nr. · Datum · Entscheid · Alternativen · Begründung · Quelle · St
 - Im Pi-Gateway wird ein Sensor für **Lufttemperatur und Luftfeuchte** eingeplant (I²C-Breakout am GPIO-Header,
   Typ in Phase 4 Welle 2, z. B. Sensirion SHT4x-Klasse). Thermisch getrennte, belüftete Kammer im Gehäuse.
   Daten fliessen in Dashboard/Analysen (Raumklima vs. Austrocknung der Töpfe).
+
+### D-018 · 2026-11-07 · Messkette D3 (Salz/Dünger)
+- **Entscheid (Auftraggeber):** Messkette **D3**: Schmitt-Oszillator 17–36 MHz (R3 1 kΩ) + Teiler ÷8 (3 × SN74LVC1G80,
+  C473331) vor dem CC2340-Timer, P-FET-Schaltung, Testpad PROBE_SENSE; R3 auf 10 kΩ umlötbar für Vergleich mit Variante A.
+  App: Taste „gedüngt“ + Salzhinweis aus der Zeitreihe. REQ-MES-11 (Soll) offen bis Becherversuch (OP-K3) am Muster.
+- **Quelle:** docs/concepts/MESSKETTE_SALZ.md, simulation/field/REPORT.md.
+
+### Info Auftraggeber · 2026-11-07 · Pi Zero 2 W Masszeichnung
+- 65 × 30 mm, Eckradius 3.0 mm, 4 × M2.5-Bohrungen Ø 2.75 ± 0.05 mm, Lochabstand 58 × 23 mm (Lochmitte 3.5 mm vom Rand).
+  Höhen (Platinendicke, Bauteile, Micro-USB) noch am Board zu messen.
