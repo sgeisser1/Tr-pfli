@@ -2,9 +2,9 @@
 
 | | |
 |---|---|
-| Stand | 2026-11-07, Elektronik, Schaltplan Rev B (`hardware/sensor/fluidi_sensor.kicad_sch`) |
+| Stand | 2026-11-07, Schaltplan Rev B (`hardware/sensor/fluidi_sensor.kicad_sch`), Layout Rev B (Commit 425174d), nachgeführt in der DFM-Prüfung (`docs/reviews/phase4_layout_revb_dfm.md`) |
 | Skript | `.venv/bin/python hardware/sensor/gen/cost_rev_b.py` (erzeugt diese Datei) |
-| Modell | `scripts/cost_model.compute` (D-005), USD→CHF 0.8189 + 1.5 % Karte; 4 Lagen 1.6 mm, **ENIG**, Economic PCBA, Versand GSDL (falls zulässig) |
+| Modell | `scripts/cost_model.compute` (D-005), USD→CHF 0.8189 + 1.5 % Karte; 4 Lagen 1.6 mm, **ENIG**, **Epoxy Filled & Capped (POFV)**, Economic PCBA, Versand GSDL (falls zulässig) |
 | Teiledaten | `docs/concepts/bom/jlc_prices.json`, JLC-API Abruf 2026-11-07 (Kategorie, Staffeln, Mindestmenge, Verlust) |
 | BOM | `hardware/sensor/out/fluidi_sensor_bom_jlc.csv`; Lötstellen = Pads mit Lotpaste je Footprint (pcbnew) |
 
@@ -12,17 +12,19 @@
 
 | Szenario | PCBA | Versand | **Stück CHF** | Einmal CHF | Bestellung total CHF | Vollkosten/Sensor CHF |
 |---|---|---|---|---|---|---|
-| Prototyp 5 PCB / 5 bestueckt, 4 x 100 uF (D-013) | economic | DHL | **9.07** | 101.17 | 146.52 | 29.30 |
-| Serie 20 PCB / 16 bestueckt / 15 Sensoren, 4 x 100 uF | economic | DHL | **8.21** | 103.06 | 226.28 | 15.09 |
-| Serie 20 PCB / 16 bestueckt / 15 Sensoren, 2 x 100 uF | economic | DHL | **8.00** | 103.06 | 223.06 | 14.87 |
+| Prototyp 5 PCB / 5 bestueckt, 4 x 100 uF (D-013) | economic | DHL | **9.06** | 119.39 | 164.71 | 32.94 |
+| Serie 20 PCB / 16 bestueckt / 15 Sensoren, 4 x 100 uF | economic | DHL | **8.21** | 121.26 | 244.40 | 16.29 |
+| Serie 20 PCB / 16 bestueckt / 15 Sensoren, 2 x 100 uF | economic | DHL | **7.99** | 121.26 | 241.18 | 16.08 |
+| Sensitivitaet: Serie 20/16/15, 4 x 100 uF, ENIG+POFV mengenproportional (ANNAHME Grenzfall) | economic | DHL | 15.91 | 121.23 | 359.86 | 23.99 |
 
-REQ-FAB-04 (< 10 CHF Stückkosten bei 10–15 Stück): Serie **8.21 / 8.00 CHF** (4 / 2 × 100 µF) → erfüllt.
+REQ-FAB-04 (< 10 CHF Stückkosten bei 10–15 Stück): Serie **8.21 / 7.99 CHF** (4 / 2 × 100 µF) → erfüllt, **sofern** die Aufpreise ENIG und POFV fix pro Bestellung sind. Wenn sie mit der Platinenzahl wachsen (Grenzfall, Sensitivität): 15.91 CHF → **nicht** erfüllt. BESTELL-PRÜFUNG: Aufpreise im JLC-Rechner bei 5 und 20 Stk (26 × 158.5 mm) ablesen.
 
 BOM-Typen: 10 Extended, 1 Preferred, 15 Basic; 50 Bauteile, 145 Lötstellen je Board.
 
 ## 2 Annahmen
 
-- **ANNAHME PCB:** Grenzkosten je Platine × 1.26 (Rechteck 26 × 160 mm statt 22 × 150 mm im JLC-Rechner); Fixanteil unverändert. Vor der Bestellung mit der Kontur aus PCB_OUTLINE Rev B im JLC-Rechner ersetzen.
+- **ANNAHME PCB:** Grenzkosten je Platine × 1.25 (Rechteck 26 × 158.5 mm laut Edge.Cuts statt 22 × 150 mm im JLC-Rechner); Fixanteil unverändert. Vor der Bestellung im JLC-Rechner ersetzen.
+- **POFV (Epoxy Filled & Capped):** +20.3 USD pro Bestellung [JLC-Rechner 2026-11-06, Auftraggeber, 4 L 1.6 mm 5 Stk, `docs/requirements/CLIENT_INPUT.md`]; gilt für die ganze Platine (alle Vias), daher gleich für 5 oder 2 Via-in-Pad im Zellfach (Befund L-1). **ANNAHME:** fix pro Bestellung, Kombination mit Economic PCBA zulässig.
 - **ANNAHME Gehäuse:** Kopf V4 (D-019) braucht ≈ 3.8 g ASA mehr (Oberflächenverhältnis), 0.035 CHF/g; Masse aus dem CAD der Mechanik übernehmen.
 - Lokale Teile wie FLOORPLAN_OPTIONS (Zelle Panasonic CR2032 1.38 CHF, Dichtungen, Versiegelung, Schraube), Ausschuss 5 %.
 - Nicht enthalten: Programmieradapter (einmalig, CONCEPTS 2.7), Werkzeug, Arbeitszeit, Gateway.
@@ -37,26 +39,26 @@ BOM-Typen: 10 Extended, 1 Preferred, 15 Basic; 50 Bauteile, 145 Lötstellen je B
     Bauteile JLC/LCSC                                        4.23
     SMT-Bestueckung                                          0.23
     Roentgen (1 leadless/Board)                              1.64
-    Summe JLC-Anteil                                         6.67 USD
+    Summe JLC-Anteil                                         6.66 USD
     + MWST-Anteil CH                                         0.44 CHF
     = JLC-Anteil pro Board                                   5.98 CHF
     x Boards / Sensoren                                  5/5
     + lokal beschaffte Teile inkl. Ausschuss                 3.09 CHF
-    = STUECKKOSTEN pro Sensor (D-005)                        9.07 CHF
+    = STUECKKOSTEN pro Sensor (D-005)                        9.06 CHF
   Einmalkosten pro Bestellung (USD):
-    PCB Fixanteil pro Bestellung (D-005)                    41.95
+    PCB Fixanteil pro Bestellung (D-005)                    62.25
     Bauteile Mindestabnahme/Verlust-Ueberschuss              3.13
     PCBA Setup                                               8.18
     Schablone                                                1.53
     Feeder/Extended (10 ext., 1 pref., 15 basic Typen)      30.70
     Confirm Parts Placement                                  0.45
     Versand DHL                                             23.44
-    Summe JLC-Rechnung einmalig                            109.38 USD
-    + MWST-Anteil CH (einmalig)                              7.26 CHF
+    Summe JLC-Rechnung einmalig                            129.68 USD
+    + MWST-Anteil CH (einmalig)                              8.60 CHF
     + Verzollungsgebuehr Kurier/Post                         3.00 CHF
-    = EINMALKOSTEN                                         101.17 CHF
-  JLC-Rechnung total 142.71 USD = 116.87 CHF; MWST 9.47 CHF; Bestellung total 146.52 CHF; VOLLKOSTEN pro Sensor 29.30 CHF
-  Hinweis: GSDL nicht zulaessig (Warenwert 119.27 USD > 65.0 USD oder Gewicht > 1.5 kg) -> DHL Express gerechnet.
+    = EINMALKOSTEN                                         119.39 CHF
+  JLC-Rechnung total 162.99 USD = 133.47 CHF; MWST 10.81 CHF; Bestellung total 164.71 CHF; VOLLKOSTEN pro Sensor 32.94 CHF
+  Hinweis: GSDL nicht zulaessig (Warenwert 139.55 USD > 65.0 USD oder Gewicht > 1.5 kg) -> DHL Express gerechnet.
 ```
 
 ```
@@ -67,27 +69,27 @@ BOM-Typen: 10 Extended, 1 Preferred, 15 Basic; 50 Bauteile, 145 Lötstellen je B
     Bauteile JLC/LCSC                                        3.74
     SMT-Bestueckung                                          0.23
     Roentgen (1 leadless/Board)                              0.82
-    Summe JLC-Anteil                                         5.36 USD
-    + MWST-Anteil CH                                         0.36 CHF
-    = JLC-Anteil pro Board                                   4.81 CHF
+    Summe JLC-Anteil                                         5.35 USD
+    + MWST-Anteil CH                                         0.35 CHF
+    = JLC-Anteil pro Board                                   4.80 CHF
     x Boards / Sensoren                                  16/15
     + lokal beschaffte Teile inkl. Ausschuss                 3.09 CHF
     = STUECKKOSTEN pro Sensor (D-005)                        8.21 CHF
   Einmalkosten pro Bestellung (USD):
-    PCB Fixanteil pro Bestellung (D-005)                    41.95
-    PCB unbestueckte Reserveplatinen                         2.26
+    PCB Fixanteil pro Bestellung (D-005)                    62.25
+    PCB unbestueckte Reserveplatinen                         2.24
     Bauteile Mindestabnahme/Verlust-Ueberschuss              2.97
     PCBA Setup                                               8.18
     Schablone                                                1.53
     Feeder/Extended (10 ext., 1 pref., 15 basic Typen)      30.70
     Confirm Parts Placement                                  0.45
     Versand DHL                                             23.44
-    Summe JLC-Rechnung einmalig                            111.48 USD
-    + MWST-Anteil CH (einmalig)                              7.39 CHF
+    Summe JLC-Rechnung einmalig                            131.76 USD
+    + MWST-Anteil CH (einmalig)                              8.74 CHF
     + Verzollungsgebuehr Kurier/Post                         3.00 CHF
-    = EINMALKOSTEN                                         103.06 CHF
-  JLC-Rechnung total 197.20 USD = 161.48 CHF; MWST 13.08 CHF; Bestellung total 226.28 CHF; VOLLKOSTEN pro Sensor 15.09 CHF
-  Hinweis: GSDL nicht zulaessig (Warenwert 173.76 USD > 65.0 USD oder Gewicht > 1.5 kg) -> DHL Express gerechnet.
+    = EINMALKOSTEN                                         121.26 CHF
+  JLC-Rechnung total 217.39 USD = 178.02 CHF; MWST 14.42 CHF; Bestellung total 244.40 CHF; VOLLKOSTEN pro Sensor 16.29 CHF
+  Hinweis: GSDL nicht zulaessig (Warenwert 193.95 USD > 65.0 USD oder Gewicht > 1.5 kg) -> DHL Express gerechnet.
 ```
 
 ```
@@ -100,25 +102,56 @@ BOM-Typen: 10 Extended, 1 Preferred, 15 Basic; 50 Bauteile, 145 Lötstellen je B
     Roentgen (1 leadless/Board)                              0.82
     Summe JLC-Anteil                                         5.13 USD
     + MWST-Anteil CH                                         0.34 CHF
-    = JLC-Anteil pro Board                                   4.61 CHF
+    = JLC-Anteil pro Board                                   4.60 CHF
     x Boards / Sensoren                                  16/15
     + lokal beschaffte Teile inkl. Ausschuss                 3.09 CHF
-    = STUECKKOSTEN pro Sensor (D-005)                        8.00 CHF
+    = STUECKKOSTEN pro Sensor (D-005)                        7.99 CHF
   Einmalkosten pro Bestellung (USD):
-    PCB Fixanteil pro Bestellung (D-005)                    41.95
-    PCB unbestueckte Reserveplatinen                         2.26
+    PCB Fixanteil pro Bestellung (D-005)                    62.25
+    PCB unbestueckte Reserveplatinen                         2.24
     Bauteile Mindestabnahme/Verlust-Ueberschuss              2.97
     PCBA Setup                                               8.18
     Schablone                                                1.53
     Feeder/Extended (10 ext., 1 pref., 15 basic Typen)      30.70
     Confirm Parts Placement                                  0.45
     Versand DHL                                             23.44
-    Summe JLC-Rechnung einmalig                            111.48 USD
-    + MWST-Anteil CH (einmalig)                              7.39 CHF
+    Summe JLC-Rechnung einmalig                            131.76 USD
+    + MWST-Anteil CH (einmalig)                              8.74 CHF
     + Verzollungsgebuehr Kurier/Post                         3.00 CHF
-    = EINMALKOSTEN                                         103.06 CHF
-  JLC-Rechnung total 193.61 USD = 158.54 CHF; MWST 12.84 CHF; Bestellung total 223.06 CHF; VOLLKOSTEN pro Sensor 14.87 CHF
-  Hinweis: GSDL nicht zulaessig (Warenwert 170.17 USD > 65.0 USD oder Gewicht > 1.5 kg) -> DHL Express gerechnet.
+    = EINMALKOSTEN                                         121.26 CHF
+  JLC-Rechnung total 213.80 USD = 175.08 CHF; MWST 14.18 CHF; Bestellung total 241.18 CHF; VOLLKOSTEN pro Sensor 16.08 CHF
+  Hinweis: GSDL nicht zulaessig (Warenwert 190.36 USD > 65.0 USD oder Gewicht > 1.5 kg) -> DHL Express gerechnet.
+```
+
+```
+=== Sensitivitaet: Serie 20/16/15, 4 x 100 uF, ENIG+POFV mengenproportional (ANNAHME Grenzfall) ===
+4 Lagen, 1.6 mm, PCB 20 Stk, bestueckt 16 Stk, nutzbare Sensoren 15, PCBA economic, Versand DHL, Gewicht ca. 0.55 kg [ANNAHME]
+  JLC-Anteil pro bestuecktem Board (USD):
+    PCB Grenzkosten pro Platine                              8.60
+    Bauteile JLC/LCSC                                        3.74
+    SMT-Bestueckung                                          0.23
+    Roentgen (1 leadless/Board)                              0.82
+    Summe JLC-Anteil                                        13.39 USD
+    + MWST-Anteil CH                                         0.89 CHF
+    = JLC-Anteil pro Board                                  12.02 CHF
+    x Boards / Sensoren                                  16/15
+    + lokal beschaffte Teile inkl. Ausschuss                 3.09 CHF
+    = STUECKKOSTEN pro Sensor (D-005)                       15.91 CHF
+  Einmalkosten pro Bestellung (USD):
+    PCB Fixanteil pro Bestellung (D-005)                    30.05
+    PCB unbestueckte Reserveplatinen                        34.41
+    Bauteile Mindestabnahme/Verlust-Ueberschuss              2.97
+    PCBA Setup                                               8.18
+    Schablone                                                1.53
+    Feeder/Extended (10 ext., 1 pref., 15 basic Typen)      30.70
+    Confirm Parts Placement                                  0.45
+    Versand DHL                                             23.44
+    Summe JLC-Rechnung einmalig                            131.73 USD
+    + MWST-Anteil CH (einmalig)                              8.74 CHF
+    + Verzollungsgebuehr Kurier/Post                         3.00 CHF
+    = EINMALKOSTEN                                         121.23 CHF
+  JLC-Rechnung total 346.03 USD = 283.37 CHF; MWST 22.95 CHF; Bestellung total 359.86 CHF; VOLLKOSTEN pro Sensor 23.99 CHF
+  Hinweis: GSDL nicht zulaessig (Warenwert 322.59 USD > 65.0 USD oder Gewicht > 1.5 kg) -> DHL Express gerechnet.
 ```
 
 ## 4 BOM mit Kostendaten

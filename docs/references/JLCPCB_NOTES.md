@@ -233,3 +233,37 @@ Hinweise:
 3. Ob Economic PCBA mit 4 Lagen 1.6 mm und Stackup ≠ NOREQ bestellbar ist.
 4. Versandkosten CH für 0.2–0.5 kg (Global Standard Direct Line, DHL Express, ggf. weitere).
 5. Ob bei 5 PCB die Option „2 bestückt“ weiterhin angeboten wird.
+
+## 8 Nachtrag 2026-11-07 (DFM-Prüfung Layout Rev B): Via-in-Pad/POFV, Rotation, Regeln
+Abgerufen 2026-11-07 per WebFetch (HTML, Auszüge sinngemäss bzw. wörtlich in Anführungszeichen).
+
+- [JLC] https://jlcpcb.com/capabilities/pcb-capabilities (ohne Datum, „© 2026“):
+  „Epoxy Filled & Capped / Copper paste Filled&Capped: Vias are filled with epoxy resin or copper paste and then
+  plated over …“, „Compatible with via diameters from 0.15 to 0.55 mm“, „This process is the default for 6-layer and
+  above multilayer boards.“ Via-in-Pad nur bei BGA ausdrücklich erwähnt („filled and plated-over vias“).
+  Weitere Werte: „Via Hole-to-Hole Spacing 0.2mm“, „Pad Hole-to-Hole Spacing 0.45mm“, „Soldermask bridge 0.10mm“,
+  „Min. pad spacing: 0.10 mm (green …)“ / „0.13 mm (black, white)“, SMD-Pad–Pad (versch. Netze) 0.15 mm,
+  Innenlage Via-Bohrung–Kupfer 0.2 mm, Innenlage PTH-Bohrung–Kupfer 0.3 mm, Kupfer–gefräste Kante ≥ 0.2 mm,
+  Multilayer min. 0.15 mm Bohrung / 0.25 mm Via-Ø; Aufpreis für 0.1/0.15 mm und 0.2/0.25 mm Bohrung.
+- [JLC] https://jlcpcb.com/blog/Free-Via-in-Pad-on-6-20-Layer-PCBs-with-POFV (Artikel datiert Nov 02, 2022):
+  „via-in-pad on 6- 20 layer PCBs are upgraded to POFV (Plated Over Filled Via) for free“,
+  „(POFV for 4-layer PCBs still requires charges.)“ – **kein Betrag**. Tabelle Via-Ø/Bohrung u. a. 0.45/0.3 mm;
+  „Via hole size: 0.2 to 0.5 mm“, Restring „0.05 mm minimum, 0.075 mm preferred“; Vias „more than 0.45 mm from
+  regular PTHs or NPTHs“. Ob bei Auswahl alle Vias gefüllt werden, steht dort nicht.
+- [JLC] https://jlcpcb.com/blog/via-filling-guide (Published/updated Aug 26, 2026): „resin filling/POFV as standard
+  at no charge on 6-layer through 20-layer boards“, „while POFV on a 4-layer board is charged“ – kein Betrag.
+- [DRITTQUELLE] EEVblog-Forum „Vias on the pads of a BGA“ (Suchtreffer 2026-11-07): Nutzer berichtet, JLC habe den
+  4-Lagen-Aufpreis manuell nachberechnet (Kommentar im Auftrag) – **nicht belegt**, nur Hinweis.
+- **Belegter Preis (lokal):** JLC-Rechner, vom Auftraggeber abgelesen 2026-11-06 (`docs/requirements/CLIENT_INPUT.md`):
+  4 L 1.6 mm, 22 × 150 mm, 5 Stk: ENIG 44.2 USD, ENIG + Epoxy filled & capped 64.5 USD → **+20.3 USD**.
+  Mengen- und Flächenabhängigkeit **nicht** abgelesen (ANNAHME fix je Bestellung).
+- [JLC] https://jlcpcb.com/help/article/pcb-assembly-faqs-part-2 („Last updated: Sep 09, 2026“):
+  Q1 „we do not call the red dot pin 1, but a marking only“; Q2 „The 0 degree that you defined for your design may
+  be different with the one that we defined“ (Korrektur über Rotation in der CPL, sonst korrigieren JLC-Ingenieure
+  nach Silkscreen); Q3 „Zero orientation for PCB library should match the component orientation in the
+  packaging(tape/reel).“, „they may have different orientations in the tape for different components“;
+  Q14 Economic: Bauteile > 0.3 mm von der Kante empfohlen (Nutzentrennung ± 0.2 mm);
+  Q17 Via-in-Pad ohne Füllung: „the solder flows into the vias and may cause weak soldering after reflowing“,
+  JLC fertigt ohne Rückfrage; passende „vias covering option“ selbst wählen.
+- EasyEDA/LCSC-Footprintdaten (Nullorientierung der JLC-Bibliothek) sind aus WSL nicht abrufbar
+  (easyeda.com/api: HTTP 403, 2026-11-07) → Rotationen nur über die JLC-Vorschau prüfbar.
