@@ -307,3 +307,104 @@ Nicht vertieft:
 | F-W4 | wichtig | RNG-Rückgabe ungeprüft, Replay möglich |
 | F-W5 | wichtig | Funk während Burst nicht ausgeschlossen |
 | F-L1…L5 | klein | Downgrade per Header, SAS-Länge, Dev-Bootloader, Company-ID, CRC |
+
+---
+
+## Runde 2 (2026-11-07, Sicherheits-Agent)
+
+Geprüft: Antwort `phase4_firmware_response.md`, PROTOCOL 0.2 (Kap. 0, 4.2–4.5), `fluidi_proto.py`,
+`test_pairing_mitm.py`, `core/fl_app.c`, `platform/cc23/fl_hw.c`, `scripts/flash_sensor.py`, `Makefile`,
+SDK-`hw_ccfg.h` (simplelink_lowpower_f3_sdk_9_23_00_27, cc23x0r5).
+
+Selbst ausgeführt:
+- `make check`: 1499 C-Prüfungen bestanden, 17 Tests Flash-Werkzeug ok, 3 Tests MITM ok. MITM v2: 39/10 000 = 0.39 %.
+- Eigene Angriffsvariante (Scratchpad, Python-Referenz): Der Angreifer lässt zuerst das Gateway offenlegen und
+  kennt damit die Ziel-SAS. Danach versucht er auf der Sensorseite, eine andere Nonce als die festgelegte offenzulegen.
+  Ergebnis: 167/40 000 = 0.42 %. Keine gefälschte Offenlegung bestand die Commitment-Prüfung (0 von 200 000).
+- Eigener C-Test gegen `fl_app.c` (Abbruch-und-Neustart):
+  - Trennung nach PAIR_RSP führt zu Abbruch, LED rot (L7) und Verlassen des Kopplungsmodus.
+  - Ein neues PAIR_REQ ohne erneuten Tastendruck lehnt der Sensor mit ERROR ab.
+  - Ein zweites PAIR_REQ in derselben Verbindung führt zum Abbruch.
+  - Ohne REVEAL innerhalb von 15 s folgt der Abbruch.
+  - Ein wiederholtes PAIR_REVEAL führt zum Abbruch.
+  - `s_nonce` ist bei jedem Versuch neu. Der Schlüssel ist im Simulator fest; die Plattform erzeugt ihn bei jedem
+    Versuch neu aus dem RNG (`fl_hw.c` `fl_port_ecdh_keygen`).
+
+### F-K1 – VETO aufgehoben (mit Auflage G-1)
+
+Die Konstruktion ist korrekt:
+- C bindet gateway_id, gw_pub und gw_nonce.
+- Das Transkript REQ‖RSP‖REVEAL enthält beide Public Keys, beide Nonces und C. Die SAS hängt vom ganzen Transkript ab.
+- Die Reihenfolge wird im Zustandsautomaten erzwungen (`sess`). Ein falscher Reveal führt zum Abbruch.
+- Ein neuer Versuch ist nur möglich, nachdem der Nutzer den Taster erneut ≥ 3 s gedrückt hat. Jeder Fehlversuch ist
+  rot sichtbar. Damit beträgt die Erfolgsrate je Nutzerversuch 1/243. Die Abbruch-und-Neustart-Taktik ist durch den
+  Nutzer begrenzt: nach 3 Versuchen 1.2 %, nach 10 Versuchen 4 % (Restrisiko F-L2, akzeptiert).
+
+Die Bedingungen 1, 3 und 4 sind erfüllt. Bedingung 2 ist nur teilweise erfüllt: `firmware/gateway/fluidi_gw`
+(`central.py`, `protocol.py`, `simsensor.py`) ist **noch v1** (PAIR_SHOW, `fluidi-pair-v1`). Ein v1-Gateway kann
+einen v2-Sensor nicht koppeln, weil die Versionsprüfung greift. Daraus entsteht deshalb kein offenes Angriffsfenster.
+
+- **Auflage G-1 (vor der Gateway-Freigabe):**
+  - Das Gateway auf v2 umstellen: gw_nonce und ECDH-Schlüssel je Versuch neu, REVEAL erst nach gültigem PAIR_RSP,
+    keine automatische Wiederholung der Kopplung.
+  - Den Interop-Test gegen `gen_vectors.py` bestehen.
+  - Den Sensor-Simulator auf v2 umstellen.
+  - Die Prüfung gehört zur Gateway-Sicherheitsprüfung.
+
+### F-W1…F-W5, F-L1…F-L3 – Stichproben
+
+| Nr | Ergebnis |
+|---|---|
+| F-W1 | **erledigt.** Prüfungen von `check_lock_key`: genau ein SPKI-Schlüssel im MCUboot-Bereich, ≠ DEV, = `--expect-key-fp`. Der Fingerabdruck steht im Namen des Werks-Hex. `make release` weist `DEV_ONLY*` und Schlüssel im Repo ab. `.gitignore` habe ich mit `git check-ignore` geprüft. |
+| F-W2 | **erledigt.** Die Offsets und Masken habe ich gegen `hw_ccfg.h` geprüft: PERM 0x18 mit Maske 0xF00F0F0F (RTF, ToolsClient, FlashProgram, DebugPort), WEPRA 0x20 Bits 0–10, WEPRAUX.ccfgSector, debugCfg 0x7D0, CRC 0x74C/0x7FC. Laut Header ist die Schutzwirkung „sticky-0“ und wird mit der FCFG „maximally restrictive“ kombiniert. Der Nachweis bleibt PP-9. |
+| F-W3 | **erledigt.** VDD und Neustartgrund werden vor dem ersten NV-Zugriff gelesen. Der Zähler steht in AONRSTA1 und begrenzt auf 3 Neustarts. Nach Brownout gilt die Schwelle 2.6 V. Bei gedrücktem Taster (`fl_hw.c` `fl_port_shutdown`) sind Pull-up und Wecken aus. `fl_platform_fatal` setzt kein „geplant“. |
+| F-W4 | **erledigt.** Der RNG-Rückgabewert wird an diesen Stellen geprüft: HELLO, Schlüsselerzeugung, s_nonce, Füllbyte. |
+| F-W5 | **erledigt.** Gemessen wird nur ohne Verbindung (`meas_pending`), und das ADV ist während der Messung aus. |
+| F-L1 | **erledigt.** `ih_ver`, Sicherheitszähler und `hw_rev` werden aus Slot 1 geprüft; Host-Test vorhanden. |
+| F-L2 | Ablehnung akzeptiert (siehe oben). |
+| F-L3 | Anleitung vorhanden. |
+
+### Neue bzw. verbleibende Punkte (keine Blocker)
+
+**N-1 · klein · PROTOCOL 4.5**
+
+Eine Commitment-Verletzung erhöht nur `cnt.auth_fail`, nicht `fail_streak` (`fl_app.c` Z. 514). Das widerspricht
+PROTOCOL 4.5 („3 in Folge → LOCKED“). Weil der Sensor den Kopplungsmodus ohnehin verlässt, ist die Auswirkung gering.
+
+Vorschlag: Den Text oder den Code angleichen.
+
+**N-2 · klein · F-W3, PROTOTYP-PRÜFUNG**
+
+Fällt VDD beim Brownout unter die POR-Schwelle, meldet der Chip vermutlich `POWER_ON`. Dann wird der Zähler genullt
+und die Schwelle ist 2.4 V statt 2.6 V. Jeder solche Zyklus enthält:
+- die MCUboot-ECDSA-Prüfung,
+- `save_counters()` vor der ersten Lastmessung (`fl_app_init`).
+
+Vorschlag:
+- `save_counters()` erst nach der Selbsttest-Messung bzw. nach `check_battery`.
+- PP-11 um „EOL-Quelle mit Einbruch unter POR, Neustartgrund und NV-Schreibzahl je Zyklus“ ergänzen.
+
+**N-3 · klein · F-W5**
+
+`fl_port_adv_set(NULL…)` ist im BLE-Stack vermutlich asynchron. Ein bereits geplantes ADV-Ereignis kann noch in den
+ersten Burst fallen.
+
+Vorschlag: Ein ADV-Ende-Ereignis abwarten oder eine Pause von ≥ 1 Intervall einhalten, alternativ in PP-2 messen.
+
+**N-4 · klein**
+
+Liefert `fl_port_vbat_mv()` beim Start 0 (Lesefehler), entfällt die UV-Prüfung (`A->vbat_rest &&`).
+
+Vorschlag: Den Wert 0 wie Unterspannung behandeln oder die Lesung einmal wiederholen.
+
+**N-5 · klein · Dokumentation**
+
+PROTOCOL 4.3 nennt für das Gateway noch `esp_fill_random`. Das Gateway ist ein Pi (D-022), deshalb dort `os.urandom`
+bzw. `secrets` angeben.
+
+### Ergebnis Runde 2
+
+- **VETO F-K1 aufgehoben** für Protokoll v2 und die Sensor-Firmware. Die Gateway-Kopplung im Echtbetrieb setzt
+  Auflage G-1 voraus.
+- F-W1…F-W5 sind umgesetzt. Die Serienfreigabe hängt weiter an PP-9 (CCFG-Wirkung) und PP-11.
+- N-1…N-5 sind klein und blockieren nicht.
