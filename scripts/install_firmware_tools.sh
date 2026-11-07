@@ -114,13 +114,15 @@ do_apt() {
 }
 
 # ------------------------------------------------------------- Teil 2: TI-Werkzeuge (ohne sudo) --
-install_bitrock() {  # install_bitrock <installer> <zielordner-erwartet>
-  local inst="$DL/$1" want="$2"
+install_bitrock() {  # install_bitrock <installer> <zielordner-erwartet> [prefix]
+  # Achtung: Der Compiler-Installer legt unter <prefix> einen eigenen Unterordner an, der
+  # SysConfig-Installer dagegen installiert DIREKT in <prefix> -> für SysConfig prefix = Zielordner.
+  local inst="$DL/$1" want="$2" prefix="${3:-$TI}"
   if [ -d "$want" ]; then ok "bereits installiert: $want"; return; fi
   chmod +x "$inst"
-  say "Installiere $1 nach $TI (unbeaufsichtigt)"
+  say "Installiere $1 nach $prefix (unbeaufsichtigt)"
   # TI-Installer (BitRock/InstallBuilder): --mode unattended --prefix <ordner>
-  "$inst" --mode unattended --prefix "$TI" || die "Installer $1 meldet Fehler. Interaktiv versuchen: $inst --prefix $TI"
+  "$inst" --mode unattended --prefix "$prefix" || die "Installer $1 meldet Fehler. Interaktiv versuchen: $inst --prefix $prefix"
   [ -d "$want" ] || die "Erwarteter Ordner fehlt nach Installation: $want  (Inhalt von $TI: $(ls "$TI" | tr '\n' ' '))"
   ok "installiert: $want"
 }
@@ -136,7 +138,13 @@ do_ti() {
   fetch "$SDK_URL"    "$SDK_ZIP"    "$SDK_SHA"
 
   install_bitrock "$CLANG_BIN"  "$CLANG_DIR"
-  install_bitrock "$SYSCFG_RUN" "$SYSCFG_DIR"
+  # Aufräumen eines früheren Fehllaufs (SysConfig direkt in $TI installiert, Skriptversion vor 2026-11-07 17:00)
+  if [ -f "$TI/sysconfig_cli.sh" ] && [ ! -d "$SYSCFG_DIR" ]; then
+    warn "SysConfig lag direkt in $TI (alter Fehllauf) – wird entfernt und neu installiert"
+    ( cd "$TI" && rm -rf .metadata "TI sysconfig.desktop" app dist install_logs nodejs nw spice64 \
+        sysconfig_cli.sh sysconfig_gui.sh tests uninstall uninstall.dat update.ini )
+  fi
+  install_bitrock "$SYSCFG_RUN" "$SYSCFG_DIR" "$SYSCFG_DIR"
 
   if [ -d "$SDK_DIR" ]; then
     ok "SDK bereits entpackt: $SDK_DIR"
