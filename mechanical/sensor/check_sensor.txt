@@ -18,7 +18,7 @@ Logo: Massstab 0.4134 mm/u -> Strich 0.83 mm (2.0 u)
    Abstand Kunststoff Stoessel             - Antennenkupfer: 1.27 mm
    Abstand Kunststoff Kappe_blau           - Antennenkupfer: 0.54 mm
    Abstand Kunststoff Fenster_transluzent  - Antennenkupfer: 2.56 mm
-   Abstand Mutter - Platine F: 0.40 mm; Mutter - O-Ring-Nut (Kragen): 0.05 mm
+   Abstand Mutter - Platine F: 0.40 mm; Mutter - O-Ring Kragen: 0.65 mm (Kragenwerkstoff dazwischen)
 7 O-Ring AS568-017: Nutgrundumfang 54.97 -> Dehnung 1.9 %
    Einbauraum 1.25 (FDM -0.1) Schnur 1.70 -> Verpressung 26 %
    Einbauraum 1.25 (FDM -0.1) Schnur 1.86 -> Verpressung 33 %
@@ -28,10 +28,10 @@ Logo: Massstab 0.4134 mm/u -> Strich 0.83 mm (2.0 u)
    Einbauraum 1.45 (FDM +0.1) Schnur 1.86 -> Verpressung 22 %
    Nutfuellung 77 % (< 85 %)
 8 Volumen / Masse (ASA 1.07, FR4 1.85, Epoxid 1.15, Stahl 7.9, Silikon 1.2 g/cm3; ANNAHME Dichten):
-   Kappe_blau           ASA       2108.5 mm3   2.26 g
+   Kappe_blau           ASA       2108.1 mm3   2.26 g
    Huelse_grau          ASA       4944.2 mm3   5.29 g
    Kragen               ASA        756.1 mm3   0.81 g
-   Fenster_transluzent  ASA         63.2 mm3   0.07 g
+   Fenster_transluzent  ASA         62.0 mm3   0.07 g
    Taste_blau           ASA         68.6 mm3   0.07 g
    Tastenteller         ASA          5.0 mm3   0.01 g
    Klemmring            ASA         24.2 mm3   0.03 g

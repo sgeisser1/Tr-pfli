@@ -86,7 +86,7 @@ ANT = dict(W=15.2, H=5.7)                          # AN043 (INDEX.csv ANT-AN043)
 
 # ----------------------------------------------------------------------------- Fenster, Taste, Mechanik
 DROP = dict(R=2.5, K=2.4, ZC=37.4, X=0.0, T=1.6,   # Tropfen wie Logo/Render (r 2.5, Spitze 6.0 ueber Mitte)
-            BOSS_D=3.0, NOTCH_GAP=0.3, GLUE=0.05)
+            BOSS_D=3.0, NOTCH_GAP=0.3, GLUE=0.1)    # Klebespalt Fenster je Seite (FDM)
 DROP['BOSS_Y1'] = PCB['Y_F'] - LED['H'] - 2.0      # Lichtschaft-Ende -> d = 2.0 mm
 BTN = dict(X=0.0, Y=5.5, W=9.0, D=6.0, CH=1.0, PROUD=0.6, STROKE=0.6, POCKET_GAP=0.4, POCKET_D=1.0,
            AX_X=-2.2, AX_Y=4.6,                    # Achse Hals/Membran/Stoessel
@@ -199,7 +199,10 @@ def interface_dict():
                          material='Epoxid 2K, thixotrop am Schott (ANNAHME Typ, Phase 4b Welle 2)'),
             window_glue_to_oring_groove=round(DROP['ZC'] - DROP['R'] - Z['SP_G1'], 2)),
         height_limits_summary=dict(F_band=2.0, F_band_under_tongue=1.5, F_fach='nur 3034 (4.1)', B='0 (unbestueckt)'),
-        open_points=['Elektronik: Platz im Band 20 x 5.6 mm (F) fuer alle Bauteile ausser Clip pruefen (S-01)',
+        open_points=['KRITISCH Elektronik/Orchestrator: Band F 20 x 5.6 = 112 mm2, Bauteilflaeche laut BOM Rev A ca. 251 mm2 '
+                     '(Abschaetzung, Huellen inkl. Pads + 0.25 mm) -> passt nicht. Optionen: beidseitig bestuecken (Band B '
+                     '+112 mm2, Standard-PCBA), kleinere Bauteile (0201, kleinerer Taster), Kopf hoeher (+1 mm = +20 mm2 je Seite, '
+                     'Auftraggeber), Bauteile im Fach nur mit Freigabe Sicherheit (REQ-SAF-05). Entscheid vor Layout -> Rev B',
                      'Elektronik: Kunststoffteile vor der Antenne (Stoesselrohr, Finger, Zunge, 0.6...2.5 mm vor F) bestaetigen',
                      'Elektronik: Lage SW1/LED gegen Layout bestaetigen (Pads SW1 x -9.5...-2.5)'])
     return d

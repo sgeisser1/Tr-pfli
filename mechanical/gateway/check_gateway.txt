@@ -17,7 +17,7 @@ Logo Gateway: Strich 1.14 mm
 5 Fuge z 13.85 ... 14.15, Facette: Tropfen von 2.31 bis 10.81 mm schraeg ueber Facettenunterkante (Facette 12.73)
 6 Wanne_grau           9.7 cm3 -> 10.4 g ASA
 6 Deckel_blau          6.3 cm3 -> 6.7 g ASA
-6 Fenster_transluzent  0.1 cm3 -> 0.1 g ASA
+6 Fenster_transluzent  0.0 cm3 -> 0.1 g ASA
 7 Verlustleistung 0.5 W: dT Gehaeuse ~ 8 K (h = 8 W/m2K, A = 0.0082 m2, ANNAHME)
 7 Verlustleistung 1.0 W: dT Gehaeuse ~ 15 K (h = 8 W/m2K, A = 0.0082 m2, ANNAHME)
 7 Verlustleistung 2.0 W: dT Gehaeuse ~ 30 K (h = 8 W/m2K, A = 0.0082 m2, ANNAHME)

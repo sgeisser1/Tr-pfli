@@ -196,6 +196,10 @@ def export_part(shape, base, rot=None, lin=0.01, ang=0.2):
     s.translate(V(-(bb.XMin + bb.XMax) / 2, -(bb.YMin + bb.YMax) / 2, -bb.ZMin))
     s.exportStep(base + '.step')
     m = MeshPart.meshFromShape(Shape=s, LinearDeflection=lin, AngularDeflection=ang, Relative=False)
+    if not m.isSolid():
+        m.removeDuplicatedPoints(); m.removeDuplicatedFacets(); m.fixDegenerations(1e-4); m.harmonizeNormals()
+        if not m.isSolid():
+            print('WARNUNG: Netz nicht geschlossen:', base)
     m.write(base + '.stl')
     m.write(base + '.3mf')
     return s

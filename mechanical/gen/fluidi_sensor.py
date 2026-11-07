@@ -125,7 +125,7 @@ def build():
     D = FP.DROP
     dpoly = drop2(D['X'], D['ZC'], D['R'], D['K'])
     cap = cap.cut(prism_xz(dpoly, -1.0, D['T']))
-    cap = cap.cut(cyl_y(D['BOSS_D'] / 2 + 0.05, D['T'] - 0.1, D['BOSS_Y1'] + 0.5, D['X'], D['ZC']))
+    cap = cap.cut(cyl_y(D['BOSS_D'] / 2 + D['GLUE'], D['T'] - 0.1, D['BOSS_Y1'] + 0.5, D['X'], D['ZC']))
     # Tastenblock, Fuehrungsrohr, Biegezunge (alles einteilig mit der Kappe; Druck kopfueber)
     ax, ay = BTN['AX_X'], BTN['AX_Y']
     blk = box(-8.0, 0.8, CAP['CAV_OFF'], PCB['Y_F'] - 0.4, BTN['BLOCK_Z0'], H['H'] - H['CEIL'] + 0.01)
@@ -287,8 +287,8 @@ def checks(S, sl_plain):
         log('   Abstand %-14s - Antenne: %.1f mm' % (k, S[k].distToShape(S['Antenne_AN043'])[0]))
     for k in ('Stoessel', 'Kappe_blau', 'Fenster_transluzent'):
         log('   Abstand Kunststoff %-20s - Antennenkupfer: %.2f mm' % (k, S[k].distToShape(S['Antenne_AN043'])[0]))
-    log('   Abstand Mutter - Platine F: %.2f mm; Mutter - O-Ring-Nut (Kragen): %.2f mm'
-        % (S['Mutter_M2'].distToShape(S['PCB'])[0], FP.SCREW['Y'] - FP.SCREW['NUT_S'] / 2 - FP.GROOVE_BOT['Y0']))
+    log('   Abstand Mutter - Platine F: %.2f mm; Mutter - O-Ring Kragen: %.2f mm (Kragenwerkstoff dazwischen)'
+        % (S['Mutter_M2'].distToShape(S['PCB'])[0], S['Mutter_M2'].distToShape(S['ORing_Kragen'])[0]))
     # 7 O-Ring
     O = FP.ORING
     per = rrect_perimeter(FP.GROOVE_BOT)
@@ -347,7 +347,7 @@ PRINT = {  # Teil: (Datei, Rotationen in Druckausrichtung, Material)
     'Huelse_grau': ('huelse_grau', [], 'ASA Warmgrau hell'),
     'Kappe_blau': ('kappe_blau', [((1, 0, 0), 180)], 'ASA Hellblau'),
     'Kragen': ('kragen', [], 'ASA (Rest, beliebig)'),
-    'Fenster_transluzent': ('fenster_tropfen', [((1, 0, 0), -90)], 'ASA/PETG natur transluzent'),
+    'Fenster_transluzent': ('fenster_tropfen', [((1, 0, 0), 90)], 'ASA/PETG natur transluzent'),
     'Taste_blau': ('taste_blau', [((1, 0, 0), 180)], 'ASA Hellblau'),
     'Tastenteller': ('tastenteller', [], 'ASA Hellblau'),
     'Klemmring': ('klemmring', [((1, 0, 0), 180)], 'ASA Hellblau'),
@@ -375,6 +375,12 @@ def main():
     for k, (fn, rot, mtl) in PRINT.items():
         export_part(S[k], os.path.join(OUT, 'print', fn), rot)
     export_part(lehre, os.path.join(OUT, 'print', 'distanzlehre_23p5'), [])
+    # Passungsprobe: Huelse unten (Boden, Schlitz, Furchlippe, Kragensitz) und oben (Zapfensitz, Rand) -> mit Kragen
+    # und O-Ring Gleitsitz, Verpressung und Schraube pruefen, bevor die ganze Huelse gedruckt wird
+    probe = sl_plain.common(box(-20, 20, -5, 20, -1, 9.0))
+    export_part(probe, os.path.join(OUT, 'print', 'passprobe_huelse_unten'), [])
+    top = sl_plain.common(box(-20, 20, -5, 20, 29.0, 40))
+    export_part(top, os.path.join(OUT, 'print', 'passprobe_huelse_oben'), [])
     App.closeDocument(doc.Name)
     for f in os.listdir(OUT):
         if f.endswith('.FCBak'):

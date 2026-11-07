@@ -1,17 +1,31 @@
 # -*- coding: utf-8 -*-
 """FEM der Sonde fluidi P3 (REQ-MECH-10): FreeCAD 0.21.2 FEM + Gmsh + CalculiX, headless.
 
-Lauf:  freecadcmd simulation/fem/fem_probe.py            (ca. 5-10 min)
-Ausgabe: simulation/fem/results.json, simulation/fem/fem_log.txt, simulation/fem/work/<fall>/ (ccx-Dateien),
-         simulation/fem/fem_probe_<fall>.FCStd (Modell inkl. Ergebnis, nur feinstes Netz)
-Bericht: simulation/fem/REPORT.md
+Lauf:  freecadcmd simulation/fem/fem_probe.py            (ca. 15 min)
+       .venv/bin/python simulation/fem/fem_eval.py      (Sicherheitsfaktoren, Konvergenz, Fall -> summary.json)
+Ausgabe: simulation/fem/results.json, summary.json, fem_log.txt, work/<fall>/ (ccx-Dateien),
+         fem_probe_LC1_seitlich_y.FCStd (feinstes Netz inkl. Ergebnis)
 
 Modell (Masse aus mechanical/gen/fluidi_params.py, Schnittstelle Rev A):
   Leiterplatte FR4 20 x 1.6 mm, Spitze 45 Grad, von z = -105 (Spitze) bis z = 32.0 (Schott, eingespannt).
-  Kragen (Verguss + ASA) als ein Koerper z 2.0 ... 7.3 um die Platine, mit der Platine verbunden (gemeinsames Netz),
-  Aussenflaechen fest (Huelse liegt nach 0.2 mm Spiel an). Vergusskante bei z = 2.0 (Kragenunterkante, buendig).
-Werkstoffe (ANNAHMEN, Quellen in REPORT.md): FR4 E = 20 GPa, nu = 0.15; Kragen E = 3 GPa (Epoxid, steifer als ASA ->
-  konservativ fuer die Kerbe), nu = 0.35.
+  Kragen (Verguss + ASA) als ein Koerper z 2.0 ... 7.3 um die Platine (bis Nutgrund 22.1 x 7.1), mit der Platine
+  verbunden (gemeinsames Netz = Verguss haftet), Aussenflaechen fest (Huelse liegt nach 0.2 mm Spiel an und stuetzt
+  sich ueber den Zapfen an der Kappe ab). Vergusskante bei z = 2.0 (Kragenunterkante, buendig, weil der Kragen auf dem
+  Huelsenboden steht). Grenzfall LC1b: ohne Kragenstuetze (nur Schott).
+  Lasten an der Spitzenflaeche: LC1 10 N quer (schwache Achse), LC2 10 N in der Ebene, LC3 50 N Druck, LC4 30 N Zug,
+  LC5/LC6 Knicken 50 N (Spitze frei / seitlich gefuehrt). Netz: Gmsh C3D10 (gerade Kanten), global 1.6 mm,
+  Verfeinerung z -4 ... 3 mit 1.0 / 0.5 / 0.25 mm (Konvergenz an LC1). Kraftrichtung: Referenzkante zeigt in -z
+  (geprueft an der Verschiebung der Spitze), daher reversed=True fuer Druck.
+Werkstoffe:
+  FR4 Festigkeit: docs/references/Kingboard_KB-6160A_TechnicalInformation.pdf S.1 (IPC-TM-650 2.4.4):
+      Biegefestigkeit >= 345 MPa quer / >= 415 MPa laengs (typ. 446 / 565). Gerechnet mit 345 MPa (Faserrichtung
+      im Nutzen unbekannt). Laminat bei JLC = ANNAHME (KB-6160-Klasse).
+  FR4 E = 20 GPa, nu = 0.15: ANNAHME (Datenblatt nennt keinen Modul; typisch 18-24 GPa).
+  Kragen E = 3 GPa, nu = 0.35: ANNAHME Epoxid; ASA 2.45 GPa (BambuLab_ASA_TechnicalDataSheet_V2.0.pdf S.2) -> der
+      steifere Wert erhoeht die Kerbspannung (konservativ).
+Handrechnung (hand() unten): L = 107 mm (Spitze bis Vergusskante), W = 20*1.6^2/6 = 8.53 mm3, I = 6.83 mm4;
+  LC1 sigma = 10*107/8.53 = 125.4 MPa, f = F L^3/(3EI) = 29.9 mm; Knicken frei pi^2 E I/(4 L^2) = 29.4 N,
+  gefuehrt 2.046 pi^2 E I/L^2 = 241 N. Verguss: Kragen 30 N / (43.2*5.3 mm2) = 0.13 MPa, Schott 50 N / (43.2*1.2) = 0.96 MPa.
 """
 import json
 import math
@@ -39,7 +53,7 @@ E_COL, NU_COL = 3000.0, 0.35
 Z_TOP = Z['BULK1']                    # 32.0 Einspannung im Schott
 Z_EDGE = Z['COL0']                    # 2.0 Vergusskante
 Z_COL1 = Z['COL1']
-Z_R0, Z_R1 = -3.0, 3.0                # verfeinerter Bereich
+Z_R0, Z_R1 = -4.0, 3.0                # verfeinerter Bereich
 LOG = []
 
 
@@ -93,7 +107,7 @@ def edge_dir(shape, vec):
     raise RuntimeError('keine Kante in Richtung %s' % vec)
 
 
-def build_case(case, h_fine, h_glob=3.0):
+def build_case(case, h_fine, h_glob=1.6):
     doc = App.newDocument('fem_' + case['name'])
     geo = doc.addObject('Part::Feature', 'Geo')
     geo.Shape = geometry()
@@ -108,7 +122,7 @@ def build_case(case, h_fine, h_glob=3.0):
     an.addObject(solver)
     m1 = ObjectsFem.makeMaterialSolid(doc, 'FR4')
     m1.Material = {'Name': 'FR4', 'YoungsModulus': '%g MPa' % E_FR4, 'PoissonRatio': str(NU_FR4), 'Density': '1850 kg/m^3'}
-    m1.References = [(geo, tuple(nm['pcb']))]
+    m1.References = []          # alle uebrigen Elemente (Platine)
     an.addObject(m1)
     m2 = ObjectsFem.makeMaterialSolid(doc, 'Kragen')
     m2.Material = {'Name': 'Kragen', 'YoungsModulus': '%g MPa' % E_COL, 'PoissonRatio': str(NU_COL), 'Density': '1150 kg/m^3'}
@@ -139,6 +153,9 @@ def build_case(case, h_fine, h_glob=3.0):
     mesh.CharacteristicLengthMax = h_glob
     mesh.CharacteristicLengthMin = min(h_fine, 0.1)
     mesh.ElementOrder = '2nd'
+    mesh.SecondOrderLinear = True          # gerade Kanten (keine gekruemmten Mittenknoten)
+    mesh.OptimizeStd = True
+    mesh.OptimizeNetgen = True
     an.addObject(mesh)
     reg = ObjectsFem.makeMeshRegion(doc, mesh, h_fine, 'Fine')
     reg.References = [(geo, tuple(nm['fine']))]
@@ -201,10 +218,17 @@ def run_case(case, h_fine, keep=False):
         out['vm_max'] = round(max(res.vonMises), 2)
         for zq in (-50.0, -20.0, -5.0, -1.0, 0.0, 1.0, 1.5):
             out['sigma_zz_at_%g' % zq] = at(zq, 0.35 if zq > -5 else 1.0)
+        prof = {}
+        for zz, yy, sz, a1, a3 in surf:
+            key = round(zz, 1)
+            prof[key] = max(prof.get(key, 0.0), abs(sz))
+        out['profile_zz'] = sorted((k, round(v, 1)) for k, v in prof.items() if k >= -6.0)
         tipn = [k for nid, k in idx.items() if abs(nodes[nid].z - PCB['Z_TIP']) < 1e-4]
         out['u_tip'] = round(max(dl[k] for k in tipn), 3)
+        dv = res.DisplacementVectors
+        out['u_tip_vec'] = [round(sum(dv[k][i] for k in tipn) / len(tipn), 4) for i in range(3)]
     log('  %-14s h=%.2f Knoten %6d  %s  (%.0f s)' % (case['name'], h_fine, out['nodes'],
-        {k: v for k, v in out.items() if k not in ('case', 'h_fine', 'nodes', 't')}, out['t']))
+        {k: v for k, v in out.items() if k not in ('case', 'h_fine', 'nodes', 't', 'profile_zz')}, out['t']))
     if keep:
         doc.saveAs(os.path.join(OUT, 'fem_probe_%s.FCStd' % case['name']))
     App.closeDocument(doc.Name)
@@ -231,15 +255,16 @@ def main():
     cases = [
         dict(name='LC1_seitlich_y', F=10.0, dir=(0, 1, 0)),
         dict(name='LC2_seitlich_x', F=10.0, dir=(1, 0, 0)),
-        dict(name='LC3_axial_druck', F=50.0, dir=(0, 0, 1)),
-        dict(name='LC4_zug', F=30.0, dir=(0, 0, 1), reversed=True),
-        dict(name='LC5_knick_frei', F=50.0, dir=(0, 0, 1), type='buckling'),
-        dict(name='LC6_knick_gefuehrt', F=50.0, dir=(0, 0, 1), type='buckling', tip_guided=True),
+        # Richtungskante zeigt in -z (geprueft: reversed=False -> Spitze bewegt sich nach unten = Zug)
+        dict(name='LC3_axial_druck', F=50.0, dir=(0, 0, 1), reversed=True),
+        dict(name='LC4_zug', F=30.0, dir=(0, 0, 1), reversed=False),
+        dict(name='LC5_knick_frei', F=50.0, dir=(0, 0, 1), type='buckling', reversed=True),
+        dict(name='LC6_knick_gefuehrt', F=50.0, dir=(0, 0, 1), type='buckling', tip_guided=True, reversed=True),
         dict(name='LC1b_ohne_Kragenstuetze', F=10.0, dir=(0, 1, 0), collar_fixed=False),
     ]
     R = dict(hand=H, materials=dict(E_FR4=E_FR4, nu_FR4=NU_FR4, E_collar=E_COL, nu_collar=NU_COL), runs=[])
     if os.environ.get('FEM_QUICK'):
-        run_case(cases[0], 1.0); run_case(cases[4], 1.0); return
+        run_case(cases[2], 1.0); run_case(cases[4], 1.0); return
     # Netzkonvergenz am kritischen Fall
     for hf in (1.0, 0.5, 0.25):
         R['runs'].append(run_case(cases[0], hf, keep=(hf == 0.25)))

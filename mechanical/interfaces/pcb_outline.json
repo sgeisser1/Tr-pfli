@@ -407,7 +407,7 @@
   "B": "0 (unbestueckt)"
  },
  "open_points": [
-  "Elektronik: Platz im Band 20 x 5.6 mm (F) fuer alle Bauteile ausser Clip pruefen (S-01)",
+  "KRITISCH Elektronik/Orchestrator: Band F 20 x 5.6 = 112 mm2, Bauteilflaeche laut BOM Rev A ca. 251 mm2 (Abschaetzung, Huellen inkl. Pads + 0.25 mm) -> passt nicht. Optionen: beidseitig bestuecken (Band B +112 mm2, Standard-PCBA), kleinere Bauteile (0201, kleinerer Taster), Kopf hoeher (+1 mm = +20 mm2 je Seite, Auftraggeber), Bauteile im Fach nur mit Freigabe Sicherheit (REQ-SAF-05). Entscheid vor Layout -> Rev B",
   "Elektronik: Kunststoffteile vor der Antenne (Stoesselrohr, Finger, Zunge, 0.6...2.5 mm vor F) bestaetigen",
   "Elektronik: Lage SW1/LED gegen Layout bestaetigen (Pads SW1 x -9.5...-2.5)"
  ]
