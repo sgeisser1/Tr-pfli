@@ -113,3 +113,8 @@ Format: Nr. · Datum · Entscheid · Alternativen · Begründung · Quelle · St
   (`docs/design/logo/fluidi_logo_v3a*.svg`).
 - **App-Icon:** hochaufgelöste fotorealistische **Nahaufnahme des Sensors**: quadratisch, leuchtender **blauer Tropfen
   gross in der Mitte**, oben Hellblau, unten Warmgrau, Übergang als sichtbarer **Spalt** (Vorlage: Screenshot des Auftraggebers).
+
+### D-012 · 2026-11-07 · Phase 3 abgeschlossen, App-Icon final
+- **App-Icon** (Sensor-Nahaufnahme, blauer Tropfen, `app/icons/`) vom Auftraggeber freigegeben. Design komplett:
+  `docs/design/P3_FLUIDI.md` / `P3_fluidi_v3.pdf`. **Phase 3 freigegeben, Phase 4 gestartet** (Auftraggeber 2026-11-07).
+- Vorhandene Hardware beim Auftraggeber: Seeed XIAO nRF52840 Sense (Nutzung siehe Phase 4).
