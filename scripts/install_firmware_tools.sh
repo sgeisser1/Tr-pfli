@@ -9,7 +9,8 @@
 #   bash scripts/install_firmware_tools.sh            # alles: apt (fragt sudo-Passwort) + TI + ESP + Python + Check
 #   bash scripts/install_firmware_tools.sh apt        # nur Systempakete + Gruppe dialout (sudo)
 #   bash scripts/install_firmware_tools.sh ti         # nur TI: SDK, TI Arm Clang, SysConfig (ohne sudo)
-#   bash scripts/install_firmware_tools.sh sdklibs    # nur SDK-Bibliotheken bauen (dauert lange)
+#   bash scripts/install_firmware_tools.sh sdklibs    # OPTIONAL, nicht nötig: SDK liefert die CC23x0-Bibliotheken fertig mit;
+#                                                     #   der Gesamt-Build bricht zudem an einem Host-Test (dmm/test_hdlc_spinel) ab
 #   bash scripts/install_firmware_tools.sh py         # nur Python-venv (imgtool, pyserial)
 #   bash scripts/install_firmware_tools.sh sbl        # optional: TI Linux-SBL (Referenz-Flasher, C)
 #   bash scripts/install_firmware_tools.sh esp        # nur ESP-IDF für das Gateway (ohne sudo)
@@ -265,11 +266,9 @@ do_check() {
   chk "TI Arm Clang"   "'$CLANG_DIR/bin/tiarmclang' --version"
   chk "SysConfig"      "test -x '$SYSCFG_DIR/sysconfig_cli.sh' && echo '$SYSCFG_DIR (Version $SYSCFG_VER)'"
   chk "TI F3 SDK"      "test -f '$SDK_DIR/imports.mak' && echo '$SDK_VER in $SDK_DIR'"
-  chk "SDK-Libs gebaut" "cat '$SDK_DIR/.fluidi_libs_built'"
+  chk "SDK-Libs (mitgeliefert)" "test -f '$SDK_DIR/source/ti/drivers/lib/ticlang/m0p/drivers_cc23x0r5.a' && test -d '$SDK_DIR/source/ti/ble/lib/CC2340R5' && echo 'drivers_cc23x0r5.a + BLE-Stack CC2340R5 vorhanden'"
   chk "imgtool"        "'$VENV/bin/imgtool' version"
   chk "pyserial"       "'$VENV/bin/python' -c 'import serial; print(\"pyserial\", serial.VERSION)'"
-  chk "ESP-IDF"        "git -C '$IDF_DIR' describe --tags"
-  chk "idf.py/esptool" "bash -c '. \"$IDF_DIR/export.sh\" >/dev/null 2>&1 && idf.py --version && python -m esptool version | tail -n1'"
   if id -nG "$USER" | tr ' ' '\n' | grep -qx dialout; then ok "Gruppe dialout: ja"; else warn "Gruppe dialout: nein (Teil 'apt', danach wsl --shutdown)"; fail=1; fi
   for m in cdc_acm ch341 cp210x ftdi_sio; do
     if modinfo "$m" >/dev/null 2>&1; then ok "Kernelmodul $m verfügbar"; else warn "Kernelmodul $m fehlt (wsl --update)"; fi
@@ -287,7 +286,7 @@ case "$cmd" in
   sbl)     do_sbl ;;
   esp)     do_esp ;;
   check)   do_check ;;
-  all)     need_user; do_apt; do_ti; do_py; do_sdklibs; do_esp; do_check
+  all)     need_user; do_apt; do_ti; do_py; do_check   # ESP-IDF entfällt (Gateway = Pi Zero 2 W, D-014); sdklibs optional
            echo; echo "Fertig. Neue Shell öffnen (bzw. nach dialout-Änderung 'wsl --shutdown') und: source $ENVFILE" ;;
   *)       die "Unbekannter Teil '$cmd'. Erlaubt: all apt ti sdklibs py sbl esp check" ;;
 esac
