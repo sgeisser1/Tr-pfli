@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="13.71mm" height="19.10mm" viewBox="0 0 13.712 19.100">
+<title>Tröpfli Bildmarke</title>
+<desc>Tröpfli-Wortmarke, eigene geometrische Pfade (keine Schrift). Erzeugt mit gen_logo.py. 1 Einheit = 1 mm im viewBox.</desc>
+<path fill="#2E9BD6" d="M6.856,1.000 L3.806,7.245 L1.089,13.261 L3.497,17.041 L6.856,18.100 Z"/>
+<path fill="#1F78AE" d="M6.856,1.000 L6.856,18.100 L10.215,17.041 L12.623,13.261 L9.906,7.245 Z"/>
+</svg>

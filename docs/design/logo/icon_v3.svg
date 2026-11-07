@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="512.00" height="512.00" viewBox="0 0 512.000 512.000">
+<title>Tröpfli Icon v3</title>
+<desc>PWA-Icon 512 px.</desc>
+<rect x="0" y="0" width="512.0" height="512.0" rx="112" ry="112" fill="#FFFFFF"/>
+<path fill="#2E9BD6" d="M256.000,117.300 L206.521,218.602 L162.443,316.197 L201.510,377.519 L256.000,394.700 Z"/>
+<path fill="#1F78AE" d="M256.000,117.300 L256.000,394.700 L310.490,377.519 L349.557,316.197 L305.479,218.602 Z"/>
+</svg>
