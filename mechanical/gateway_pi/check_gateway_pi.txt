@@ -1,0 +1,50 @@
+Logo Gateway: Strich 1.14 mm
+=== fluidi Gateway G1 v4 (Raspberry Pi Zero 2 W) ===
+Aussenmasse 84 x 42 x 20 mm (B x T x H), Wand 2.0, Fuge z 13.85 ... 14.15
+Pi: X=0 bei x 26.0, Y=0 bei y 18.6, PCB z 5.0 ... 6.0 (ANNAHME T 1.0)
+1 Kollisionen montiert: keine
+   RTC-Modul im Rahmen: Ueberschneidung 0.000 mm3
+2 Mindestabstaende (Spiel, Ziel >= 0.3 FDM bzw. >= 1.0 zu Waenden):
+   Pi_PCB             - Wanne 0.00   - Deckel 0.00
+   Pi_Bauteile_oben   - Wanne 0.30   - Deckel 0.20
+   Pi_Bauteile_unten  - Wanne 0.20   - Deckel 1.02
+   microSD_Karte      - Wanne 0.50   - Deckel 1.30
+   LED_Platine        - Wanne 0.00   - Deckel 0.25
+   RTC_Modul_Option   - Wanne 4.00   - Deckel 0.00
+   Klima_Modul_Option - Wanne 0.00   - Deckel 0.70
+   Leitungen_Klima    - Wanne 0.20   - Deckel 0.30
+   (Pi_PCB 0.00 = Auflage auf Abstandshaltern / Niederhalterrohren, gewollt; Bauteilhuelle 0.20 nur innerhalb
+    des Freihaltekreises Ø 6 der Zeichnung, dort keine Bauteile)
+   Pi_PCB - Wand (ohne Freistiche) 0.40
+   LED_Platine        - Pi_Bauteile_oben 4.88  - Pi_PCB 5.72
+   LED_RGB            - Pi_Bauteile_oben 5.88  - Pi_PCB 6.77
+3 Niederhalterrohre (R 2.8, Deckel) zur Wanne min. 1.00 mm (keine Anbindung an die Wand) -> Wand ueberall 2.0 mm
+   Rohr Ø 5.6 innerhalb Freihaltekreis Ø 6.0 der Zeichnung: ja
+   Schraube M2.5 x 8: Spitze z 9.6, Einsatz z 6.2 ... 10.2 -> Einschraubtiefe 3.4 mm
+4 Micro-USB-PWR: Buchsenfront 1.5 mm hinter Aussenflaeche, Umspritzung 10.6 x 7.0 -> Spiel zur Wanne_grau 0.40 mm
+4 Micro-USB-OTG: Buchsenfront 1.5 mm hinter Aussenflaeche, Umspritzung 10.6 x 7.0 -> Spiel zur Wanne_grau_OTG 0.40 mm
+5 GPIO: Auftraggeber-Pi ohne Stiftleiste, Leitungen direkt in die Loetaugen (Lage aus Zeichnung, Pin 1 = Quadratpad):
+   Pin 1  X 8.39 Y 25.25  -> x 17.61 y -6.65
+   Pin 3  X 10.93 Y 25.25  -> x 15.07 y -6.65
+   Pin 5  X 13.47 Y 25.25  -> x 12.53 y -6.65
+   Pin 6  X 13.47 Y 27.79  -> x 12.53 y -9.19
+   Pin 9  X 18.55 Y 25.25  -> x 7.45 y -6.65
+   Option 1x5-Stiftleiste gerade (Pins 1-3-5-7-9, Pin 7 frei) + Buchsengehaeuse, Huelle 2.5 + 14 mm hoch (ANNAHME): Kollision mit Deckel_blau, Leitungen_Klima
+   Option gewinkelte Leiste: Stifte zeigen in Y (zur Front) -> Steckergehaeuse ~14 mm passt nicht (Front 7.6 mm)
+   volle 40-pol. Leiste (8.5 mm, ANNAHME): Kollision mit Deckel_blau -> nicht vorgesehen
+6 Metall im Gehaeuse: 4 Schrauben/Einsaetze nur in den 4 Befestigungsbohrungen des Pi (Herstellerbohrungen),
+   LED-Platine (Kupfer) Abstand zur Pi-Platine 5.7 mm; keine weiteren Metallteile. Lage der Onboard-Antenne
+   ist in den offiziellen Unterlagen nicht angegeben -> RSSI offen/geschlossen messen (PROTOTYP-PRUEFUNG).
+7 Wanne_grau           13.0 cm3 -> 14.0 g ASA
+7 Wanne_grau_OTG       12.9 cm3 -> 13.8 g ASA
+7 Deckel_blau          9.0 cm3 -> 9.7 g ASA
+7 Fenster_transluzent  0.0 cm3 -> 0.1 g ASA
+8 Verlustleistung 1.0 W: dT Gehaeuse ~ 11 K (h = 8 W/m2K, A = 0.0111 m2, ANNAHME; Leistung Pi nicht im Product Brief)
+8 Verlustleistung 2.0 W: dT Gehaeuse ~ 22 K (h = 8 W/m2K, A = 0.0111 m2, ANNAHME; Leistung Pi nicht im Product Brief)
+8 Verlustleistung 3.0 W: dT Gehaeuse ~ 34 K (h = 8 W/m2K, A = 0.0111 m2, ANNAHME; Leistung Pi nicht im Product Brief)
+   Deckel t 0.3: x 21.7..26.3 y -14.7..-14.2 z 14.2..14.7
+10 Montage senkrecht: Pi in Wanne (mit Lichtschacht/LED-Platine) und Deckel auf Wanne, Ueberschneidung beim Anheben um t: t 0.3: Pi 0.00 / Deckel 0.00 mm3, t 1.0: Pi 0.00 / Deckel 0.00 mm3, t 2.0: Pi 0.00 / Deckel 0.00 mm3, t 4.0: Pi 0.00 / Deckel 0.00 mm3, t 8.0: Pi 0.00 / Deckel 0.00 mm3, t 15.0: Pi 0.00 / Deckel 0.00 mm3
+11 Klimakammer rechts: Innenraum x 32.0 ... 40.0 (8.0 mm), Trennwand 2.0 mm + 4.0 mm Luftspalt (SD-Raum) zum Pi;
+   Modul (ANNAHME max. 24 x 14 mm, steht in Nuten, Sensorseite zur Stirnwand): Abstand zu SiP 28.0 mm, zu Micro-USB-PWR (Einspeisung, Regler vermutl. nahe) 58.1 mm, zur Pi-Platine 8.2 mm
+   Zuluft 2 Bodenschlitze + 3 Stirnschlitze (Wanne), Abluft 1 Stirnschlitz (Deckel); Kabelkanal Ø 3.0 x 4.5 mm bei y -3.5 z 10.5, vergossen
+9 Lueftung: 5 Bodenschlitze 1.2 mm unter dem SiP, 4 Kaminschlitze 1.2 x 2.6 mm in der Deckel-Rueckwand

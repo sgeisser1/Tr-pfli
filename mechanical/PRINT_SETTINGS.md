@@ -68,6 +68,30 @@ ASA pro Sensor ≈ **9 g** (≈ CHF 0.25, **ANNAHME** CHF 25/kg), kein AMS-Farbw
 | `deckel_blau` | Deckel mit Facette, Steg, Domen, Lichtschacht | Hellblau | **kopfüber** | Facette = 45°-Überhang; Lichtschacht 45° | 6.8 |
 | `fenster_tropfen_gw` | Lichtfenster Gateway | natur transluzent | Aussenfläche auf dem Bett | | 0.1 |
 
+### Gateway G1 v4 für Raspberry Pi Zero 2 W (`mechanical/gateway_pi/print/`, D-014)
+
+Erzeugen: `freecadcmd mechanical/gen/fluidi_gateway_pi.py` (schreibt auch `check_gateway_pi.txt` und `preview.png`).
+Aussen 84 × 42 × 20 mm, Profil, Facette, Fuge und Tropfen wie G1 v3; Profil und Material wie Kap. 1–2.
+
+| Datei | Teil | Farbe | Ausrichtung | Kritische Stellen | g |
+|---|---|---|---|---|---|
+| `wanne_grau` | Wanne mit Pi-Abstandshaltern, Lichtschacht, Trennwand Klimakammer, Nutpfosten, Kabelkanal | Warmgrau | Boden auf dem Bett | Senkkopfbohrungen unten (Brücke über Ø 5.4); Micro-USB-Fenster 11.4 × 7.8 (Brücke 11.4); Lichtschacht hängt 45° an der Innenfacette (ohne Stütze, Probedruck); Kabelkanal Ø 3.0 waagrecht; Stirnschlitze 1.2 hoch (Brücken 20 mm) | 14.0 |
+| `wanne_grau_otg` | wie oben, zusätzlich Micro-USB-OTG-Fenster (XIAO-Empfänger extern, D-014) | Warmgrau | wie oben | Steg zwischen den Fenstern 1.2 mm | 13.8 |
+| `deckel_blau` | Deckel mit 4 Niederhalterrohren (Einsatz M2.5), Steg, Gegenrippe Klimakammer, RTC-Rahmen | Hellblau | **kopfüber** | Facette 45°; vordere Rohre stehen auf der Innenfacette; Steg vorne bewusst weggelassen (sonst nicht senkrecht montierbar) | 9.7 |
+| `fenster_tropfen_gw` | Lichtfenster | natur transluzent | Aussenfläche auf dem Bett | | 0.1 |
+
+Montage: Pi auf die 4 Abstandshalter legen (Buchsen in die inneren Freistiche der Rückwand), Klimasensor-Leitungen
+(3V3 Pin 1, SDA Pin 3, SCL Pin 5, GND Pin 6 oder 9) **direkt in die Lötaugen** löten (Pi ohne Stiftleiste), Bündel
+durch den Kanal Ø 3.0 in der Trennwand führen, Modul in die Nuten stecken, Kanal mit Silikon vergiessen (Zugentlastung
+und Luftsperre). LED-Platine auf den Lichtschacht kleben. Deckel senkrecht aufsetzen, umdrehen, 4 × M2.5 × 8 (ISO 7380,
+**ANNAHME**) von unten durch Abstandshalter und Pi-Bohrung in die Einsätze (Ø 3.5 × 4, Bohrung 3.2, Lötkolben 220 °C,
+**ANNAHME**) – die 4 Schrauben halten Pi und Deckel zugleich. Nylonschrauben als Option, falls die RSSI-Messung mit
+Stahlschrauben schlechter ist (PROTOTYP-PRÜFUNG). microSD bleibt innen (Zugang nach Lösen der 4 Schrauben).
+
+**Vor dem ersten Druck am vorhandenen Pi messen** und in `PI`/`PARTS` des Generators eintragen: Platinendicke
+(ANNAHME 1.0), Höhen HDMI/Micro-USB/microSD-Halter/Kamerabuchse, Überstand der microSD-Karte (ANNAHME 2.5),
+Umspritzung des Netzteilsteckers (ANNAHME ≤ 10.6 × 7.0).
+
 ## 4 Toleranzen (FDM P1S, 0.4 mm) – im CAD umgesetzt
 
 | Fügung | Spiel je Seite | Herkunft |
@@ -82,6 +106,10 @@ ASA pro Sensor ≈ **9 g** (≈ CHF 0.25, **ANNAHME** CHF 25/kg), kein AMS-Farbw
 | Stössel in Rohr | 0.10 | |
 | Gateway Deckelsteg in Wanne | 0.15 | |
 | Gewindeeinsatz M2.5 (Gateway) | Bohrung Ø 3.2 (**ANNAHME** Einsatz Ø 3.5 × 4) | |
+| G1 v4: Pi-Platine zu Wänden / microSD-Karte zur Trennwand | 0.4 (Buchsenseite) bzw. ≥ 1.0 / 1.5 | `check_gateway_pi.txt` |
+| G1 v4: Micro-USB-Umspritzung im Fenster | 0.4 je Seite | |
+| G1 v4: Klimamodul-Platine in Nut | 0.15 je Seite (Nut 1.9 für 1.6) | Modul Welle 2 |
+| G1 v4: Deckel-Gegenrippe zur Trennwand | 0.3 (= Fuge) | |
 
 **Vor der ersten Serie:** `passprobe_huelse_unten` + `kragen` + O-Ring und `passprobe_huelse_oben` + `kappe_blau` drucken
 und prüfen: Hülse gleitet mit Silikonfett ohne Klemmen, O-Ring sichtbar verpresst, Schraube M2 × 4 furcht durch die Lippe und
