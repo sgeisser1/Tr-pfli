@@ -160,6 +160,10 @@ Legende Zugriff: **L** = lesen (öffentlich, wenn `public_read`), **S** = Sitzun
 ## 5 Abläufe
 
 ### 5.1 Manuelle Messung (UC-04, REQ-SYS-05)
+Protokoll v2 (Ä-8): Der Sensor bestätigt MEASURE mit `{status, seq}`, misst erst **nach dem Trennen** und meldet
+den Wert mit dem nächsten Funkkontakt (schnelles Advertising). Job: `waiting_for_sensor` → `running` („Sensor
+misst“) → `done`, sobald der Datensatz `seq` gespeichert ist. Kalibrierpunkte: `samples` Messungen = `samples` Kontakte.
+
 1. `POST /plants/{id}/measure` → `202 Job{state: queued}`. Läuft für den Sensor schon eine Messung, kommt derselbe
    Job zurück (keine Doppelaufträge).
 2. Gateway setzt einen **ausstehenden Befehl** für den Sensor. `waiting_for_sensor`: der Sensor meldet sich
@@ -308,7 +312,7 @@ Batterie: `mv` unter Last vom Sensor, `pct` und `days_left` schätzt das Gateway
 
 | Nr. | Punkt | Wer |
 |---|---|---|
-| API-1 | ~~Abgleich mit `firmware/PROTOCOL.md`~~ erledigt in Welle 2: Gateway setzt PROTOCOL v1 um; Befunde `docs/reviews/phase4_protocol_software.md` | Firmware + Software |
+| API-1 | ~~Abgleich mit `firmware/PROTOCOL.md`~~ erledigt: Gateway setzt PROTOCOL 0.2 / Protokoll v2 um (byte-gleich mit `firmware/tools/fluidi_proto.py`); Befunde `docs/reviews/phase4_protocol_software.md` | Firmware + Software |
 | API-2 | `public_read` Werk ein? (Komfort vs. Sicherheit) | Auftraggeber |
 | API-3 | Signalschwellen, Temperaturkoeffizient `k`, Startkalibrierung je Substrat | Prototyp |
 | API-4 | ~~UTC-Minuten~~ geklärt: PROTOCOL 8 `led_window` in Lokalzeit + `TIME_SET.tz_min`; Gateway sendet TIME_SET bei Wechsel des Versatzes (Zeitumstellung). Wochentage: Emulation über `water_led` (Befund W-7) | Firmware |

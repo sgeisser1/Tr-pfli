@@ -602,13 +602,11 @@ class Model:
         win = led["water_window"]
         hm = lambda x: int(x[:2]) * 60 + int(x[3:5])  # noqa: E731
         wl = se["led"]["water_hint"] if not p or p.get("water_led", "inherit") == "inherit" else p["water_led"] == "on"
-        # Wochentage: Protokoll kennt nur ein Tagesfenster -> Gateway schaltet water_led an ausgeschlossenen Tagen ab
-        # (Emulation, Befund W-7: TLV für Wochentagsmaske vorgeschlagen)
-        today = datetime.fromtimestamp(now(), self.tz()).isoweekday()
-        wl = wl and today in (win.get("weekdays") or [1, 2, 3, 4, 5, 6, 7]) and s.get("led_enabled", True)
+        wl = wl and s.get("led_enabled", True)
         v = {"meas_interval_s": max(900, min(86400, round(86400 / per_day))),
              "adv_interval_ms": max(1000, min(150000, P.adv_interval_ms(se["reaction_time_min"], self.cfg.p_miss))),
              "water_led": 1 if wl else 0, "led_window": (hm(win["start"]), hm(win["end"])),
+             "led_weekdays": P.weekdays_mask(win.get("weekdays")),   # TLV 0x0F (v2, W-7)
              "led_level": LED_LEVEL.get(led.get("brightness", "normal"), 70),
              "heartbeat_led": 1 if led.get("enabled", True) and s.get("led_enabled", True) else 0,
              "batt_low_flag": 1 if s.get("battery") and s["battery"]["state"] != "ok" else 0}
@@ -635,7 +633,7 @@ class Model:
             prev_boot = s.get("boot_id")
             s.update(last_seen=t, fw_version=si.fw_version, hw_rev=f"rev 0x{si.hw_rev:02X}", boot_id=si.boot_id,
                      lost_records=si.lost_records, reset_reason=P.RESET_REASONS[si.reset_reason] if si.reset_reason < 7 else str(si.reset_reason),
-                     slot_confirmed=bool(si.slot & 1), ota_result=si.ota_result)
+                     slot_confirmed=bool(si.slot & 1), ota_result=si.ota_result, sec_cnt=si.sec_cnt)
             pend = 0 if si.seq_last == 0xFFFFFFFF else max(0, si.seq_last - si.seq_oldest_unacked + 1)
             s["buffered_records"] = pend
             self._battery(s, si, t)

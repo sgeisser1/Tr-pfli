@@ -347,11 +347,11 @@ Stand Software 0.5.0. Geprüft mit `python3 -m unittest discover -s firmware/gat
 |---|---|
 | `service.py`, `__main__.py` | Zusammenbau, systemd-Benachrichtigung (READY, WATCHDOG nur bei lebendem Funk-Thread), CLI (`serve`, `sim`, `setup-code`, `reset-password`, `pki-init`, `fingerprint`, `test-image`) |
 | `config.py` | `/etc/fluidi/gateway.toml` (Pfade, Ports, Funk, `p_miss`, Startkalibrierung) |
-| `protocol.py` | PROTOCOL.md v1: Frames, Advertising, SECURE (AES-CCM, ctr), Kopplung (ECDH, HKDF, SAS), SESSION_INFO, Datensatz, TLV, OTA-Nutzlasten, Formel `adv_interval` (Kap. 2.2) |
+| `protocol.py` | PROTOCOL.md 0.2 / **Protokoll v2**: Frames (`vt` 0x2t), Advertising, SECURE (AES-CCM, ctr, OTA-Lücke), Kopplung (ECDH, Commitment/Reveal, HKDF, SAS), SESSION_INFO, Datensatz, TLV, OTA-Nutzlasten, Formel `adv_interval` (Kap. 2.2) |
 | `crypto.py`, `_pure.py` | `cryptography` (OpenSSL) auf dem Pi; reine Python-Rückfallebene für Tests (gegen FIPS-197, RFC 5869, GCM-Testfall und OpenSSL geprüft) |
 | `central.py` | BLE-Central im asyncio-Thread: Verbindungsentscheid (PROTOCOL 2.5), max. 3 Verbindungen, Sitzung, Nachlieferung in Blöcken (lesen → COMMIT → ACK), Befehle, Kopplung mit SAS, OTA (Go-back-N) |
 | `transport.py` | `BleakRadio` (bleak 3.0.2 / BlueZ) oder `SimRadio` (simulierte Sensoren im Prozess) |
-| `simsensor.py` | Sensorseite des Protokolls für Simulation und Tests (Ring 1122, Quittung, Sperre, Laufzeit statt Uhr, OTA mit Test/Bestätigung) |
+| `simsensor.py` | Sensorseite des Protokolls für Simulation und Tests (Ring 840, Quittung, Sperre nur bei Krypto-Fehlern bzw. 10 Fristüberschreitungen, Messung nach dem Trennen, Laufzeit statt Uhr, OTA mit Test/Bestätigung) |
 | `timesync.py` | Zeitrekonstruktion aus (boot_id, uptime) und Synchronpunkten (PROTOCOL 7) |
 | `store.py` | SQLite (WAL, `synchronous=FULL`), Tabellen Kap. 3.1 + Synchronpunkte, Sitzungen, Klima, Abbilder |
 | `model.py` | Fachmodell: Pflanzen, Zuordnungen (UC-11), Kalibrierung, Tagebuch, Jobs, Auswertung (gemeinsamer Rechenkern `app/dev/fluidi_calc.py`, `fluidi_analysis.py`), Artenprofile (`app/data/species.json`, D-021: Regime, Winterfaktor, „zu nass“ erst nach 48 h), Salz-Hinweis (D-018), Batterie, Einstellungen an den Sensor |
@@ -419,6 +419,6 @@ und übernimmt die Datenbank (`restore-pending.sqlite`). Test: `test_api.Gateway
 ### 14.6 Offene Punkte (neu)
 | Nr. | Punkt | Wer |
 |---|---|---|
-| OP-GW-7 | Befunde zur Schnittstelle PROTOCOL.md: `docs/reviews/phase4_protocol_software.md` (K-1, K-2 vor dem ersten Muster klären) | Firmware + Software |
+| OP-GW-7 | Schnittstelle PROTOCOL.md: Runde 1 erledigt (Protokoll v2), Rest-Befunde R-1…R-5 in `docs/reviews/phase4_protocol_software.md` Kap. „Runde 2“ | Firmware + Software |
 | OP-GW-8 | bleak/BlueZ am Pi: Verbindungsdauer bis HELLO, MTU, GATT-Cache, Koexistenz (OP-K12) | Prototyp |
 | OP-GW-9 | Startkalibrierung (0.01 pF) und Batteriemodell gegen Muster (API-3, FW-P6) | Prototyp |

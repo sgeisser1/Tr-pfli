@@ -64,6 +64,55 @@ class Pairing(unittest.TestCase):
         self.assertEqual(self.gw.model.pairing_out()["candidates"], [])
 
 
+class SensorRules(unittest.TestCase):
+    """Sensorseitige v2-Regeln der Simulation direkt geprüft (Commitment, Fristen ohne Fehlversuch)."""
+
+    def run_async(self, coro):
+        import asyncio
+        return asyncio.run(coro)
+
+    def test_commitment_violation_counts_as_failure(self):
+        from fluidi_gw.transport import SimLink
+
+        async def go():
+            s = SimSensor("80:6F:B0:12:AB:CD", auto_confirm=False)
+            s.press_button_long()
+            link = SimLink(s)
+            s.on_connect(link)
+            g = crypto.EcdhKey()
+            req = P.PairReq.make(bytes(8), g.public_raw, bytes([1] * 16))
+            await s.on_write(link, P.pair_frame(P.PAIR_REQ, req.payload()))
+            await s.on_write(link, P.pair_frame(P.PAIR_REVEAL, bytes([2] * 16)))   # passt nicht zum Commitment
+            frames = []
+            while not link.rxq.empty():
+                frames.append(link.rxq.get_nowait())
+            return s, frames
+        s, frames = self.run_async(go())
+        self.assertEqual(s.fail_streak, 1)
+        self.assertIsNone(s.k_link)
+        self.assertIn(P.pair_frame(P.PAIR_DONE, b"\x06"), frames)
+
+    def test_timeouts_do_not_lock_early(self):
+        import asyncio
+        from fluidi_gw.transport import SimLink
+
+        async def go():
+            s = SimSensor("80:6F:B0:12:AB:CD")
+            s.k_link, s.gateway_id = bytes(16), bytes(8)
+            s.hello_deadline = 0.01
+            for _ in range(9):
+                s.on_connect(SimLink(s))
+                await asyncio.sleep(0.03)
+            locked9 = s.clock() < s.locked_until
+            s.on_connect(SimLink(s))
+            await asyncio.sleep(0.03)
+            return locked9, s.clock() < s.locked_until, s.fail_streak
+        locked9, locked10, fails = self.run_async(go())
+        self.assertFalse(locked9)      # Ä-4: Fristüberschreitungen sind keine Fehlversuche
+        self.assertTrue(locked10)      # erst 10 in Folge -> Sperre
+        self.assertEqual(fails, 0)
+
+
 class DataPath(unittest.TestCase):
     def setUp(self):
         self.gw, _ = make_gateway(sensors=1, history_days=40, http=False, speed=0.001)
@@ -118,6 +167,7 @@ class DataPath(unittest.TestCase):
     def test_settings_pushed(self):
         self.assertTrue(wait(lambda: self.s.settings_ver > 0, 15))
         self.assertEqual(self.s.settings["adv_interval_ms"], 27500)
+        self.assertEqual(self.s.settings["led_weekdays"], 0x7F)               # TLV 0x0F (v2)
         self.assertGreater(self.s.settings["water_raw"], 0)    # Schwelle als Rohwert (REQ-UI-07)
         self.assertTrue(self.s.time_known)                     # TIME_SET gesendet
 
@@ -127,7 +177,36 @@ class DataPath(unittest.TestCase):
         self.M.central.submit(self.s.addr, {"kind": "measure", "job": j, "on_done": lambda r: got.update(r) or {}})
         self.assertTrue(wait(lambda: j["state"] == "done", 15), j["message"])
         self.assertEqual(got["records"][0].cause, 2)
-        self.assertTrue(wait(lambda: self.s.acked >= got["records"][0].seq, 5))
+        self.assertTrue(wait(lambda: self.s.acked >= got["records"][0].seq, 10))
+
+    def test_measure_async_record_in_next_session(self):
+        """Ä-8: Antwort {status, seq}; Messung nach dem Trennen; Auftrag fertig erst mit dem Datensatz `seq`."""
+        wait(lambda: self.s.acked >= self.s.seq - 1, 15)
+        seq_before = self.s.seq
+        j = self.M.new_job("measure", self.s.name, 1)
+        states = []
+        orig = self.M.job_update
+
+        def spy(job, **kw):
+            states.append(kw.get("state"))
+            orig(job, **kw)
+        self.M.job_update = spy
+        self.M.central.submit(self.s.addr, {"kind": "measure", "job": j})
+        self.assertTrue(wait(lambda: j["state"] == "done", 15), j["message"])
+        self.M.job_update = orig
+        self.assertIn("running", states)
+        r = self.gw.store.q1("SELECT cause FROM reading WHERE sensor=? AND seq=?", (self.s.addr, seq_before))
+        self.assertEqual(r["cause"], 2)
+        self.assertTrue(wait(lambda: self.s.acked >= seq_before, 10))
+
+    def test_calibration_capture_multi_session(self):
+        got = {}
+        j = self.M.new_job("calibration_capture", self.s.name, 1, timeout_s=60)
+        self.M.central.submit(self.s.addr, {"kind": "calibration_capture", "job": j, "samples": 3, "purpose": 1,
+                                            "on_done": lambda r: got.update(r) or {}})
+        self.assertTrue(wait(lambda: j["state"] == "done", 30), j["message"])
+        self.assertEqual(len(got["records"]), 3)
+        self.assertEqual({r.cause for r in got["records"]}, {3})
 
     def test_bad_mic_session_dropped(self):
         """Falscher Schlüssel im Gateway: SESSION_INFO-MIC ungültig -> Sitzung abgebrochen, nichts gespeichert."""
@@ -155,6 +234,7 @@ class DataPath(unittest.TestCase):
         self.assertEqual(it["state"], "done", it["message"])
         self.assertEqual(self.s.fw, (1, 1, 0))
         self.assertTrue(self.s.slot_confirmed)
+        self.assertTrue(wait(lambda: self.M.sensors[self.s.name].get("sec_cnt") == meta.security_counter, 10))
 
     def test_unpair(self):
         j = self.M.new_job("unpair", self.s.name, None)

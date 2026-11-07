@@ -46,7 +46,7 @@ export default async function calibrate(el, ctx) {
     const msg = h('p.status');
     const btn = h('button.btn.primary', { type: 'button' }, icon('pulse'), `${title} messen`);
     btn.addEventListener('click', () => capture(point, btn, msg));
-    return card(title, h('div.cal-art', null, art), h('p', null, text), h('p.small.muted', null, 'Der Sensor misst beim nächsten Funkkontakt (bis ca. 1 min).'), msg, h('div.actions', null, btn));
+    return card(title, h('div.cal-art', null, art), h('p', null, text), h('p.small.muted', null, 'Der Sensor misst 5-mal, jeweils nach einem kurzen Funkkontakt (Messung ohne Funk). Dauer bis ca. 1 min.'), msg, h('div.actions', null, btn));
   }
 
   function draw() {

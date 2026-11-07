@@ -1,6 +1,9 @@
-"""Rahmen, Nachrichten und Zeitrekonstruktion gegen PROTOCOL.md v1 (Layouts, Längen, Regeln)."""
+"""Rahmen, Nachrichten und Zeitrekonstruktion gegen PROTOCOL.md v2 (Layouts, Längen, Regeln) und byte-genau gegen
+die gemeinsame Referenz firmware/tools/fluidi_proto.py (gleiche Eingaben wie firmware/sensor/tests/gen_vectors.py)."""
 import struct
+import sys
 import unittest
+from pathlib import Path
 
 import helpers  # noqa: F401
 from fluidi_gw import crypto, mcuboot
@@ -11,19 +14,22 @@ from fluidi_gw import timesync as T
 class Layout(unittest.TestCase):
     def test_sizes(self):
         self.assertEqual(len(P.hello(bytes(8), bytes(8))), 18)                  # 5.2
-        self.assertEqual(len(P.hello_rsp(1, bytes(8))), 10)
-        self.assertEqual(len(P.SessionInfo().pack()), 48)                       # 5.5
-        self.assertEqual(len(P.SessionInfo().pack(True)), 64)
+        self.assertEqual(len(P.hello_rsp(2, bytes(8))), 10)
+        self.assertEqual(len(P.SessionInfo().pack()), 52)                       # 5.5 v2 (sec_cnt, Ä-9)
+        self.assertEqual(len(P.SessionInfo().pack(True)), 68)
+        si = P.SessionInfo.parse(P.SessionInfo(sec_cnt=7).pack(True))
+        self.assertEqual(si.sec_cnt, 7)
+        self.assertEqual(len(P.measure_rsp(0, 5)), 5)                           # 5.4 v2 (Ä-8)
         self.assertEqual(len(P.Record(1, 2, 3, 4, 5, 6, 7, 8, 9).pack()), 20)   # 5.6
         self.assertEqual(P.records_per_frame(247), 11)                          # 5.6: MTU 247 -> 11
-        self.assertEqual(len(P.PairReq(bytes(8), bytes(64), bytes(16)).payload()), 88)
+        self.assertEqual(len(P.PairReq.make(bytes(8), bytes(64), bytes(16)).payload()), 104)   # v2 (Ä-1)
         self.assertEqual(len(P.PairRsp(bytes(6), 0, bytes(4), bytes(64), bytes(16)).payload()), 91)
 
     def test_vt_and_version(self):
-        self.assertEqual(P.hello(bytes(8), bytes(8))[0], 0x10)
-        self.assertEqual(P.frame_type(bytes([0x12])), P.FT_SECURE)
+        self.assertEqual(P.hello(bytes(8), bytes(8))[0], 0x20)               # vt = 0x2t (Ä-2)
+        self.assertEqual(P.frame_type(bytes([0x22])), P.FT_SECURE)
         with self.assertRaises(P.ProtocolError) as e:
-            P.frame_type(bytes([0x22]))
+            P.frame_type(bytes([0x12]))                                         # v1-Frame abgelehnt
         self.assertEqual(e.exception.code, 0x08)
 
     def test_name_and_addr(self):
@@ -49,6 +55,8 @@ class Layout(unittest.TestCase):
         self.assertEqual(d["tx_power_dbm"], -4)
         self.assertEqual(P.decode_settings(b + bytes([0x77, 1, 0]))[1], 0x77)    # unbekannte id -> abgelehnt
         self.assertEqual(P.decode_settings(bytes([0x01, 4]) + struct.pack("<I", 60))[1], 0x01)  # Bereich 900…
+        self.assertEqual(P.decode_settings(P.encode_settings({"led_weekdays": P.weekdays_mask([1, 2, 3, 4, 5])}))[0],
+                         {"led_weekdays": 0x1F})                                # TLV 0x0F (W-7)
 
     def test_adv_interval_formula(self):
         self.assertEqual(P.adv_interval_ms(1), 27500)                           # Tab. 2.2
@@ -59,10 +67,13 @@ class Layout(unittest.TestCase):
 class Crypto(unittest.TestCase):
     def test_pairing_both_sides(self):
         g, s = crypto.EcdhKey(), crypto.EcdhKey()
-        req = P.PairReq(bytes(range(8)), g.public_raw, bytes(16))
+        gn = bytes([9] * 16)
+        req = P.PairReq.make(bytes(range(8)), g.public_raw, gn)
         rsp = P.PairRsp(P.addr_to_bytes("80:6F:B0:12:AB:CD"), 0x0A, b"\x01\x00\x03\x00", s.public_raw, bytes([1] * 16))
-        kg = P.pair_keys(g.shared(s.public_raw), req, rsp)
-        ks = P.pair_keys(s.shared(g.public_raw), req, rsp)
+        self.assertTrue(req.check_reveal(gn))
+        self.assertFalse(req.check_reveal(bytes(16)))                           # Commitment-Verletzung
+        kg = P.pair_keys(g.shared(s.public_raw), req, rsp, gn)
+        ks = P.pair_keys(s.shared(g.public_raw), req, rsp, gn)
         self.assertEqual(kg, ks)
         self.assertEqual(len(kg[3]), 5)
         self.assertTrue(all(d in (0, 1, 2) for d in kg[3]))                     # nur Rot/Grün/Gelb, kein Blau
@@ -87,11 +98,82 @@ class Crypto(unittest.TestCase):
         with self.assertRaises(P.ProtocolError) as e:
             se.open(bytes(f1))
         self.assertEqual(e.exception.code, 0x06)
+        # OTA (Ä-6): Lücke nur für OTA_DATA zulässig, danach streng monoton
+        gw.tx_ctr += 3
+        self.assertEqual(se.open(gw.seal(P.M_OTA_DATA, 1, b"x"), ota_gap=64)[0], P.M_OTA_DATA)
+        gw.tx_ctr += 2
+        with self.assertRaises(P.ProtocolError):
+            se.open(gw.seal(P.M_GET_INFO, 1), ota_gap=64)
         # Richtung zählt: ein Gateway-Frame ist kein gültiger Sensor-Frame
         g2 = P.SecureChannel(k, a, True)
         with self.assertRaises(P.ProtocolError):
             g2.open(P.SecureChannel(k, a, True).seal(1, 1))
         self.assertEqual(len(gw.seal(1, 1, bytes(10))), 15 + 10)                 # Overhead 15 Byte (5.3)
+
+
+TOOLS = Path(__file__).resolve().parents[2] / "tools"
+try:
+    sys.path.insert(0, str(TOOLS))
+    import fluidi_proto as REF  # gemeinsame Referenz (braucht `cryptography`)
+    from cryptography.hazmat.primitives.asymmetric import ec as _ec
+except ImportError:  # pragma: no cover
+    REF = None
+
+
+@unittest.skipUnless(REF, "firmware/tools/fluidi_proto.py oder cryptography fehlt")
+class Reference(unittest.TestCase):
+    """Gleiche feste Eingaben wie firmware/sensor/tests/gen_vectors.py -> byte-gleiche Ergebnisse."""
+
+    def setUp(self):
+        self.addr = bytes.fromhex("CDAB12B06F80")
+        self.gw_id = bytes.fromhex("0102030405060708")
+        gp = _ec.derive_private_key(0x1F2E3D4C5B6A79881F2E3D4C5B6A79881F2E3D4C5B6A79881F2E3D4C5B6A7988, _ec.SECP256R1())
+        sp = _ec.derive_private_key(0x0A1B2C3D4E5F60710A1B2C3D4E5F60710A1B2C3D4E5F60710A1B2C3D4E5F6071, _ec.SECP256R1())
+        self.gw_pub, self.s_pub = REF.pub64(gp), REF.pub64(sp)
+        self.z = REF.ecdh(gp, self.s_pub)
+        self.gn, self.sn = bytes(range(0xA0, 0xB0)), bytes(range(0xC0, 0xD0))
+        self.fw = bytes([0, 1, 0, 0])
+
+    def test_pairing_vectors(self):
+        req = P.PairReq.make(self.gw_id, self.gw_pub, self.gn)
+        rsp = P.PairRsp(self.addr, 0x0B, self.fw, self.s_pub, self.sn)
+        self.assertEqual(req.payload(), REF.pair_req_payload(self.gw_id, self.gw_pub, self.gn))
+        self.assertEqual(req.commit, REF.commit(self.gw_id, self.gw_pub, self.gn))
+        self.assertEqual(rsp.payload(), REF.pair_rsp_payload(self.addr, 0x0B, self.fw, self.s_pub, self.sn))
+        k_link, k_conf, tr, sas = P.pair_keys(self.z, req, rsp, self.gn)
+        rtr = REF.transcript(req.payload(), rsp.payload(), self.gn)
+        self.assertEqual(tr, rtr)
+        self.assertEqual((k_link, k_conf), REF.pair_keys(self.z, self.gn, self.sn, self.gw_id, self.addr))
+        self.assertEqual(sas, REF.sas(rtr))
+        self.assertEqual(P.confirm_mac(k_conf, b"S", tr), REF.confirm_mac(k_conf, "S", rtr))
+        self.assertEqual(P.confirm_mac(k_conf, b"G", tr), REF.confirm_mac(k_conf, "G", rtr))
+        self.assertTrue(REF.check_reveal(req.payload(), self.gn))
+        # Frames mit Kopf: vt = 0x23, pmsg
+        self.assertEqual(P.pair_frame(P.PAIR_REVEAL, self.gn)[:2], bytes([REF.vt(REF.FT_PAIR), REF.PAIR_REVEAL]))
+
+    def test_session_vectors(self):
+        k_link, _ = REF.pair_keys(self.z, self.gn, self.sn, self.gw_id, self.addr)
+        gn8, sn8 = bytes(range(0x10, 0x18)), bytes(range(0x20, 0x28))
+        ks = P.session_key(k_link, gn8, sn8)
+        self.assertEqual(ks, REF.session_key(k_link, gn8, sn8))
+        sensor = P.SecureChannel(ks, self.addr, i_am_gateway=False)
+        sensor.tx_ctr = 7
+        f = sensor.seal(0x90, 0x42, bytes(range(30)))
+        self.assertEqual(f, REF.seal(ks, REF.DIR_S2G, 7, self.addr, 0x90, 0x42, bytes(range(30))))
+        gw = P.SecureChannel(ks, self.addr, i_am_gateway=True)
+        gw.rx_ctr = 7
+        self.assertEqual(gw.open(f), (0x90, 0x42, bytes(range(30))))
+
+    def test_adv_name_record(self):
+        hint = REF.gw_hint(self.gw_id)
+        ref = REF.parse_adv(REF.adv_data(self.addr, 0x05, 2950, 0x123456, hint))
+        mine = P.build_mfr(0x05, 2950, 0x123456 & 0xFFFF, P.gw_hint(self.gw_id))
+        a = P.parse_adv("80:6F:B0:12:AB:CD", ref["name"], {0xFFFF: mine})
+        self.assertEqual(ref["name"], P.sensor_name("80:6F:B0:12:AB:CD"))
+        self.assertEqual((a.state, a.vbat_mv, a.seq_lo), (ref["state"], ref["vbat_mv"], ref["seq_lo"]))
+        self.assertEqual(a.gw_hint.to_bytes(2, "little"), ref["gw_hint"])
+        r = REF.Record(5, 2, 3600, 2500, 0xFFFF, 2150, 2950, 2, 0)
+        self.assertEqual(P.Record.parse(r.encode()).pack(), r.encode())
 
 
 class TimeSync(unittest.TestCase):

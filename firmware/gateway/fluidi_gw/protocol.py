@@ -1,12 +1,12 @@
-"""Funkprotokoll Sensor <-> Gateway, Version 1 (firmware/PROTOCOL.md) – Rahmen, Nachrichten, Krypto.
+"""Funkprotokoll Sensor <-> Gateway, Version 2 (firmware/PROTOCOL.md 0.2) – Rahmen, Nachrichten, Krypto.
 
 Wird vom Gateway (central.py) UND vom simulierten Sensor (simsensor.py) benutzt; beide Seiten sind
 damit gegeneinander testbar. Alle Mehrbyte-Zahlen little-endian (PROTOCOL Kap. 1).
 
-Festlegungen, die PROTOCOL.md offen lässt (Befunde in docs/reviews/phase4_protocol_software.md):
-- `sensor_addr` (6 Byte) in PAIR_RSP, HKDF-info und CCM-Nonce: Byte-Reihenfolge wie in der Luft (LSB zuerst),
-  d. h. Adresse 80:6F:B0:12:AB:CD -> CD AB 12 B0 6F 80 (ANNAHME, Befund W-3).
-- payload(PAIR_REQ/PAIR_RSP) für das Transkript = Nutzlast nach `vt` und `pmsg` (88 bzw. 91 Byte).
+v2 (PROTOCOL Kap. 0, Ä-1…Ä-16): Kopplung mit Commitment/Reveal, `vt` = 0x2t, info `fluidi-pair-v2`/`fluidi-sess-v2`,
+SESSION_INFO 52 Byte (`sec_cnt`), MEASURE antwortet {status, seq} und misst nach dem Trennen, OTA_DATA mit
+Zählerlücken (≤ 64), TLV 0x0F `led_weekdays`. `sensor_addr` LSB zuerst, `payload()` ohne `vt`/`pmsg` (Ä-7).
+Byte-genau geprüft gegen die Referenz firmware/tools/fluidi_proto.py (tests/test_protocol.py, Klasse Reference).
 """
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ from dataclasses import dataclass, field
 
 from . import crypto
 
-PROTO_VERSION = 1
+PROTO_VERSION = 2
 SERVICE_UUID = "0f740001-f9fb-4a4d-9c3b-347f1f1affd5"
 RX_UUID = "0f740002-f9fb-4a4d-9c3b-347f1f1affd5"   # Gateway -> Sensor (Write / Write Without Response)
 TX_UUID = "0f740003-f9fb-4a4d-9c3b-347f1f1affd5"   # Sensor -> Gateway (Notify)
@@ -28,7 +28,7 @@ FT_HELLO, FT_HELLO_RSP, FT_SECURE, FT_PAIR, FT_ERROR = 0x0, 0x1, 0x2, 0x3, 0xF
 # Advertising-Zustandsbits (Kap. 2.4)
 ST_PAIRED, ST_PAIRING, ST_DATA_PENDING, ST_BATT_LOW, ST_ERROR, ST_OTA_TEST, ST_LOCKED, ST_TIME_UNSYNCED = (1 << i for i in range(8))
 # PAIR-Nachrichten (Kap. 5.2)
-PAIR_REQ, PAIR_RSP, PAIR_SHOW, PAIR_CONFIRM_S, PAIR_CONFIRM_G, PAIR_DONE = 1, 2, 3, 4, 5, 6
+PAIR_REQ, PAIR_RSP, PAIR_REVEAL, PAIR_CONFIRM_S, PAIR_CONFIRM_G, PAIR_DONE = 1, 2, 3, 4, 5, 6
 # SECURE-Nachrichten (Kap. 5.4)
 M_SESSION_INFO = 0x01
 M_GET_INFO, M_TIME_SET, M_READ_RECORDS, M_ACK_RECORDS, M_MEASURE = 0x10, 0x11, 0x12, 0x13, 0x14
@@ -52,6 +52,7 @@ ERRORS = {
     0x40: "Update: Batterie zu tief", 0x41: "Update: Abbild zu gross", 0x42: "Update: Offset falsch", 0x43: "Update: Prüfsumme falsch",
     0x44: "Update: Signatur abgelehnt", 0x45: "Update: Version zu alt (Anti-Rollback)", 0x46: "Update: Flash-Fehler",
     0x47: "Update abgebrochen", 0x48: "Update nicht gestartet", 0x49: "Update nicht bestätigt, alte Version wiederhergestellt",
+    0x4A: "Update: Abbild passt nicht zur Hardware (hw_rev)",
     0x50: "Watchdog-Neustart", 0x51: "Brownout-Neustart", 0x52: "Absturz (HardFault)", 0x53: "Taste klemmt",
     0x54: "32-kHz-Quarz gestört", 0x55: "Unterspannungsabschaltung",
 }
@@ -171,20 +172,33 @@ def parse_pair(f: bytes):
 
 
 # ------------------------------------------------------------------------------------------------ Kopplung (4.2)
+def commit(gateway_id: bytes, gw_pub: bytes, gw_nonce: bytes) -> bytes:
+    """C = SHA-256("fluidi-commit" ‖ gateway_id ‖ gw_pub ‖ gw_nonce) (Kap. 4.2, Ä-1)."""
+    return crypto.sha256(b"fluidi-commit" + gateway_id + gw_pub + gw_nonce)
+
+
 @dataclass
 class PairReq:
     gateway_id: bytes
     gw_pub: bytes
-    gw_nonce: bytes
+    commit: bytes
 
     def payload(self):
-        return self.gateway_id + self.gw_pub + self.gw_nonce
+        return self.gateway_id + self.gw_pub + self.commit
+
+    @staticmethod
+    def make(gateway_id, gw_pub, gw_nonce16):
+        return PairReq(gateway_id, gw_pub, commit(gateway_id, gw_pub, gw_nonce16))
 
     @staticmethod
     def parse(p: bytes):
-        if len(p) < 88:
+        if len(p) < 104:
             raise ProtocolError("PAIR_REQ zu kurz", 0x02)
-        return PairReq(p[:8], p[8:72], p[72:88])
+        return PairReq(p[:8], p[8:72], p[72:104])
+
+    def check_reveal(self, gw_nonce16: bytes) -> bool:
+        import hmac
+        return hmac.compare_digest(commit(self.gateway_id, self.gw_pub, gw_nonce16), self.commit)
 
 
 @dataclass
@@ -205,10 +219,10 @@ class PairRsp:
         return PairRsp(p[:6], p[6], p[7:11], p[11:75], p[75:91])
 
 
-def pair_keys(z: bytes, req: PairReq, rsp: PairRsp):
-    """-> (K_link 16 B, K_conf 16 B, transcript 32 B, SAS-Ziffern [5])"""
-    okm = crypto.hkdf_sha256(z, req.gw_nonce + rsp.s_nonce, b"fluidi-pair-v1" + req.gateway_id + rsp.sensor_addr, 32)
-    transcript = crypto.sha256(req.payload()[:88] + rsp.payload()[:91])
+def pair_keys(z: bytes, req: PairReq, rsp: PairRsp, gw_nonce: bytes):
+    """-> (K_link 16 B, K_conf 16 B, transcript 32 B, SAS-Ziffern [5]) – Kap. 4.2 v2."""
+    okm = crypto.hkdf_sha256(z, gw_nonce + rsp.s_nonce, b"fluidi-pair-v2" + req.gateway_id + rsp.sensor_addr, 32)
+    transcript = crypto.sha256(req.payload()[:104] + rsp.payload()[:91] + gw_nonce)
     return okm[:16], okm[16:], transcript, sas_digits(transcript)
 
 
@@ -227,7 +241,7 @@ def confirm_mac(k_conf: bytes, who: bytes, transcript: bytes) -> bytes:
 
 
 def session_key(k_link: bytes, gw_nonce: bytes, s_nonce: bytes) -> bytes:
-    return crypto.hkdf_sha256(k_link, gw_nonce + s_nonce, b"fluidi-sess-v1", 16)
+    return crypto.hkdf_sha256(k_link, gw_nonce + s_nonce, b"fluidi-sess-v2", 16)
 
 
 # ------------------------------------------------------------------------------------------------ SECURE (4.4, 5.3)
@@ -255,24 +269,27 @@ class SecureChannel:
         self.tx_ctr += 1
         return head + ct
 
-    def open(self, frame: bytes):
-        """-> (msg, rid, payload). Fehler -> ProtocolError (Sitzung beenden, Kap. 4.4)."""
+    def open(self, frame: bytes, ota_gap: int = 0):
+        """-> (msg, rid, payload). Fehler -> ProtocolError (Sitzung beenden, Kap. 4.4).
+        ota_gap > 0 (nur Sensorseite während OTA, Ä-6): ctr bis erwartet + ota_gap zulässig, aber nur für OTA_DATA."""
         if len(frame) < 15 or frame_type(frame) != FT_SECURE:
             raise ProtocolError("kein SECURE-Frame", 0x02)
         ctr = struct.unpack_from("<I", frame, 1)[0]
-        if ctr != self.rx_ctr:
+        if not (self.rx_ctr <= ctr <= self.rx_ctr + ota_gap):
             raise ProtocolError(f"ctr {ctr} statt {self.rx_ctr}", 0x07)
         try:
             pt = crypto.ccm_decrypt(self.key, self._nonce(self.rx_dir, ctr), frame[5:], frame[:5], 8)
         except crypto.InvalidTag as e:
             raise ProtocolError("MIC ungültig", 0x06) from e
-        self.rx_ctr += 1
+        if ctr != self.rx_ctr and pt[0] != M_OTA_DATA:
+            raise ProtocolError(f"ctr-Lücke nur für OTA_DATA ({ctr} statt {self.rx_ctr})", 0x07)
+        self.rx_ctr = ctr + 1
         return pt[0], pt[1], pt[2:]
 
 
 # ------------------------------------------------------------------------------------------------ Nutzlasten
-_SI = struct.Struct("<BBBHIBBHIHIIHHIHBBBBBHI")  # 48 Byte, Kap. 5.5
-assert _SI.size == 48
+_SI = struct.Struct("<BBBHIBBHIHIIHHIHBBBBBHII")  # 52 Byte, Kap. 5.5 v2 (sec_cnt bei 48)
+assert _SI.size == 52
 
 
 @dataclass
@@ -295,15 +312,17 @@ class SessionInfo:
     ota_result: int = 0xFF
     slot: int = 1
     rec_fmt: int = 1
-    log_capacity: int = 1122
+    log_capacity: int = 840
     lost_records: int = 0
-    counters: dict = field(default_factory=dict)  # INFO-Erweiterung ab Offset 48 (SOLL)
+    sec_cnt: int = 0                              # v2 (Ä-9): Sicherheitszähler des laufenden Images
+    counters: dict = field(default_factory=dict)  # INFO-Erweiterung ab Offset 52 (SOLL)
 
     def pack(self, with_counters=False) -> bytes:
         b = _SI.pack(1, self.fw_ver[0], self.fw_ver[1], self.fw_ver[2], self.fw_build, self.hw_rev, self.state,
                      self.boot_id, self.uptime_s, self.uptime_frac, self.seq_last, self.seq_oldest_unacked,
                      self.vbat_load_mv, self.vbat_rest_mv, self.charge_uc, self.settings_ver, self.reset_reason,
-                     self.last_error, self.ota_result, self.slot, self.rec_fmt, self.log_capacity, self.lost_records)
+                     self.last_error, self.ota_result, self.slot, self.rec_fmt, self.log_capacity, self.lost_records,
+                     self.sec_cnt)
         if with_counters:
             c = self.counters
             b += struct.pack("<IIII", c.get("meas", 0), c.get("adv", 0), c.get("conn", 0), c.get("led_ms", 0))
@@ -311,13 +330,13 @@ class SessionInfo:
 
     @staticmethod
     def parse(p: bytes) -> "SessionInfo":
-        if len(p) < 48:
+        if len(p) < 52:
             raise ProtocolError("SESSION_INFO zu kurz", 0x02)
         v = _SI.unpack_from(p)
         si = SessionInfo((v[1], v[2], v[3]), v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13], v[14],
-                         v[15], v[16], v[17], v[18], v[19], v[20], v[21], v[22])
-        if len(p) >= 64:  # zusätzliche Byte am Ende ignorieren (Kap. 5.3 Erweiterbarkeit)
-            m, a, c, l = struct.unpack_from("<IIII", p, 48)
+                         v[15], v[16], v[17], v[18], v[19], v[20], v[21], v[22], v[23])
+        if len(p) >= 68:  # zusätzliche Byte am Ende ignorieren (Kap. 5.3 Erweiterbarkeit)
+            m, a, c, l = struct.unpack_from("<IIII", p, 52)
             si.counters = {"meas": m, "adv": a, "conn": c, "led_ms": l}
         return si
 
@@ -398,6 +417,15 @@ SETTINGS = {
     0x0C: ("batt_low_flag", "<B", 0, 1),
     0x0D: ("ota_min_mv", "<H", 2500, 3000),
     0x0E: ("diag_f2", "<B", 0, 255),
+    0x0F: ("led_weekdays", "<B", 0, 0x7F),            # v2 (W-7): Bit 0 = Montag … Bit 6 = Sonntag
+    # 0x10–0x16 Werkskalibrierung der Messkette (setzt das Gateway nicht; nur lesen/prüfen)
+    0x10: ("cref_eff", "<H", 500, 5000),
+    0x11: ("cpar", "<H", 0, 5000),
+    0x12: ("td0_ps", "<H", 0, 30000),
+    0x13: ("td_kv", "<h", -32768, 32767),
+    0x14: ("td_kt", "<h", -32768, 32767),
+    0x15: ("c_kv", "<h", -32768, 32767),
+    0x16: ("c_kt", "<h", -32768, 32767),
 }
 SETTING_IDS = {v[0]: k for k, v in SETTINGS.items()}
 
@@ -431,6 +459,22 @@ def decode_settings(b: bytes, strict=True):
             return out, tid
         out[spec[0]] = vals if len(vals) > 1 else vals[0]
     return out, 0
+
+
+def measure_rsp(status: int, seq: int) -> bytes:
+    return struct.pack("<BI", status, seq)
+
+
+def parse_measure_rsp(p: bytes):
+    """MEASURE-Antwort v2 (Ä-8): {status, seq des kommenden Datensatzes}."""
+    if len(p) < 5:
+        raise ProtocolError("MEASURE_RSP zu kurz", 0x02)
+    return struct.unpack_from("<BI", p)
+
+
+def weekdays_mask(days) -> int:
+    """API-Wochentage 1 = Montag … 7 = Sonntag -> Bitmaske (Bit 0 = Montag)."""
+    return sum(1 << (d - 1) for d in set(days or range(1, 8)) if 1 <= d <= 7)
 
 
 def adv_interval_ms(reaction_min: int, p_miss: float = 0.10, setup_s: float = 5.0) -> int:

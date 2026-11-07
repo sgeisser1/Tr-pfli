@@ -732,3 +732,9 @@ html[data-page="login"] .main { margin-left: 0; }
 .ch-rh { fill: var(--dry-soft); stroke: none; }
 section.card > .actions .btn, section.card > .actions input { flex: 0 0 auto; }
 @media (min-width: 1100px) { .d-body.no-room { grid-template-columns: 1fr; } .d-body.no-room .d-tiles { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); } }
+
+/* Messstatus „Jetzt messen“ (Protokoll v2: Messung nach dem Trennen, Wert mit dem nächsten Kontakt) */
+.mstate { display: flex; gap: 6px; list-style: none; padding: 0; margin: 8px 0 0; flex-wrap: wrap; font-size: 0.8rem; }
+.mstate li { padding: 4px 10px; border-radius: 99px; background: var(--surface-2); color: var(--text-3); }
+.mstate li.cur { background: var(--dry-soft); color: var(--text); animation: pulse 1.2s ease-in-out infinite; }
+.mstate li.done { color: var(--ok); }

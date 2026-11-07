@@ -559,7 +559,7 @@ class State:
             threading.Timer(self.rng.uniform(2.0, 5.0), step2).start()
 
         def step2():
-            self.job_update(j, state="running", message="Sensor misst", progress=0.5)
+            self.job_update(j, state="running", message="Sensor misst – der Wert kommt mit dem nächsten Funkkontakt", progress=0.5)
             threading.Timer(1.5, step3).start()
 
         def step3():
@@ -1273,7 +1273,8 @@ def run_capture(h: Handler, run_id, body, **_):
         if run["substrate"] != (S.plants.get(s["plant_id"]) or {}).get("substrate", run["substrate"]):
             base *= 1.01
         temp = S._temp_at(now())
-        xs = [base * (1 + S.rng.gauss(0, 0.0008)) for _ in range(run["samples"])]
+        # deterministisches Rauschen (Test erwartet genau einen Ausreisser; geteilter Zufall machte ihn wackelig)
+        xs = [base * (1 + 0.0006 * math.sin(1.7 * i + (point == "wet"))) for i in range(run["samples"])]
         if run["samples"] >= 5:
             xs[2] *= 1.03  # ein Ausreisser, wird verworfen
         st = C.robust_mean(xs)

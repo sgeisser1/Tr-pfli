@@ -136,3 +136,46 @@ oder Anforderung nur mit Umweg erfüllt; **klein** = Klarstellung.
 | FW-P6 | Gateway nutzt dieselbe Rückfallschwelle 2.55 V für „Batterie tief“; Restlaufzeit-Rückfall 17 Monate (D-006) |
 | FW-P7 | siehe S-9 |
 | FW-P8 | `p_miss` in `/etc/fluidi/gateway.toml`, Formel Kap. 2.2 im Gateway (`protocol.adv_interval_ms`, Test 27.5/57.5/147.5 s); das Gateway misst je Sensor den Anteil verpasster Advertisings (Statistik „verpasst“) als Grundlage für OP-K12 |
+
+---
+
+## Runde 2 – Prüfung PROTOCOL.md 0.2 / Protokoll v2 (2026-11-07)
+
+Grundlage: `firmware/PROTOCOL.md` 0.2 (Kap. 0, Ä-1…Ä-16), Antwort `docs/reviews/phase4_firmware_response.md`,
+Referenz `firmware/tools/fluidi_proto.py`, Sensor-Code `firmware/sensor/core/fl_app.c` (gelesen, nicht gebaut).
+Gateway (`fluidi_gw`), Simulation und PWA sind auf v2 umgestellt. **Nachweis:** `firmware/gateway/tests/test_protocol.py`
+Klasse `Reference` – Commitment, PAIR_REQ/RSP, Transkript, K_link/K_conf, SAS, beide MACs, K_s, SECURE-Frame,
+Advertising, Datensatz **byte-gleich** mit `fluidi_proto.py` (gleiche feste Eingaben wie `firmware/sensor/tests/gen_vectors.py`);
+dazu Sitzungstests (Commitment-Verletzung = Fehlversuch, 9 Fristüberschreitungen ohne Sperre / 10 mit, MEASURE
+asynchron, Kalibrierung über mehrere Kontakte, OTA mit `sec_cnt`), alle grün.
+
+### Stand der Befunde aus Runde 1
+
+| Nr | Antwort Firmware | Prüfung Gateway-Seite | Status |
+|---|---|---|---|
+| K-1 | umgesetzt | Fristen 1 s ab CCCD-Write / 5 s, Fristen kein Fehlversuch, 10 → Sperre (Kap. 3, 4.5; `fl_app.c`). Gateway sendet HELLO direkt nach `start_notify` | **erledigt** (Zeit am Pi: PROTOTYP-PRÜFUNG OP-GW-8) |
+| K-2 | umgesetzt | 15 s bis REVEAL, 60 s Farbvergleich, 90 s gesamt; Gateway: `PAIR_RSP_TIMEOUT` 8 s, 60 s, gesamt 88 s | **erledigt** |
+| W-1 | umgesetzt | Sensor fordert Intervall selbst an; Kopf nennt Pi/BlueZ/bleak | erledigt (PROTOTYP-PRÜFUNG PP-12) |
+| W-2 | umgesetzt | Lücke ≤ 64 nur für OTA_DATA; Simulation und `SecureChannel.open(ota_gap)` gleich umgesetzt, Test | **erledigt** |
+| W-3 | umgesetzt | LSB zuerst, payload ohne `vt`/`pmsg`; byte-gleich mit Referenz | **erledigt** |
+| W-4 | „werden geliefert“ | Gateway speichert sie beim Sensor, Pflanzenzuordnung ab Kopplungszeit | **erledigt** |
+| W-5 | umgesetzt | Richtungen wie vom Gateway angenommen (`c < water_raw` …) | **erledigt** |
+| W-6 | umgesetzt | `sec_cnt` (Offset 48) wird gespeichert und bei der Verteilung geprüft (Abbild-Zähler < installiert → abgelehnt); TLV 0xA0 prüft das Gateway beim Hochladen; Fehler 0x4A in den Klartexten | **erledigt** |
+| W-7 | umgesetzt | Gateway sendet TLV 0x0F aus `water_window.weekdays`; Emulation über `water_led` entfernt | **erledigt** |
+| W-8 | umgesetzt (MUSS) | so umgesetzt | **erledigt** |
+| W-9 | umgesetzt | Gateway liest 110 je Block, quittiert je Block | **erledigt** |
+| S-1…S-7 | umgesetzt | geprüft (S-1 Datei-SHA-256, S-2 MEASURE-Datensätze quittiert, S-4 TIME_SET bei `tz_min`) | **erledigt** |
+| S-8, S-9 | angenommen | – | erledigt |
+
+### Rest-Befunde (Runde 2)
+
+| Nr | Stufe | Befund | Vorschlag |
+|---|---|---|---|
+| R-1 | **wichtig** | PROTOCOL Kap. 5.1–5.3 nennen noch v1-Werte: „Frame-Version (**1**)“, HELLO `vt=0x10`, HELLO_RSP `0x11`, ERROR `0x1F`, PAIR `0x13`, SECURE `0x12`. Ä-2, Kap. 13, `fluidi_proto.py` und `fl_proto.h` verwenden **0x2t**. Wer nach Kap. 5 implementiert, ist nicht interoperabel. | Kap. 5.1–5.3 auf `vt = 0x20/0x21/0x22/0x23/0x2F` und Frame-Version 2 korrigieren. Gateway folgt der Referenz (0x2t). |
+| R-2 | wichtig | MEASURE: Sensor speichert nur **eine** ausstehende Messung (`meas_pending` bool); ein zweites MEASURE in derselben Sitzung liefert dieselbe `seq` und erzeugt keine zweite Messung. Der Sensor trennt 0.3 s nach der Antwort, wenn kein Frame folgt. Beides steht nicht in Kap. 5.4. | Regel ergänzen: „höchstens ein MEASURE je Sitzung, als letzte Anfrage; der Sensor trennt danach“. Gateway hält sich daran (MEASURE zuletzt, Kalibrierung = `samples` Kontakte). |
+| R-3 | klein | Kopf nennt „INFO-Format 2“, Kap. 5.5/13 und `FL_INFO_FMT` sagen 1. | Einheitlich 1 (nur angehängt) oder 2; Gateway wertet `info_fmt` nicht aus. |
+| R-4 | klein | Kap. 4.3 „Gateway: `esp_fill_random`“ (Rest ESP32); Kap. 2.5 Nummerierung 4, 6, 5. | Text bereinigen (`os.urandom`/`secrets`). |
+| R-5 | klein | `fluidi_proto.SAS_COLORS` „gruen“, PWA zeigt „grün“ (nur Anzeige). Bei Dauerangriff 13 µA statt 0.4 µA (Kap. 4.5) ist eine bewusste Folge von K-1. | keine Änderung nötig; PWA zeigt `LOCKED`/Fehlversuche als Hinweis. |
+
+Keine kritischen Rest-Befunde. Offen bleiben die Prüfungen am Gerät (OP-GW-8: Zeit bis HELLO unter BlueZ,
+Annahme des Peripheral-Parameter-Requests, MTU; PP-12 MCUboot mit TLV 0xA0).

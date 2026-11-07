@@ -1,11 +1,13 @@
-"""BLE-Central des Gateways: Scan-Entscheid, Sitzungen, Nachlieferung, Befehle, Kopplung, OTA (PROTOCOL.md v1).
+"""BLE-Central des Gateways: Scan-Entscheid, Sitzungen, Nachlieferung, Befehle, Kopplung, OTA (PROTOCOL.md v2).
 
 Läuft in einem eigenen Thread mit asyncio-Ereignisschleife (bleak ist asyncio). HTTP-Threads reichen Aufträge
 über submit()/pair()/confirm_pair() thread-sicher herein.
 
 Ablauf je Kontakt (PROTOCOL 6.1, ARCHITECTURE 4): verbinden -> HELLO -> HELLO_RSP + SECURE#0 SESSION_INFO
 (MIC geprüft = Sensor echt) -> ggf. TIME_SET -> ggf. SET_SETTINGS -> READ_RECORDS blockweise -> speichern (COMMIT)
--> ACK_RECORDS -> ausstehende Befehle (MEASURE, IDENTIFY, UNPAIR, OTA) -> trennen.
+-> ACK_RECORDS -> Befehle (IDENTIFY, UNPAIR …) -> OTA -> zuletzt höchstens ein MEASURE -> trennen.
+v2 (Ä-8): MEASURE antwortet {status, seq}; der Sensor misst erst nach dem Trennen und meldet DATA_PENDING; der
+Messauftrag ist fertig, wenn der Datensatz `seq` in einer folgenden Sitzung gespeichert ist.
 """
 from __future__ import annotations
 
@@ -23,8 +25,10 @@ from .transport import LinkClosed
 
 log = logging.getLogger("fluidi.central")
 READ_CHUNK = 110            # Datensätze je READ_RECORDS (10 Frames bei MTU 247); danach speichern + quittieren
-RSP_TIMEOUT = 3.0           # PROTOCOL Kap. 3: Sensor trennt nach 3 s ohne gültigen Frame
-PAIR_USER_TIMEOUT = 60.0    # PROTOCOL 4.2: 60 s nach PAIR_SHOW
+RSP_TIMEOUT = 4.0           # PROTOCOL v2 Kap. 3: Sensor trennt nach 5 s ohne gültigen Frame
+PAIR_RSP_TIMEOUT = 8.0      # PAIR_REQ -> PAIR_RSP: ECDH auf dem Sensor ≤ 3 s (ANNAHME, FW-P3) + Reserve
+PAIR_USER_TIMEOUT = 60.0    # PROTOCOL 4.2/Kap. 3: 60 s Farbvergleich nach PAIR_REVEAL
+PAIR_TOTAL_TIMEOUT = 88.0   # Kap. 3: Kopplung gesamt ≤ 90 s
 RETRY_BACKOFF_S = 20.0
 
 
@@ -44,6 +48,7 @@ class Central:
         self.pending = defaultdict(deque)   # addr -> Befehle
         self.plock = threading.Lock()
         self.pairs = {}                 # addr -> {"job", "spec", "event", "match"}
+        self.expect = {}                # (addr, seq) -> Messauftrag (MEASURE v2: Datensatz kommt später)
         self.ota_lock = None
         self.last_try = {}
         self.stats = {"sessions": 0, "errors": 0, "auth_fail": 0}
@@ -104,6 +109,26 @@ class Central:
                 for c in list(q):
                     if c.get("job") and c["job"]["id"] == job_id:
                         q.remove(c)
+            for k, c in list(self.expect.items()):
+                if c.get("job") and c["job"]["id"] == job_id:
+                    self.expect.pop(k, None)
+
+    def records_arrived(self, addr, recs):
+        """Datensätze gespeichert: erwartete MEASURE-Ergebnisse zuordnen und Aufträge abschliessen."""
+        for r in recs:
+            cmd = self.expect.pop((addr, r.seq), None)
+            if not cmd:
+                continue
+            cmd.setdefault("records", []).append(r)
+            if len(cmd["records"]) >= cmd.get("samples", 1) and not cmd.get("finished"):
+                cmd["finished"] = True
+                res = {"records": cmd["records"]}
+                if cmd.get("on_done"):
+                    res = cmd["on_done"](res) or {}
+                res.pop("records", None)
+                j = cmd.get("job")
+                if j and self.model.job_active(j):
+                    self.model.job_update(j, state="done", progress=1.0, message="Neuer Messwert empfangen", result=res or None)
 
     def pair(self, addr, job, spec):
         ev = threading.Event()
@@ -172,10 +197,12 @@ class Central:
             m.job_update(job, state="running", progress=0.2, message="Verbinde mit dem Sensor")
             async with self.sem:
                 link = await self.radio.connect(addr)
+                t0 = time.monotonic()
                 ek = crypto.EcdhKey()
-                req = P.PairReq(m.gateway_id, ek.public_raw, crypto.random_bytes(16))
+                gw_nonce = crypto.random_bytes(16)          # je Kopplung neu (Kap. 4.2 Regel)
+                req = P.PairReq.make(m.gateway_id, ek.public_raw, gw_nonce)   # nur das Commitment geht hinaus
                 await link.send(P.pair_frame(P.PAIR_REQ, req.payload()))
-                f = await link.recv(RSP_TIMEOUT + 3)  # ECDH auf dem Sensor ≤ 3 s (ANNAHME, FW-P3)
+                f = await link.recv(PAIR_RSP_TIMEOUT)
                 if P.frame_type(f) == P.FT_ERROR:
                     code, _ = P.parse_error(f)
                     raise SessionError(f"Sensor lehnt ab: {P.ERRORS.get(code, code)}")
@@ -189,13 +216,13 @@ class Central:
                     z = ek.shared(rsp.s_pub)
                 except ValueError as e:
                     raise SessionError("Öffentlicher Schlüssel des Sensors ungültig") from e
-                k_link, k_conf, tr, sas = P.pair_keys(z, req, rsp)
-                await link.send(P.pair_frame(P.PAIR_SHOW))
+                k_link, k_conf, tr, sas = P.pair_keys(z, req, rsp, gw_nonce)
+                await link.send(P.pair_frame(P.PAIR_REVEAL, gw_nonce))   # erst nach PAIR_RSP offenlegen
                 m.job_update(job, state="awaiting_confirmation", progress=0.5,
                              message="Farbfolge vergleichen: Stimmen die Farben am Sensor mit der App überein?",
                              result={"sas": [P.SAS_COLORS[d] for d in sas], "sas_codes": sas})
                 # warten: PAIR_CONFIRM_S (Taste am Sensor) und Bestätigung in der PWA, beides innert 60 s
-                deadline = time.monotonic() + PAIR_USER_TIMEOUT
+                deadline = min(time.monotonic() + PAIR_USER_TIMEOUT, t0 + PAIR_TOTAL_TIMEOUT)
                 conf_s = None
                 while conf_s is None:
                     f = await link.recv(max(0.1, deadline - time.monotonic()))
@@ -286,10 +313,13 @@ class Session:
                 m.log("error", "settings_rejected", f"{self.addr}: Einstellung {rp[1] if len(rp) > 1 else '?'} abgelehnt")
         await self.fetch_records()
         m.retime_uncertain(self.addr)
-        await self.commands()
+        if await self.commands(measure=False) == "unpaired":
+            return
         it = m.rollout_item(m.by_addr.get(self.addr))
         if it and it["state"] in ("pending", "waiting_for_sensor") and not self.c.ota_lock.locked():
             await self.ota(it)
+            return  # Sensor startet nach OTA_END neu
+        await self.commands(measure=True)  # MEASURE zuletzt: der Sensor misst nach dem Trennen (Ä-8)
 
     # ------------------------------------------------------------------ Anfrage/Antwort
     async def request(self, msg, payload=b"", timeout=RSP_TIMEOUT):
@@ -329,6 +359,7 @@ class Session:
             if not recs:
                 break
             self.m.store_records(self.addr, recs, via_read=True)          # COMMIT (synchronous=FULL)
+            self.c.records_arrived(self.addr, recs)
             upto = self.m.contiguous_ack(self.addr, frm, max(r.seq for r in recs))
             if upto >= frm:
                 _, pl = await self.request(P.M_ACK_RECORDS, struct.pack("<I", upto))
@@ -337,58 +368,77 @@ class Session:
                 break
             frm = max(r.seq for r in recs) + 1
 
-    async def commands(self):
+    async def commands(self, measure: bool):
+        """measure=False: alle Befehle ausser Messen; measure=True: höchstens EIN MEASURE, danach trennen."""
         c, m = self.c, self.m
         while True:
             with c.plock:
-                q = c.pending.get(self.addr)
-                cmd = q[0] if q else None
+                q = c.pending.get(self.addr) or []
+                cmd = next((x for x in q if (x["kind"] in ("measure", "calibration_capture")) == measure), None)
             if not cmd:
-                return
+                return None
             j = cmd.get("job")
             if j and not m.job_active(j):
                 with c.plock:
-                    q.popleft()
+                    if cmd in q:
+                        q.remove(cmd)
                 continue
+            if measure:
+                try:
+                    await self.measure(cmd)
+                except SessionError as e:
+                    with c.plock:
+                        if cmd in q:
+                            q.remove(cmd)
+                    if j:
+                        m.job_update(j, state="failed", message=str(e))
+                return None
             if j:
                 m.job_update(j, state="running", progress=0.5, message="Sensor verbunden")
             try:
                 res = await self.execute(cmd)
                 with c.plock:
-                    if q and q[0] is cmd:
-                        q.popleft()
+                    if cmd in q:
+                        q.remove(cmd)
                 msg = res.pop("_message", "erledigt")
                 if cmd.get("on_done"):
                     res = cmd["on_done"](res) or {}
-                res.pop("records", None)
                 if j and m.job_active(j):
                     m.job_update(j, state="done", progress=1.0, message=msg, result=res or None)
             except SessionError as e:
                 with c.plock:
-                    if q and q[0] is cmd:
-                        q.popleft()
+                    if cmd in q:
+                        q.remove(cmd)
                 if j:
                     m.job_update(j, state="failed", message=str(e))
             if cmd["kind"] == "unpair":
-                return
+                return "unpaired"
+
+    async def measure(self, cmd):
+        """Ein MEASURE senden (v2): Antwort {status, seq}; Datensatz `seq` folgt in einer späteren Sitzung.
+        Kalibrierung: `samples` Messungen = `samples` Sitzungen (je Sitzung misst der Sensor einmal)."""
+        c, m = self.c, self.m
+        n = cmd.get("samples", 1)
+        sent = cmd.setdefault("sent", 0)
+        _, pl = await self.request(P.M_MEASURE, bytes([cmd.get("purpose", 0), 1 if cmd["kind"] == "measure" else 0]))
+        st, seq = P.parse_measure_rsp(pl)
+        if st != 0:
+            raise SessionError(P.ERRORS.get(st, f"Messung abgelehnt (0x{st:02X})"))
+        cmd["sent"] = sent + 1
+        c.expect[(self.addr, seq)] = cmd
+        if cmd["sent"] >= n:
+            with c.plock:
+                q = c.pending.get(self.addr) or []
+                if cmd in q:
+                    q.remove(cmd)
+        j = cmd.get("job")
+        if j and m.job_active(j):
+            txt = "Sensor misst – der Wert kommt mit dem nächsten Funkkontakt" if n == 1 else \
+                f"Messung {cmd['sent']} von {n} – der Sensor misst nach jedem Kontakt"
+            m.job_update(j, state="running", progress=round(0.5 + 0.4 * cmd["sent"] / n, 2), message=txt)
 
     async def execute(self, cmd):
         m, k = self.m, cmd["kind"]
-        if k in ("measure", "calibration_capture"):
-            purpose = cmd.get("purpose", 0)
-            recs = []
-            for _ in range(cmd.get("samples", 1)):
-                _, pl = await self.request(P.M_MEASURE, bytes([purpose, 1 if k == "measure" else 0]), timeout=5.0)
-                if not pl or pl[0] != 0:
-                    raise SessionError(P.ERRORS.get(pl[0] if pl else 0x09, "Messung fehlgeschlagen"))
-                recs.append(P.Record.parse(pl[1:21]))
-            m.store_records(self.addr, recs, via_read=False)
-            # Quittung: der Messwert liegt auch im Ring des Sensors (Kap. 6.2 Regel 1) -> lückenlos quittieren
-            start = self.si.seq_oldest_unacked
-            upto = m.contiguous_ack(self.addr, start, max(r.seq for r in recs))
-            if upto >= start:
-                await self.request(P.M_ACK_RECORDS, struct.pack("<I", upto))
-            return {"records": recs, "_message": "Neuer Messwert empfangen"}
         if k == "identify":
             await self.request(P.M_IDENTIFY, bytes([cmd.get("seconds", 10)]))
             return {"blinked": True, "_message": "LED blinkt"}
@@ -415,6 +465,9 @@ class Session:
             data = m.image_path(img["version"]).read_bytes()
             vparts = [int(x) for x in img["version"].split("+")[0].split(".")]
             cur = tuple(self.si.fw_ver)
+            if img.get("security_counter", 0) < self.si.sec_cnt:
+                m.rollout_update(item, state="failed", message=f"Sicherheitszähler {img.get('security_counter', 0)} < installiert {self.si.sec_cnt} (Anti-Rollback)")
+                return
             if tuple(vparts) <= cur:
                 m.rollout_update(item, state="failed", message=f"Sensor hat bereits {self.si.fw_version} (keine Rückstufung)")
                 return

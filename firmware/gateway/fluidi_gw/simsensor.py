@@ -1,4 +1,4 @@
-"""Simulierter fluidi-Sensor (Sensorseite von PROTOCOL.md v1) für Simulationsmodus und Tests.
+"""Simulierter fluidi-Sensor (Sensorseite von PROTOCOL.md v2) für Simulationsmodus und Tests.
 
 Bildet die für das Gateway sichtbaren Regeln nach: Advertising-Zustände (2.1), Kopplung mit SAS (4.2),
 Sitzung mit HELLO/SECURE (4.3/4.4), Fehlversuch-Sperre (4.5), Nachrichten (5.4), Ringspeicher mit
@@ -21,12 +21,12 @@ import time
 from . import crypto
 from . import protocol as P
 
-CAPACITY = 1122               # PROTOCOL 6.3
+CAPACITY = 840                # PROTOCOL 6.3 v2: garantiert 840 Datensätze
 SLOT_MAX = 226 * 1024         # PROTOCOL 6.4
 DEFAULT_SETTINGS = {"meas_interval_s": 14400, "adv_interval_ms": 27500, "adv_interval_offline_ms": 147500,
                     "tx_power_dbm": 0, "water_raw": 0, "water_led": 1, "led_window": (420, 1140), "led_level": 100,
                     "heartbeat_led": 1, "avg_count": 16, "air_flood_raw": (0, 0), "batt_low_flag": 0,
-                    "ota_min_mv": 2700, "diag_f2": 6}
+                    "ota_min_mv": 2700, "diag_f2": 6, "led_weekdays": 0x7F}
 # ANNAHME (Simulation): Kapazität der Sonde trocken/nass in 0.01 pF, Grössenordnung MESSKETTE_SALZ.md Kap. 0
 SIM_DRY, SIM_WET = 1330, 4000
 
@@ -77,7 +77,11 @@ class SimSensor:
         self.identify_until = 0.0
         self.button_presses = 0
         self.log = []          # für Tests: empfangene Nachrichtentypen
-        self.hello_deadline = 0.5
+        self.hello_deadline = 1.0      # v2: 1 s nach CCCD-Write (Simulation: ab Verbindung)
+        self.timeouts = 0              # Fristüberschreitungen in Folge (Ä-4: 10 -> Sperre)
+        self.meas_pending = None       # v2 (Ä-8): Messung nach dem Trennen
+        self.fast_adv_until = 0.0
+        self.sec_cnt = 1
         # Modell
         self.m = moisture
         self.k = drying_per_day
@@ -164,7 +168,7 @@ class SimSensor:
                            seq_last=seq_last, seq_oldest_unacked=min(unacked) if unacked else self.seq,
                            vbat_load_mv=self.vbat, vbat_rest_mv=self.vbat + 40, charge_uc=self.charge_uc,
                            settings_ver=self.settings_ver, reset_reason=self.reset_reason, ota_result=self.ota_result,
-                           slot=1 if self.slot_confirmed else 0, lost_records=self.lost,
+                           slot=1 if self.slot_confirmed else 0, lost_records=self.lost, sec_cnt=self.sec_cnt,
                            counters={"meas": self.seq, "adv": 0, "conn": 0, "led_ms": 0})
         return si.pack(with_counters=counters)
 
@@ -188,6 +192,8 @@ class SimSensor:
         now = self.clock()
         if now < self.pairing_until:
             return 0.5
+        if now < self.fast_adv_until:
+            return 0.1
         if now - self.last_contact > 86400:
             return self.settings["adv_interval_offline_ms"] / 1000
         return self.settings["adv_interval_ms"] / 1000
@@ -214,31 +220,42 @@ class SimSensor:
         self.sess = None
         self.pair = None
         loop = asyncio.get_running_loop()
-        # 0.5 s Frist für HELLO (Kap. 3), in der Simulation mit speed skaliert nicht – Echtzeit
+        # v2: 1 s für HELLO (Kap. 3, ab CCCD-Write), in der Simulation ab Verbindung, Echtzeit
         link._deadline = loop.call_later(self.hello_deadline, lambda: self._timeout(link))
 
     def _timeout(self, link):
         if self.sess is None and self.pair is None and link in self.links:
+            self.timeouts += 1     # kein Fehlversuch (Ä-4), eigener Zähler
+            if self.timeouts >= 10:
+                self.locked_until = self.clock() + 1800 * max(self.speed, 0.0001)
+                self.timeouts = 0
             self._drop(link)
 
     def on_disconnect(self, link):
         self.links.discard(link)
-        if self.pair and self.pair.get("timer"):
-            self.pair["timer"].cancel()
         self.sess = None
         self.pair = None
+        self._after_disconnect()
 
     def _drop(self, link):
         self.links.discard(link)
         self.sess = None
         self.pair = None
         link.drop()
+        self._after_disconnect()
+
+    def _after_disconnect(self):
+        if self.meas_pending is not None:   # Ä-8: Messung ohne Funk, danach schnelles Advertising 2 s
+            cause, self.meas_pending = self.meas_pending, None
+            self.measure(cause)
+            self.fast_adv_until = self.clock() + 2.0
 
     def _fail(self, link):
-        self.fail_streak += 1
+        self.fail_streak += 1   # nur kryptografische Fehler (Ä-4)
         if self.fail_streak >= 3:
             self.locked_until = self.clock() + 1800 * max(self.speed, 0.0001)
             self.fail_streak = 0
+            self.timeouts = 0
         self._drop(link)
 
     async def on_write(self, link, f: bytes):
@@ -254,7 +271,7 @@ class SimSensor:
             return await self._pair(link, f)
         if ft == P.FT_SECURE and self.sess:
             try:
-                msg, rid, pl = self.sess.open(f)
+                msg, rid, pl = self.sess.open(f, ota_gap=64 if self.ota else 0)   # Ä-6
             except P.ProtocolError:
                 return self._fail(link)
             self.fail_streak = 0
@@ -262,6 +279,7 @@ class SimSensor:
             if not self.slot_confirmed:  # 9.5: authentisierte Sitzung + Selbsttest -> bestätigen
                 self.slot_confirmed = True
                 self.ota_result = 0
+                self.sec_cnt = max(self.sec_cnt, getattr(self, "sec_pending", self.sec_cnt))  # erst mit Bestätigung (9.5)
             self.log.append(msg)
             return await self._dispatch(link, msg, rid, pl)
         self._fail(link)
@@ -306,8 +324,9 @@ class SimSensor:
                 self._send(link, R, rid, struct.pack("<BI", 0, min(unacked) if unacked else self.seq))
             elif msg == P.M_MEASURE:
                 purpose = pl[0] if pl else 0
-                rec = self.measure({0: 2, 1: 3, 2: 4, 3: 5}.get(purpose, 2))
-                self._send(link, R, rid, b"\x00" + rec.pack())
+                self.meas_pending = {0: 2, 1: 3, 2: 4, 3: 5}.get(purpose, 2)   # misst nach dem Trennen (Ä-8)
+                self._send(link, R, rid, P.measure_rsp(0, self.seq))
+                asyncio.get_running_loop().call_later(0.3, lambda: link in self.links and self._drop(link))
             elif msg == P.M_GET_SETTINGS:
                 self._send(link, R, rid, struct.pack("<H", self.settings_ver) + P.encode_settings(self.settings))
             elif msg == P.M_SET_SETTINGS:
@@ -371,7 +390,7 @@ class SimSensor:
         if not st and self.ota and self.ota["sha"] == sha:
             resume = len(self.ota["data"])
         elif not st:
-            self.ota = {"size": size, "ver": ver, "build": build, "sha": sha, "data": bytearray(), "n": 0}
+            self.ota = {"size": size, "ver": ver, "build": build, "sha": sha, "data": bytearray(), "n": 0, "sec": sec}
         self._send(link, P.M_OTA_BEGIN | P.RSP, rid, P.ota_begin_rsp(st, resume, 16, 224))
 
     def _ota_data(self, link, rid, pl):
@@ -399,6 +418,7 @@ class SimSensor:
         self._send(link, P.M_OTA_END | P.RSP, rid, b"\x00")
         # MCUboot: Swap, neues Image im Test (Signaturprüfung im Bootloader hier nicht nachgebildet)
         self.prev_fw, self.fw, self.fw_build = self.fw, o["ver"], o["build"]
+        self.sec_pending = o.get("sec", self.sec_cnt)
         self.slot_confirmed = False
         self.ota = None
         self._reboot(3)
@@ -420,22 +440,26 @@ class SimSensor:
             except ValueError:
                 link.notify(P.error_frame(0x03))
                 return self._drop(link)
-            k_link, k_conf, tr, sas = P.pair_keys(z, req, rsp)
-            self.pair = {"req": req, "k_link": k_link, "k_conf": k_conf, "tr": tr, "sas": sas, "pressed": False}
+            self.pair = {"req": req, "rsp": rsp, "z": z, "pressed": False}
             link.notify(P.pair_frame(P.PAIR_RSP, rsp.payload()))
-        elif pmsg == P.PAIR_SHOW and self.pair:
-            self.pair["shown"] = True
+        elif pmsg == P.PAIR_REVEAL and self.pair and "tr" not in self.pair:
+            gw_nonce = pl[:16]
+            if len(gw_nonce) != 16 or not self.pair["req"].check_reveal(gw_nonce):   # Commitment verletzt
+                link.notify(P.pair_frame(P.PAIR_DONE, b"\x06"))
+                return self._fail(link)
+            k_link, k_conf, tr, sas = P.pair_keys(self.pair["z"], self.pair["req"], self.pair["rsp"], gw_nonce)
+            self.pair.update(k_link=k_link, k_conf=k_conf, tr=tr, sas=sas, shown=True)
             if self.auto_confirm:  # Nutzer vergleicht Farben und drückt kurz (Simulation: nach 0.2 s)
                 await asyncio.sleep(0.2)
                 self.press_short(link)
         elif pmsg == P.PAIR_CONFIRM_G and self.pair:
-            exp = P.confirm_mac(self.pair["k_conf"], b"G", self.pair["tr"])
-            if pl[:16] != exp or not self.pair["pressed"]:
+            exp = P.confirm_mac(self.pair.get("k_conf", b""), b"G", self.pair.get("tr", b""))
+            if "tr" not in self.pair or pl[:16] != exp or not self.pair["pressed"]:
                 link.notify(P.pair_frame(P.PAIR_DONE, b"\x06"))
                 return self._drop(link)
             self.k_link, self.gateway_id = self.pair["k_link"], self.pair["req"].gateway_id
             self.pairing_until = 0
-            # Ringinhalt bleibt unquittiert und wird nach der Kopplung abgeholt (PROTOCOL offen, Befund W-4)
+            # Ringinhalt bleibt unquittiert und wird nach der Kopplung geliefert (PROTOCOL 6.2 Regel 0, Ä-12)
             link.notify(P.pair_frame(P.PAIR_DONE, b"\x00"))
             self.pair = None
             self.last_contact = self.clock()

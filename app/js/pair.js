@@ -1,4 +1,4 @@
-// Sensor koppeln (UC-02, REQ-RF-05, PROTOCOL 4.2): Taste ≥ 3 s am Sensor, Kandidat wählen, Farbfolge (SAS)
+// Sensor koppeln (UC-02, REQ-RF-05, PROTOCOL v2 Kap. 4.2 mit Commitment/Reveal): Taste ≥ 3 s am Sensor, Kandidat wählen, Farbfolge (SAS)
 // am Sensor mit der App vergleichen, kurz die Sensortaste drücken UND hier bestätigen.
 import { h, toast, fill } from './dom.js';
 import { icon, dropChar } from './art.js';
@@ -32,9 +32,15 @@ export default async function pair(el, ctx) {
     };
     yes.addEventListener('click', () => send(true));
     no.addEventListener('click', () => send(false));
+    // Protokoll v2: 60 s für Farbvergleich und Bestätigung (PROTOCOL Kap. 3), danach bricht der Sensor ab
+    const left = h('strong');
+    const t0 = Date.now();
+    const tick = () => { const r = Math.max(0, 60 - Math.round((Date.now() - t0) / 1000)); left.textContent = `${r} s`; if (r > 0 && left.isConnected !== false) setTimeout(tick, 1000); };
+    tick();
     return card('Farbfolge vergleichen', h('p', null, 'Der Sensor blinkt jetzt diese fünf Farben (danach Pause, dann wieder von vorne). Stimmt die Reihenfolge?'),
       dots, h('ol.small', null, h('li', null, 'Stimmt die Folge, drücke kurz die Taste am Sensor.'), h('li', null, 'Bestätige hier mit „Farben stimmen“.')),
       h('p.small.muted', null, 'Weicht die Folge ab, könnte ein fremdes Gerät mithören – dann „Stimmen nicht“ wählen.'),
+      h('p.small', null, 'Zeit für den Vergleich: ', left),
       h('div.actions', null, yes, no));
   }
 

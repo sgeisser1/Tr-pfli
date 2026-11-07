@@ -191,23 +191,35 @@ async function addEntry(ctx, p) {
   } catch (e) { toast(e.message, 'err'); }
 }
 
+/** „Jetzt messen“ (Protokoll v2, Ä-8): 1) warten auf den Sensor, 2) Sensor bestätigt und misst NACH dem Trennen,
+ *  3) der Wert kommt mit dem nächsten Funkkontakt (Sekunden). Status als Schritte unter dem Knopf. */
 async function measure(ctx, p, btn) {
   btn.disabled = true;
   btn.classList.add('busy');
+  const label = btn.lastChild;
+  const old = label.textContent;
+  const steps = [['waiting_for_sensor', 'Warte auf Sensor'], ['running', 'Sensor misst'], ['done', 'Wert empfangen']];
+  const box = h('ol.mstate', { 'aria-live': 'polite' });
+  const show = (j) => {
+    const ix = j.state === 'done' ? 2 : j.state === 'running' ? 1 : 0;
+    fill(box, steps.map(([, t], i) => h(`li${i < ix ? '.done' : i === ix ? '.cur' : ''}`, null, t)));
+    label.textContent = ix === 1 ? 'misst …' : ix === 0 ? 'warte auf Sensor …' : old;
+    if (j.message) box.title = j.message;
+  };
+  btn.closest('.actions').after(box);
   try {
-    let j = await ctx.api.post(`/plants/${p.id}/measure`);
-    while (['queued', 'waiting_for_sensor', 'running'].includes(j.state)) {
-      btn.lastChild.textContent = j.state === 'running' ? 'misst …' : 'warte auf Sensor …';
-      await new Promise((r) => setTimeout(r, 1000));
-      j = await ctx.api.get(`/jobs/${j.id}`);
-    }
-    toast(j.state === 'done' ? 'Neuer Messwert' : j.message, j.state === 'done' ? 'ok' : 'err');
-    ctx.refresh();
+    const j0 = await ctx.api.post(`/plants/${p.id}/measure`);
+    show(j0);
+    const j = await ctx.api.watchJob(j0, show, ctx.live);
+    toast(j.state === 'done' ? 'Neuer Messwert' : (j.message || 'Sensor hat nicht geantwortet'), j.state === 'done' ? 'ok' : 'err');
+    if (j.state === 'done') setTimeout(() => ctx.refresh(), 800); else box.remove();
   } catch (e) {
     toast(e.message, 'err');
+    box.remove();
   } finally {
     btn.disabled = false;
     btn.classList.remove('busy');
+    label.textContent = old;
   }
 }
 
