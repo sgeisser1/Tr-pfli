@@ -36,6 +36,43 @@
    ]
   ]
  },
+ "C113518": {
+  "brand": "Texas Instruments",
+  "describe": "-40℃~+85℃ 1 1.65V~5.5V 13pF 195MHz 1:1 4.2ns 5.5Ω 5ns 600ps SC-70-5 Analog Switches, Multiplexers ROHS",
+  "least": 5,
+  "library": "expand",
+  "loss": 0,
+  "model": "SN74LVC1G66DCKR",
+  "package": "SC-70-5",
+  "preferred": false,
+  "stock": 68645,
+  "tiers": [
+   [
+    1,
+    0.1602
+   ],
+   [
+    50,
+    0.127
+   ],
+   [
+    150,
+    0.1129
+   ],
+   [
+    500,
+    0.0951
+   ],
+   [
+    3000,
+    0.0872
+   ],
+   [
+    6000,
+    0.0825
+   ]
+  ]
+ },
  "C148209": {
   "brand": "Littelfuse",
   "describe": "-65℃~+150℃ 12.3A@10/1000us 1uA 20V 24.5V 32.4V 400W@10/1000us IEC 61000-4-2 TVS Unidirectional DO-214AC(SMA) ESD and Surge Protection (TVS/ESD) ROHS",
@@ -440,6 +477,43 @@
    [
     1000,
     0.2358
+   ]
+  ]
+ },
+ "C18834": {
+  "brand": "Sunlord",
+  "describe": "100mA 220nH 450MHz 4Ω 8@100MHz ±5% 0402 Inductors (SMD) ROHS",
+  "least": 20,
+  "library": "expand",
+  "loss": 10,
+  "model": "SDCL1005CR22JTDF",
+  "package": "0402",
+  "preferred": false,
+  "stock": 17641,
+  "tiers": [
+   [
+    1,
+    0.0136
+   ],
+   [
+    200,
+    0.011
+   ],
+   [
+    600,
+    0.0095
+   ],
+   [
+    2000,
+    0.0086
+   ],
+   [
+    10000,
+    0.0078
+   ],
+   [
+    20000,
+    0.0074
    ]
   ]
  },
@@ -1291,6 +1365,80 @@
    [
     10000,
     0.022
+   ]
+  ]
+ },
+ "C473331": {
+  "brand": "Texas Instruments",
+  "describe": "-40℃~+125℃ 1 1 1.3ns 1.65V~5.5V 10uA 160MHz 3.5pF 32mA 32mA 4.5ns@5V,50pF 74LVC Series 900ps D-Type Rising Edge SC-70-5 Flip Flops ROHS",
+  "least": 5,
+  "library": "expand",
+  "loss": 2,
+  "model": "SN74LVC1G80DCKR",
+  "package": "SC-70-5",
+  "preferred": false,
+  "stock": 8059,
+  "tiers": [
+   [
+    1,
+    0.211
+   ],
+   [
+    50,
+    0.169
+   ],
+   [
+    150,
+    0.151
+   ],
+   [
+    500,
+    0.1286
+   ],
+   [
+    3000,
+    0.1185
+   ],
+   [
+    6000,
+    0.1126
+   ]
+  ]
+ },
+ "C485082": {
+  "brand": "Texas Instruments",
+  "describe": "-40℃~+125℃ 1 1 1.24V~4.13V 1.65V~5.5V 10uA 3.5ns@5V,50pF 32mA 32mA 410mV~1.38V 74LVC 电源关断保护 SC-70-5 Inverters ROHS",
+  "least": 5,
+  "library": "expand",
+  "loss": 4,
+  "model": "SN74LVC1GU04DCKR",
+  "package": "SC-70-5",
+  "preferred": false,
+  "stock": 3895,
+  "tiers": [
+   [
+    1,
+    0.101
+   ],
+   [
+    50,
+    0.0818
+   ],
+   [
+    150,
+    0.0722
+   ],
+   [
+    500,
+    0.065
+   ],
+   [
+    3000,
+    0.0593
+   ],
+   [
+    6000,
+    0.0563
    ]
   ]
  },

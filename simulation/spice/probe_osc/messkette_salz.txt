@@ -1,0 +1,242 @@
+# Ausgabe messkette_salz.py (Entscheidungsvorlage Messkette, REQ-MES-11)
+
+## 0 Validierung der Modelle
+
+| Fall | f0 ngspice [MHz] (results.csv) | f0 oscmodel [MHz] | Abw. [%] |
+|---|---|---|---|
+| air | 5.6054 | 5.6045 | -0.016 |
+| dry | 4.4739 | 4.4731 | -0.018 |
+| wet_nosalt | 2.2336 | 2.2338 | +0.007 |
+| wet_tap | 1.0186 | 1.0186 | -0.001 |
+| wet_fert_normal | 0.9137 | 0.9137 | -0.005 |
+| mid_tap | 1.6511 | 1.6511 | -0.000 |
+| mid_fert_low | 0.9750 | 0.9750 | -0.001 |
+
+Max. Abweichung 0.018 % -> oscmodel ersetzt ngspice fuer Parameterstudien.
+
+Ersatzschaltbild (2D-Fit bis 20 MHz) gegen komplexe 2D-FEM, Fehler nass gegen Leitungswasser [%-Punkte]:
+
+| f [MHz] | FEM low / normal | Ersatzschaltbild low / normal |
+|---|---|---|
+| 6 | +163.6 / +235.9 | +177.3 / +244.8 |
+| 20 | +50.6 / +144.3 | +53.6 / +156.1 |
+| 70 | +5.1 / +20.9 | +5.2 / +21.8 |
+
+(FEM-Werte: results/salt_index_2d.csv; Abweichung Ersatzschaltbild - FEM siehe Tabelle; Fit nur bis 20 MHz.)
+
+## A Status quo 2-6 MHz (RC-Oszillator R 10 kOhm, ratiometrisch mit Cref1)
+
+Kalibrierung trocken theta 0.05 (eps' 3.85, sigma_b 0) / nass theta 0.398 (eps' 25) mit Leitungswasser. Mitte = eps' 10 = theta 0.198.
+
+### A1 Anzeige [%] ueber der Feuchte (sigma_p konstant | konzentrierend sigma_p ~ theta_nass/theta)
+
+| theta | eps' | Index verlustfrei | Leitung | low | normal | low konz. | normal konz. | Fehler low/normal [%-P] |
+|---|---|---|---|---|---|---|---|---|
+| 0.050 | 3.9 | 0 | 0 | 0 | 0 | 0 | 0 | +0 / +0 |
+| 0.080 | 4.7 | 5 | 1 | 2 | 46 | 95 | 113 | +1 / +45 |
+| 0.100 | 5.3 | 9 | 3 | 44 | 87 | 108 | 120 | +41 / +85 |
+| 0.120 | 6.1 | 14 | 4 | 74 | 103 | 114 | 123 | +70 / +99 |
+| 0.150 | 7.5 | 22 | 7 | 96 | 114 | 118 | 125 | +89 / +107 |
+| 0.198 | 10.0 | 36 | 31 | 111 | 121 | 121 | 127 | +80 / +91 |
+| 0.250 | 13.3 | 52 | 63 | 118 | 125 | 123 | 127 | +55 / +62 |
+| 0.300 | 16.9 | 68 | 81 | 122 | 127 | 124 | 128 | +41 / +46 |
+| 0.350 | 20.9 | 85 | 93 | 124 | 128 | 125 | 128 | +32 / +35 |
+| 0.398 | 25.0 | 100 | 100 | 126 | 129 | 126 | 129 | +26 / +29 |
+
+C_mess [pF] (ratiometrisch) bei Leitung / low / normal; verlustfrei max. = Wasser 64.6 pF:
+
+| theta | Leitung | low | normal |
+|---|---|---|---|
+| 0.050 | 13.3 | 13.3 | 13.3 |
+| 0.100 | 15.2 | 44.3 | 74.9 |
+| 0.150 | 18.0 | 80.9 | 93.8 |
+| 0.198 | 35.1 | 91.5 | 99.0 |
+| 0.300 | 70.4 | 99.2 | 102.8 |
+| 0.398 | 83.8 | 101.9 | 104.0 |
+
+### A2 Giess-Schwelle: Bei welcher wirklichen Feuchte meldet der Sensor 'Giessen noetig'?
+
+Schwelle = Anzeige (Leitungswasser-Kalibrierung). 'wirklich' = Anzeige, die der Sensor bei Leitungswasser am selben theta zeigen wuerde. ANNAHME: Schwelle je Pflanze 20-40 %.
+
+| Schwelle | theta Leitung | theta low / Leitungs-Index dort | theta normal / Leitungs-Index dort | low konz. | normal konz. |
+|---|---|---|---|---|---|
+| 20 % | 0.183 | 0.090 / 2 % | 0.074 / 1 % | 0.062 / 0 % | 0.059 / 0 % |
+| 30 % | 0.197 | 0.094 / 2 % | 0.076 / 1 % | 0.063 / 0 % | 0.059 / 0 % |
+| 40 % | 0.211 | 0.098 / 3 % | 0.078 / 1 % | 0.064 / 0 % | 0.060 / 0 % |
+
+Zwischenwerte sigma_p (Schwelle 30 %): theta beim Ausloesen / Leitungs-Index dort
+
+| sigma_p [S/m] | Bedeutung | theta | Leitungs-Index |
+|---|---|---|---|
+| 0.031 | Leitungswasser min. (KLZH) | 0.210 | 39 % |
+| 0.036 | Leitungswasser max. (KLZH) | 0.194 | 28 % |
+| 0.072 | Einzelprobe 721 uS/cm (KLZH) | 0.137 | 5 % |
+| 0.100 | ANNAHME gelegentlich geduengt | 0.118 | 4 % |
+| 0.180 | PourThru low (Purdue) | 0.094 | 2 % |
+
+Sensitivitaet eps_off 3 statt 4 (ANNAHME Hilhorst): Schwelle 30 %, low -> theta 0.061 / Leitungs-Index 0 %. Trockenpunkt: Fehler +64.0 %-P (normal).
+
+### A3 Nass-Kalibrierung im eigenen gedüngten Topf (Nasspunkt mit Salzzustand 'Kal.'), spaeter anderer Salzzustand
+
+Eintrag: theta beim Unterschreiten von 30 % / Leitungs-Index an diesem Punkt (Soll: wie Zeile Leitung/Leitung = 30 %). Diagonale = automatische Nachfuehrung des Nasspunkts nach jedem Giessen (Variante D2).
+
+| Kal. \ Messung | Leitung | low | normal |
+|---|---|---|---|
+| Leitung | 0.197 / 30 % | 0.094 / 2 % | 0.076 / 1 % |
+| low | 0.207 / 38 % | 0.097 / 2 % | 0.078 / 1 % |
+| normal | 0.209 / 39 % | 0.098 / 3 % | 0.078 / 1 % |
+
+Anzeige bei Mitte (theta 0.198) nach Nass-Kalibrierung mit 'low': Leitung 25 / low 88 / normal 97 % (Leitungs-Kalibrierung, Leitung: 31 %).
+
+### A5 Gelernte Schwelle (Nutzer giesst bei theta_need = 0.197, App speichert die Anzeige im Salzzustand 'Lern'), spaeter Salzzustand 'Messung'
+
+Eintrag: theta beim Ausloesen (Soll 0.197). Kleiner = zu spaet (trockener), groesser = zu frueh (Uebergiessen).
+
+| Lern \ Messung | Leitung | low | normal |
+|---|---|---|---|
+| Leitung (Schwelle 30 %) | 0.197 | 0.094 | 0.076 |
+| low (Schwelle 111 %) | sofort (nass) | 0.197 | 0.137 |
+| normal (Schwelle 121 %) | sofort (nass) | 0.292 | 0.197 |
+
+### A4 Salzerkennung mit vorhandener Hardware: C(T0,T2 mit Cref2) / C(T0,T1 mit Cref1)
+
+| theta | Leitung | low | normal |
+|---|---|---|---|
+| 0.050 | 1.000 | 1.000 | 1.000 |
+| 0.100 | 0.983 | 1.122 | 1.054 |
+| 0.198 | 1.154 | 1.024 | 1.011 |
+| 0.398 | 1.038 | 1.007 | 1.003 |
+
+Verlustfrei = 1.000; Abweichung > ~3 % (ANNAHME Messgenauigkeit) = Hinweis 'Salz/Duenger'.
+
+## B Mehrere Messfrequenzen + Inversion des Ersatzschaltbilds (sigma_b und eps' schaetzen)
+
+Unbekannte: k (R, Schwellen), eps', ln sigma_b. Lineare Fehlerfortpflanzung der Restunsicherheiten (ANNAHME nach Kalibrierung: Ci/C0/Cg je 2 % (Fit-Residuum 1-2 %, REPORT Kap. 2/6), Cpar 0.3 pF, Cref 1 %, VT+/VT- je 1 %, 2 tpd 1 ns). Strukturfehler (Maxwell-Wagner im Substrat, Torf) nicht enthalten -> Ergebnis ist eine **Untergrenze**.
+
+### B1 vorhandene HW: R10k, +Cref1, +Cref2 (1.0-4.5 MHz)
+
+| Fall | sigma_p | f [MHz] | 1-sigma Indexfehler [%-P] | groesster Beitrag |
+|---|---|---|---|---|
+| trocken+ (theta 0.08) | Leitung | 4.07 | 1.9 | Cpar +-0.3 pF |
+| trocken+ (theta 0.08) | low | 2.97 | 1.9 | Cpar +-0.3 pF |
+| trocken+ (theta 0.08) | normal | 1.40 | 10.1 | Ci +-2 % |
+| Schwelle (theta 0.12) | Leitung | 3.39 | 2.0 | Cpar +-0.3 pF |
+| Schwelle (theta 0.12) | low | 1.15 | 56.1 | Ci +-2 % |
+| Schwelle (theta 0.12) | normal | 1.00 | 323.0 | Ci +-2 % |
+| Mitte (theta 0.20) | Leitung | 1.62 | 4.5 | Ci +-2 % |
+| Mitte (theta 0.20) | low | 0.97 | 576.6 | Ci +-2 % |
+| Mitte (theta 0.20) | normal | 0.93 | 2554.0 | Ci +-2 % |
+| nass (theta 0.40) | Leitung | 1.01 | 172.6 | Ci +-2 % |
+| nass (theta 0.40) | low | 0.91 | 5076.1 | Ci +-2 % |
+| nass (theta 0.40) | normal | 0.91 | 21524.3 | Ci +-2 % |
+
+### B2 +Analogschalter: R10k, R10k+Cref1, R5k (statt Cref2, bis ~11 MHz)
+
+| Fall | sigma_p | f [MHz] | 1-sigma Indexfehler [%-P] | groesster Beitrag |
+|---|---|---|---|---|
+| trocken+ (theta 0.08) | Leitung | 4.07 | 1.9 | Cpar +-0.3 pF |
+| trocken+ (theta 0.08) | low | 2.97 | 1.9 | Cpar +-0.3 pF |
+| trocken+ (theta 0.08) | normal | 1.40 | 2.6 | Ci +-2 % |
+| Schwelle (theta 0.12) | Leitung | 3.39 | 2.0 | Cpar +-0.3 pF |
+| Schwelle (theta 0.12) | low | 1.15 | 127.9 | Ci +-2 % |
+| Schwelle (theta 0.12) | normal | 1.00 | 305.8 | Ci +-2 % |
+| Mitte (theta 0.20) | Leitung | 1.62 | 2.2 | Cpar +-0.3 pF |
+| Mitte (theta 0.20) | low | 0.97 | 482.0 | Ci +-2 % |
+| Mitte (theta 0.20) | normal | 0.93 | 1819.6 | Ci +-2 % |
+| nass (theta 0.40) | Leitung | 1.01 | 351.4 | Ci +-2 % |
+| nass (theta 0.40) | low | 0.91 | 3389.5 | Ci +-2 % |
+| nass (theta 0.40) | normal | 0.91 | 13744.3 | Ci +-2 % |
+
+## C Hohe Messfrequenz
+
+### C1 Ideale Messung von C_eff = Im(Y)/w (Obergrenze der Verbesserung), Fehler gegen Leitungswasser [%-Punkte] Mitte (eps' 10) | nass (eps' 25), low / normal; Guete Q der Sonde nass/normal
+
+| f [MHz] | Mitte low / normal | nass low / normal | Q Sonde nass normal |
+|---|---|---|---|
+| 2 | +95.1 / +119.6 | +55.1 / +58.4 | 16.3 |
+| 6 | +69.4 / +163.1 | +146.5 / +187.2 | 5.6 |
+| 10 | +35.2 / +112.0 | +125.3 / +205.3 | 3.5 |
+| 20 | +10.4 / +41.3 | +56.8 / +147.6 | 2.1 |
+| 50 | +1.8 / +7.5 | +11.4 / +43.8 | 1.9 |
+| 70 | +0.9 / +3.9 | +5.9 / +24.2 | 2.2 |
+| 100 | +0.4 / +1.9 | +2.9 / +12.4 | 2.9 |
+| 150 | +0.2 / +0.9 | +1.3 / +5.7 | 4.0 |
+
+### C2 Realer Pierce-LC-Oszillator (SN74LVC1GU04 + 220 nH + C2 47 pF + Sonde), ratiometrisch mit Cref1, Teiler 16
+
+Verlust der Sonde + Phasenfehler des Inverters (tpd 1.1-3.7 ns bei 3.3 V, SN74LVC1GU04 S.7 Tab. 6.6; Ausgangswiderstand ro ANNAHME) verschieben die Frequenz salzabhaengig.
+
+| ro [Ohm] | tpd [ns] | f Luft / trocken / nass [MHz] | f/16 [MHz] | Mitte low / normal [%-P] | nass low / normal [%-P] | noetige Verstaerkung nass normal |
+|---|---|---|---|---|---|---|
+| 30 | 0.0 | 99 / 92 / 78 | 6.2 / 4.9 | -8.6 / -24.7 | -31.0 / -50.3 | 4.0 |
+| 30 | 1.1 | 88 / 81 / 65 | 5.5 / 4.1 | -0.8 / -0.8 | -5.9 / -5.1 | 2.0 |
+| 30 | 3.7 | 74 / 68 / 53 | 4.6 / 3.3 | +11.5 / +29.5 | +16.2 / +43.3 | 1.2 |
+| 100 | 0.0 | 94 / 87 / 73 | 5.9 / 4.5 | -0.0 / -5.1 | -11.6 / -17.1 | 3.5 |
+| 100 | 1.1 | 89 / 82 / 67 | 5.5 / 4.2 | +0.0 / +0.0 | +4.0 / +16.4 | 2.5 |
+| 100 | 3.7 | 69 / 66 / 55 | 4.3 / 3.4 | +17.1 / +33.9 | +29.9 / +64.7 | 2.2 |
+
+## D Geometrie/Isolation (komplexe 2D-FEM, results/salt_index_2d.csv), Fehler Mitte | nass low / normal [%-Punkte]
+
+| Variante | f [MHz] | Mitte low / normal | nass low / normal |
+|---|---|---|---|
+| 4L SG gap2 | 2 | +95 / +143 | +85 / +93 |
+| 4L SG gap2 | 4 | +83 / +177 | +155 / +193 |
+| 4L SG gap2 | 6 | +60 / +155 | +164 / +236 |
+| 4L SG gap2 7628C | 2 | +64 / +74 | +24 / +26 |
+| 4L SG gap2 7628C | 4 | +78 / +111 | +57 / +62 |
+| 4L SG gap2 7628C | 6 | +71 / +123 | +76 / +89 |
+| 4L IDE n6 gap1 | 2 | +52 / +59 | +18 / +19 |
+| 4L IDE n6 gap1 | 4 | +70 / +92 | +41 / +44 |
+| 4L IDE n6 gap1 | 6 | +68 / +105 | +56 / +64 |
+| 4L GSG ws6 gap2 7628C | 2 | +46 / +51 | +14 / +14 |
+| 4L GSG ws6 gap2 7628C | 4 | +66 / +83 | +33 / +35 |
+| 4L GSG ws6 gap2 7628C | 6 | +67 / +97 | +47 / +53 |
+
+## D3 RC-Oszillator schneller (R kleiner) + Teiler vor dem Timer
+
+| R | Teiler | f Luft / nass Leitung [MHz] | Mitte Leitung / low / normal [%] | theta bei 30 %: Leitung | low (Leitungs-Index) | normal (Leitungs-Index) | sigma_p 0.072 / 0.10 / low konz. / normal konz. (Leitungs-Index) | tpd-Drift +1 ns [%-P] |
+|---|---|---|---|---|---|---|---|---|
+| 10.00k | /1 | 5.3 / 1.0 | 31 / 111 / 121 | 0.197 | 0.094 (2 %) | 0.076 (1 %) | 5 / 3 / 0 / 0 | +0.2 |
+| 4.70k | /2 | 10.7 / 2.5 | 15 / 137 / 172 | 0.259 | 0.121 (6 %) | 0.091 (3 %) | 14 / 10 / 1 / 1 | +0.5 |
+| 2.20k | /4 | 20.3 / 7.5 | 34 / 133 / 282 | 0.184 | 0.158 (22 %) | 0.116 (11 %) | 36 / 34 / 5 / 3 | +2.8 |
+| 1.50k | /8 | 27.2 / 11.7 | 35 / 45 / 222 | 0.182 | 0.188 (32 %) | 0.137 (16 %) | 35 / 40 / 10 / 4 | +4.4 |
+| 1.00k | /8 | 36.1 / 17.4 | 34 / 19 / 119 | 0.185 | 0.223 (43 %) | 0.166 (24 %) | 33 / 38 / 19 / 7 | +6.4 |
+| 0.68k | /16 | 45.8 / 24.0 | 34 / 19 / 27 | 0.185 | 0.249 (51 %) | 0.200 (34 %) | 33 / 37 / 36 / 11 | +8.8 |
+
+### D3b Szenario konzentrierend (Ionen bleiben beim Austrocknen im Topf, ANNAHME physikalisch plausibel): theta beim Ausloesen der 30-%-Schwelle; Bedarf der Pflanze theta_need = theta(Leitung konstant, A) = 0.197
+
+| R | Leitung | 0.072 | 0.10 | low | normal | Spannweite theta |
+|---|---|---|---|---|---|---|
+| 10.00k | 0.106 | 0.076 | 0.070 | 0.063 | 0.059 | 0.059-0.106 |
+| 1.00k | 0.195 | 0.226 | 0.223 | 0.145 | 0.089 | 0.089-0.226 |
+| 0.68k | 0.195 | 0.223 | 0.244 | 0.205 | 0.112 | 0.112-0.244 |
+
+## E Energie je Messung und Laufzeit (A-32, CR2032, 2 x 100 uF, Reaktionszeit 1 min)
+
+Strom D3 waehrend der Messung: 10.2 mA (Grenze DIO12 10 mA -> P-FET empfohlen).
+
+Strom C waehrend der Messung: Teiler 15.2 mA + Oszillator 8.5 mA (davon 5 mA ANNAHME) = **24 mA** (DIO12 liefert spezifiziert 10 mA, DS S.31 -> Lastschalter).
+
+| Variante | Ladung/Messung [uC] | Mittel pess. A [uA] | Laufzeit pess. A [Mt.] | Mittel pess. DS [uA] | Laufzeit pess. DS [Mt.] |
+|---|---|---|---|---|---|
+| A Status quo (energy_budget Q_MEAS) | 30 | 5.13 | 36.9 | 11.73 | 17.0 |
+| B1 3 Konfigurationen (wie A, Firmware) | 30 | 5.13 | 36.9 | 11.73 | 17.0 |
+| B2 + 4. Konfiguration (R 5k, ~2 mA) | 62 | 5.14 | 36.8 | 11.74 | 17.0 |
+| C 70-100 MHz: 24 mA x 24 x 0.6 ms | 341 | 5.17 | 36.6 | 11.77 | 16.9 |
+| D3 R 1k /8: 10 mA x 16 x 0.6 ms | 98 | 5.14 | 36.8 | 11.74 | 17.0 |
+
+Einbruch am Puffer 200 uF je 0.6-ms-Burst: 71 mV (ohne Nachladung) -> Bursts mit Pausen wie LED-Regel (PINMAP Kap. 3).
+
+## F Flaeche und Kosten (Courtyards KiCad, Faktor 1.5 fuer Verdrahtung wie FLOORPLAN_OPTIONS, Band 20 mm breit; Preise JLC @20 Stk, Loetstelle 0.0016 USD, Extended-Feeder 3.07 USD je Typ und Bestellung)
+
+| Variante | Courtyard-Delta [mm2] | Band-Delta [mm] | Teile-Delta [USD/Stk] | neue Extended-Typen | Einmal-Delta [USD/Bestellung] |
+|---|---|---|---|---|---|
+| A | +0.0 | +0.0 | +0.000 | - | +0.00 |
+| B1 | +0.0 | +0.0 | +0.000 | - | +0.00 |
+| B2 | +11.2 | +0.8 | +0.174 | C113518 | +3.07 |
+| C | +58.1 | +4.4 | +1.040 | C18834, C473331, C485082 | +9.21 |
+| D3 (R3 1k, /8) | +45.1 | +3.4 | +0.756 | C473331 | +3.07 |
+| D3 ohne P-FET (DIO12 direkt) | +29.7 | +2.2 | +0.663 | C473331 | +3.07 |
+
+(- U2 LVC1G14 mit 0.057 USD aus CONCEPTS 2.3/research 6.3; Extended-Gebuehr U2 entfaellt in C, dafuer 3 neue Typen.)
+
