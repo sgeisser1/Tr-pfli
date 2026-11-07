@@ -1,6 +1,87 @@
-# fluidi – P3 „Stele“, Verfeinerung 1
+# fluidi – P3 „Stele“, Verfeinerung 2
 
-Stand 2026-11-07, Version 0.2 (Industriedesign), zur Durchsicht durch den Auftraggeber.
+Stand 2026-11-07, Version 0.3 (Industriedesign), zur Durchsicht durch den Auftraggeber.
+Verfeinerung 2 (Kapitel V2, vorne) setzt die drei Änderungswünsche aus **D-010** um. Der Sensor ist freigegeben
+und bleibt unverändert. Die Kapitel 1–7 dahinter sind der Stand aus Verfeinerung 1, unverändert und zum Nachschlagen.
+
+## V2 Verfeinerung 2 (D-010)
+
+Neu erzeugen:
+
+```
+blender -b --factory-startup --python renders/gen/render_p3v3.py -- gateway familie
+python3 docs/design/logo/gen_logo_fluidi_v3.py
+python3 scripts/md2pdf.py docs/design/P3_FLUIDI.md docs/design/P3_fluidi_v2.pdf
+```
+
+### V2.1 Gateway: LED-Tropfen „tropft“ aus dem blauen Deckel
+
+![Gateway G1 v3 in Warmgrau hell #B9B5AC und Hellblau: Der grüne LED-Tropfen hängt an der Farbfuge auf der Frontfacette, wie am Sensor. Logo Ton in Ton, keine Stabantenne](../../renders/phase3_v3/g1v3_gateway.png)
+
+![Familie: drei Sensoren (Warmgrau hell, LED grün / grün / blau) und Gateway im selben Massstab](../../renders/phase3_v3/g1v3_familie_3sensoren.png)
+
+| | |
+|---|---|
+| Tropfen | **Gleiche Geometrie wie am Sensor:** Kreis r 2.5 mm, Spitze 6.0 mm über der Mitte, Mitte 0.4 mm über der Fuge. Die Spitze liegt im blauen Deckel, der Bauch hängt in die graue Wanne. Das Fenster sitzt im Deckel genau, in der Wanne ist die Kerbe 0.3 mm grösser (wie Hülse/Kappe am Sensor). So folgt die Fuge um den Tropfen herum |
+| Lage | Auf der 45°-Frontfacette rechts (x = +21 mm). Die Fuge (z = 14) liegt 4.24 mm (schräg gemessen) über der Facettenunterkante. Der Tropfen reicht von 2.1 bis 10.6 mm, die Facette ist 12.7 mm lang. Von vorne und von oben gut sichtbar |
+| Farben | Wanne Warmgrau hell #B9B5AC, Deckel Hellblau, Logo-Relief Ton in Ton (Wortmarke, 22 mm), keine Stabantenne (FPC innen) |
+| Masse | unverändert 62 × 40 × 20 mm |
+| Technik | Das Fenster überbrückt wie am Sensor die Teilungsebene. Es wird in den Deckel geklebt und taucht beim Schliessen in die Kerbe der Wanne. Die LED (RGB, Lichtschacht) sitzt hinter der Facette. Mit `mechanik`/`elektronik` zu klären: Lichtschacht schräg 45°, Abstand zur FPC-Antenne (GW-4) |
+
+### V2.2 Wortmarke – vier ruhigere Fassungen
+
+Feedback: „zwei blaue tropfen zu viel. auch das schwarz ist zu hart.“ Das Anthrazit #2B3036 ersetzt jetzt ein
+**warmes Dunkelgrau #4F4B45**. Es hat den Farbton der Hülse, abgedunkelt (Kontrast auf Weiss 8.7:1). Höchstens **ein** Tropfen ist farbig, der andere ist in der Schriftfarbe.
+Die Geometrie ist unverändert die harte Formsprache (Variante A, wie am Sensor), (d) hat eine feinere Linie.
+
+![Wortmarke Verfeinerung 2, Varianten a–d (je auf Hell / auf Dunkel / Mono) und App-Icon-Kacheln a und b in 512 (Rundquadrat, Kreis), 192, 96, 48 px und 48 px vergrössert](../../renders/phase3_v3/logo_icon_uebersicht.png)
+
+| Variante | Schrift | Tropfen | Charakter | Kontrast hell / dunkel |
+|---|---|---|---|---|
+| **a** | warmes Dunkelgrau #4F4B45 | letztes i hellblau #4AA8DE, erstes in Schriftfarbe | ruhig, ein Farbakzent wie die blaue Kappe | 8.7:1 / 10.0:1 |
+| **b** | warmes Dunkelgrau | beide in Schriftfarbe | ganz ruhig, einfarbig; die Tropfen wirken nur durch die Form | 8.7:1 / 10.0:1 |
+| **c** | gedämpftes Petrol #3D5F6B | letztes i hellblau | kühler, „wässriger“; Blau-in-Blau, sehr harmonisch | 6.9:1 / 10.0:1 |
+| **d** | warmes Dunkelgrau, **feinere Linie** (Strich 1.7 statt 2.0 u) | letztes i im LED-Grün „ok“ #3FA95C | leichter, technischer; Grün verbindet Logo und Status „alles gut“ | 8.7:1 / 10.0:1 |
+
+Dateien (`docs/design/logo/`): `fluidi_logo_v3a.svg` … `v3d.svg` (für helle Flächen), `…_dunkel.svg` (helle Schrift für dunkle
+Flächen), `…_mono.svg` (eine Farbe, eine Fläche: Silkscreen, FDM-Relief, Prägung), Vorschau `preview_fluidi_logo_v3a…d.png`.
+Alle SVG ohne Hintergrund, eigene Pfade, keine Schrift.
+
+**Mindestmasse** (Skriptausgabe, Regeln wie Kap. 5): a–c wie bisher (Silkscreen ≥ 3.8 mm breit bei 0.2 mm Strich, empfohlen
+10–12 mm; FDM-Relief 2 Bahnen ≥ 15.0 mm; am Sensor 16 mm → Strich 0.85 mm). **d** braucht für 2 Druckbahnen ≥ 16.8 mm
+Breite. Am Sensor (16 mm) wäre der Strich 0.76 mm, also knapp 2 Bahnen. Mit d müsste das Sensorlogo auf 17 mm wachsen (Platz vorhanden:
+Hülsenfront 28 mm minus Fasen), für Silkscreen ist d ohne Einschränkung tauglich (≥ 4.2 mm).
+Am Gehäuse ändert sich nichts: Dort ist das Logo einfarbiges Relief Ton in Ton, die Geometrie von a–c ist identisch mit der jetzigen.
+
+### V2.3 App-Icon als Kachel im Sensor-Look
+
+Oben Hellblau (Kappe), unten Warmgrau hell #B9B5AC (Hülse), an der Grenze der **grün leuchtende Tropfen** in der Sensorgeometrie
+(Spitze 2.4 r über der Mitte, Mitte 0.16 r über der Grenze, entsprechend 0.4/2.5 mm am Sensor). Flach, mit radialem Leuchten, ohne Fotografie.
+
+| | Kachel a | Kachel b |
+|---|---|---|
+| Farbgrenze | auf **2/5** Höhe (von oben) | auf **1/3** Höhe (näher an der Sensorproportion) |
+| Kante/Schatten | flach, ohne Fuge | dezente Fuge (läuft wie am Sensor um den Tropfenbauch) und leichter Schatten unter der Kappe |
+| Tropfen | r 59 px, Höhe 200 px | r 46 px, Höhe 155 px |
+| 48 px | Tropfen ≈ 11 × 19 px, klar als grüner Tropfen an der Farbkante erkennbar | Tropfen ≈ 9 × 15 px, noch erkennbar, Fuge verschwindet |
+
+Beide sind 512 × 512 px, vollflächig und maskable: Das Motiv reicht bis r = 202 px, die Sicherheitszone ist 205 px. Damit sind Rundquadrat und Kreis
+problemlos (siehe Übersicht). Dateien: `icon_fluidi_kachel_a.svg`/`_b.svg` und `icon_fluidi_kachel_a_512.png`, `_192`, `_96`, `_48`
+(dto. b). Das SVG wurde in Edge gerendert und stimmt mit dem PNG überein.
+Empfehlung: **Kachel a**. Die grössere Farbfläche oben und der grössere Tropfen lesen sich in 48 px deutlich besser. Die Fuge von b
+ist erst ab 192 px sichtbar. Hinweis: Grau und Grün sind fast gleich hell (1.06:1). Der Tropfen hebt sich nur über den Farbton und
+den dunkleren Rand ab. Für Nutzer mit Rot-Grün-Schwäche trägt die Form, nicht die Farbe.
+
+### V2.4 Fragen an den Auftraggeber
+
+1. Wortmarke: a, b, c oder d?
+2. App-Icon: Kachel a (2/5, flach) oder b (1/3, mit Fuge)?
+3. Gateway-Tropfen rechts auf der Facette, oder lieber mittig?
+
+---
+
+## Stand Verfeinerung 1 (Kapitel 1–7)
+
 Grundlage: D-008 (Name **fluidi**), D-009 (Wahl P3 mit Änderungen), Machbarkeitsberichte
 `docs/reviews/phase3_sleeve_mechanik.md` (Konstruktion **A1**, Variante 28/20), `docs/reviews/phase3_sleeve_sicherheit.md`
 (kein Veto, Bedingungen S3-K1/K2, W1–W4) und `docs/reviews/phase3_rgb_antenne_elektronik.md` (RGB-LED, FPC-Antenne im Gateway).
@@ -156,3 +237,6 @@ Die Icons haben 512 × 512 px, sind vollflächig und maskable: Das Motiv liegt i
 | `renders/phase3_v2/*.png`, `*.blend` | Bilder und Szenen |
 | `docs/design/logo/gen_logo_fluidi.py` | Wortmarken, Icons, Vorschauen, Mindestmasse |
 | `docs/design/logo/fluidi_*.svg`, `icon_fluidi_*.svg`, `preview_*fluidi*.png`, `logo_uebersicht.png` | Logo-Dateien |
+| `renders/gen/render_p3v3.py` | Verfeinerung 2: Gateway G1 v3 (Tropfen an der Fuge), Szenen Gateway/Familie |
+| `renders/phase3_v3/*.png`, `*.blend` | Bilder Verfeinerung 2, `logo_icon_uebersicht.png` |
+| `docs/design/logo/gen_logo_fluidi_v3.py` | Wortmarke v3a–d, Icon-Kacheln a/b, Übersicht, Kontrast, Mindestmasse |
