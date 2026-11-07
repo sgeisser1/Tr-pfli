@@ -24,6 +24,25 @@ for m in numpy scipy matplotlib sympy requests yaml serial cryptography pcbnew g
   "$PY" -c "import $m" 2>/dev/null && ok "python ($PY): $m" || bad "python: $m"
 done
 
+echo "== Firmware-Werkzeuge (Phase 4; Installation: scripts/install_firmware_tools.sh) =="
+# Prüft nur, installiert nichts. Pfade aus ~/fluidi-tools/env.sh, falls vorhanden.
+FT="${FLUIDI_TOOLS:-$HOME/fluidi-tools}"
+[ -f "$FT/env.sh" ] && . "$FT/env.sh" >/dev/null 2>&1 || bad "$FT/env.sh (noch nicht installiert)"
+for t in cmake ninja picocom lsusb; do command -v "$t" >/dev/null && ok "$t" || bad "$t"; done
+[ -x "${FLUIDI_TICLANG:-/nonexistent}/bin/tiarmclang" ] && ok "TI Arm Clang: $("$FLUIDI_TICLANG/bin/tiarmclang" --version 2>&1 | head -1)" || bad "TI Arm Clang (tiarmclang)"
+[ -x "${FLUIDI_SYSCONFIG:-/nonexistent}" ] && ok "SysConfig: $FLUIDI_SYSCONFIG" || bad "SysConfig (sysconfig_cli.sh)"
+[ -f "${FLUIDI_TI_SDK:-/nonexistent}/imports.mak" ] && ok "TI F3 SDK: $FLUIDI_TI_SDK" || bad "TI SimpleLink Low Power F3 SDK"
+[ -f "${FLUIDI_TI_SDK:-/nonexistent}/.fluidi_libs_built" ] && ok "SDK-Bibliotheken gebaut" || bad "SDK-Bibliotheken (install_firmware_tools.sh sdklibs)"
+[ -x "$FT/venv/bin/imgtool" ] && ok "imgtool $("$FT/venv/bin/imgtool" version 2>&1 | tail -1)" || bad "imgtool (MCUboot-Signatur)"
+"$FT/venv/bin/python" -c "import serial" 2>/dev/null && ok "pyserial (venv)" || bad "pyserial (venv)"
+IDF="${FLUIDI_IDF:-$HOME/esp/esp-idf}"
+[ -d "$IDF/.git" ] && ok "ESP-IDF $(git -C "$IDF" describe --tags 2>/dev/null)" || bad "ESP-IDF ($IDF)"
+( export IDF_TOOLS_PATH="${IDF_TOOLS_PATH:-$HOME/esp/.espressif}"; . "$IDF/export.sh" >/dev/null 2>&1 && idf.py --version >/dev/null 2>&1 ) \
+  && ok "idf.py (ESP-IDF-Umgebung lädt)" || bad "idf.py (ESP-IDF-Umgebung)"
+id -nG | tr ' ' '\n' | grep -qx dialout && ok "Gruppe dialout" || bad "Gruppe dialout (serielle Ports ohne sudo)"
+for m in cdc_acm ch341 cp210x ftdi_sio; do modinfo "$m" >/dev/null 2>&1 && ok "Kernelmodul $m" || bad "Kernelmodul $m"; done
+ls /dev/ttyUSB* /dev/ttyACM* 2>/dev/null | sed 's/^/  [INFO]  serieller Port: /'
+
 echo "== Funktionstest KiCad (Board erzeugen, DRC, Gerber, STEP) =="
 ( cd "$TMP" && "$PY" - <<'EOF'
 import pcbnew
