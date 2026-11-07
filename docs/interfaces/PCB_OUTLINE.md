@@ -2,18 +2,26 @@
 
 | | |
 |---|---|
-| Revision | **B** (2026-11-07), ersetzt Rev A (siehe Kap. 11 Revisionsvermerk) |
-| Status | **verbindlich für das Layout (Phase 4b, Welle 2)**. Ausnahme: Zone Z5B (Bauteile im Kragen) erst nach Freigabe Sicherheit (S3-K2). Änderungen nur über eine neue Revision (Mechanik + Elektronik) |
+| Revision | **C** (2026-11-08), ersetzt Rev B; **Kontur unverändert** (siehe Kap. 11 Revisionsvermerk) |
+| Status | **verbindlich für das Layout Rev C**. Z5B freigegeben unter K-1…K-7 (`docs/reviews/phase4_sicherheit_kragen_firmware.md`). **Offen:** LS-W1 (Clip-Pad ≥ 0.3 mm zu den Vergusskanten inkl. Toleranz) verlangt eine Fachverlängerung um 0.7 mm – Entscheid Projektleitung, Vorschlag Kap. 9. Änderungen nur über eine neue Revision (Mechanik + Elektronik) |
 | Maschinenlesbar | `mechanical/interfaces/pcb_outline.json`, `mechanical/interfaces/pcb_outline.dxf` (Edge.Cuts, Zonen, feste Bauteile, Mechanik-Referenzen und Blockplan `Plan_*` als Layer, KiCad-Koordinaten) |
 | Blockplan | `mechanical/interfaces/pcb_rev_b_floorplan.png` (massstäblich, Ansicht von vorne = KiCad-Top) |
 | Erzeugt von | `.venv/bin/python mechanical/gen/pcb_rev_b_floorplan.py` (ruft `fluidi_params.main()`; `fluidi_params.py` ist die einzige Quelle aller Masse, auch für CAD und FEM) |
-| Geprüft mit | `freecadcmd mechanical/gen/fluidi_sensor.py` → `mechanical/sensor/check_sensor.txt`, `collision_placeholder.txt` |
+| Geprüft mit | `freecadcmd mechanical/gen/fluidi_sensor.py` → `mechanical/sensor/check_sensor.txt`, `collision_placeholder.txt`; mit dem KiCad-STEP: `freecadcmd mechanical/gen/fluidi_pcb_collision.py` → `mechanical/sensor/collision_pcb_step.txt`, Baugruppe `fluidi_sensor_mit_pcb.step` |
 | Grundlage | D-019 (Kopf V4 34 × 13 × 57.5, Kappe 14 mm, Fuge z 43.5, Platine im Kopf ≈ 26 mm), D-018 (Messkette D3), `hardware/sensor/out/FLOORPLAN_OPTIONS.md` Option (f), `docs/design/PROPORTIONEN.md`, `docs/reviews/phase3_sleeve_sicherheit.md` (S3-K1/K2, W1–W4), `simulation/field/REPORT.md` Kap. 8 |
 
 ## 1 Koordinaten
 
 - **Kopf:** x = Breite (0 = Mitte, + rechts, von vorne gesehen), y = Tiefe (0 = Frontfläche, + nach hinten), z = Höhe (0 = Kopfunterkante).
 - **KiCad:** `X = x`, `Y = 53.5 − z` (Ursprung Mitte Platinenoberkante, Y nach unten zur Spitze). Top-View = Ansicht von vorne.
+  In `fluidi_sensor.kicad_pcb` liegt dieser Ursprung als Hilfsursprung (`aux_axis_origin`) bei Seite (150, 30):
+  `x = X_Seite − 150`, `z = 53.5 − (Y_Seite − 30)`. Gerber/Bohrdaten nutzen den Hilfsursprung.
+- **KiCad-STEP** (`kicad-cli pcb export step` ohne Ursprungsoption, `hardware/sensor/out/fluidi_sensor.step`):
+  `X_s = X_Seite`, `Y_s = −Y_Seite`, `Z_s` = Höhe über der B-Seite (Bauteile auf F bei `Z_s = 1.6`). In Kopfkoordinaten:
+  `x = X_s − 150`, `y = 8.2 − Z_s`, `z = 83.5 + Y_s` (= Drehung +90° um x, dann Verschiebung (−150, 8.2, 83.5)).
+  Nachgeprüft (`collision_pcb_step.txt` Kap. A): STEP-Platine x ±13.000, z −105.000…53.500, Bauteile auf y 6.60,
+  Kontur STEP ↔ `fluidi_params.outline()` 0.08 mm² Abweichung (Bogen R 2 als Polygon). Der STEP-Platinenkörper ist
+  1.52 mm dick (KiCad zählt nur die Dielektrika), die Bauteile sitzen richtig bei 1.6.
 - **F-Seite (F.Cu, bestückt) zeigt nach vorne zum Fenster (−y)**, Oberfläche bei **y = 6.6** (Rev A 7.4). B-Seite y = 8.2, **unbestückt** (JLC Economic einseitig).
 - **Feldsimulation** (`simulation/field/REPORT.md` Kap. 8): z_f = −z (z_f = 0 an der Kopfunterkante, positiv zur Spitze).
   Beispiel: S-Elektrode z_f 10…86 → z −10…−86 → KiCad Y 63.5…139.5. Die dortige ANNAHME „z = 0 = Unterkante Kragen“
@@ -31,7 +39,7 @@
 | Kontur (KiCad X/Y) | (−2.5/158.5) (2.5/158.5) (10/151) (10/45.83) ⌒ R 2.0 ⌒ (10.59/44.41) (13/42) (13/0) (−13/0) (−13/42) (−10.59/44.41) ⌒ R 2.0 ⌒ (−10/45.83) (−10/151); Bogen in DXF/JSON als 8 Segmente – in KiCad als Bogen R 2.0 zeichnen |
 | Innenecken Schulter | **R 2.0** (Tangente ab z 7.67, 0.37 mm über dem Kragen). Grund: FEM LC1b (ohne Kragenstütze): scharfe Ecke 284 MPa, mit R 2.0 191 MPa (`simulation/fem/REPORT.md` Kap. 4) |
 | Sonde inkl. Beschichtung | max. 20.4 × 2.0 mm (Bodenschlitz der Hülse 20.8 × 2.4) – **ANNAHME** Schichtdicke (REQ-MECH-07) |
-| Lage im Kern | z ± 0.2 mm (Montage mit Distanzlehre 23.5, Kap. 7) |
+| Lage im Kern | **z: Platinenoberkante liegt am Anschlag der Kappe** (z 53.5, x −8.0…−3.0, Kap. 6), Toleranz Pad ↔ Vergusskante ± 0.22 (RSS: JLC-Kontur ± 0.2, FDM ± 0.1). Rev B hatte keinen Anschlag (0.7 mm Luft zum Tastenblock → Lage 0…+0.7). Kragen mit Distanzlehre 23.5 am Schott (Kap. 7). y: Gabel am Anschlag (F 0.05, B 0.15 Luft), Schottkeil |
 | Max. Stecktiefe | Silkscreen-Linie bei **z = −5.0 (Y 58.5)** auf F und B, x −9…9, Text „max“ + Pfeil (REQ-MECH-01) |
 
 **Herleitung 26 mm (aus V4 34 mm aussen):** Hülsenwand 1.6 + O-Ring-Einbauraum 1.35 + Zapfenwand hinter der Nut 0.8
@@ -46,14 +54,14 @@ Rev A ≈ 0.5). Folgen im CAD nachgeführt: Lichtschaft (d bleibt 2.0), Mutter M
 
 | Zone | z (Y) | x | Seite | Max. Höhe | Regel |
 |---|---|---|---|---|---|
-| Z1 Antenne | 47.8 … 53.5 (0 … 5.7) | ±13 | F+B | 0 | AN043-IFA 15.2 × 5.7 (`RF_Antenna:Texas_SWRA117D_2.4GHz_Left`) an der Oberkante. Lage in x durch Elektronik; Vorschlag rechtsbündig (Einspeisung links, offenes Ende rechts, nicht hinter Stössel x −4.2…−0.2 oder Zunge x −7.6…−4.4). Ganze Zone ohne Bauteile, neben und über der Antenne kein Kupfer (AN043). Kein Metall des Gehäuses |
+| Z1 Antenne | 47.8 … 53.5 (0 … 5.7) | ±13 | F+B | 0 | AN043-IFA 15.2 × 5.7, Footprint **`RF_Antenna:Texas_SWRA117D_2.4GHz_Right`** (Einspeisung/Kurzschluss links, offenes Ende rechts; Rev B nannte fälschlich „…_Left“, L-5). Lage Layout Rev B: Speisepunkt X 0.35, Kupfer **x −2.2…12.2, z 47.8…53.2**, Keepout alle Lagen x −2.7…12.5. Ganze Zone ohne Bauteile, neben und über der Antenne kein Kupfer (AN043). Kein Metall des Gehäuses. **Platinenanschlag der Kappe x −8.0…−3.0** (Kunststoff, Kap. 6): dort Kupfer erlaubt (ausserhalb Keepout), keine Bauteile |
 | Z2 Band F | 32.7 … 47.8 (5.7 … 20.8) | ±13 | F | **2.0** | Elektronikband 26 × 15.1 = **392.6 mm²**. Höhe ≤ 2.0 überall (Einschieben durch das Schott; Zunge 0.2 vor SW1). Courtyards ≥ 0.3 zur Kontur. D1/SW1 fest (Kap. 5). Im Kreis r 1.8 um D1 nur Teile ≤ 0.6 (Lichtschaft) |
 | Z2 Band B | 30.3 … 47.8 (5.7 … 23.2) | ±13 | B | 0 | unbestückt; **Kupfer und Testpads erlaubt** (TP4 OSZ_OUT, TP5 PROBE_SENSE, GND). Pogo-Zugang nur vor dem Einschieben. Hinter B 0.2 mm Spiel (Zapfen) |
-| Z3 Schott | 30.3 … 32.7 (20.8 … 23.2) | ±13 | F+B | 0 | Schott-Verguss z 30.8 … 32.0: keine Bauteile, **keine Vias, kein Kupfer auf Aussenlagen**, Lötstopp geschlossen. Signale nur Innenlagen (S3-K1, M-03) |
-| Z4 Fach F | 7.5 … 30.3 (23.2 … 46.0) | ±13 (Schulter) | F | 4.1 | **Nur** Keystone 3034 (Clip x −7.0 … 9.1) und Minuspad. **Testpads nur im Streifen x −12.7 … −7.5, z 12 … 30** (TP1–TP3, nur Pads, ausserhalb des Ausschubwegs +x). Unter der Zelle nur Lötstopp ausser Minuspad (R2-W01). **Keine Vias** (S2-W03). Leitungen zu Kragen (SENS_PWR, SDA, SCL, GND) und Sonde nur Innenlagen, GND als schmale Bahn (Thermik U3, FLOORPLAN 2f). Schulter z 7.67 … 11.5 ohne Aussenkupfer |
+| Z3 Schott | 30.3 … 32.7 (20.8 … 23.2) | ±13 | F+B | 0 | Schott-Verguss z 30.8 … 32.0: keine Bauteile, **keine Vias, kein Kupfer auf Aussenlagen**, Lötstopp geschlossen. Signale nur Innenlagen, ≥ 1.0 mm zur Kante (S3-K1, M-03, K-3). **Ausnahme Rev C:** oberes Clip-Pad XBT1 bis z 30.60 (Y 22.90), Kap. 5 – Abstand zum Verguss nominal 0.20 (LS-W1 offen, Kap. 9) |
+| Z4 Fach F | 7.5 … 30.3 (23.2 … 46.0) | ±13 (Schulter) | F | 4.1 | **Nur** Keystone 3034 (Clipkörper **x −4.4 … 11.7** nach Datenblatt, Zelle x −7.0 … 13.0) und Minuspad 4 × 4. **Testpads nur TP1 (TX) und TP2 (RX)** im Streifen x −12.7 … −7.5, z 12 … 30 (nur Pads, ausserhalb des Ein-/Ausschubwegs +x). **TP3 entfällt** (Auflage A-1, Adapter-GND über das Minuspad). **Genau 4 Via-in-Pad, gefüllt und überkupfert (POFV):** VBAT-Clip-Pad, Minuspad, TP1, TP2; sonst keine Vias (S2-W03, L-1/A-1). Unter der Zelle nur Lötstopp ausser Minuspad (R2-W01). Leitungen zu Kragen und Sonde nur Innenlagen, ≥ 1.0 mm zur Kante (K-3). Schulter z 7.67 … 11.5 ohne Aussenkupfer |
 | Z4 Fach B | 7.5 … 30.3 | ±13 | B | 0 | Silkscreen Warnsymbol ≥ 7 × 9 mm + „CR2032 Verschluckgefahr“ (S3-W4, x −8…8, z 11…28). Keine Testpads (Fach wird geflutet, REQ-SAF-05) |
-| Z5B Kragen Bauteile | 4.2 … 7.5 (46.0 … 49.3) | ±10 | F | **0.7 im Feld**, sonst 0 | Im Kragen-Verguss. **Nur U3 TMP1075N + C24 im Feld x −9.4 … −4.6, z 4.4 … 6.8** (Tasche 1.2 tief, ≥ 0.5 mm Epoxid darüber). Vias nur in diesem Feld. Sonst keine Bauteile, keine Vias, kein Aussenkupfer. |x| ≥ 2.6 (Mutter). **Erst nach Freigabe Sicherheit (S3-K2)**; ohne Freigabe gilt Z5A-Regel für ganz Z5 und U3 kommt ins Band |
-| Z5A Kragen Dichtstreifen | 1.5 … 4.2 (49.3 … 52.0) | ±10 | F+B | 0 | **Sondendichtung** (S3-K2, REQ-MECH-08/15), Vergusskante z 2.0: keine Bauteile, keine Vias, kein Aussenkupfer, Lötstopp geschlossen. Innenlagen nur Sondennetze (S, Guard/G) und die 4 Netze zu U3 |
+| Z5B Kragen Bauteile | 4.2 … 7.5 (46.0 … 49.3) | ±10 | F | **0.7 im Feld**, sonst 0 | Im Kragen-Verguss, freigegeben unter K-1…K-7. **Nur U3 TMP1075N + C24 im Feld x −9.0 … −4.6, z 4.4 … 6.8** (Y 46.7 … 49.1; K-2, Rev B −9.4; Tasche 1.2 tief, ≥ 0.5 mm Epoxid darüber). Vias nur in diesem Feld, **tented oder gefüllt, ≥ 1.0 mm zur Platinenkante** (K-2). Sonst keine Bauteile, keine Vias, kein Aussenkupfer. Innenlagen ≥ 1.0 mm zur Kante (LS-K1). |x| ≥ 2.6 (Mutter). **Ausnahme Rev C:** unteres Clip-Pad XBT1 ab z 7.50 (Y 46.00) – das ist die Zonengrenze, also kein Eingriff (Rev-B-Footprint: 7.43) |
+| Z5A Kragen Dichtstreifen | 1.5 … 4.2 (49.3 … 52.0) | ±10 | F+B | 0 | **Sondendichtung** (S3-K2, REQ-MECH-08/15), Vergusskante z 2.0: keine Bauteile, keine Vias, kein Aussenkupfer, Lötstopp geschlossen. **Innenlagen nur GND/Guard und die Sondennetze** (K-1); SENS_PWR, SDA, SCL enden über z 4.4 |
 | Z6 frei | −5.0 … 1.5 (52.0 … 58.5) | ±10 | F+B | 0 | zwischen Erde und Kragen: **keine Elektroden**; Guard L2/L3 erlaubt (Feld Kap. 8), keine Vias. F: Logo, B: „max“ + „fluidi rev B“ |
 | Z7 Sonde | −105 … −5 (58.5 … 158.5) | ±10 | F+B | 0 | Elektroden nur L2/L3 (REQ-MECH-04), Aussenlagen ohne Kupfer, **Kupfer ≥ 1.25 mm zur Kontur inkl. Spitze** (Feld Kap. 8; REQ-MECH-06 ≥ 1.0), keine Vias (REQ-MECH-05). Elektrodenlage nach Feld Kap. 8 mit z_f = −z |
 
@@ -85,11 +93,11 @@ Antennenspeisung, UART R9–R12 links unten (kurzer Weg zum Testpad-Streifen).
 |---|---|---|---|---|---|
 | D1 | RGB 1615 TUOZHAN C7496855 | **(0, 43.9)** | (0, 9.6) | 0.6 | 0.4 mm über der Sichtfuge z 43.5, direkt hinter dem Tropfenfenster. Lichtschaft Ø 3.0 endet bei y = 4.0 → **d = 2.0 mm** (Ziel 1.5 … 2.5). Kein Lichtleiter nötig |
 | SW1 | XUNPU TS-1088-AR02016 C720477 | **(−6.0, 45.1)** | (−6.0, 8.4) | 2.0 | Footprint `SW_SPST_TS-1088-xR020` unrotiert: Pads 2 × (1.05 in x × 2.0 in z), Mittenabstand 4.45 in x. Betätiger Ø 1.8, Hub 0.2, 1.57 N (`XUNPU_TS-1088-AR02016_Datasheet_LCSC-2022-06.pdf` S.1). Betätigung senkrecht (+y) durch die Biegezunge der Kappe |
-| XBT1 | Keystone 3034TR C5213768 | Zelle **(3.0, 19.05)** | (3.0, 34.45) | 4.1 | 90° gedreht: Einschub in x, geschlossenes Ende −x, offenes Ende +x; **Clip x −7.0 … 9.1**, z 7.5 … 30.6; Zelle Ø 20 bündig mit der rechten Kante x = 13 |
-| U3, C24 | TMP1075NDRLR C3663690 + 100 nF | Feld x −9.2 … −4.8, z 4.6 … 6.6 | Y 46.9 … 48.9 | ≤ 0.7 | Kragen-Tasche (Z5B), Freigabe Sicherheit offen |
-| TP1–TP3 | Pads | Streifen x −12.7 … −7.5, z 12 … 30 | X −12.7 … −7.5, Y 23.5 … 41.5 | 0 | nur Pads |
+| XBT1 | Keystone 3034TR C5213768 | Zelle **(3.0, 19.05)** | (3.0, 34.45) | 4.1 | 90° gedreht: Einschub in x, **geschlossenes Ende −x** (Quersteg + Anschlaglappen), **offenes Ende +x** (Ein-/Ausschub). **Clipkörper x −4.4 … 11.7** (Katalog B 7.4 ab Zellmitte, L 16.1; KiCad-Footprint −4.44 … 11.9, 3D-Modell −4.76 … 11.65); Zelle Ø 20 x −7.0 … 13.0, bündig mit der rechten Kante. **Plus-Pads (VBAT): 2 × 5.08 (x) × 1.27 (z), x 0.46 … 5.54, Spanne W 23.1 = z 7.50 … 30.60 (Y 22.90 … 46.00), Padmitten Y 23.535 und 45.365** (Katalogminimum, Rev-B-Footprint 23.24: je 0.07 kürzen, LS-W1 a). Minuspad 4 × 4 in der Zellmitte |
+| U3, C24 | TMP1075NDRLR C3663690 + 100 nF | **Feld x −9.0 … −4.6, z 4.4 … 6.8** (K-2) | Y 46.7 … 49.1 | ≤ 0.7 | Kragen-Tasche (Z5B), freigegeben unter K-1…K-7. Layout Rev B: U3 (−6.69, 5.60), C24 (−8.45, 5.50), Pads innerhalb |
+| TP1, TP2 | Pads (Via-in-Pad) | Streifen x −12.7 … −7.5, z 12 … 30 | X −12.7 … −7.5, Y 23.5 … 41.5 | 0 | nur Pads; **TP3 entfällt** (A-1) |
 | TP4, TP5 | Pads | B-Seite im Band | | 0 | OSZ_OUT, PROBE_SENSE (D3) |
-| ANT | AN043 | z 47.8 … 53.5 | Y 0 … 5.7 | – | Lage in x durch Elektronik (Vorschlag Kap. 3) |
+| ANT | AN043 `…_Right` | Kupfer x −2.2 … 12.2, z 47.8 … 53.2 | Speisepunkt (0.35, 5.45) | – | Layout Rev B (L-5) |
 | Logo | Wortmarke v3a mono | F, x −9 … 3, z −4.4 … −0.8 | | Silk | 10 mm breit (Strich 0.52 mm), REQ-MECH-16 |
 | Rev | „fluidi rev B“ | B, z −4.4 … −0.8 | | Silk | REQ-MECH-16 |
 
@@ -97,13 +105,15 @@ Antennenspeisung, UART R9–R12 links unten (kurzer Weg zum Testpad-Streifen).
 
 | Teil | Lage | Abstand |
 |---|---|---|
-| Biegezunge (Kappe) | x −7.6 … −4.4, y 3.6 … 4.4, z 43.5 … 53.9 | 0.2 mm zu SW1 (Ruhe); Hebel 2.5 → 0.49 mm Weg am Betätiger, nötig 0.40 |
-| Stössel Ø 3 / Rohr Ø 4, Finger, Tastenblock | Achse (−2.2, 3.8), z 49.1 … 56 | Stössel **1.26 mm**, Kappenblock 0.54 mm zum Antennenkupfer (wie Rev A, Elektronik bestätigt Rev A) |
+| Biegezunge (Kappe) | x −7.6 … −4.4, y 3.6 … 4.4, z 43.5 … 53.9 | 0.2 mm zu SW1 (Ruhe, KiCad-Modell 2.0; mit H 2.1 max. 0.1); Betätiger Ø 1.8 liegt 0.7 mm innerhalb der Zunge (x und unten); Hebel 2.5 → 0.49 mm Weg am Betätiger, nötig 0.40 |
+| **Platinenanschlag + Gabel (Kappe, Rev C)** | x −8.0 … −3.0; Anschlagfläche z 53.5; Gabel z 52.0 … 53.5, y 5.75 … 6.55 (vor F) und 8.35 … 9.15 (hinter B) | Platinenoberkante liegt an (beim Schott-Verguss kopfüber durch das Eigengewicht). 0.8 mm neben dem Antennenkupfer (x −2.2) |
+| Stössel Ø 3 / Rohr Ø 4, Finger, Tastenblock | Achse (−2.2, 3.8), z 49.1 … 56 | zum echten Antennenkupfer (STEP): Stössel **1.26 mm**, Kappe 0.76 mm, Membran 1.00, Klemmring 1.50, Taste 2.00 |
 | Fenster-Lichtschaft Ø 3.0 | x 0, z 42.4 … 45.4, bis y 4.0 | 3.5 mm zum Antennenkupfer |
 | Zapfen innen | x ± 13.2, y 4.4 … 8.4 (z 32 … 44.9) | 0.2 mm zur Bauteilhülle 2.0 und zur B-Seite |
 | Schott-Durchführung | x ± 13.2, y 4.4 … 8.4 | danach mit Schottkeil + Epoxid verschlossen |
 | Mutter / Schraube M2 (Metall) | Achse x 0, **y 4.2**, z −1.3 … 4.0 | 43.9 mm zur Antenne, 0.4 mm vor F (vergossen) |
-| Zelle / Clip (Metall) | | 18.8 / 17.2 mm zur Antenne |
+| Zelle / Clip (Metall) | | 18.85 / 17.13 mm zur Antenne (STEP) |
+| Clip ↔ Kragen / Schottkeil / Verguss | Clip-Pads z 7.43 … 30.67 (Rev-B-Footprint) | **0.13 mm** je Seite (Rev C mit W 23.1: 0.20); Zelle 1.75 mm |
 
 ## 7 Dichtungen, Sichtschale und Verguss
 
@@ -121,7 +131,7 @@ Antennenspeisung, UART R9–R12 links unten (kurzer Weg zum Testpad-Streifen).
   Tasche für U3 + C24 vor F (x −9.6 … −4.4, 1.2 tief, z 2.0 … 6.8, **unten offen**: der Verguss erfolgt kopfüber
   von der Hohlkehle aus, die Tasche entlüftet nach oben). Vergussvolumen Kragen 62 mm³ (Rev A 43).
   Epoxid mineralisch gefüllt, Tg ≥ 80 °C (**ANNAHME** Typ, FLOORPLAN 2f).
-- Montage: Kappe + Fenster + Stössel → Platine von unten einschieben → Schottkeil + Epoxid (Kappe kopfüber)
+- Montage: Kappe + Fenster + Stössel → Platine von unten **bis zum Anschlag** einschieben (Rev C) → Schottkeil + Epoxid (Kappe kopfüber)
   → Kragen mit 2 Distanzlehren 23.5 mm auf der B-Seite gegen das Schott setzen, Mutter von vorne einschieben,
   vergiessen (Kapton-Punkt auf die Mutter) → Lehren entfernen.
 
@@ -146,17 +156,26 @@ Bauteile laut Schaltplan Rev B (`hardware/sensor/out/fluidi_sensor_bom_jlc.csv`,
 | L1 WPN201610H | 1.0 | INDEX L1 (2.0 × 1.6 × 1.0) | Z2, 2.0 |
 | D1 1615 | 0.6 | Elektronikbericht 1.1 | Z2, Lichtschaft 2.0 davor |
 | U3 SOT-563 / C24 0402 | 0.6 / 0.55 | FLOORPLAN_OPTIONS 2f | Z5B, 0.7 |
-| C1–C4 1206 100 µF, U1 VQFN, Y1/Y2, SC-70, SOT-23, 0402 | ≤ 2.0 | **ANNAHME** (Gehäusenorm, im Layout mit 3D-Modell prüfen) | Z2, 2.0 |
+| U1 CC2340R5 RGE0024B | 1.0 max | `TI_CC2340R5_Datasheet_SWRS272F.pdf` S. 77 („1 MAX“; STEP-Ersatzmodell 0.8) | Z2, 2.0 |
+| U3 TMP1075N DRL0006A | 0.6 max | `TI_TMP1075_Datasheet_SBOS854F.pdf` S. 36 („0.6 MAX“; KiCad-Modell 0.63) | Z5B, 0.7 |
+| D1 1615 (nachgeprüft) | 0.6 ± 0.1 | `TUOZHAN_…_Datasheet_A0.pdf` S. 4 (1.6 × 1.5 ± 0.1) | Z2 |
+| SW1 (Toleranz) | 2.0 ± 0.1 | XUNPU S. 1, Allgemeintoleranz 0.5…2: ± 0.10 → Zungenspalt 0.1 … 0.3 | Z2, 2.0 |
+| C1–C4 1206 100 µF, Y1/Y2, SC-70, SOT-23, 0402 | KiCad-Modelle 1.6 / 0.64, 0.93 / 1.1 / 1.2 / ≤ 0.5 | **ANNAHME** Modell = Datenblatt (Datenblätter C1–C4 nicht lokal) | Z2, 2.0 |
 
 Hinweis Kosten: `COSTS_REV_B.md` rechnet mit 26 × 160 mm; die Kontur Rev B ist 26 × 158.5 mm (Sonde 20 mm), die Annahme
 liegt also auf der sicheren Seite.
 
 ## 9 Offene Punkte
 
-1. **Sicherheit:** Freigabe Z5B (Bauteile im Kragen-Verguss, S3-K2). Ohne Freigabe: U3 zurück ins Band (+4.8 mm²
-   Courtyard, Faktor effektiv 1.51 ≥ 1.5), Z5 ganz nach Z5A-Regel.
-2. **Elektronik:** Lage der Antenne in x, Kunststoff vor der Antenne bestätigen; S11/RSSI im Gehäuse (**PROTOTYP-PRÜFUNG**).
-3. **Elektronik:** SW1-Footprint unrotiert (Pads in x) bestätigen.
+1. **Projektleitung (LS-W1):** Clip-Pad zu den Vergusskanten ≥ 0.3 mm inkl. Toleranz geht im Fach 23.5 nicht
+   (W 23.1 → 0.20 je Seite nominal, ± 0.22 Lage). Nötig 23.1 + 2 × 0.3 + 0.22 + 0.25 = 24.17 mm. **Vorschlag V-K:** Hülsenboden 2.0 → 1.3, Kragen samt
+   Tasche, Mutter, O-Ring-Nut und Feld 0.7 mm tiefer (Kragen z 1.3 … 6.6), Zelle/Clip 0.35 mm tiefer (Zellmitte z 18.70,
+   Y 34.80; Pads z 7.15 … 30.25, Y 23.25 … 46.35) → je Seite 0.55 nominal, ≥ 0.30 (RSS) bzw. ≥ 0.15 (worst); die Pads liegen
+   dann ausserhalb Z3 und Z5B (keine Ausnahme mehr). Folgen: Z5A/Z5B/Z6 und Feld U3/C24 0.7 mm tiefer (Layout),
+   FEM Hülsenboden 1.3, Feld: Vergusskante z 1.3. Details
+   `docs/reviews/phase4_kollision_mechanik.md`. Bis zum Entscheid gilt Rev C.
+2. **Elektronik:** Kunststoff vor der Antenne (Kappe 0.76, Membran 1.0, Stössel 1.26 mm) bestätigen; S11/RSSI im Gehäuse (**PROTOTYP-PRÜFUNG**).
+3. **Elektronik:** Footprint 3034 auf Pad-Spanne 23.1 (Kap. 5), TP3 streichen (A-1).
 4. **Mechanik:** Abfluss an der Sichtfuge und Kragen-Verguss mit Tasche am Muster prüfen (REQ-MECH-13, **PROTOTYP-PRÜFUNG**);
    dünnste Zapfenwand 0.54 mm hinter den hinteren Nutecken (FDM: 2 Linien 0.42 mit Überlappung, Passprobe oben drucken).
 
@@ -172,4 +191,5 @@ liegt also auf der sicheren Seite.
 | Rev | Datum | Änderung |
 |---|---|---|
 | A | 2026-11-07 | Erstausgabe: Kopf 28 × 13 × 48, Platine 20 × 149, Band 5.6 mm (passte nicht, Kap. 7 Rev A) |
-| **B** | 2026-11-07 | Kopf V4 34 × 13 × 57.5 (D-019): Platine Kopf 26 / Sonde 20 (Schulter 45°, Innenecke R 2), Länge 158.5, Oberkante z 53.5 (KiCad-Ursprung verschoben!); Band z 32.7 … 47.8 (15.1 mm), Antenne z 47.8 … 53.5; F-Fläche y 7.4 → 6.6; D1 (0, 37.4) → (0, 43.9); SW1 TS-1187A → TS-1088 bei (−6, 45.1); Clip x −10 … 6.1 → −7 … 9.1, Testpads links; Z5 geteilt (Z5A Dichtstreifen, Z5B U3-Feld); Kupfer Sonde ≥ 1.25; B-Seite Band: Pads erlaubt; O-Ring AS568-017 → -019; Sichtschale mit Ablauf. Unverändert: Sonde 20 × 1.6, Spitze, Stecktiefe z −5, Kragen z 2.0 … 7.3, Fach z 7.5 … 30.6, Schott z 30.8 … 32.0 |
+| B | 2026-11-07 | Kopf V4 34 × 13 × 57.5 (D-019): Platine Kopf 26 / Sonde 20 (Schulter 45°, Innenecke R 2), Länge 158.5, Oberkante z 53.5 (KiCad-Ursprung verschoben!); Band z 32.7 … 47.8 (15.1 mm), Antenne z 47.8 … 53.5; F-Fläche y 7.4 → 6.6; D1 (0, 37.4) → (0, 43.9); SW1 TS-1187A → TS-1088 bei (−6, 45.1); Clip x −10 … 6.1 → −7 … 9.1, Testpads links; Z5 geteilt (Z5A Dichtstreifen, Z5B U3-Feld); Kupfer Sonde ≥ 1.25; B-Seite Band: Pads erlaubt; O-Ring AS568-017 → -019; Sichtschale mit Ablauf. Unverändert: Sonde 20 × 1.6, Spitze, Stecktiefe z −5, Kragen z 2.0 … 7.3, Fach z 7.5 … 30.6, Schott z 30.8 … 32.0 |
+| **C** | 2026-11-08 | **Kontur unverändert.** Clip 3034 nach Datenblatt x −4.4 … 11.7 (Rev B −7 … 9.1 falsch, LS-W3/L-2), Plus-Pads Spanne 23.1 (z 7.50 … 30.60), Ausnahmen Z3/Z5B für die Clip-Pads; Antenne `…_Right` an Layout-Lage (L-5); Feld Z5B x −9.0 … −4.6, Vias tented ≥ 1.0 zur Kante (K-2, L-4); Z5A Innenlagen nur GND/Guard + Sonde (K-1); K-3; TP3 entfällt, 4 VIP im Fach (A-1); Platinenanschlag + Gabel in der Kappe (Lage z definiert); STEP-Koordinatenbezug (Kap. 1); Bauteilhöhen nach Datenblatt (Kap. 8). Nachweis `mechanical/sensor/collision_pcb_step.txt` |

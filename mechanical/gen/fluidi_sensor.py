@@ -12,7 +12,9 @@ Konstruktion A1 (Kern + Huelse, M2 von unten) nach docs/reviews/phase3_sleeve_me
   - Platine einseitig bestueckt (F zum Fenster), Clip 3034 gedreht (S-01), Mutter M2 vor der F-Seite im Kragen
   - Taste oben: Silikonmembran (Dichtung) -> Stoessel -> 30-Grad-Keil -> Biegezunge der Kappe -> TS-1187A
   - Tropfenfenster transluzent mit Lichtschaft (d = 2.0 mm zur LED), Klebefuge >= 1 mm ueber der O-Ring-Nut
-Alle Masse: mechanical/gen/fluidi_params.py (Schnittstelle docs/interfaces/PCB_OUTLINE.md, Rev A).
+Alle Masse: mechanical/gen/fluidi_params.py (Schnittstelle docs/interfaces/PCB_OUTLINE.md, Rev C).
+Rev C: Anschlag + Gabel fuer die Platinenoberkante in der Kappe (Lage in z), Clip 3034 nach Datenblatt (B 7.4),
+Antenne an der Layout-Lage. Pruefung mit dem KiCad-STEP: fluidi_pcb_collision.py -> collision_pcb_step.txt.
 
 Lauf:  freecadcmd mechanical/gen/fluidi_sensor.py
 Ausgabe: mechanical/sensor/fluidi_sensor.FCStd, fluidi_sensor_assembly.step, print/<Teil>.{step,stl,3mf},
@@ -59,8 +61,9 @@ def build():
     out = FP.outline()
     pcb = prism_xz(out, PCB['Y_F'], PCB['Y_B'])
     S['PCB'] = pcb
-    # Antennenkupfer (F, Lage nach Elektronik; hier mittig 15.2 breit)
-    S['Antenne_AN043'] = box(-FP.ANT['W'] / 2, FP.ANT['W'] / 2, PCB['Y_F'] - 0.035, PCB['Y_F'], Z['ANT0'], Z['ANT1'])
+    # Antennenkupfer (F, Lage laut Layout Rev B: Texas_SWRA117D_2.4GHz_Right, x -2.2 ... 12.2)
+    A_ = FP.ANT
+    S['Antenne_AN043'] = box(A_['X0'], A_['X1'], PCB['Y_F'] - 0.035, PCB['Y_F'], A_['Z0'], A_['Z1'])
     # Bauteil-Huelle Elektronikband F: <= 2.0 mm, unter der Biegezunge <= 1.5 mm (Schnittstelle Z2_BAND_F)
     T = FP.TONGUE
     yb = PCB['Y_F']
@@ -77,7 +80,7 @@ def build():
     # Clip + Zelle (F-Seite, gedreht: geschlossenes Ende -x, Ausschub +x)
     c = FP.CLIP
     cell = cyl_y(FP.CELL['D'] / 2, yb - 0.1 - FP.CELL['T'], yb - 0.1, FP.CELL['XC'], Z['CELL_C'])
-    clip = box(c['X0'], c['X1'], yb - c['H'], yb, Z['CLIP0'], Z['CLIP1']).cut(cell)
+    clip = box(c['X0'], c['X1'], yb - c['H'], yb, Z['CLIP0'], Z['CLIP1']).cut(cell)   # Huelle nach Datenblatt (L, W, H, B)
     S['CR2032'] = cell
     S['Keystone3034'] = clip
 
@@ -157,7 +160,13 @@ def build():
     blk = blk.fuse(box(-8.0, 0.8, CAP['CAV_OFF'], PCB['Y_B'] + 0.6, BTN['BLOCK_Z0'] + 0.3, H['H'] - H['CEIL'] + 0.01))  # 0.7 ueber Oberkante
     blk = blk.fuse(cyl(BTN['TUBE_OD'] / 2, BTN['TUBE_Z0'], BTN['BLOCK_Z0'] + 0.01, ax, ay))
     tg = box(FP.TONGUE['X0'], FP.TONGUE['X1'], FP.TONGUE['Y0'], FP.TONGUE['Y1'], FP.TONGUE['Z_TIP'], BTN['BLOCK_Z0'] + 0.01)
-    cap = cap.fuse(blk).fuse(tg).removeSplitter()
+    # Rev C: Anschlag + Gabel fuer die Platinenoberkante (links der Antenne), definiert die Lage der Platine in z und y
+    ps = FP.PSTOP
+    yf0, yb1 = PCB['Y_F'] - ps['CLR_F'], PCB['Y_B'] + ps['CLR_B']
+    stop = box(ps['X0'], ps['X1'], yf0 - ps['T'], yb1 + ps['T'], PCB['Z_TOP'], BTN['BLOCK_Z0'] + 0.31)
+    stop = stop.fuse(box(ps['X0'], ps['X1'], yf0 - ps['T'], yf0, PCB['Z_TOP'] - ps['FORK'], PCB['Z_TOP'] + 0.01))
+    stop = stop.fuse(box(ps['X0'], ps['X1'], yb1, yb1 + ps['T'], PCB['Z_TOP'] - ps['FORK'], PCB['Z_TOP'] + 0.01))
+    cap = cap.fuse(blk).fuse(tg).fuse(stop).removeSplitter()
     # Tastentasche (sichtbar 9.8 x 6.8), Senkung fuer Membran + Klemmring, Bohrung Stoessel
     btn_poly = [(x + BTN['X'], y + BTN['Y']) for x, y in plan(BTN['W'], BTN['D'], BTN['CH'], BTN['CH'], 0.0)]
     btn_poly = [(x, y - BTN['D'] / 2) for x, y in btn_poly]
@@ -310,6 +319,18 @@ def checks(S, sl_plain):
         if hitp: break
     log('5 Platine (mit Bauteilhuelle) 60 mm von unten durch das Schott einschieben: %s'
         % ('frei' if not hitp else 'Kollision %d mm vor Endlage: %s/%s' % hitp))
+    # 5b Lage der Platine in z: freier Weg nach oben bis zum ersten Anschlag in der Kappe
+    up = None
+    for i in range(0, 41):
+        dz = 0.05 * i + 0.01
+        m = S['PCB'].copy(); m.translate(V(0, 0, dz))
+        if m.common(S['Kappe_blau']).Volume > 1e-3:
+            up = dz; break
+    log('5b Platine in Endlage: freier Weg nach oben bis Anschlag %s (Rev B: 0.70 bis Tastenblock)'
+        % ('%.2f mm' % (up - 0.01) if up is not None else '> 2 mm, KEIN ANSCHLAG'))
+    pz0, pz1 = Z['CELL_C'] - FP.CLIP['W'] / 2, Z['CELL_C'] + FP.CLIP['W'] / 2
+    log('   Clip-Pads (Spanne W %.2f): z %.2f ... %.2f -> Luft zum Kragen-Verguss (z %.2f) %.2f mm, zum Schott-Verguss (z %.2f) %.2f mm; '
+        'Lagetoleranz Platine +-%.2f' % (FP.CLIP['W'], pz0, pz1, Z['COL1'], pz0 - Z['COL1'], Z['BULK0'], Z['BULK0'] - pz1, PCB['TOL_Z']))
     # 6 Abstaende
     d_led = PCB['Y_F'] - FP.LED['H'] - FP.DROP['BOSS_Y1']
     log('6 LED-Oberseite bis Fenster-Lichtschaft: %.2f mm (Ziel 1.5-2.5)' % d_led)
@@ -392,7 +413,7 @@ def placeholder_collision(S):
         ('U3 TMP1075N + C24 im Kragen', 'Huelle 4.4 x 2.0 x 0.7 (SOT-563 0.6, 0402 0.55 laut FLOORPLAN 2f)', 'U3_TMP_Kragen'),
         ('AN043-Antenne', 'INDEX ANT-AN043: 15.2 x 5.7, Kupfer', 'Antenne_AN043')]
     lines = ['Kollisionspruefung mit vereinfachtem PCB-Modell, fluidi Sensor (Schnittstelle Rev %s), erzeugt von fluidi_sensor.py' % FP.REV,
-             'Modell: Kontur Rev B + Bauteilhuellen je Zone + feste Bauteile. Pruefung mit KiCad-STEP folgt nach dem Layout.', '']
+             'Modell: Kontur (Rev B = Rev C) + Bauteilhuellen je Zone + feste Bauteile. Pruefung mit dem KiCad-STEP: collision_pcb_step.txt (fluidi_pcb_collision.py).', '']
     housing = ['Kappe_blau', 'Huelse_grau', 'Kragen', 'Verguss_Kragen', 'Stoessel', 'Fenster_transluzent', 'Schottkeil', 'Mutter_M2',
                'Schraube_M2x4', 'ORing_Kragen', 'ORing_Zapfen', 'Taste_blau', 'Klemmring', 'Membran_Silikon', 'Tastenteller']
     for name, src, key in rows:
@@ -457,4 +478,5 @@ def main():
     print('gespeichert:', fc)
 
 
-main()
+if not os.environ.get('FLUIDI_NO_MAIN'):        # fluidi_pcb_collision.py importiert build() ohne Neuerzeugung
+    main()

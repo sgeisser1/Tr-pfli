@@ -21,8 +21,8 @@ import json
 import math
 import os
 
-REV = 'B'
-REV_DATE = '2026-11-07'
+REV = 'C'
+REV_DATE = '2026-11-08'
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 
 # ----------------------------------------------------------------------------- Kopf aussen (D-019, V4)
@@ -42,7 +42,7 @@ PCB = dict(T=1.6, Y_F=6.6,                         # F.Cu (bestueckt) bei y = 6.
            Z_SH0=8.5, Z_SH1=11.5, R_SH=2.0,        # Schulter 45 Grad: 20 -> 26 mm, Innenecke R 2.0 (FEM LC1b)
            Z_TOP=53.5, Z_TIP=-105.0, TIP_FLAT=5.0, # Spitze 45 Grad: flach 5.0 mm breit
            T_COAT_MAX=2.0, W_COAT_MAX=20.4,        # Sonde inkl. Beschichtung max. (ANNAHME, REQ-MECH-07)
-           TOL_Z=0.2,                              # Lage der Platine im Kern nach Verguss (Lehre), +-
+           TOL_Z=0.2,                              # Lage der Platine im Kern, +- (Rev C: Anschlag; JLC Kontur +-0.2 + FDM)
            EDGE_CLR=0.3,                           # Courtyard-Rand zur Kontur im Kopf (ANNAHME wie FLOORPLAN_OPTIONS)
            CU_EDGE_PROBE=1.25)                     # Kupfer zur Kontur in der Sonde (simulation/field/REPORT.md Kap. 8)
 PCB['Y_B'] = PCB['Y_F'] + PCB['T']
@@ -91,18 +91,26 @@ DRAIN = dict(XC=(-10.0, -4.0, 4.0, 10.0), W=3.0, H=1.2)    # Unterkante = Z['STE
 
 # ----------------------------------------------------------------------------- Bauteile auf der Platine
 CELL = dict(D=20.0, T=3.2)                         # CR2032 Nennmass (Panasonic_CR2032_Datasheet_2026-02.pdf S.1)
-CLIP = dict(L=16.1, W=23.1, H=4.1, A=21.2,         # Keystone_3034_Catalog_M65.pdf S.1 Zeile 3034
-            X0=-7.0, X1=-7.0 + 16.1)               # geschlossenes Ende -x, offenes Ende +x (Ausschub +x)
-CELL['XC'] = CLIP['X0'] + CELL['D'] / 2            # Zellmitte x = 3.0 (Zelle schliesst buendig mit x = 13)
+CELL['XC'] = PCB['W_HEAD'] / 2 - CELL['D'] / 2     # Zellmitte x = 3.0 (Zelle schliesst buendig mit x = 13)
+# Keystone_3034_Catalog_M65.pdf S.1 Zeile 3034: L 16.1, W 23.1 (Clipfuesse aussen), H 4.1, B 7.4.
+# Rev C: B ist ab Zellmitte bis zum geraden Quersteg (geschlossenes Ende) bemasst - bestaetigt durch KiCad-Footprint
+# (Quersteg 7.39 ab Zellmitte) und KiCad-3D-Modell (Anschlaglappen x -4.76 ... -1.6, collision_pcb_step.txt Kap. E).
+# Rev B hatte den Clip faelschlich buendig mit dem Zellrand angenommen (x -7.0 ... 9.1).
+CLIP = dict(L=16.1, W=23.1, H=4.1, A=21.2, B=7.4,
+            PAD_D=1.27)                            # Pad-Tiefe >= .050 (1.27), Pad Layout Fig. 1
+CLIP['X0'] = CELL['XC'] - CLIP['B']                # -4.4: geschlossenes Ende (Anschlag) -x
+CLIP['X1'] = round(CLIP['X0'] + CLIP['L'], 3)      # 11.7: offenes Ende +x (Ein-/Ausschub +x)
 LED = dict(X=0.0, Z=HEAD['Z_FUGE'] + 0.4, LX=1.6, LZ=1.5, H=0.6,   # TUOZHAN 1615 (Elektronikbericht 1.1)
            D_TARGET=(1.5, 2.5))                    # Elektronikbericht 1.9
 SW = dict(PART='XUNPU TS-1088-AR02016 (C720477)', X=-6.0, Z=45.1, BODY_X=3.9, BODY_Z=3.0, H=2.0,
           PAD_CC=4.45, PAD_OUT=5.50, PAD_W=1.05, PAD_L=2.0,          # XUNPU_TS-1088-AR02016_Datasheet S.1
           ACT_D=1.8, TRAVEL=0.2, FORCE_N=1.57)                       # Hub 0.2 +-0.1, 160 gf
-ANT = dict(W=15.2, H=5.7)                          # AN043 (INDEX.csv ANT-AN043)
-TMP = dict(PART='TI TMP1075NDRLR SOT-563 (C3663690) + C24 100 nF 0402', X0=-9.2, X1=-4.8, Z0=4.6, Z1=6.6, H=0.7)
+ANT = dict(W=15.2, H=5.7,                          # AN043 (INDEX.csv ANT-AN043)
+           FP='RF_Antenna:Texas_SWRA117D_2.4GHz_Right',   # Einspeisung links, offenes Ende rechts (Layout Rev B, L-5)
+           X0=-2.2, X1=12.2, Z0=47.8, Z1=53.2, FEED_X=0.35)   # Kupfer laut Layout Rev B (Speisepunkt X 0.35)
+TMP = dict(PART='TI TMP1075NDRLR SOT-563 (C3663690) + C24 100 nF 0402', X0=-9.0, X1=-4.6, Z0=4.6, Z1=6.6, H=0.7)   # Huelle im Feld K-2 (x -9.0...-4.6, z 4.4...6.8)
 KPOCKET = dict(X0=-9.6, X1=-4.4, DEPTH=1.2, Z0=Z['COL0'], Z1=Z['KCOMP1'])   # Tasche im Kragen vor F, unten offen
-TPSTRIP = dict(X0=-PCB['W_HEAD'] / 2 + PCB['EDGE_CLR'], X1=CLIP['X0'] - 0.5, Z0=12.0, Z1=30.0)
+TPSTRIP = dict(X0=-PCB['W_HEAD'] / 2 + PCB['EDGE_CLR'], X1=CELL['XC'] - CELL['D'] / 2 - 0.5, Z0=12.0, Z1=30.0)
 
 # ----------------------------------------------------------------------------- Fenster, Taste, Mechanik
 DROP = dict(R=2.5, K=2.4, ZC=LED['Z'], X=0.0, T=1.6,   # Tropfen wie Logo/Render (r 2.5, Spitze 6.0 ueber Mitte)
@@ -113,6 +121,10 @@ BTN = dict(X=0.0, Y=5.5, W=9.0, D=6.0, CH=1.0, PROUD=0.6, STROKE=0.6, POCKET_GAP
            AX_X=-2.2, AX_Y=PCB['Y_F'] - 2.8,       # Achse Hals/Membran/Stoessel
            NECK_D=3.0, CB_D=6.4, MEMB_T=0.5, RING_ID=3.4, SKIRT_ID=5.6, WASHER_D=5.0, WASHER_T=0.4,
            STEM_D=3.0, BORE_D=3.2, TUBE_OD=4.0, TUBE_Z0=42.0 + _dz, BLOCK_Z0=PCB['Z_TOP'] + 0.4)
+# Rev C: Anschlag + Gabel fuer die Platinenoberkante in der Kappe (links neben der Antenne, x -8.0 ... -3.0).
+# Die Platine liegt beim Schott-Verguss (Kappe kopfueber) durch ihr Gewicht am Anschlag -> Lage in z definiert
+# (Rev B: 0.4/0.7 mm Luft zum Tastenblock, Lage 0 ... +0.7 unbestimmt). Gabel fuehrt die Oberkante in y.
+PSTOP = dict(X0=-8.0, X1=-3.0, FORK=1.5, T=0.8, CLR_F=0.05, CLR_B=0.15)
 _ty1 = PCB['Y_F'] - SW['H'] - 0.2                  # Zunge 0.2 vor dem Betaetiger
 TONGUE = dict(X0=-7.6, X1=-4.4, Y0=_ty1 - 0.8, Y1=_ty1, Z_TIP=SW['Z'] - 1.6,   # Biegezunge (Kappe)
               COL_X0=-7.8, COL_X1=-4.2, WEDGE_GAP=0.15, Z_CONTACT=40.0 + _dz)
@@ -132,10 +144,11 @@ def zones():
     w2, h2, w2p = PCB['W_HEAD'] / 2, PCB['W_HEAD'] / 2, PCB['W'] / 2
     return [
         dict(id='Z1_ANTENNE', side='FB', x=(-h2, h2), z=(Z['ANT0'], Z['ANT1']), hmax=0.0,
-             rule='AN043-IFA 15.2 x 5.7 (Footprint Texas_SWRA117D_2.4GHz_Left) an der Oberkante; Lage in x durch '
-                  'Elektronik, offenes Ende (Arm mit hoechstem E-Feld) rechts, nicht hinter Stoessel (x -4.2...-0.2) oder '
-                  'Zunge (x -7.6...-4.4). Ganze Zone ohne Bauteile, neben und ueber der Antenne kein Kupfer (AN043). '
-                  'Kein Metall des Gehaeuses.'),
+             rule='AN043-IFA 15.2 x 5.7, Footprint RF_Antenna:Texas_SWRA117D_2.4GHz_Right (Einspeisung links, offenes Ende '
+                  'rechts; Rev B nannte faelschlich _Left, L-5). Lage Layout Rev B: Speisepunkt X 0.35, Kupfer x -2.2...12.2, '
+                  'z 47.8...53.2, Keepout alle Lagen x -2.7...12.5. Ganze Zone ohne Bauteile, neben und ueber der Antenne kein '
+                  'Kupfer (AN043). Kein Metall des Gehaeuses. Platinenanschlag der Kappe x -8.0...-3.0 (Kunststoff, 0.8 mm '
+                  'neben dem Antennenkupfer), dort Kupfer F/B erlaubt (ausserhalb Keepout).'),
         dict(id='Z2_BAND_F', side='F', x=(-h2, h2), z=(Z['BAND0'], Z['BAND1']), hmax=2.0,
              rule='Elektronikband 26 x 15.1 = 392.6 mm2 (Bedarf 382.3 mm2 = 254.9 Courtyard x 1.5, Kap. 4). Bauteilhoehe <= 2.0 mm ueberall '
                   '(Einschieben von unten durch das Schott; Zunge 0.2 vor SW1). Courtyards >= 0.3 mm zur Kontur. '
@@ -145,23 +158,28 @@ def zones():
                   'Zugang nur vor dem Einschieben (Pogo). Freiraum hinter B: 0.2 mm (Zapfen), 3.2 mm (Kappe, z > 44.9).'),
         dict(id='Z3_SCHOTT', side='FB', x=(-h2, h2), z=(Z['BULK0'] - 0.5, Z['BAND0']), hmax=0.0,
              rule='Schott-Verguss z 30.8...32.0: keine Bauteile, keine Vias, kein Kupfer auf Aussenlagen, Loetstopplack '
-                  'geschlossen. Signale nur Innenlagen (M-03, S3-K1).'),
+                  'geschlossen. Signale nur Innenlagen (M-03, S3-K1). Ausnahme Rev C: Clip-Pads XBT1 bis z 30.60 '
+                  '(Pad-Spanne 23.1, Kap. 5); Abstand Pad - Verguss nominal 0.20 (LS-W1: >= 0.3 inkl. Toleranz erst mit '
+                  'Fachverlaengerung, Entscheid offen).'),
         dict(id='Z4_FACH_F', side='F', x=(-h2, h2), z=(Z['COL1'] + 0.2, Z['BULK0'] - 0.5), hmax=4.1,
-             rule='Zellfach: nur Keystone 3034 (gedreht, Ausschub +x, Clip x -7.0...9.1) und Minuspad; UART-/Testpads '
-                  'nur im Streifen x -12.7...-7.5, z 12...30 (ausserhalb des Ausschubwegs). Unter der Zelle nur '
-                  'Loetstopplack ausser Minuspad (R2-W01 Nr. 2). Keine Vias im Fach (S2-W03). Leitungen zum Kragen '
-                  '(SENS_PWR, SDA, SCL, GND) und zur Sonde nur Innenlagen; GND als schmale Bahn (Thermik U3). '
-                  '2 x 100 kOhm im Elektronikraum (R2-A3). Schulter z 7.7...11.5 (45 Grad, Innenecke R 2) ohne Kupfer aussen.'),
+             rule='Zellfach: nur Keystone 3034 (gedreht, geschlossenes Ende -x, Ein-/Ausschub +x; Clipkoerper x -4.4...11.7 '
+                  'nach Datenblatt B 7.4/L 16.1; Zelle x -7.0...13.0) und Minuspad 4 x 4; Testpads nur TP1 (TX), TP2 (RX) im '
+                  'Streifen x -12.7...-7.5, z 12...30 (TP3 entfaellt, Auflage A-1; Adapter-GND ueber das Minuspad). Genau 4 '
+                  'Via-in-Pad, gefuellt und ueberkupfert (POFV): VBAT-Clip-Pad, Minuspad, TP1, TP2; sonst keine Vias. Unter '
+                  'der Zelle nur Loetstopplack ausser Minuspad (R2-W01 Nr. 2). Leitungen nur Innenlagen, >= 1.0 zur Kante '
+                  '(K-3). 2 x 100 kOhm im Elektronikraum (R2-A3). Schulter z 7.7...11.5 (45 Grad, Innenecke R 2) ohne Kupfer aussen.'),
         dict(id='Z4_FACH_B', side='B', x=(-h2, h2), z=(Z['COL1'] + 0.2, Z['BULK0'] - 0.5), hmax=0.0,
              rule='Silkscreen Warnsymbol Dreieck >= 7 x 9 mm + "CR2032 Verschluckgefahr" (S3-W4, zweiter Ort). '
                   'Keine Testpads (Fach wird geflutet, REQ-SAF-05).'),
         dict(id='Z5B_KRAGEN_BAUTEILE', side='FB', x=(-w2p, w2p), z=(Z['SEAL1'], Z['COL1'] + 0.2), hmax=0.0,
-             rule='Im Kragen-Verguss. F: nur U3 TMP1075N + C24 im Feld x -9.4...-4.6, z 4.4...6.8, Hoehe <= 0.7 '
-                  '(Tasche 1.2 tief, >= 0.5 mm Epoxid darueber); Vias nur in diesem Feld. Sonst keine Bauteile, keine '
-                  'Vias, kein Aussenkupfer. B: frei. Abstand zur Mutter |x| >= 2.6. ERST NACH FREIGABE SICHERHEIT (S3-K2).'),
+             rule='Im Kragen-Verguss (Z5B freigegeben unter K-1...K-7). F: nur U3 TMP1075N + C24 im Feld x -9.0...-4.6, '
+                  'z 4.4...6.8 (K-2), Hoehe <= 0.7 (Tasche 1.2 tief, >= 0.5 mm Epoxid darueber); Vias nur in diesem Feld, '
+                  'tented oder gefuellt, >= 1.0 mm zur Platinenkante (K-2). Sonst keine Bauteile, keine Vias, kein '
+                  'Aussenkupfer. Ausnahme Rev C: Clip-Pads XBT1 ab z 7.50. B: frei. Abstand zur Mutter |x| >= 2.6.'),
         dict(id='Z5A_KRAGEN_DICHTSTREIFEN', side='FB', x=(-w2p, w2p), z=(Z['COL0'] - 0.5, Z['SEAL1']), hmax=0.0,
              rule='Sondendichtung (S3-K2, REQ-MECH-08/15), Vergusskante z 2.0: keine Bauteile, keine Vias, kein Kupfer '
-                  'auf Aussenlagen, Loetstopp geschlossen. Innenlagen nur Sondennetze (S, Guard/G) und die 4 Netze zu U3.'),
+                  'auf Aussenlagen, Loetstopp geschlossen. Innenlagen nur GND/Guard und die Sondennetze (K-1); SENS_PWR, '
+                  'SDA, SCL enden ueber z 4.4.'),
         dict(id='Z6_FREI', side='FB', x=(-w2p, w2p), z=(-HEAD['GAP_SOIL'], Z['COL0'] - 0.5), hmax=0.0,
              rule='Zwischen Erde und Kragen: keine Elektroden (Luftanteil), Guard auf L2/L3 erlaubt (Feld Kap. 8), '
                   'keine Vias (Feld: z 0...2 und nasser Bereich). Silkscreen Logo (F) und "max"/Revision (B).'),
@@ -210,16 +228,23 @@ def interface_dict(area=None):
     d = dict(
         title='fluidi Sensor P3 - Schnittstelle PCB-Kontur <-> Gehaeuse',
         revision=REV, date=REV_DATE,
-        revision_note='Rev B ersetzt Rev A: Kopf V4 34 x 13 x 57.5 (D-019), Platine im Kopf 26 mm, Oberkante z 53.5, '
-                      'Band 15.1 mm, Platine 0.8 mm nach vorn (y_F 6.6), LED an der Fuge z 43.9, SW1 TS-1088 bei z 45.1, '
-                      'Clip x -7...9.1, U3 im Kragen (Option f), O-Ring AS568-019, Kupfer Sonde >= 1.25 mm.',
-        status='verbindlich fuer Layout Phase 4b Welle 2 (Aenderung nur ueber neue Revision); Z5B erst nach Freigabe Sicherheit',
+        revision_note='Rev C ersetzt Rev B, Kontur unveraendert: Clip 3034 nach Datenblatt x -4.4...11.7 (Rev B -7...9.1 falsch), '
+                      'Clip-Pad-Spanne 23.1 (z 7.50...30.60), Antenne Footprint _Right an Layout-Lage, Feld Z5B x -9.0...-4.6 '
+                      '(K-2), Z5A Innenlagen nur GND/Guard + Sonde (K-1), K-3, TP3 entfaellt und 4 VIP im Fach (A-1), '
+                      'Platinenanschlag in der Kappe (Lage z), STEP-Koordinatenbezug. Rev B: Kopf V4 (D-019).',
+        status='verbindlich fuer Layout Rev C (Aenderung nur ueber neue Revision). Offen: LS-W1 (Pad - Verguss >= 0.3 inkl. '
+               'Toleranz) braucht Fachverlaengerung, Entscheid Projektleitung (docs/reviews/phase4_kollision_mechanik.md)',
         generator='mechanical/gen/fluidi_params.py', doc='docs/interfaces/PCB_OUTLINE.md',
         units='mm',
         coordinate_systems=dict(
             head='x Breite (+ rechts von vorne), y Tiefe (0 = Front, + hinten), z Hoehe (0 = Kopfunterkante)',
             kicad='X = x, Y = %.1f - z (Ursprung Mitte Oberkante, Y nach unten), Top-View = Ansicht von vorne, '
                   'F.Cu = bestueckte Seite zeigt zum Fenster (-y)' % PCB['Z_TOP'],
+            kicad_page='Hilfsursprung (aux_axis_origin) = Mitte Oberkante, in fluidi_sensor.kicad_pcb bei Seite (150, 30): '
+                       'x = X_p - 150, z = %.1f - (Y_p - 30)' % PCB['Z_TOP'],
+            kicad_step='kicad-cli pcb export step ohne Ursprungsoption: X_s = X_p, Y_s = -Y_p, Z_s = Hoehe ueber B. '
+                       'Kopf: x = X_s - 150, y = %.1f - Z_s, z = %.1f + Y_s (Drehung +90 Grad um x, Verschiebung '
+                       '(-150, %.1f, %.1f)); fluidi_pcb_collision.py' % (PCB['Y_B'], PCB['Z_TOP'] + 30, PCB['Y_B'], PCB['Z_TOP'] + 30),
             field='simulation/field/REPORT.md: z_f = -z (0 an der Kopfunterkante, + zur Spitze); Vergusskante liegt bei '
                   'z = 2.0 (z_f = -2.0), d. h. 2 mm hoeher als dort angenommen (konservativ fuer Luftanteil)'),
         head=dict(W=HEAD['W'], D=HEAD['D'], H=HEAD['H'], z_fuge=HEAD['Z_FUGE'], cap_h=HEAD['H'] - HEAD['Z_FUGE'],
@@ -255,20 +280,37 @@ def interface_dict(area=None):
                                 SW['ACT_D'], SW['TRAVEL'], SW['FORCE_N']),
                             actuation='Taste oben -> Silikonmembran -> Stoessel -> 30-Grad-Keil -> Biegezunge der Kappe '
                                       '(Hebel 2.5) -> senkrecht (+y) auf den Betaetiger'),
-            XBT1_CLIP=dict(part='Keystone 3034TR (C5213768)', side='F', rotation='90 Grad: Einschub in x, offenes Ende +x',
+            XBT1_CLIP=dict(part='Keystone 3034TR (C5213768)', side='F', rotation='90 Grad: Einschub in x, geschlossenes Ende -x, offenes Ende +x',
                            cell_center_xz=(CELL['XC'], Z['CELL_C']), kicad_XY=to_kicad(CELL['XC'], Z['CELL_C']),
                            clip_x=(CLIP['X0'], CLIP['X1']), clip_z=(Z['CLIP0'], Z['CLIP1']), height=CLIP['H'],
-                           note='Minuspad innerhalb der Minuskappe (R2-W01 Nr. 1); Zelle Ø20 schliesst buendig mit der '
-                                'rechten Platinenkante x = 13 ab; Ausschub +x frei bei abgezogener Huelse, in der Huelse '
-                                '2.4 mm bis zur Wand (Clip haelt)'),
+                           cell_x=(CELL['XC'] - CELL['D'] / 2, CELL['XC'] + CELL['D'] / 2),
+                           pads_plus=dict(span_z=CLIP['W'], z=(Z['CELL_C'] - CLIP['W'] / 2, Z['CELL_C'] + CLIP['W'] / 2),
+                                          kicad_Y=(to_kicad(0, Z['CELL_C'] + CLIP['W'] / 2)[1], to_kicad(0, Z['CELL_C'] - CLIP['W'] / 2)[1]),
+                                          size_xz=(5.08, CLIP['PAD_D']), x=(round(CELL['XC'] - 2.54, 3), round(CELL['XC'] + 2.54, 3)),
+                                          kicad_pad_centers_Y=(round(to_kicad(0, Z['CELL_C'])[1] - (CLIP['W'] - CLIP['PAD_D']) / 2, 3),
+                                                               round(to_kicad(0, Z['CELL_C'])[1] + (CLIP['W'] - CLIP['PAD_D']) / 2, 3)),
+                                          note='Katalogminimum W 23.1 (Keystone_3034_Catalog_M65.pdf S.1 Fig. 1 Pad Layout); '
+                                               'KiCad-Bibliothek 23.24 -> je Seite 0.07 kuerzen (LS-W1 a)'),
+                           pad_minus='4 x 4 in der Zellmitte, Via-in-Pad gefuellt',
+                           note='B 7.4 ab Zellmitte bis Quersteg (geschlossenes Ende -x, Anschlaglappen x -4.8...-1.6 laut '
+                                'KiCad-3D-Modell). Zelle Ø20 buendig mit der rechten Platinenkante x = 13; Ein-/Ausschub +x, '
+                                'der Weg fuehrt nicht ueber TP1/TP2 (x <= -7.5). In der Huelse 2.4 mm bis zur Wand (Clip haelt).'),
+            PCB_STOP=dict(x=(PSTOP['X0'], PSTOP['X1']), z_stop=PCB['Z_TOP'], fork_depth=PSTOP['FORK'],
+                          fork_y=(round(PCB['Y_F'] - PSTOP['CLR_F'], 2), round(PCB['Y_B'] + PSTOP['CLR_B'], 2)),
+                          note='Kappe: Anschlag fuer die Platinenoberkante (Lage in z beim Schott-Verguss kopfueber) und '
+                               'Gabel (y). Platine dort ohne Bauteile (Z1), Kupfer erlaubt ausserhalb des Antennen-Keepouts.'),
             U3_TMP_KRAGEN=dict(part=TMP['PART'], side='F', x=(TMP['X0'], TMP['X1']), z=(TMP['Z0'], TMP['Z1']),
                                height_max=TMP['H'], kicad_Y=(to_kicad(0, TMP['Z1'])[1], to_kicad(0, TMP['Z0'])[1]),
+                               field_K2=dict(x=(-9.0, -4.6), z=(4.4, 6.8), kicad_Y=(46.7, 49.1),
+                                             vias='tented oder gefuellt, >= 1.0 mm zur Kante'),
                                pocket=dict(x=(KPOCKET['X0'], KPOCKET['X1']), y=(round(PCB['Y_F'] - KPOCKET['DEPTH'], 2), PCB['Y_F']),
                                            z=(KPOCKET['Z0'], KPOCKET['Z1']), note='unten offen (Verguss kopfueber, entlueftet)'),
-                               note='Option (f), FLOORPLAN_OPTIONS.md Kap. 2f; Freigabe Sicherheit (S3-K2) offen'),
+                               note='Option (f), FLOORPLAN_OPTIONS.md Kap. 2f; Feld K-2; freigegeben unter K-1...K-7'),
             TESTPAD_STRIP_FACH=dict(side='F', x=(TPSTRIP['X0'], TPSTRIP['X1']), z=(TPSTRIP['Z0'], TPSTRIP['Z1']),
-                                    note='UART TX/RX, GND, VBAT-Messpunkt als Pads (keine Bauteile), ausserhalb des Ausschubwegs'),
-            ANTENNA=dict(part='AN043 IFA', zone='Z1_ANTENNE', z=(Z['ANT0'], Z['ANT1'])),
+                                    note='nur TP1 (TX), TP2 (RX) als Pads mit Via-in-Pad (gefuellt); TP3 entfaellt (A-1)'),
+            ANTENNA=dict(part='AN043 IFA', footprint=ANT['FP'], zone='Z1_ANTENNE', z=(Z['ANT0'], Z['ANT1']),
+                         copper_x=(ANT['X0'], ANT['X1']), copper_z=(ANT['Z0'], ANT['Z1']), feed_x=ANT['FEED_X'],
+                         keepout_x=(-2.7, 12.5)),
             SCREW_NUT=dict(screw='ISO 7045 M2x4 A2 PH1 (unverlierbar, Gewindefurch-Lippe Ø1.7 im Huelsenboden)',
                            nut='ISO 4032 M2 A2 SW4 x 1.6, im Kragen eingegossen',
                            axis_xy=(SCREW['X'], SCREW['Y']), nut_z=(Z['COL_NUT0'], Z['COL_NUT1']),
@@ -286,9 +328,11 @@ def interface_dict(area=None):
                           '(vorn) -> %.1f (hinten), 4 Schlitze %.0f x %.1f in der Huelsenrueckwand.' % (
                               HEAD['Z_FUGE'], Z['STEP_FRONT'], Z['STEP_BACK'], DRAIN['W'], DRAIN['H'])),
         height_limits_summary=dict(F_band=2.0, F_kragen_feld=TMP['H'], F_fach='nur 3034 (4.1)', B='0 (unbestueckt, Pads erlaubt im Band)'),
-        open_points=['Sicherheit: Freigabe Z5B (Bauteile im Kragen-Verguss, S3-K2)',
-                     'Elektronik: Lage der Antenne in x (offenes Ende rechts), Kunststoff vor der Antenne (Stoessel 1.3 mm, '
-                     'Zunge 2.2 mm) bestaetigen; S11/RSSI im Gehaeuse (PROTOTYP-PRUEFUNG)',
+        open_points=['Projektleitung: LS-W1 - Abstand Clip-Pad zu den Vergusskanten >= 0.3 inkl. Toleranz verlangt eine '
+                     'Fachverlaengerung um 0.7 mm (Vorschlag V-K: Huelsenboden 2.0 -> 1.3, Kragen und Kragenfeld 0.7 tiefer, Zelle 0.35 tiefer); '
+                     'ohne Entscheid gilt Rev C mit 0.20 nominal',
+                     'Elektronik: Kunststoff vor der Antenne (Stoessel, Kappe, Anschlag) bestaetigen; S11/RSSI im Gehaeuse '
+                     '(PROTOTYP-PRUEFUNG)',
                      'Elektronik: Blockplan Kap. 4 ist ein Machbarkeitsnachweis (Faktor 1.5 ANNAHME), Layout darf umordnen, '
                      'D1/SW1/Zonen nicht',
                      'Mechanik: Verguss Kragen mit Tasche (Volumen, Entlueftung) am Muster pruefen (PROTOTYP-PRUEFUNG)'])
@@ -337,6 +381,10 @@ def main(area=None, plan_polys=()):
     polys.append(('Comp_Cell', [to_kicad(CELL['XC'] + 10 * math.cos(2 * math.pi * i / n),
                                          Z['CELL_C'] + 10 * math.sin(2 * math.pi * i / n)) for i in range(n)], True))
     polys.append(('Comp_U3_Kragen', rect_k(TMP['X0'], TMP['X1'], TMP['Z0'], TMP['Z1']), True))
+    for zp in (Z['CELL_C'] - CLIP['W'] / 2, Z['CELL_C'] + CLIP['W'] / 2 - CLIP['PAD_D']):   # Rev C: Clip-Pads, Spanne W 23.1
+        polys.append(('Comp_XBT1_pads', rect_k(CELL['XC'] - 2.54, CELL['XC'] + 2.54, zp, zp + CLIP['PAD_D']), True))
+    polys.append(('Mech_Anschlag_Platine', rect_k(PSTOP['X0'], PSTOP['X1'], PCB['Z_TOP'] - PSTOP['FORK'], PCB['Z_TOP']), True))
+    polys.append(('Zone_Z5B_Feld_K2', rect_k(-9.0, -4.6, 4.4, 6.8), True))
     polys.append(('Mech_Kragentasche', rect_k(KPOCKET['X0'], KPOCKET['X1'], KPOCKET['Z0'], KPOCKET['Z1']), True))
     polys.append(('Pads_Fachstreifen', rect_k(TPSTRIP['X0'], TPSTRIP['X1'], TPSTRIP['Z0'], TPSTRIP['Z1']), True))
     polys.append(('Mech_Lichtschaft', [to_kicad(DROP['X'] + 1.5 * math.cos(2 * math.pi * i / 24),

@@ -1,5 +1,5 @@
 Logo: Massstab 0.5021 mm/u -> Strich 1.00 mm (2.0 u)
-=== fluidi Sensor P3, Schnittstelle Rev B (2026-11-07) ===
+=== fluidi Sensor P3, Schnittstelle Rev C (2026-11-08) ===
 1 Kollisionen montiert (Ruhe):
   -> keine
 2 Taste gedrueckt (Hub 0.6): Ueberdeckungen keine
@@ -9,15 +9,17 @@ Logo: Massstab 0.5021 mm/u -> Strich 1.00 mm (2.0 u)
 4 Zelle seitlich 25 mm (+x) herausschieben (ohne Huelse): frei
    Zelle in montierter Huelse: Weg bis Seitenwand 2.40 mm (Clip haelt Zelle, Ausschub begrenzt)
 5 Platine (mit Bauteilhuelle) 60 mm von unten durch das Schott einschieben: frei
+5b Platine in Endlage: freier Weg nach oben bis Anschlag 0.00 mm (Rev B: 0.70 bis Tastenblock)
+   Clip-Pads (Spanne W 23.10): z 7.50 ... 30.60 -> Luft zum Kragen-Verguss (z 7.30) 0.20 mm, zum Schott-Verguss (z 30.80) 0.20 mm; Lagetoleranz Platine +-0.20
 6 LED-Oberseite bis Fenster-Lichtschaft: 2.00 mm (Ziel 1.5-2.5)
    Klebefuge Fenster (Tropfen-Unterkante z 41.40) bis O-Ring-Nut oben z 33.70: 7.70 mm (>= 1.0); Lichtschaft-Unterkante 8.70 mm
-   U3 (Kragen) - Kragen-ASA: 0.20 mm, Epoxid ueber U3: 0.50 mm (>= 0.5), U3 - Mutter: 3.09 mm
+   U3 (Kragen) - Kragen-ASA: 0.20 mm, Epoxid ueber U3: 0.50 mm (>= 0.5), U3 - Mutter: 2.92 mm
    Abstand Mutter_M2      - Antenne: 43.9 mm
    Abstand Schraube_M2x4  - Antenne: 43.8 mm
    Abstand CR2032         - Antenne: 18.8 mm
    Abstand Keystone3034   - Antenne: 17.2 mm
    Abstand Kunststoff Stoessel             - Antennenkupfer: 1.26 mm
-   Abstand Kunststoff Kappe_blau           - Antennenkupfer: 0.54 mm
+   Abstand Kunststoff Kappe_blau           - Antennenkupfer: 0.76 mm
    Abstand Kunststoff Fenster_transluzent  - Antennenkupfer: 3.51 mm
    Abstand Mutter - Platine F: 0.40 mm; Mutter - O-Ring Kragen: 0.65 mm (Kragenwerkstoff dazwischen)
 7 O-Ring AS568-019: Nutgrundumfang 65.25 -> Dehnung 2.1 %
@@ -41,7 +43,7 @@ Logo: Massstab 0.5021 mm/u -> Strich 1.00 mm (2.0 u)
 10 Tropfen: Mitte z 43.9 (Fuge 43.5), Kerbe in der Sichtschale z 41.1 ... Rand 44.7; Fenster-Unterkante bis Stufe vorn 5.2 mm
 8 Volumen / Masse (ASA 1.07, FR4 1.85, Epoxid 1.15, Stahl 7.9, Silikon 1.2 g/cm3; ANNAHME Dichten):
    U3_TMP_Kragen        Epoxid       6.2 mm3   0.01 g
-   Kappe_blau           ASA       4123.0 mm3   4.41 g
+   Kappe_blau           ASA       4146.2 mm3   4.44 g
    Huelse_grau          ASA       6968.6 mm3   7.46 g
    Kragen               ASA        974.5 mm3   1.04 g
    Fenster_transluzent  ASA         56.3 mm3   0.06 g
@@ -59,8 +61,8 @@ Logo: Massstab 0.5021 mm/u -> Strich 1.00 mm (2.0 u)
    ORing_Zapfen         Silikon    178.2 mm3   0.21 g
    Membran_Silikon      Silikon     15.9 mm3   0.02 g
    + CR2032 2.9 g (ANNAHME), Clip 0.6 g, Bestueckung 0.5 g -> Sensor gesamt ca. 28.1 g
-Kollisionspruefung mit vereinfachtem PCB-Modell, fluidi Sensor (Schnittstelle Rev B), erzeugt von fluidi_sensor.py
-Modell: Kontur Rev B + Bauteilhuellen je Zone + feste Bauteile. Pruefung mit KiCad-STEP folgt nach dem Layout.
+Kollisionspruefung mit vereinfachtem PCB-Modell, fluidi Sensor (Schnittstelle Rev C), erzeugt von fluidi_sensor.py
+Modell: Kontur (Rev B = Rev C) + Bauteilhuellen je Zone + feste Bauteile. Pruefung mit dem KiCad-STEP: collision_pcb_step.txt (fluidi_pcb_collision.py).
 
 XBT1 Keystone 3034 (gedreht)                                           | Keystone_3034_Catalog_M65.pdf S.1: H 4.1, W 23.1, L 16.1
     Kollision: keine | kleinster Abstand 0.20 mm zu Schottkeil, 0.20 mm zu Verguss_Kragen
@@ -75,4 +77,4 @@ Band F (CC2340 QFN 4x4, Quarze, L, C 1206, SC70, SOT-23, 0402)         | Huelle 
 U3 TMP1075N + C24 im Kragen                                            | Huelle 4.4 x 2.0 x 0.7 (SOT-563 0.6, 0402 0.55 laut FLOORPLAN 2f)
     Kollision: keine | kleinster Abstand 0.20 mm zu Kragen, 2.60 mm zu Huelse_grau
 AN043-Antenne                                                          | INDEX ANT-AN043: 15.2 x 5.7, Kupfer
-    Kollision: keine | kleinster Abstand 0.54 mm zu Kappe_blau, 0.70 mm zu Membran_Silikon
+    Kollision: keine | kleinster Abstand 0.76 mm zu Kappe_blau, 1.00 mm zu Membran_Silikon
