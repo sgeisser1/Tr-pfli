@@ -55,7 +55,7 @@ in CLIENT_INPUT #7 („alle 30–60 s erreichbar“) sollte aber nicht als Vorga
 | PWA vom Gateway, HTTPS praktikabel | APP-02 | ok |
 | LED + Taster, Blinkmuster, Tastenfunktionen, LED-Energie | UI-01..06 | ok |
 | **Design**: schlicht/modern, mehrere Designvorschläge zur Freigabe, Tropfenform, Logo/Wortmarke für Gehäuse, Silkscreen, PWA | MECH-16 (nur Name/Logo) | **fehlt weitgehend** (F-12) |
-| Namen `troepfli` in Technik, „Tröpfli“ sichtbar | SYS-08, APP-01 | teilweise (Hostname, Dateien nicht als REQ) – klein, in CLAUDE.md geregelt |
+| Namen `fluidi` in Technik, „fluidi“ sichtbar | SYS-08, APP-01 | teilweise (Hostname, Dateien nicht als REQ) – klein, in CLAUDE.md geregelt |
 | 3D-Druck Bambu, alle Materialien | MECH-12, RB-07 | ok |
 | Bestückung komplett JLC, Rest separat und minimal | FAB-01/03 | ok |
 | TA1: Sonde Teil des PCB, kein freiliegendes Metall | MES-01, MECH-03 | ok |
@@ -233,7 +233,7 @@ in CLIENT_INPUT #7 („alle 30–60 s erreichbar“) sollte aber nicht als Vorga
 - *Vorschlag:* Neue REQ-DES-01 bis 03:
   - „≥ 3 Designvorschläge als fotorealistische Renderings, Auswahl und Freigabe durch den
     Auftraggeber.“
-  - „Wortmarke/Logo ‚Tröpfli‘ in Varianten für Gehäuse (ein- bzw. mehrfarbig mit AMS),
+  - „Wortmarke/Logo ‚fluidi‘ in Varianten für Gehäuse (ein- bzw. mehrfarbig mit AMS),
     Silkscreen und PWA-Icon.“
   - „Formsprache schlicht, Tropfenmotiv optional.“
 

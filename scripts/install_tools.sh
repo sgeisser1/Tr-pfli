@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Tröpfli – Vorschlag für fehlende Werkzeuge (Phase 0). NUR nach Freigabe ausführen.
+# fluidi – Vorschlag für fehlende Werkzeuge (Phase 0). NUR nach Freigabe ausführen.
 # Ausführung durch den Auftraggeber in WSL (sudo braucht Passwort):  bash scripts/install_tools.sh
 set -euo pipefail
 

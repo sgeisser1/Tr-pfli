@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Troepfli - Energiebudget je Konzept (Phase 2, docs/concepts/CONCEPTS.md).
+"""fluidi - Energiebudget je Konzept (Phase 2, docs/concepts/CONCEPTS.md).
 
 Aufruf:  .venv/bin/python scripts/concept_energy.py
 
@@ -178,6 +178,6 @@ def part2():
 
 
 if __name__ == "__main__":
-    print("# Troepfli Energiebudget je Konzept - Ausgabe scripts/concept_energy.py\n")
+    print("# fluidi Energiebudget je Konzept - Ausgabe scripts/concept_energy.py\n")
     part1()
     part2()

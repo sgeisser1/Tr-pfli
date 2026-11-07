@@ -1,7 +1,7 @@
 # Prüfbericht Phase 3 – Designvorschläge, Sicht Mechanik
 
 Prüfer: Mechanik-Konstrukteur, Stand 2026-11-07, Kurzprüfung (Abschätzung, kein CAD).
-Geprüft: `docs/design/DESIGN_PROPOSALS.md` v0.1, `renders/phase3/*.png`, `renders/gen/troepfli_lib.py`
+Geprüft: `docs/design/DESIGN_PROPOSALS.md` v0.1, `renders/phase3/*.png`, `renders/gen/fluidi_lib.py`
 (Profile `head_p1…p4`, `battery_lid`, `GAP_SOIL`), gegen REQ-MECH-01/02/08/10/12/13/15/17, REQ-UI-05/06,
 REQ-SAF-CC-04, REQ-SAF-05, RB-03 und CONCEPTS Kap. 2.9/2A (A-32).
 

@@ -1,5 +1,8 @@
 # Projektauftrag (Original des Auftraggebers, 2026-11-06, wörtlich übernommen)
 
+> **Hinweis 2026-11-07:** Das Produkt heisst neu **fluidi** (D-008). Der Text unten bleibt als
+> Original unverändert und verwendet noch den alten Namen „Tröpfli“.
+>
 > Dieses Dokument ist die unveränderte Vorgabe. Ergänzungen und Antworten stehen in
 > `CLIENT_INPUT.md`, die daraus abgeleitete Spezifikation in `REQUIREMENTS.md`.
 

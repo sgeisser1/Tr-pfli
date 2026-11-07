@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Troepfli - Kostenvergleich der Konzepte (Phase 2, docs/concepts/CONCEPTS.md v0.2).
+"""fluidi - Kostenvergleich der Konzepte (Phase 2, docs/concepts/CONCEPTS.md v0.2).
 
 Aufruf:  .venv/bin/python scripts/concept_costs.py            (alle Konzepte, Markdown-Tabellen)
          .venv/bin/python scripts/concept_costs.py --detail   (zusaetzlich Einzelberichte cost_model)
@@ -231,7 +231,7 @@ def main():
     if "--csv" in sys.argv:
         write_csv(os.path.join(HERE, "..", "docs", "concepts", "bom"))
         return
-    print("# Troepfli Konzeptkosten - Ausgabe scripts/concept_costs.py (Kostendefinition D-005)\n")
+    print("# fluidi Konzeptkosten - Ausgabe scripts/concept_costs.py (Kostendefinition D-005)\n")
     print(f"USD->CHF {cm.USD_TO_CHF:.4f}; PCB fix/Grenzkosten D-005; Versand GSDL bis 65 USD Warenwert, sonst DHL; "
           f"1.6 mm, PCBA auto; Roentgen ein; Pre-reflow aus (W-2, siehe Abschnitt 4); "
           f"JLC-Teiledaten Abruf {JLC['_abruf']}.\n")

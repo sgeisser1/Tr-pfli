@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Troepfli - Kostenmodell Sensor-PCB/PCBA bei JLCPCB inkl. Versand und Import Schweiz.
+"""fluidi - Kostenmodell Sensor-PCB/PCBA bei JLCPCB inkl. Versand und Import Schweiz.
 
 Aufruf:  .venv/bin/python scripts/cost_model.py            (Beispiel-BOM, alle Szenarien)
          .venv/bin/python scripts/cost_model.py --bom datei.csv --layers 4 --thickness 1.6 \
@@ -482,7 +482,7 @@ def main(argv=None) -> int:
     p.add_argument("--epoxy-vias", action="store_true")
     a = p.parse_args(argv)
 
-    print(f"Troepfli Kostenmodell | USD->CHF {USD_TO_CHF:.4f} ({FX_DATE}), Kartenaufschlag "
+    print(f"fluidi Kostenmodell | USD->CHF {USD_TO_CHF:.4f} ({FX_DATE}), Kartenaufschlag "
           f"{FX_CARD_MARKUP:.1%} [ANNAHME] | MWST CH {CH_VAT:.1%}")
     print("PCB-Preise und Versand: JLC-Rechner/JLC-Seite, vom Auftraggeber abgelesen 2026-11-06 (2.0 mm/2 L, ENIG 2 L = ANNAHME).")
     bom = load_bom(a.bom) if a.bom else EXAMPLE_BOM

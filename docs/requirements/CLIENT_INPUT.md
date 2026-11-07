@@ -1,11 +1,11 @@
-# Tröpfli – Vorgaben des Auftraggebers (Antworten Phase 0, 2026-11-06)
+# fluidi – Vorgaben des Auftraggebers (Antworten Phase 0, 2026-11-06)
 
 Ergänzt die ursprüngliche Projektbeschreibung. Gilt als Grundlage für Phase 1.
 
 | # | Thema | Antwort | Folgen für die Entwicklung |
 |---|---|---|---|
 | 1 | Tools | `scripts/install_tools.sh` wird vom Auftraggeber ausgeführt | Toolcheck danach wiederholen |
-| 2 | Repository | Name `Tr-pfli` bleibt; sichtbarer Produktname und Logo: **Tröpfli**. Commit/Push frei | Remote auf SSH umgestellt |
+| 2 | Repository | Name `Tr-pfli` bleibt; sichtbarer Produktname und Logo: **fluidi**. Commit/Push frei | Remote auf SSH umgestellt |
 | 3 | Einsatzort | Vorerst nur Büro, **ein grosser Raum ca. 10 × 15 m** | Max. Distanz Gateway–Sensor ≈ 18 m (Diagonale), Sichtverbindung wahrscheinlich, Personen/Möbel dämpfen. Ein Gateway sollte reichen (in Phase 2 belegen). |
 | 4 | Gateway | Heute kein Dauerläufer vorhanden. **Raspberry Pi nur, wenn nötig.** MQTT optional | Gateway-Varianten in Phase 2 offen vergleichen, inkl. kleiner Mikrocontroller-Lösung mit USB-Netzteil. |
 | 5 | Netz | **Firmen-WLAN, nicht sehr gut**; Bluetooth evtl. besser | Kein WLAN im Sensor. Gateway-Anbindung ans Firmennetz (Geräteisolation, Zertifikate auf Firmenhandys) ist ein Hauptrisiko → in Phase 2 Alternativen prüfen. |

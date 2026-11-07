@@ -1,4 +1,4 @@
-# Tröpfli – Phase 2: Red-Team-Prüfung der technischen Konzepte
+# fluidi – Phase 2: Red-Team-Prüfung der technischen Konzepte
 
 | | |
 |---|---|

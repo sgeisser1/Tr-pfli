@@ -1,4 +1,4 @@
-# Tröpfli
+# fluidi
 
 Kapazitiver Pflanzen-Feuchtesensor mit lokalem Gateway und PWA. Strikt lokal, keine Cloud.
 

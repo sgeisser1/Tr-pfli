@@ -3,7 +3,7 @@
 Zusammenfassung von HTML-Seiten (keine PDF-Version verfügbar). Jede Angabe mit URL und
 Abrufdatum. Kennzeichnung: **[JLC]** offizielle JLC-Seite, **[OFFIZIELL]** Behörde/Kurier,
 **[DRITTQUELLE]** nur Orientierung, **ANNAHME** unbelegt.
-Auswertung für Tröpfli: `docs/concepts/research_fertigung.md`. Kostenmodell: `scripts/cost_model.py`.
+Auswertung für fluidi: `docs/concepts/research_fertigung.md`. Kostenmodell: `scripts/cost_model.py`.
 
 PDF-Ablage: JLC bietet die Capability- und Preisseiten nur als HTML an; es gibt kein PDF zum
 Ablegen. Der JLC-Online-Preisrechner (`cart.jlcpcb.com/quote`) und der Versandrechner

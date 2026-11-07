@@ -1,11 +1,11 @@
-# Tröpfli – Phase 3: Designvorschläge Sensorkopf, Gateway, Logo
+# fluidi – Phase 3: Designvorschläge Sensorkopf, Gateway, Logo
 
 Stand 2026-11-07, Version 0.1 (Industriedesign), zur Auswahl durch den Auftraggeber.
 Grundlage: D-006 (Konzept A-32), D-007 (Designvorgabe „schöne harte Formen, schlichte schöne einfache
 Logos, aber auch etwas verspielt“), `docs/requirements/REQUIREMENTS.md` v1.0, `docs/concepts/CONCEPTS.md` v0.3.
 
 Alle Renderings: Blender 4.0.2, Cycles CPU **ohne Denoiser**, 256 Samples (adaptiv), Szene vollständig per
-Skript (`renders/gen/troepfli_lib.py`, `renders/gen/render_phase3.py`), Massstab 1:1 in Metern, Geometrie
+Skript (`renders/gen/fluidi_lib.py`, `renders/gen/render_phase3.py`), Massstab 1:1 in Metern, Geometrie
 mm-genau. Neu erzeugen:
 
 ```
@@ -65,7 +65,7 @@ Tropfen, der von innen glüht, und die Taste sitzt wie ein Deckel auf der gekapp
 | Dichtung | ~ flache Oberseite um die Taste – Stösseldichtung nötig, Oberseite 2–3° nach vorn neigen (Abfluss) |
 | Antenne | ✔ nach Verbreiterung (oben 19 mm); Seitenwände schräg → gleichmässig ≥ 2 mm Wand halten |
 | LED-Sicht | ✔ von vorn/schräg oben |
-| Wirkung | ✔✔ trägt den Namen „Tröpfli“, hart und freundlich zugleich |
+| Wirkung | ✔✔ trägt den Namen „fluidi“, hart und freundlich zugleich |
 
 ## 2 Vorschlag P2 „Keil“ – Prisma mit Giebelschräge
 
@@ -131,7 +131,7 @@ gerade aus dem Band tropfen.
 ![P4 Rückseite mit Batteriedeckel](../../renders/phase3/p4_gipfel_rueck.png)
 
 **Idee:** Ein schweizerischer Berg mit asymmetrischem Gipfel und Schulter. Die Schneekappe ist der
-Lichtleiter: wenn Tröpfli Durst meldet, glüht der Gipfel – „Alpenglühen“. Die Taste liegt auf der flachen Schulter.
+Lichtleiter: wenn fluidi Durst meldet, glüht der Gipfel – „Alpenglühen“. Die Taste liegt auf der flachen Schulter.
 
 | | |
 |---|---|
@@ -251,7 +251,7 @@ Gestaltungselemente lassen sich kombinieren (z. B. P1 mit dem farbigen „Wasser
 
 | Datei | Inhalt |
 |---|---|
-| `renders/gen/troepfli_lib.py` | Geometrie aller Köpfe, Sonde, Deckel, Gateways, Umgebung (Topf, Erde, Pflanze), Materialien |
+| `renders/gen/fluidi_lib.py` | Geometrie aller Köpfe, Sonde, Deckel, Gateways, Umgebung (Topf, Erde, Pflanze), Materialien |
 | `renders/gen/render_phase3.py` | Szenen und Kameras je Vorschlag, Familie, Gateway |
 | `renders/gen/batch_render.py` | Stapel-Rendering ohne Oberfläche |
 | `renders/gen/logo_preview.py` | SVG-Importtest und Logo-Vorschauen |

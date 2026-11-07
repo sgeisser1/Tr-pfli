@@ -1,15 +1,15 @@
-"""Tröpfli Phase 3 – Renderings aller Designvorschläge (Blender 4.0.2, Cycles CPU, ohne Denoiser).
+"""fluidi Phase 3 – Renderings aller Designvorschläge (Blender 4.0.2, Cycles CPU, ohne Denoiser).
 
 In Blender ausführen (MCP oder Texteditor):
     exec(open('/home/sgeisser/git/Tr-pfli/renders/gen/render_phase3.py').read())
     build_design('p1'); render_design('p1')        # je Vorschlag 3 Bilder + .blend
     build_family(); render_family()                 # Familienbild 2400 x 1200 + .blend
     build_gateway(); render_gateway()               # Gateway-Varianten
-Alle Geometrie in troepfli_lib.py (mm-genau, Meter-Einheiten).
+Alle Geometrie in fluidi_lib.py (mm-genau, Meter-Einheiten).
 """
 import bpy, math, os
 from mathutils import Vector
-exec(open('/home/sgeisser/git/Tr-pfli/renders/gen/troepfli_lib.py').read())
+exec(open('/home/sgeisser/git/Tr-pfli/renders/gen/fluidi_lib.py').read())
 
 NAMES = {'p1': 'facette', 'p2': 'keil', 'p3': 'stele', 'p4': 'gipfel'}
 SOIL = 115.0  # mm, Erdoberfläche im Topf
@@ -46,7 +46,7 @@ def new_scene(name):
 
 
 def build_design(key, samples=384):
-    sc = new_scene('Troepfli_' + key)
+    sc = new_scene('fluidi_' + key)
     env = env_mats()
     room(env)
     pot(env, (0, 0), soil_z=SOIL)
@@ -177,7 +177,7 @@ def trough(env, x0, x1, y0, y1, h=125.0, wall=8.0, soil_z=SOIL):
 def build_family(samples=256):
     """Alle 4 Vorschläge im gleichen Massstab auf einem Präsentationsständer (Eiche, Schlitze 40 mm tief),
     Sonden sichtbar; Gateway G1 daneben; Topf mit Pflanze im Hintergrund."""
-    sc = new_scene('Troepfli_Familie')
+    sc = new_scene('fluidi_Familie')
     env = env_mats()
     room(env)
     stand = box('Staender', -195, 195, -25, 25, 0, 40, env['wood'], bevel=1.0)
@@ -209,7 +209,7 @@ def render_family():
 
 # ----------------------------------------------------------------------------- Gateway
 def build_gateway(samples=256):
-    sc = new_scene('Troepfli_Gateway')
+    sc = new_scene('fluidi_Gateway')
     env = env_mats()
     room(env)
     g1 = gateway_g1()

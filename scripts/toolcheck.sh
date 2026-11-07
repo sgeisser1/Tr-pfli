@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Tröpfli – Toolcheck (Phase 0). Prüft alle CLI-Werkzeuge reproduzierbar.
+# fluidi – Toolcheck (Phase 0). Prüft alle CLI-Werkzeuge reproduzierbar.
 # MCP-Server (FreeCAD, Blender) werden vom Orchestrator separat getestet.
 # Aufruf: scripts/toolcheck.sh   (aus dem Repo-Root, in WSL)
 set -u

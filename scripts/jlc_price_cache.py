@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Troepfli - JLC-Teiledaten (Basic/Preferred/Extended, Lager, Preisstaffeln, Mindestmengen) abfragen
+"""fluidi - JLC-Teiledaten (Basic/Preferred/Extended, Lager, Preisstaffeln, Mindestmengen) abfragen
 und als Cache fuer scripts/concept_costs.py ablegen.
 
 Aufruf:  .venv/bin/python scripts/jlc_price_cache.py C20416850 C2925606 ...   (ohne Argumente: alle Teile

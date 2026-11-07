@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Troepfli - Energiebudget Sensor (Phase 2, Variantenvergleich REQ-ENE-01).
+"""fluidi - Energiebudget Sensor (Phase 2, Variantenvergleich REQ-ENE-01).
 
 Aufruf:   .venv/bin/python scripts/energy_budget.py            (alle Tabellen, Markdown)
           .venv/bin/python scripts/energy_budget.py --params   (nur Parametertabelle)
@@ -292,7 +292,7 @@ def main():
     if "--params" in sys.argv:
         print_params()
         return
-    print("# Troepfli Energiebudget - Ausgabe scripts/energy_budget.py\n")
+    print("# fluidi Energiebudget - Ausgabe scripts/energy_budget.py\n")
     print(f"Sonnenprofil: Ruhestrom-Temperaturfaktor (Tagesmittel) = {SLEEP_TEMP_FACTOR:.3f}")
     for m in (1, 2, 5):
         print(f"Reaktionszeit {m} min -> Erreichbarkeitsintervall {reach_interval(m*60):.1f} s")

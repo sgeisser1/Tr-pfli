@@ -1,4 +1,4 @@
-"""Tröpfli Phase 3 – Bibliothek für Renderings (Blender 4.0.2, nur bpy/bmesh, alles selbst modelliert).
+"""fluidi Phase 3 – Bibliothek für Renderings (Blender 4.0.2, nur bpy/bmesh, alles selbst modelliert).
 
 Einheiten: Szene in Metern; Geometrie wird in mm beschrieben und mit 0.001 skaliert (mm-genau).
 Kopf-Koordinaten: x = Breite, y = Tiefe (Front = -y, Batteriedeckel = +y), z nach oben,
@@ -8,7 +8,7 @@ Gemeinsame Masse (Quelle docs/concepts/CONCEPTS.md Kap. 2A, D-006):
   Kopf 28 x 13 x 45 mm (Breite 23.1 Halter + 1 + 2 x 2 Wand; Tiefe 12 + Schraubdom; Höhe 45)
   Sonde: Leiterplatte 1.6 mm, Breite 22 mm (ANNAHME aus Platinenformat ~22 x 170 mm, Kap. 2.9/OP-K1b),
          100 mm im Boden + 5 mm freie Strecke bis zur Markierung "max".
-Verwendung:  exec(open('.../troepfli_lib.py').read())  (definiert Funktionen im Namensraum)
+Verwendung:  exec(open('.../fluidi_lib.py').read())  (definiert Funktionen im Namensraum)
 """
 import bpy, bmesh, math, os, random
 from mathutils import Vector, Matrix
@@ -308,7 +308,7 @@ def probe(root, mats):
     on_front_xz(t, -6.0, -PROBE_T / 2 - 0.03, -GAP_SOIL + 1.6)
     prism('MaxPfeil', [(-10.2, -GAP_SOIL + 2.4), (-7.8, -GAP_SOIL + 2.4), (-9.0, -GAP_SOIL + 0.6)], 'y',
           -PROBE_T / 2 - 0.04, -PROBE_T / 2, mat=mats['silk'], parent=root, bevel=0)
-    t3 = text_obj('Rev', 'troepfli rev A', 1.2, mats['silk'], root, extrude=0.02)
+    t3 = text_obj('Rev', 'fluidi rev A', 1.2, mats['silk'], root, extrude=0.02)
     on_front_xz(t3, 2.0, -PROBE_T / 2 - 0.03, -GAP_SOIL + 1.6)
 
 

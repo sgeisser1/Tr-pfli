@@ -1,4 +1,4 @@
-# Tröpfli – Recherche Fertigung und Kosten (Phase 2)
+# fluidi – Recherche Fertigung und Kosten (Phase 2)
 
 | | |
 |---|---|
@@ -36,7 +36,7 @@ EUR/USD 1.1165, EUR/CHF 0.9143).
 6. **Kupfer–Kontur:** JLC verlangt ≥ 0.2 mm (gefräst); REQ-MECH-06 fordert ≥ 1.0 mm → unsere Regel ist
    strenger und bestimmt die DRC-Einstellung.
 7. **Logo auf Silkscreen (REQ-DES-03/MECH-16):** Linien ≥ 0.15 mm, Text ≥ 1.0 mm hoch, Verhältnis
-   Strichbreite:Höhe 1:6, Abstand zu Pads ≥ 0.15 mm [JLC]. Empfehlung: Logo-Strich ≥ 0.2 mm, Schrift „Tröpfli“
+   Strichbreite:Höhe 1:6, Abstand zu Pads ≥ 0.15 mm [JLC]. Empfehlung: Logo-Strich ≥ 0.2 mm, Schrift „fluidi“
    ≥ 1.5 mm hoch (Reserve; „ö“-Punkte als eigene Flächen ≥ 0.2 mm).
 8. **Isolationsdicke über Innenlagen-Elektroden (REQ-MECH-04/11):** Standard-Stackup 4 Lagen hat bei
    **1.6 mm und 2.0 mm dasselbe Prepreg L1–L2: 0.210 mm (7628, Er 4.4)** [JLC, 2.0 mm DRITTQUELLE]. Die
@@ -102,7 +102,7 @@ eintragen. Dauer ca. 10 min.
 
 ### 3.3 Designregeln für das Board (Auszug, Details JLCPCB_NOTES.md §3)
 
-| Regel | 2 Lagen | 4 Lagen | Tröpfli-Vorgabe |
+| Regel | 2 Lagen | 4 Lagen | fluidi-Vorgabe |
 |---|---|---|---|
 | Leiterbahn/Abstand min. | 0.10/0.10 mm | 0.09/0.09 mm | ≥ 0.15/0.15 mm (Reserve, kein Aufpreis) |
 | Bohrung/Via-Ø min. | 0.15/0.25 mm | 0.15/0.25 mm | ≥ 0.3/0.6 mm (kein Aufpreis, ANNAHME „preferred ≥ 0.2 mm“ genügt) |

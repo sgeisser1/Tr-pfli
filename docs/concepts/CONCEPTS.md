@@ -1,4 +1,4 @@
-# Tröpfli – Phase 2: Technische Konzepte und Empfehlung
+# fluidi – Phase 2: Technische Konzepte und Empfehlung
 
 | | |
 |---|---|
@@ -623,8 +623,8 @@ unter WLAN-Last, 95-%-Quantil). `P_MISS` und die Werkseinstellung der Reaktionsz
 festgelegt. Rückfall: BLE-Koprozessor oder LAN-Variante (c2).
 
 ### 5.2 HTTPS (REQ-APP-02, REQ-SAF-NET-04)
-- `troepfli.local` (mDNS) + **Einmal-CA mit Name Constraints** (`permitted DNS:troepfli.local`,
-  `.troepfli.local`, IP ausgeschlossen); Serverzertifikat ECDSA P-256, ≤ 825 Tage; Gateway erzeugt
+- `fluidi.local` (mDNS) + **Einmal-CA mit Name Constraints** (`permitted DNS:fluidi.local`,
+  `.fluidi.local`, IP ausgeschlossen); Serverzertifikat ECDSA P-256, ≤ 825 Tage; Gateway erzeugt
   seinen Schlüssel, der PC signiert nur den CSR (`research_gateway.md` 4).
 - **CA-Schlüssel nur im RAM bzw. auf tmpfs erzeugen** und nach dem Signieren verwerfen (S2-L04) – kein
   „Löschen“ auf SSD.

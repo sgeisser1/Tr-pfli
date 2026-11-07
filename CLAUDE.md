@@ -1,12 +1,14 @@
-# Tröpfli – Projektregeln für alle Agenten
+# fluidi – Projektregeln für alle Agenten
 
 Kapazitiver Pflanzen-Feuchtesensor (Stab mit PCB-Sonde, ~100 mm im Boden) plus lokales
 Gateway mit PWA. Strikt lokal, keine Cloud. Projektleitung: Orchestrator (Hauptsitzung).
 Der Auftraggeber gibt jede Phase frei.
 
 ## Namen
-- Sichtbar (UI, Dokumente, Silkscreen-Logo): **Tröpfli**
-- Technisch (Dateien, Code, BLE-Namen, Hostnamen, Repo): **troepfli**, z. B. `troepfli-XXXX`
+- Produktname: **fluidi** – immer klein geschrieben, sichtbar wie technisch (UI, Dokumente, Logo,
+  Dateien, Code, BLE-Gerätenamen `fluidi-XXXX`, Hostname `fluidi.local`). Umbenannt von „Tröpfli“
+  am 2026-11-07 (D-008). Logo: Wortmarke „fluidi“ in Kleinbuchstaben, i-Punkte als Wassertropfen.
+- Das GitHub-Repository heisst noch `Tr-pfli` (Umbenennung durch den Auftraggeber, siehe D-008).
 
 ## Prioritäten
 Sicherheit > Kosten > Komfort. Ziel: < 10 CHF pro Sensor bei 10–15 Stück (alles inkl.

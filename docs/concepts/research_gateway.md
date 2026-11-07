@@ -1,4 +1,4 @@
-# Tröpfli – Recherche Gateway, PWA-Auslieferung, sicherer Kontext (Phase 2)
+# fluidi – Recherche Gateway, PWA-Auslieferung, sicherer Kontext (Phase 2)
 
 | | |
 |---|---|
@@ -27,7 +27,7 @@ Quellen am Ende mit Nummer [Qn], alle abgerufen am **2026-11-06**. Lokale Datenb
    (Gecko Bootloader, signiertes GBL)** gut; **CC2340** machbar (MCUboot-OAD, weniger
    Fremd-Implementierungen); **CH592 nicht empfohlen** (keine Signaturprüfung im Hersteller-OTA
    gefunden → Eigenbau eines sicheren Bootloaders, Risiko für REQ-FW-04).
-3. **HTTPS:** Name `troepfli.local` (mDNS) + **Einmal-CA mit Namensbeschränkung**, auf dem PC
+3. **HTTPS:** Name `fluidi.local` (mDNS) + **Einmal-CA mit Namensbeschränkung**, auf dem PC
    erzeugt; Serverzertifikat ECDSA P-256, Laufzeit ≤ 825 Tage; **CA-Schlüssel wird nach dem
    Signieren gelöscht** → erfüllt REQ-SAF-NET-04 auch dann, wenn ein Gerät Name Constraints nicht
    durchsetzt. Let's-Encrypt-Variante verworfen (Internet-Abhängigkeit, 45-Tage-Zertifikate ab 2028).
@@ -115,7 +115,7 @@ Wear-Leveling über ~2000 Sektoren ist Verschleiss vernachlässigbar (A).
 
 **(c1) Gateway als eigener Access Point (ohne Firmen-WLAN).**
 - Kein Eingriff ins Firmennetz, mDNS funktioniert sicher im eigenen Netz.
-- Nutzbarkeit **schlecht**: Handy muss für jede Abfrage ins WLAN „troepfli“ wechseln und verliert
+- Nutzbarkeit **schlecht**: Handy muss für jede Abfrage ins WLAN „fluidi“ wechseln und verliert
   dort Internet. Android betrachtet ein WLAN ohne Internet ggf. nicht als Standardnetz und schickt
   Verkehr über Mobilfunk, bis der Nutzer „Verbunden bleiben“ bestätigt (ANNAHME, PROTOTYP-PRÜFUNG).
   Kein NTP → Zeit nur aus RTC und Browser (REQ-GW-09 erlaubt das).
@@ -247,14 +247,14 @@ als sicher (nur `localhost`) [Q27]. Ohne HTTPS ist REQ-APP-02 nicht erfüllbar.
   abgelehnt wird – dokumentiert, ob die Geräte Constraints durchsetzen (relevant für O2).
 
 ### 4.4 Zertifikatsprofil (Vorschlag)
-- **CA** (auf dem PC, Skript `scripts/troepfli_ca.sh` o. ä. in Phase 3, openssl):
+- **CA** (auf dem PC, Skript `scripts/fluidi_ca.sh` o. ä. in Phase 3, openssl):
   ECDSA P-256, `basicConstraints=critical,CA:TRUE,pathlen:0`,
-  `keyUsage=critical,keyCertSign`, **`nameConstraints=critical,permitted;DNS:troepfli.local,`
-  `permitted;DNS:.troepfli.local, excluded;IP:0.0.0.0/0.0.0.0, excluded;IP:::/0`** (IP-Namen
+  `keyUsage=critical,keyCertSign`, **`nameConstraints=critical,permitted;DNS:fluidi.local,`
+  `permitted;DNS:.fluidi.local, excluded;IP:0.0.0.0/0.0.0.0, excluded;IP:::/0`** (IP-Namen
   ausschliessen, sonst wären IP-Adressen unbeschränkt; ggf. einen Firmen-DNS-Namen zusätzlich
   zulassen, wenn die IT einen vergibt). Laufzeit z. B. 10 Jahre, Schlüssel nach dem Signieren
   löschen (O1).
-- **Serverzertifikat:** ECDSA P-256, SAN `DNS:troepfli.local` (+ `DNS:troepfli-<gw-id>.local` für
+- **Serverzertifikat:** ECDSA P-256, SAN `DNS:fluidi.local` (+ `DNS:fluidi-<gw-id>.local` für
   REQ-SYS-11), EKU `serverAuth`, SHA-256, Laufzeit **≤ 825 Tage** (Apple-Pflicht für alle
   TLS-Serverzertifikate seit 2019 [Q2]; die 398-Tage-Regel betrifft Benutzer-Roots **nicht** [Q2b]).
 - **Schlüssel des Servers** erzeugt das Gateway selbst (verlässt das Gateway nie); der PC signiert
@@ -266,26 +266,26 @@ deckt auch UC-16 „Passwort vergessen“):
 1. Gateway per USB an den PC; Skript liest Gateway-ID und CSR (P-256) über die serielle
    Schnittstelle.
 2. Skript erzeugt die Einmal-CA, signiert den CSR, schreibt Zertifikat, WLAN-Zugangsdaten und
-   Admin-Passwort (bzw. Einmal-Code) aufs Gateway, löscht den CA-Schlüssel, gibt `troepfli-ca.crt`
+   Admin-Passwort (bzw. Einmal-Code) aufs Gateway, löscht den CA-Schlüssel, gibt `fluidi-ca.crt`
    und dessen **SHA-256-Fingerabdruck** aus.
 3. Zertifikat aufs Handy bringen: per AirDrop/E-Mail an sich selbst oder Download von
-   `http://troepfli.local/ca.crt` (dann Fingerabdruck vergleichen; die Datei ist öffentlich,
+   `http://fluidi.local/ca.crt` (dann Fingerabdruck vergleichen; die Datei ist öffentlich,
    Manipulation im LAN würde am Fingerabdruck auffallen).
 
 **iOS (Safari)** [Q1]:
-1. `troepfli-ca.crt` in Safari öffnen bzw. antippen → „Profil geladen“.
+1. `fluidi-ca.crt` in Safari öffnen bzw. antippen → „Profil geladen“.
 2. Einstellungen → „Profil geladen“ → Installieren (Code eingeben) → Installieren.
 3. Einstellungen → Allgemein → Info → **Zertifikatsvertrauenseinstellungen** → unter „Volles
-   Vertrauen für Root-Zertifikate aktivieren“ Tröpfli-CA einschalten. (Ohne diesen Schritt
+   Vertrauen für Root-Zertifikate aktivieren“ fluidi-CA einschalten. (Ohne diesen Schritt
    vertraut iOS manuell installierten Profilen **nicht** für TLS [Q1].)
-4. Safari → `https://troepfli.local` → Teilen → „Zum Home-Bildschirm“.
+4. Safari → `https://fluidi.local` → Teilen → „Zum Home-Bildschirm“.
 
 **Android (Chrome)** (Menüpfad Pixel/Android 14+, herstellerabhängig) [Q28]:
-1. `troepfli-ca.crt` herunterladen.
+1. `fluidi-ca.crt` herunterladen.
 2. Einstellungen → Sicherheit & Datenschutz → Weitere Sicherheitseinstellungen →
    Verschlüsselung & Anmeldedaten → Zertifikat installieren → **CA-Zertifikat** → Warnung
    bestätigen → Datei wählen. Bildschirmsperre ist Voraussetzung [Q28].
-3. Chrome → `https://troepfli.local` → Menü → „App installieren“.
+3. Chrome → `https://fluidi.local` → Menü → „App installieren“.
 4. Hinweis: Apps ab API 24 vertrauen Benutzer-CAs standardmässig nicht [Q29] – betrifft andere
    Apps, nicht die PWA in Chrome (ANNAHME, PROTOTYP-PRÜFUNG).
 
@@ -296,7 +296,7 @@ Firefox: eigener Speicher (Einstellungen → Zertifikate importieren).
 **Erneuerung (≤ 825 Tage):** PWA warnt 60 Tage vorher; Provisionierungsskript erneut (neue
 Einmal-CA), Profil auf den Geräten ersetzen. Bei Gateway-Tausch (UC-14) gleiches Verfahren.
 
-### 4.6 Name `troepfli.local` (mDNS)
+### 4.6 Name `fluidi.local` (mDNS)
 - **iOS/macOS:** Bonjour/mDNS nativ (allgemein bekannt; Apple-Primärquelle nicht abgerufen → ANNAHME).
 - **Android:** Systemresolver unterstützt `.local` per mDNS **seit November 2021** (DnsResolver-
   Mainline-Modul, faktisch Android 12+, ANNAHME zur Version); **nicht** über VPN und Mobilfunk [Q30].
@@ -305,7 +305,7 @@ Einmal-CA), Profil auf den Geräten ersetzen. Bei Gateway-Tausch (UC-14) gleiche
 - **Windows 10/11:** mDNS-Namensauflösung seit Windows 10 1703 (Sekundärquelle) [Q31].
 - **Firmen-WLAN-Risiko:** Viele Firmen-WLANs filtern Multicast oder isolieren Clients. Dann
   funktionieren weder mDNS noch der direkte Zugriff Handy → Gateway. **Vor dem Bau vor Ort testen**
-  (z. B. ein beliebiges mDNS-Gerät oder Laptop mit `troepfli.local`-Testdienst).
+  (z. B. ein beliebiges mDNS-Gerät oder Laptop mit `fluidi.local`-Testdienst).
   Rückfall in dieser Reihenfolge: (1) IT vergibt DNS-Namen → als zusätzlicher erlaubter Name in die
   Constraints/SAN; (2) DHCP-Reservierung + IP-SAN; (3) Variante (c1) eigener AP.
 

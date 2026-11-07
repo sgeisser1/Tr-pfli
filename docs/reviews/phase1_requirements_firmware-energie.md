@@ -1,4 +1,4 @@
-# Prüfbericht Phase 1 – Anforderungen Tröpfli: Energie, Funk, Firmware
+# Prüfbericht Phase 1 – Anforderungen fluidi: Energie, Funk, Firmware
 
 | | |
 |---|---|
@@ -160,7 +160,7 @@ Ausgeführt mit `python3 -I energy_review.py` (nur Standardbibliothek).
 
 ```python
 #!/usr/bin/env python3
-"""Troepfli - unabhaengige Ueberschlagsrechnung Energie/Erreichbarkeit (Pruefung Phase 1).
+"""fluidi - unabhaengige Ueberschlagsrechnung Energie/Erreichbarkeit (Pruefung Phase 1).
 
 Pruefer: firmware-energie. Nur Pruefrechnung, kein Projektskript (gehoert nicht ins Repo).
 Quellen (lokal im Scratchpad .../energy_review/dl/, PDF-Seitenzahl = Seite im PDF-Viewer):

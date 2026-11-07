@@ -1,4 +1,4 @@
-# Tröpfli – Anforderungsdokument
+# fluidi – Anforderungsdokument
 
 | | |
 |---|---|
@@ -13,13 +13,13 @@
 
 ## 1 Zweck und Systemübersicht
 
-Tröpfli überwacht die Bodenfeuchte von Topfpflanzen im Büro. Das System besteht aus:
+fluidi überwacht die Bodenfeuchte von Topfpflanzen im Büro. Das System besteht aus:
 
 - **Sensor** (10–15 Stück): Stab mit kleinem, abgedichtetem Kopf (Elektronik, Energiequelle, LED,
   Taster) und einer ca. 100 mm langen Sonde, die als Teil der Leiterplatte in die Erde gesteckt wird.
   Misst kapazitiv die Feuchte sowie die Temperatur, puffert Messwerte und funkt sie lokal.
 - **Gateway** (1 Stück): dauerhaft mit Strom versorgt, empfängt und speichert die Daten aller Sensoren
-  und stellt die **PWA „Tröpfli“** im lokalen Netz bereit.
+  und stellt die **PWA „fluidi“** im lokalen Netz bereit.
 - **PWA**: Bedienung auf Smartphone (iOS, Android) und PC.
 
 Alles bleibt **strikt lokal**: keine Cloud, keine externen Server, kein Zugriff aus dem Internet.
@@ -64,7 +64,7 @@ Sicherheitsanforderungen (Kap. 6 sowie REQ-FW-04, REQ-RF-05, REQ-RF-06) werden n
 | ID | Anwendungsfall | Ablauf (Kurzform) |
 |---|---|---|
 | UC-01 | **Erstinbetriebnahme Gateway** | Gateway einstecken, ins Netz bringen, PWA öffnen, Vertrauensstellung (HTTPS) einrichten, Passwort setzen, PWA installieren. |
-| UC-02 | **Neuen Sensor koppeln** | Energiequelle einsetzen/laden → Taster lang drücken → Sensor erscheint in der PWA als `troepfli-XXXX` → Nutzer bestätigt, gibt Pflanzennamen und Substrat ein. |
+| UC-02 | **Neuen Sensor koppeln** | Energiequelle einsetzen/laden → Taster lang drücken → Sensor erscheint in der PWA als `fluidi-XXXX` → Nutzer bestätigt, gibt Pflanzennamen und Substrat ein. |
 | UC-03 | **Automatische Messung** | Im eingestellten Intervall misst der Sensor, puffert und überträgt; PWA zeigt aktuellen Wert und Verlauf. |
 | UC-04 | **Manuelle Messung** | In der PWA „Jetzt messen“ → Wert innert Reaktionszeit (REQ-SYS-05). Alternativ kurzer Tastendruck am Sensor. |
 | UC-05 | **Kalibrierung** | In der PWA geführt „Trocken“ und „Nass“ auslösen; Werte werden gespeichert. |
@@ -91,7 +91,7 @@ Sicherheitsanforderungen (Kap. 6 sowie REQ-FW-04, REQ-RF-05, REQ-RF-06) werden n
 | REQ-SYS-05 | Reaktionszeit der manuellen Messung (95 % der Auslösungen): **≤ 5 min** (Muss), **≤ 1 min** (Soll). Die Reaktionszeit ist im Bereich 1–5 min einstellbar; Werkseinstellung ist der kürzeste Wert, der REQ-ENE-02 bzw. -03 **und REQ-ENE-09** noch erfüllt. *(Runde 2: N-01)* *(F-02, FE-03)* | Muss/Soll | A, T |
 | REQ-SYS-06 | Zwei-Wege-Kommunikation Gateway → Sensor für: manuelle Messung, Kalibrierung, Einstellungen, Zeit, Firmware-Update. | Muss | T |
 | REQ-SYS-07 | Zeitstempel der Messwerte: Abweichung **gegenüber der Gateway-Zeit, bei 5–45 °C** ≤ **±2 min** nach 14 Tagen und ≤ **±5 min** nach 60 Tagen ohne Gateway. Nach einem Energiequellenwechsel ohne Gateway werden Werte mit relativer Zeit gespeichert und beim nächsten Kontakt korrekt zurückgerechnet. *(F-07, FE-04, Runde 2: N-04)* | Muss | A, T |
-| REQ-SYS-08 | Eindeutige Sensor-ID, sichtbar als `troepfli-XXXX` (XXXX aus Chip-ID, hexadezimal). | Muss | I |
+| REQ-SYS-08 | Eindeutige Sensor-ID, sichtbar als `fluidi-XXXX` (XXXX aus Chip-ID, hexadezimal). | Muss | I |
 | REQ-SYS-09 | Datenformat (Funk und Export) versioniert und dokumentiert. | Muss | I |
 | REQ-SYS-10 | Anbindung an MQTT / Home Assistant (Auto-Discovery). | Kann | T |
 | REQ-SYS-11 | Architektur erlaubt später mehrere Gateways bzw. Räume (eindeutige Gateway-ID, Sensor gehört genau einem Gateway); nicht umgesetzt in Rev. A. *(F-11)* | Soll | A |
@@ -201,7 +201,7 @@ Sicherheitsanforderungen (Kap. 6 sowie REQ-FW-04, REQ-RF-05, REQ-RF-06) werden n
 | REQ-MECH-13 | Spritzwasserschutz Kopf: kein Wassereintritt bei Giessen von oben (1 l Wasser aus 20 cm Höhe über den Kopf, 10 Wiederholungen; Anlehnung IPX4-Methode), **geprüft mit eingesetzter Energiequelle**, danach Öffnen und Sichtprüfung auf Feuchte/Kondensat. *(S-K01)* | Muss | T |
 | REQ-MECH-14 | Sonde: dauerhaft in nassem Substrat ohne Funktionsverlust; Wassertest ≥ **30 Tage** bis zur Dichtlinie vor Freigabe der Serie (siehe REQ-MES-06). | Muss | T, PROTOTYP-PRÜFUNG |
 | REQ-MECH-15 | Batteriefach bzw. Ladeport dicht und ohne Spezialwerkzeug zugänglich (ein handelsüblicher Schraubenzieher bzw. eine Münze gilt nicht als Spezialwerkzeug); Wechsel/Laden ohne Lösen der Sondendichtung. | Muss | T |
-| REQ-MECH-16 | Revisionsstand auf PCB-Silkscreen; Produktname „Tröpfli“ bzw. Logo auf Gehäuse und Silkscreen. | Muss | I |
+| REQ-MECH-16 | Revisionsstand auf PCB-Silkscreen; Produktname „fluidi“ bzw. Logo auf Gehäuse und Silkscreen. | Muss | I |
 | REQ-MECH-17 | Sensor steht stabil; Kopfgewicht kippt die Sonde in lockerem Granulat nicht. | Soll | T |
 | REQ-MECH-18 | Kein Kondenswasser im Kopf nach 7 Tag/Nacht-Zyklen auf der Fensterbank (Feuchteindikator). *(F-20)* | Soll | T, PROTOTYP-PRÜFUNG |
 
@@ -278,7 +278,7 @@ Sicherheitsanforderungen (Kap. 6 sowie REQ-FW-04, REQ-RF-05, REQ-RF-06) werden n
 
 | ID | Anforderung | Prio | Verif. |
 |---|---|---|---|
-| REQ-APP-01 | Name „Tröpfli“; läuft auf iOS Safari, Android Chrome und Desktop (Chrome/Edge; Firefox/Safari Desktop **Soll**), jeweils aktuelle Version. *(F-01)* | Muss | T |
+| REQ-APP-01 | Name „fluidi“; läuft auf iOS Safari, Android Chrome und Desktop (Chrome/Edge; Firefox/Safari Desktop **Soll**), jeweils aktuelle Version. *(F-01)* | Muss | T |
 | REQ-APP-02 | Installierbar als PWA; dafür sicherer Kontext (HTTPS) im LAN mit praktikabler, dokumentierter Lösung, die REQ-SAF-NET-04 erfüllt. | Muss | T, I |
 | REQ-APP-03 | Übersicht aller Pflanzen: Name, Feuchteindex, Temperatur, Zeit der letzten Messung, Batterie, Signalqualität, Hinweis „Giessen nötig“. | Muss | T |
 | REQ-APP-04 | Verlauf/Diagramme pro Pflanze (Tag, Woche, Monat; Jahr **Soll**). *(F-01)* | Muss | T |
@@ -296,7 +296,7 @@ Sicherheitsanforderungen (Kap. 6 sowie REQ-FW-04, REQ-RF-05, REQ-RF-06) werden n
 |---|---|---|---|
 | REQ-DES-01 | Schlicht und modern; **3–4 Designvorschläge** für den Sensorkopf und ein passendes Gateway-Gehäuse als Renderings, vom Auftraggeber verfeinert und freigegeben. | Muss | I |
 | REQ-DES-02 | Formsprache darf vom Namen inspiriert sein (z. B. weiche Tropfenform, dezentes Tropfensymbol). | Kann | I |
-| REQ-DES-03 | Logo bzw. Wortmarke „Tröpfli“, geeignet für Gehäuse (FDM, ggf. mehrfarbig per AMS), PCB-Silkscreen (JLC-Mindestmasse) und PWA-Icon. | Muss | I |
+| REQ-DES-03 | Logo bzw. Wortmarke „fluidi“, geeignet für Gehäuse (FDM, ggf. mehrfarbig per AMS), PCB-Silkscreen (JLC-Mindestmasse) und PWA-Icon. | Muss | I |
 | REQ-DES-04 | Fotorealistische Renderings des finalen Designs (in der Pflanze, Explosionsansicht, Details). | Muss | I |
 
 ## 10 Fertigung und Kosten

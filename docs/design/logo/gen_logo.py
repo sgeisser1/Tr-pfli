@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Tröpfli – Wortmarke und Icons als SVG (eigene Pfade, keine Schrift).
+"""fluidi – Wortmarke und Icons als SVG (eigene Pfade, keine Schrift).
 
 Aufruf:  python3 docs/design/logo/gen_logo.py
 Erzeugt im selben Ordner:
@@ -202,7 +202,7 @@ def write(name, text):
     print("geschrieben", name)
 
 
-LIC = ("Tröpfli-Wortmarke, eigene geometrische Pfade (keine Schrift). "
+LIC = ("fluidi-Wortmarke, eigene geometrische Pfade (keine Schrift). "
        "Erzeugt mit gen_logo.py. 1 Einheit = 1 mm im viewBox.")
 
 
@@ -217,9 +217,9 @@ def make_wordmark_files():
         body = f'<path fill="{INK}" fill-rule="nonzero" d="{ink}"/>\n'
         if acc:
             body += f'<path fill="{BLUE}" fill-rule="nonzero" d="{acc}"/>\n'
-        write(name + ".svg", svg(W, H, body, "Tröpfli", LIC + f" Variante {dots}."))
+        write(name + ".svg", svg(W, H, body, "fluidi", LIC + f" Variante {dots}."))
         mono = f'<path fill="#000000" fill-rule="nonzero" d="{ink} {acc}"/>\n'
-        write(name + "_mono.svg", svg(W, H, mono, "Tröpfli mono", LIC + " Einfarbig für Silkscreen/FDM."))
+        write(name + "_mono.svg", svg(W, H, mono, "fluidi mono", LIC + " Einfarbig für Silkscreen/FDM."))
 
     # V3: facettierter Tropfen + Wortmarke v1 (i-Punkt quadratisch)
     items, _, width = wordmark("square")
@@ -241,16 +241,16 @@ def make_wordmark_files():
     ink = " ".join(poly_to_d(shift(p, gapx, 0), 0, oy0, 1.0, H) for p in items)
     body = (f'<path fill="{BLUE}" d="{L}"/>\n<path fill="{BLUE_D}" d="{R}"/>\n'
             f'<path fill="{INK}" d="{ink}"/>\n')
-    write("logo_v3_facette.svg", svg(W, H, body, "Tröpfli", LIC + " Bildmarke facettierter Tropfen."))
+    write("logo_v3_facette.svg", svg(W, H, body, "fluidi", LIC + " Bildmarke facettierter Tropfen."))
     write("logo_v3_facette_mono.svg", svg(W, H, f'<path fill="#000000" d="{O} {ink}"/>\n',
-                                          "Tröpfli mono", LIC + " Einfarbig."))
+                                          "fluidi mono", LIC + " Einfarbig."))
     # Bildmarke allein (für Gehäuse/Druck)
     Wd = 2 * 5.0 * k + 2
     Hd = drop_h * k + 2
     Lm = poly_to_d(tr(left, ox=5.0 * k + 1, oy=5.0 * k + 1), 0, 0, 1.0, Hd)
     Rm = poly_to_d(tr(right, ox=5.0 * k + 1, oy=5.0 * k + 1), 0, 0, 1.0, Hd)
     write("mark_v3_tropfen.svg", svg(Wd, Hd, f'<path fill="{BLUE}" d="{Lm}"/>\n<path fill="{BLUE_D}" d="{Rm}"/>\n',
-                                    "Tröpfli Bildmarke", LIC))
+                                    "fluidi Bildmarke", LIC))
 
 
 def make_icons():
@@ -262,13 +262,13 @@ def make_icons():
     ox, oy = 4.0 - N / 2 / k, 6.0 - N / 2 / k   # Zentrum der Glyphe (4,6) ins Bildzentrum
     d = " ".join(poly_to_d([p], ox, oy, k, N) for p in o)
     write("icon_v1.svg", svg(N, N, bg.format(BLUE) + f'<path fill="{PAPER}" d="{d}"/>\n',
-                             "Tröpfli Icon v1", "PWA-Icon 512 px, Motiv in der 80-%-Sicherheitszone (maskable).", unit=""))
+                             "fluidi Icon v1", "PWA-Icon 512 px, Motiv in der 80-%-Sicherheitszone (maskable).", unit=""))
     # V2: Achteck-ö mit Tropfenpunkten, anthrazit + blau auf weiss
     ring_d = poly_to_d(g_o(), ox, oy, k, N)
     drops = drop_poly(2.1, 9.9, 1.3, 2.6, 10) + drop_poly(5.9, 9.9, 1.3, 2.6, -10)
     dd = " ".join(poly_to_d([p], ox, oy, k, N) for p in drops)
     write("icon_v2.svg", svg(N, N, bg.format("#F4F1EA") + f'<path fill="{INK}" d="{ring_d}"/>\n'
-                             f'<path fill="{BLUE}" d="{dd}"/>\n', "Tröpfli Icon v2", "PWA-Icon 512 px.", unit=""))
+                             f'<path fill="{BLUE}" d="{dd}"/>\n', "fluidi Icon v2", "PWA-Icon 512 px.", unit=""))
     # V3: facettierter Tropfen auf weiss
     outer, left, right = facet_drop(0, 0, 1.0)
     k3 = 19.0
@@ -276,7 +276,7 @@ def make_icons():
     Ld = poly_to_d([left], ox3, oy3, k3, N)
     Rd = poly_to_d([right], ox3, oy3, k3, N)
     write("icon_v3.svg", svg(N, N, bg.format("#FFFFFF") + f'<path fill="{BLUE}" d="{Ld}"/>\n'
-                             f'<path fill="{BLUE_D}" d="{Rd}"/>\n', "Tröpfli Icon v3", "PWA-Icon 512 px.", unit=""))
+                             f'<path fill="{BLUE_D}" d="{Rd}"/>\n', "fluidi Icon v3", "PWA-Icon 512 px.", unit=""))
 
 
 if __name__ == "__main__":

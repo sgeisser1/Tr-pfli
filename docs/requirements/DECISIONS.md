@@ -1,4 +1,4 @@
-# Tröpfli – Entscheidungsprotokoll
+# fluidi – Entscheidungsprotokoll
 
 Format: Nr. · Datum · Entscheid · Alternativen · Begründung · Quelle · Status
 
@@ -79,3 +79,21 @@ Format: Nr. · Datum · Entscheid · Alternativen · Begründung · Quelle · St
 
 ### D-007 · 2026-11-07 · Designvorgaben
 - **Auftraggeber:** „schöne harte Formen“, schlichte, einfache Logos, aber auch etwas verspielt. Keine weiteren Vorgaben.
+
+### D-008 · 2026-11-07 · Umbenennung „Tröpfli“ → „fluidi“
+- **Entscheid (Auftraggeber):** Produkt, PWA, Logo und Repository heissen **fluidi** (klein geschrieben).
+  Logo: Wortmarke „fluidi“ mit Wassertropfen als i-Punkte. Technische Namen ebenfalls `fluidi`
+  (`fluidi-XXXX`, `fluidi.local`), da keine Umlaute mehr.
+- **Umsetzung:** Alle Projektdateien ersetzt (Ausnahme: `PROJEKTAUFTRAG.md` bleibt wörtliches Original mit Hinweis).
+  Renderings und Logos werden in Phase 3 neu erzeugt. GitHub-Repository-Umbenennung `Tr-pfli` → `fluidi`
+  durch den Auftraggeber (GitHub → Settings → Repository name); danach wird der Remote angepasst.
+- **Status:** gültig
+
+### D-009 · 2026-11-07 · Designwahl P3 „Stele“ mit Änderungen (Auftraggeber)
+- Kopf **P3 Stele**; Körper **grau** statt weiss (weiss verschmutzt), Band oben **hellblau** wie bisher,
+  **Taster oben ebenfalls hellblau**; LED-Tropfenfenster bleibt, dahinter **RGB-LED** für farbige Zustände.
+- Kopf 28 × 12–13 × 45 mm und 5 mm Abstand zur Erde bestätigt.
+- **Kein Batteriefach hinten**, kein Warnaufdruck. Wunsch: Batteriewechsel durch Trennen an der Farbfuge
+  blau/grau (Klick oder Schraube von unten), graues Teil nach unten abziehen → nur eine sichtbare Trennung.
+  Machbarkeit (Dichtung, REQ-SAF-05, REQ-SAF-CC-04) wird geprüft.
+- Gateway in denselben Farben; Antenne möglichst intern statt Stabantenne (Machbarkeit wird geprüft).

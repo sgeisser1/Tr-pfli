@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Markdown -> PDF für Tröpfli-Dokumente (ohne Zusatzpakete).
+"""Markdown -> PDF für fluidi-Dokumente (ohne Zusatzpakete).
 
 Wandelt eine Markdown-Datei (Untermenge: Überschriften, Absätze, Tabellen, Listen, Codeblöcke,
 Bilder, **fett**, *kursiv*, `code`, Links, ---) in HTML um, verkleinert eingebettete PNG-Bilder
@@ -48,7 +48,7 @@ def inline(s, img):
 
 def convert(md_path, out_pdf):
     src_dir = os.path.dirname(os.path.abspath(md_path))
-    work = tempfile.mkdtemp(prefix="troepfli_pdf_", dir=WIN_TMP)
+    work = tempfile.mkdtemp(prefix="fluidi_pdf_", dir=WIN_TMP)
     n = [0]
     def img(rel):
         p = os.path.normpath(os.path.join(src_dir, rel))
