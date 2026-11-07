@@ -13,3 +13,4 @@ simulation/**/work/
 *.sta
 *.cvg
 docs/design/references/
+simulation/field/elmer3d/

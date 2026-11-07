@@ -38,11 +38,11 @@ def analyse(path):
     for k in ("air", "dry", "e10", "wet", "water", "wet_flood"):
         out["C_" + k] = C.get(k)
     out["span"] = C["wet"] - C["dry"]
+    if "fill005.0" not in C and "wet" in C:
+        C["fill005.0"] = C["wet"]
     fills = sorted((float(k[4:]), v) for k, v in C.items() if k.startswith("fill"))
     out["fill"] = fills
-    z = np.array([f[0] for f in fills] + [d["geo"]["z_bot"]])
-    cz = np.array([f[1] for f in fills] + [C["air"]])
-    cf = dict(zip(np.round(z, 3), cz))
+    cf = dict((round(z, 3), c) for z, c in fills)
     tot = cf[5.0] - C["air"]
     out["mes08_fill"] = (cf[10.0] - cf[90.0]) / tot
     out["share_5_10"] = (cf[5.0] - cf[10.0]) / tot
@@ -55,7 +55,8 @@ def analyse(path):
         out["fr4_drift_water_pct"] = 100 * (C["water_fr4wet"] - C["water"]) / span
     if "wet_flood" in C:
         out["flood_pct"] = 100 * (C["wet_flood"] - C["wet"]) / (C["wet"] - C["dry"])
-    out["lumped"] = lumped_fit(C)
+    if all(k in C for k in ("air", "dry", "e10", "wet", "water")):
+        out["lumped"] = lumped_fit(C)
     return out, d
 
 
@@ -68,6 +69,9 @@ def main():
     for i, p in enumerate(sys.argv[1:]):
         o, d = analyse(p)
         res.append(o)
+        print(json.dumps({k: v for k, v in o.items() if k != "fill"}, indent=None, default=float))
+        if len(o["fill"]) < 5:
+            continue
         z = [f[0] for f in o["fill"]]
         c = [f[1] for f in o["fill"]]
         tot = o["fill"][0][1] - o["C_air"]
@@ -75,7 +79,6 @@ def main():
         # Anteil je 5-mm-Scheibe an der Gesamtaenderung
         dz = np.diff(c + [o["C_air"]]) * -1 / tot * 100
         ax[1].step(z, dz, where="post", label=o["tag"])
-        print(json.dumps({k: v for k, v in o.items() if k != "fill"}, indent=None, default=float))
         if i == 0:
             json.dump({**o["lumped"], "tag": o["tag"], "C_air": o["C_air"], "C_dry": o["C_dry"],
                        "C_wet": o["C_wet"], "C_water": o["C_water"]},

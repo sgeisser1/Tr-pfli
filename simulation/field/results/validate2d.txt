@@ -1,0 +1,5 @@
+analytisch CPS w=8.5 s=1.0: C' = 24.102 pF/m
+R=  50 hmin=0.005 hel=0.06 dist=10: C'=23.942 pF/m  Abw -0.66 %  ndof=24056 t=1.0s
+R= 200 hmin=0.005 hel=0.06 dist=10: C'=24.111 pF/m  Abw +0.03 %  ndof=85142 t=7.1s
+R= 200 hmin=0.005 hel=0.06 dist=60: C'=24.121 pF/m  Abw +0.08 %  ndof=23381 t=0.9s
+R= 200 hmin=0.002 hel=0.02 dist=60: C'=24.100 pF/m  Abw -0.01 %  ndof=63029 t=3.8s

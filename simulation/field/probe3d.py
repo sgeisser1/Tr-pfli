@@ -32,7 +32,8 @@ ELMER = os.path.join(ROOT, "scripts", "elmer.sh")
 @dc.dataclass
 class Geo3D:
     name: str = "gsg"
-    ws: float = 6.0          # Breite S (voll)
+    topo: str = "gsg"        # "gsg" (Viertelmodell) oder "sg" (Halbmodell, S links / G rechts)
+    ws: float = 6.0          # Breite S (voll, nur GSG)
     gap: float = 2.0         # Abstand S-G seitlich
     edge: float = P.EDGE_CLEAR + 0.25   # Kupfer-Kontur (Empfehlung 1.25 mm, >= 1.0 REQ-MECH-06)
     z_guard: float = 8.0     # Guard (GND, volle Breite) bis z_guard
@@ -58,6 +59,10 @@ class Geo3D:
 
 
 GEOS = {
+    # Empfehlung: SG koplanar, gap 2, Rand 1.25, Guard bis 8, S 10...86, G-Steg unter S
+    "sg": Geo3D(name="sg", topo="sg", z_guard=8.0, gap_z=2.0, z_s1=86.0, z_g1=90.0, g_bar=True),
+    "sg_nobar": Geo3D(name="sg_nobar", topo="sg", z_guard=8.0, gap_z=2.0, z_s1=88.0, z_g1=88.0, g_bar=False),
+    "sg_long": Geo3D(name="sg_long", topo="sg", z_guard=6.0, gap_z=2.0, z_s1=94.0, z_g1=94.0, g_bar=False),
     "gsg": Geo3D(),
     "gsg_long": Geo3D(name="gsg_long", z_s1=94.0, z_g1=95.5, g_bar=False),
     "gsg_short": Geo3D(name="gsg_short", z_guard=10.0, z_s1=84.0, z_g1=86.0),
@@ -79,15 +84,18 @@ def build(g: Geo3D, wd: str):
     gmsh.model.add("probe")
     occ = gmsh.model.occ
     # Substratscheiben (Viertelzylinder)
+    half = g.topo == "sg"
     sl = []
     for z0, z1 in slabs(g):
-        c = occ.addCylinder(0, 0, z0, 0, 0, z1 - z0, g.R, angle=math.pi / 2)
+        c = occ.addCylinder(0, 0, z0, 0, 0, z1 - z0, g.R, angle=math.pi if half else math.pi / 2)
         sl.append(c)
     # Sondenkontur in der x-z-Ebene als Prisma in y
 
     def outline_prism(y0, y1):
         zc = g.L - (W2 - g.x_tip)
         pts = [(0, g.z_top), (W2, g.z_top), (W2, zc), (g.x_tip, g.L), (0, g.L)]
+        if half:
+            pts = [(-W2, g.z_top), (W2, g.z_top), (W2, zc), (g.x_tip, g.L), (-g.x_tip, g.L), (-W2, zc)]
         pt = [occ.addPoint(x, y0, z) for x, z in pts]
         ln = [occ.addLine(pt[i], pt[(i + 1) % len(pt)]) for i in range(len(pt))]
         cl = occ.addCurveLoop(ln)
@@ -103,10 +111,18 @@ def build(g: Geo3D, wd: str):
     def rect(x0, x1, z0, z1):
         return occ.addRectangle(x0, z0, 0, x1 - x0, z1 - z0)
 
-    s_parts = [rect(0, g.ws / 2, g.z_s0, g.z_s1), rect(0, g.wf / 2, g.z_top, g.z_s0 + 0.5)]
-    g_parts = [rect(g.wf / 2 + g.cf, xe, g.z_top, g.z_guard), rect(g.ws / 2 + g.gap, xe, g.z_top, g.z_g1)]
-    if g.g_bar:
-        g_parts.append(rect(0, xe, g.z_s1 + g.gap, g.z_s1 + g.gap + g.w_bar))
+    if half:
+        xs = (-xe - g.gap / 2) / 2           # Mitte S-Streifen (Zuleitung dort)
+        s_parts = [rect(-xe, -g.gap / 2, g.z_s0, g.z_s1), rect(xs - g.wf / 2, xs + g.wf / 2, g.z_top, g.z_s0 + 0.5)]
+        g_parts = [rect(-xe, xs - g.wf / 2 - g.cf, g.z_top, g.z_guard),
+                   rect(xs + g.wf / 2 + g.cf, xe, g.z_top, g.z_guard), rect(g.gap / 2, xe, g.z_top, g.z_g1)]
+        if g.g_bar:
+            g_parts.append(rect(-xe, xe, g.z_s1 + g.gap, g.z_s1 + g.gap + g.w_bar))
+    else:
+        s_parts = [rect(0, g.ws / 2, g.z_s0, g.z_s1), rect(0, g.wf / 2, g.z_top, g.z_s0 + 0.5)]
+        g_parts = [rect(g.wf / 2 + g.cf, xe, g.z_top, g.z_guard), rect(g.ws / 2 + g.gap, xe, g.z_top, g.z_g1)]
+        if g.g_bar:
+            g_parts.append(rect(0, xe, g.z_s1 + g.gap, g.z_s1 + g.gap + g.w_bar))
     s_f, _ = occ.fuse([(2, s_parts[0])], [(2, t) for t in s_parts[1:]])
     g_f, _ = occ.fuse([(2, g_parts[0])], [(2, t) for t in g_parts[1:]])
     el = s_f + g_f
@@ -139,7 +155,7 @@ def build(g: Geo3D, wd: str):
     gmsh.model.addPhysicalGroup(3, [t for t, r in vol_reg.items() if r[0] == "mask"], tag=2)
     for i in range(nsl):
         tags = [t for t, r in vol_reg.items() if r == ("slab", i)]
-        gmsh.model.addPhysicalGroup(3, tags, tag=10 + i)
+        gmsh.model.addPhysicalGroup(3, tags, tag=3 + i)
     gmsh.model.addPhysicalGroup(2, [t for t, n in surf_net.items() if n == "S"], tag=1)
     gmsh.model.addPhysicalGroup(2, [t for t, n in surf_net.items() if n == "G"], tag=2)
     # Netz
@@ -179,6 +195,12 @@ def build(g: Geo3D, wd: str):
     gmsh.finalize()
     subprocess.run(["ElmerGrid", "14", "2", "probe.msh", "-autoclean"], cwd=wd, check=True,
                    stdout=subprocess.DEVNULL)
+    # Kontrolle: ElmerGrid nummeriert Koerper fortlaufend -> physikalische Tags muessen 1..N sein
+    bodies = set()
+    with open(os.path.join(wd, "probe", "mesh.elements")) as fh:
+        for line in fh:
+            bodies.add(int(line.split()[1]))
+    assert bodies == set(range(1, len(slabs(g)) + 3)), f"Koerpernummern unerwartet: {sorted(bodies)}"
     return {"ntet": ntet, "nnode": nnode, "nslab": len(slabs(g))}
 
 
@@ -244,18 +266,18 @@ def write_case(wd, case, nslab, soil_mask, eps_soil, er_fr4):
               "Body 2\n  Target Bodies(1) = 2\n  Equation = 1\n  Material = 2\nEnd"]
     for i in range(nslab):
         mat = 4 if soil_mask[i] else 3
-        bodies.append(f"Body {3 + i}\n  Target Bodies(1) = {10 + i}\n  Equation = 1\n  Material = {mat}\nEnd")
+        bodies.append(f"Body {3 + i}\n  Target Bodies(1) = {3 + i}\n  Equation = 1\n  Material = {mat}\nEnd")
     txt = SIF.format(bodies="\n".join(bodies), case=case, er_fr4=er_fr4, er_mask=P.ER_MASK, eps_soil=eps_soil)
     with open(os.path.join(wd, case + ".sif"), "w") as f:
         f.write(txt)
 
 
-def run_case(wd, case):
+def run_case(wd, case, mult):
     log = open(os.path.join(wd, case + ".log"), "w")
     subprocess.run([ELMER, case + ".sif"], cwd=wd, stdout=log, stderr=subprocess.STDOUT, check=True)
     with open(os.path.join(wd, case + ".dat")) as f:
         v = [float(x) for x in f.read().split()]
-    return case, 4 * v[2] * 1e12  # Viertelmodell -> volle Sonde, pF
+    return case, mult * v[2] * 1e12  # Viertel-/Halbmodell -> volle Sonde, pF
 
 
 def cases_for(g: Geo3D):
@@ -289,9 +311,10 @@ def main():
     ap.add_argument("--h", type=float, default=1.0)
     ap.add_argument("--jobs", type=int, default=8)
     ap.add_argument("--only", default="")
+    ap.add_argument("--p2", action="store_true", help="quadratische Elemente (Netzkontrolle)")
     a = ap.parse_args()
     g = dc.replace(GEOS[a.geo], h=a.h)
-    tag = f"{g.name}_h{a.h:g}"
+    tag = f"{g.name}_h{a.h:g}" + ("_p2" if a.p2 else "")
     wd = os.path.join(HERE, "elmer3d", tag)
     info = build(g, wd)
     print(tag, info, flush=True)
@@ -311,13 +334,18 @@ def main():
             txt = txt.replace("Material 4\n", f"Material 5\n  Relative Permittivity = {P.EPS_WET}\nEnd\nMaterial 4\n", 1)
             for i in range(n):
                 if wetm[i]:
-                    txt = txt.replace(f"Target Bodies(1) = {10 + i}\n  Equation = 1\n  Material = 4",
-                                      f"Target Bodies(1) = {10 + i}\n  Equation = 1\n  Material = 5")
+                    txt = txt.replace(f"Target Bodies(1) = {3 + i}\n  Equation = 1\n  Material = 4",
+                                      f"Target Bodies(1) = {3 + i}\n  Equation = 1\n  Material = 5")
+            open(p, "w").write(txt)
+        if a.p2:
+            p = os.path.join(wd, case + ".sif")
+            txt = open(p).read().replace('  Variable = Potential\n', '  Variable = Potential\n  Element = "p:2"\n', 1)
             open(p, "w").write(txt)
         todo.append(case)
     res = {}
     with cf.ThreadPoolExecutor(a.jobs) as ex:
-        for case, c in ex.map(lambda c: run_case(wd, c), todo):
+        mult = 2 if g.topo == "sg" else 4
+        for case, c in ex.map(lambda c: run_case(wd, c, mult), todo):
             res[case] = c
             print(f"  {case:18s} C = {c:8.3f} pF", flush=True)
     out = os.path.join(HERE, "results", f"probe3d_{tag}.json")

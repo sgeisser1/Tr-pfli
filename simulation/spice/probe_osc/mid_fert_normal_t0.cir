@@ -1,0 +1,20 @@
+* fluidi Sonde: Schmitt-RC-Oszillator (Verhaltensmodell), Fall mid_fert_normal_t0
+VDD vdd 0 3.0
+Ecu cu 0 vdd in 1
+S1 vdd out cu 0 swup
+S2 out 0 in 0 swdn
+.model swup sw vt=1.665 vh=0.345 ron=30 roff=1e10
+.model swdn sw vt=1.335 vh=0.345 ron=30 roff=1e10
+R1 out in 10000.0
+Cpar in 0 1e-11
+
+* Sonde (Ersatzschaltbild aus der Feldsimulation)
+C0 in 0 7.0489818286258674e-12
+Ci in n1 9.90040001485092e-11
+Cs n1 0 1.718935135976231e-11
+Rs n1 0 185.62063478368734
+.ic v(in)=0 v(n1)=0
+.tran 0.2n 5.5125166439139155e-05 0 0.2n
+.meas tran ta when v(in)=1.335 rise=10
+.meas tran tb when v(in)=1.335 rise=40
+.end

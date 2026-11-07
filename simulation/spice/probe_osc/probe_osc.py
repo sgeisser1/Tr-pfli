@@ -7,7 +7,7 @@ KEIN Ersatz fuer die SPICE-Simulation mit dem Herstellermodell SN74LVC1G14 (Well
 Schmitt-Inverter ideal mit Schwellen-Mittelwerten bei 3 V (VT+ 1.68 V, VT- 0.99 V,
 TI_SN74LVC1G14_Datasheet_SCES218AA.pdf S.7 Tab. 5.5 laut research_elektronik.md 6.3),
 Ausgangswiderstand 30 Ohm (ANNAHME), tpd = 0 (Verhaltensmodell).
-Schaltung laut CONCEPTS.md 2.3: R = 4.7 kOhm Ausgang->Eingang, Sonde Eingang->GND, Cpar 10 pF (ANNAHME),
+Schaltung laut CONCEPTS.md 2.3 (dort R = 4.7 kOhm, hier 10 kOhm, s.u.): R Ausgang->Eingang, Sonde Eingang->GND, Cpar 10 pF (ANNAHME),
 Cref1 = 22 pF zuschaltbar; C_mess = Cref1 * T0 / (T1 - T0) - Cpar.
 
 Aufruf: .venv/bin/python simulation/spice/probe_osc/probe_osc.py
@@ -26,7 +26,8 @@ import params as P  # noqa: E402
 
 VDD = 3.0
 VTP, VTN = 1.68, 0.99
-R_OSC = 4.7e3
+R_OSC = 10e3   # ANNAHME/Vorschlag: mit den Feld-Kapazitaeten (Luft ~9 pF + 10 pF) laege 4.7 kOhm bei ~11.6 MHz
+#                (ueber der Zaehlgrenze ~10-12 MHz); 10 kOhm -> Luft ~5.4 MHz, nass ~2.2 MHz
 C_PAR = 10e-12
 C_REF = 22e-12
 
@@ -57,7 +58,7 @@ def period(case, c0, ci, cs, rs, cref):
     vh = (VTP - VTN) / 2
     vtd = (VTP + VTN) / 2
     vtu = VDD - vtd
-    f_est = 1 / (0.95 * R_OSC * (C_PAR + c0 + cs + (cref or 0)))
+    f_est = 1 / (0.95 * R_OSC * (C_PAR + c0 + ci + (cref or 0)))  # langsamster Fall (Sonde "kurzgeschlossen")
     tstop = 50 / f_est
     txt = NET.format(case=case, vdd=VDD, vtu=vtu, vtd=vtd, vh=vh, r=R_OSC, cpar=C_PAR,
                      cref=f"Cref in 0 {cref}" if cref else "", c0=c0, ci=ci, cs=cs, rs=rs,
@@ -71,7 +72,7 @@ def period(case, c0, ci, cs, rs, cref):
 
 
 def main():
-    fit = json.load(open(os.path.join(ROOT, "simulation", "field", "results", "probe_lumped_3d.json")))
+    fit = json.load(open(os.path.join(ROOT, "simulation", "field", "results", "probe_lumped_3d_extrap.json")))
     c0, ci, cg = fit["C0_pF"] * 1e-12, fit["Ci_pF"] * 1e-12, fit["Cg_pF"] * 1e-12
     rows = []
 

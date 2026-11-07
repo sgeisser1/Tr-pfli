@@ -119,7 +119,7 @@ def main():
     ax[0].set_xlabel("Bulk-Leitfaehigkeit sigma_b [S/m] (0 links als 3e-4 dargestellt)")
     ax[0].set_ylabel("C_eff(sigma) / C_eff(0), eps' = 25, f = 4 MHz")
     ax[0].grid(True, which="both", alpha=.3); ax[0].legend(fontsize=7)
-    main_name = names[0]
+    main_name = "4L SG gap2" if "4L SG gap2" in names else names[0]
     for f in (1e6, 2e6, 4e6, 6e6, 10e6, 20e6, 70e6):
         pts = sorted((r["sigma"], r["C"]) for r in rows if r["name"] == main_name and r["eps"] == eps_w and r["f"] == f)
         ax[1].semilogx([max(p[0], 3e-4) for p in pts], [p[1] for p in pts], "o-", ms=3, label=f"{f/1e6:g} MHz")

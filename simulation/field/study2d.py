@@ -9,6 +9,7 @@ Kennzahlen je Variante (Belaege pro m Elektrodenlaenge):
   d50/d90  Abstand von der Sondenoberflaeche, innerhalb dessen 50/90 % von dC'/d eps liegen (mm)
   fr4_moist  Drift bei FR4-Er +10 % (Saettigung) in % der Spanne, Mittel aus Luft- und Wasserpunkt
   tc_fr4   FR4-Temperaturgang (0.1 %/K) in %-Punkten/K, im Nasspunkt
+  lack_moist  Drift bei Er(Lack/Coating) +10 % in % der Spanne (ANNAHME Feuchteaufnahme Lack)
   gap01/gap05  Spanne mit 0.1 / 0.5 mm Luftspalt relativ zu ohne (%)
 """
 import os
@@ -65,6 +66,11 @@ def evaluate(args):
     out["fr4_moist_water"] = 100 * dfw / span
     out["fr4_moist"] = 0.5 * (out["fr4_moist_air"] + out["fr4_moist_water"])
     out["tc_fr4"] = 100 * fr4_sens(m, caps["wet"][1]) * er_fr4 * P.DK_FR4_TC / span
+    # Lack/Coating-Feuchte: Er +10 % (ANNAHME, keine Herstellerangabe) -> Drift in % der Spanne
+    def lack(phi):
+        rs = m.region_sens(phi)
+        return rs.get("mask", 0) * g.er_mask + rs.get("coat", 0) * g.er_coat
+    out["lack_moist"] = 100 * 0.5 * (lack(caps["air"][1]) + lack(caps["water"][1])) * 0.10 / span
     # Energieanteile im Nasspunkt
     rs = m.region_sens(caps["wet"][1])
     eps = caps["wet"][2]
@@ -134,6 +140,14 @@ def variants():
     for e in (1.5, 2.0):
         V.append((f"4L GSG ws6 gap2 rand{e}", X.Geometry(X.topo_gsg(6, 2, e=e), layers=4),
                   {"topo": "GSG", "ws": 6, "gap": 2, "edge": e}))
+    for e in (1.25, 1.5, 2.0):
+        V.append((f"4L SG gap2 rand{e}", X.Geometry(X.topo_sg(2, e=e), layers=4),
+                  {"topo": "SG", "gap": 2, "edge": e}))
+    for st in ("1080", "2116", "7628C"):
+        V.append((f"4L SG gap2 stack {st}", X.Geometry(X.topo_sg(2), layers=4, stack=st),
+                  {"topo": "SG", "gap": 2, "stack": st}))
+    V.append(("4L SG gap2 coat0.05", X.Geometry(X.topo_sg(2), layers=4, t_coat=0.05),
+              {"topo": "SG", "gap": 2, "coat": 0.05}))
     # 2 Lagen + Coating (Elektroden aussen unter Lack 15 um auf Cu + Coating)
     for tc in (0.02, 0.05, 0.1):
         V.append((f"2L GSG ws6 gap2 coat{tc}", X.Geometry(X.topo_gsg(6, 2, layers=("F", "B")), layers=2,
@@ -154,6 +168,10 @@ SALT_VARIANTS = [
     ("4L IDE n6 gap1", X.Geometry(X.topo_ide(6, 1.0), layers=4)),
     ("2L GSG ws6 gap2 coat0.05", X.Geometry(X.topo_gsg(6, 2, layers=("F", "B")), layers=2,
                                              t_mask=P.T_MASK_CU, t_coat=0.05)),
+    ("2L SG gap2 coat0.02", X.Geometry(X.topo_sg(2, layers=("F", "B")), layers=2, t_mask=P.T_MASK_CU, t_coat=0.02)),
+    ("4L SG gap2 1080", X.Geometry(X.topo_sg(2), layers=4, stack="1080")),
+    ("4L SG gap2 7628C", X.Geometry(X.topo_sg(2), layers=4, stack="7628C")),
+    ("4L versetzt gap2", X.Geometry(X.topo_offset(2), layers=4)),
 ]
 
 
