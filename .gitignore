@@ -15,3 +15,5 @@ simulation/**/work/
 docs/design/references/
 simulation/field/elmer3d/
 app/docs/concept/
+simulation/fem/*.FCStd
+*.FCBak
