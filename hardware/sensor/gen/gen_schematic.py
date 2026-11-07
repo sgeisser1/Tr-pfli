@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""fluidi Sensor Rev A - Schaltplan-Generator (KiCad 10, S-Expression direkt geschrieben).
+"""fluidi Sensor Rev B - Schaltplan-Generator (KiCad 10, S-Expression direkt geschrieben).
 
 Erzeugt im Ordner hardware/sensor/:
   fluidi_sensor.kicad_sch, fluidi_sensor.kicad_pro, sym-lib-table, fp-lib-table
@@ -29,7 +29,7 @@ NAME = "fluidi_sensor"
 KICAD_SYM = "/usr/share/kicad/symbols"
 NS = uuid.UUID("6f1d2c3a-0b6e-4c9a-9a51-f1a1d1000000")
 ROOT_UUID = str(uuid.uuid5(NS, "root"))
-REV = "A"
+REV = "B"
 DATE = "2026-11-07"
 STUB = 2.54
 
@@ -274,9 +274,9 @@ class Sheet:
     def write(self, path):
         tb = ["title_block", ["title", Q("fluidi Sensor - Schaltplan")], ["date", Q(DATE)], ["rev", Q(REV)],
               ["company", Q("fluidi (Projekt Tr-pfli)")],
-              ["comment", "1", Q("Konzept A-32 (D-006): CC2340R52 + RC-Oszillator + TMP1075 + Panasonic CR2032")],
+              ["comment", "1", Q("A-32 (D-006), Messkette D3 (D-018), Kopf V4 (D-019): CC2340R52, TMP1075N, CR2032")],
               ["comment", "2", Q("Generiert: hardware/sensor/gen/gen_schematic.py - nicht von Hand aendern")],
-              ["comment", "3", Q("Revisionsstand Rev A, Silkscreen 'fluidi Rev A' im Layout")],
+              ["comment", "3", Q("Revisionsstand Rev B, Silkscreen 'fluidi Rev B' im Layout")],
               ["comment", "4", Q("4 Lagen 1.6 mm, Economic PCBA, ENIG")]]
         root = ["kicad_sch", ["version", "20250114"], ["generator", Q("eeschema")], ["generator_version", Q("9.0")],
                 ["uuid", Q(ROOT_UUID)], ["paper", Q("A3")], tb,
@@ -290,7 +290,7 @@ NOTES = [
     (4, 5, "ENERGIEPFAD\n"
            "CR2032 (Panasonic) im Keystone 3034, 90 Grad gedreht (Mechanik S-01)\n"
            "-> AO3401A Verpolschutz (D = Zelle+, S = VDD, G = GND) -> VDD, kein Regler\n"
-           "(VDDS 1.71-3.8 V, DS S.18). Puffer 2 x 100 uF + 2 x DNM (E1).\n"
+           "(VDDS 1.71-3.8 V, DS S.18). Puffer 4 x 100 uF im Prototyp (D-013).\n"
            "Abschaltung 2.4 V unter Last an der Zellklemme (E1), SPICE simulation/spice.\n"
            "Kein Pad auf VBAT/VDD: AO3401A leitet in beide Richtungen (REQ-SAF-CC-03)."),
     (46, 5, "SoC CC2340R52E0RGER (QFN24, DS S.7 Abb. 6-2)\n"
@@ -299,7 +299,7 @@ NOTES = [
             "VDDD 1 uF; RSTN 100 k + 100 nF; 48 MHz ohne externe C (Cap-Array, DS S.26)."),
     (100, 5, "HF  LC-Filter 1.5 pF / 2.7 nH / 1.5 pF, DC-Block 15 pF, Pi-Netz 0 R + 2 x DNM\n"
              "(HW-Guide S.5). ESD-Diode der Referenz (TPD1E0B04) nicht vorgesehen.\n"
-             "Antenne AN043 oben, Keepout nach AN043, Platine dort 20 mm breit (S-02)."),
+             "Antenne AN043 oben, Keepout nach AN043 (FLOORPLAN_OPTIONS Kap. 1)."),
     (104, 30, "PROGRAMMIERUNG (REQ-SAF-CC-03, Auflagen R2-A1...A4)\n"
               "Barriere 1: Dummy-Zellen-Adapter einteilig, statt der Zelle im Halter,\n"
               "  Speisung nur ueber die Halterkontakte, VDD 1.8-2.0 V, 1.8-V-UART (R2-A2).\n"
@@ -310,18 +310,20 @@ NOTES = [
               "Pads RX/TX im Zellfach ausserhalb der Zellflaeche, keine Vias (R2-W01).\n"
               "Kein nRST-, SWD- oder VDD-Pad. ROM-Bootloader: SW1 (DIO21) beim\n"
               "  Einschalten gedrueckt, RX = DIO20, TX = DIO6 (TRM S.464).\n"
-              "TP3 GND, TP4 OSZ_OUT: nur messen, keine Quelle (Abstimmung sicherheit)."),
-    (4, 70, "MESSKETTE  RC-Oszillator SN74LVC1G14, Y -> 4.7 k -> A\n"
-            "Sondenknoten PROBE_SENSE gegen GND-Band (Innenlagen).\n"
-            "Cref1 22 pF (DIO8) / Cref2 100 pF (DIO11): GPIO low = zu,\n"
-            "sonst hochohmig + Eingangspuffer aus. SENS_PWR = DIO12 speist\n"
-            "U2, U3 und I2C-Pull-ups. Knoten kurz, kein Testpad am Knoten."),
-    (52, 72, "TEMPERATUR  TMP1075DGKR an SENS_PWR,\n"
-             "Adresse 0x48 (DS S.14). Pull-ups schaltbar.\n"
-             "Firmware: SWD + Pulls DIO16/17 aus (E3)."),
-    (84, 72, "BEDIENUNG  RGB-LED gem. Anode an VDD,\n"
-             "Kathode ueber R an GPIO (low = an).\n"
-             "DIO6 = LED_R + UART-TX, DIO20 = LED_B + UART-RX."),
+              "TP3 GND (Fach); TP4 MEAS_CLK, TP5 PROBE_SENSE auf der B-Seite des\n"
+              "  Elektronikbands: nur messen, keine Quelle (Abstimmung sicherheit)."),
+    (4, 66, "MESSKETTE D3 (D-018)  Q2 AO3401A schaltet OSC_PWR (DIO11 low = an, R13 haelt aus).\n"
+            "U2 SN74LVC1G14: Y -> R3 1 k -> A, Sondenknoten PROBE_SENSE gegen GND (Innenlagen),\n"
+            "17-36 MHz; R3 auf 10 k umloetbar (Variante A). Cref1 22 pF (DIO8 low = zu).\n"
+            "Teiler /8: U4-U6 SN74LVC1G80, D an /Q -> MEAS_CLK (DIO24, T3C0). Cref2 entfaellt.\n"
+            "TP5 PROBE_SENSE (B-Seite, VNA). Firmware: kein I2C waehrend der Messung."),
+    (4, 32, "TEMPERATUR  U3 TMP1075NDRLR + C24 im Sondenkragen\n"
+            "(FLOORPLAN_OPTIONS Option f), R4/R5 im Band. SENS_PWR = DIO12.\n"
+            "Adresse 0x48 (A0 = GND, DS S.14 Tab. 7-3). SWD + Pulls DIO16/17 aus (E3)."),
+    (102, 61, "BEDIENUNG  RGB-LED gem. Anode an VDD,\n"
+              "Kathode ueber R an GPIO (low = an).\n"
+              "DIO6 = LED_R + UART-TX, DIO20 = LED_B + UART-RX.\n"
+              "SW1 TS-1088 (H 2.0 mm) nach GND."),
 ]
 
 

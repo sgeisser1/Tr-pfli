@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""fluidi Sensor Rev A - BOM im JLC-Format aus dem Schaltplan erzeugen (kicad-cli sch export bom).
+"""fluidi Sensor Rev B - BOM im JLC-Format aus dem Schaltplan erzeugen (kicad-cli sch export bom).
 
 Ausgabe (hardware/sensor/out/):
   fluidi_sensor_bom_raw.csv   je Symbol (kicad-cli, alle Felder)
   fluidi_sensor_bom_jlc.csv   JLC-Format: Comment,Designator,Footprint,LCSC Part #  (ohne DNP, ohne Leiterplattenstrukturen)
   fluidi_sensor_bom_extra.csv nicht von JLC bestueckt: DNP-Positionen, Leiterplattenstrukturen, lokale Teile (Zelle)
-Optional: --register schreibt docs/datasheets/_staging/INDEX_schaltplan.csv (Kopf aus HEADER.csv), mit JLC-Status
+Optional: --register schreibt docs/datasheets/_staging/INDEX_schaltplan_b.csv (Kopf aus HEADER.csv), mit JLC-Status
 aus hardware/sensor/gen/jlc_check.json.
 Aufruf: .venv/bin/python hardware/sensor/gen/bom_jlc.py [--register] [kicad-cli]
 """
@@ -96,12 +96,12 @@ def write_register(groups):
         hst, mpn, _, cat, ds, descr = parts.PARTDB[key_of[lcsc]]
         j = chk.get(lcsc, {})
         refs = sorted(d["refs"], key=ref_key)
-        stat = (f"JLC-Abfrage 2026-11-07: {j.get('library', '?')}{' preferred' if j.get('preferred') else ''}, "
+        stat = (f"JLC-Abfrage {chk.get('_abruf', '?')}: {j.get('library', '?')}{' preferred' if j.get('preferred') else ''}, "
                 f"Lager {j.get('stock', '?')}, {j.get('price1', [[0, '?']])[0][1]} USD @1") if j else "JLC nicht abgefragt"
         lines.append(";".join(q(x) for x in [
             " ".join(refs), descr, hst, mpn, lcsc, cat, d["fp"], "siehe INDEX (bestehender Eintrag)", "-",
-            "2026-11-07", ds, f"Schaltplan Rev A, Wert {d['val']}, {len(refs)} Stk; {stat}"]))
-    path = os.path.join(ROOT, "docs", "datasheets", "_staging", "INDEX_schaltplan.csv")
+            "2026-11-07", ds, f"Schaltplan Rev B, Wert {d['val']}, {len(refs)} Stk; {stat}"]))
+    path = os.path.join(ROOT, "docs", "datasheets", "_staging", "INDEX_schaltplan_b.csv")
     with open(path, "w") as fh:
         fh.write("\n".join(lines) + "\n")
     print(f"Register: {len(lines) - 1} Zeilen -> {os.path.relpath(path, ROOT)}")

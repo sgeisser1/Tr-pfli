@@ -3,7 +3,6 @@
   (lib (name "74xGxx")(type "KiCad")(uri "${KICAD10_SYMBOL_DIR}/74xGxx.kicad_sym")(options "")(descr ""))
   (lib (name "Connector")(type "KiCad")(uri "${KICAD10_SYMBOL_DIR}/Connector.kicad_sym")(options "")(descr ""))
   (lib (name "Device")(type "KiCad")(uri "${KICAD10_SYMBOL_DIR}/Device.kicad_sym")(options "")(descr ""))
-  (lib (name "Sensor_Temperature")(type "KiCad")(uri "${KICAD10_SYMBOL_DIR}/Sensor_Temperature.kicad_sym")(options "")(descr ""))
   (lib (name "Switch")(type "KiCad")(uri "${KICAD10_SYMBOL_DIR}/Switch.kicad_sym")(options "")(descr ""))
   (lib (name "fluidi")(type "KiCad")(uri "${KIPRJMOD}/lib/fluidi.kicad_sym")(options "")(descr ""))
   (lib (name "power")(type "KiCad")(uri "${KICAD10_SYMBOL_DIR}/power.kicad_sym")(options "")(descr ""))

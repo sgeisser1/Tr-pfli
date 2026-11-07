@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-# fluidi Sensor Rev A - Schaltplan komplett neu erzeugen und pruefen.
+# fluidi Sensor Rev B - Schaltplan komplett neu erzeugen und pruefen.
 # Aufruf aus dem Repo-Wurzelordner: bash hardware/sensor/gen/run_all.sh
 # Schritte: Bibliothek + Schaltplan erzeugen, Netzliste gegen Soll pruefen, ERC mit KiCad 10 (WSL) und
 # KiCad 10 (Windows), PDF-Export, BOM im JLC-Format + Register-Zeilen.
+# JLC-Status vorher bei Bedarf neu abfragen: .venv/bin/python hardware/sensor/gen/jlc_check.py
 set -euo pipefail
 cd "$(dirname "$0")/../../.."
 PY=.venv/bin/python

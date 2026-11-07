@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""fluidi Sensor Rev A - SPICE (a): Versorgung CR2032 + Puffer bei Funk-/Messlast (REQ-ENE-06, E1, OP-K6).
+"""fluidi Sensor Rev B - SPICE (a): Versorgung CR2032 + Puffer bei Funk-/Messlast (REQ-ENE-06, E1, OP-K6).
 
 Aufruf: .venv/bin/python simulation/spice/supply/supply_burst.py
 Ausgabe: supply_<Ereignis>.cir (R_int 100 Ohm, pessimistisch, Puffer 4x100uF), supply_results.csv, supply_waveforms.png, supply_drop.png (in diesem Ordner)
@@ -12,7 +12,7 @@ Modell (Schaltplan hardware/sensor/fluidi_sensor.kicad_sch, Netze VBAT/VDD):
            TI SWRA349 S.10 (Ri = 1 kOhm); 500 Ohm Zwischenwert; 20 Ohm neue Zelle (ANNAHME).
            Vocv 3.0 V (neu) bzw. 2.7 V (Lebensende, SWRA349 S.11 "2.7 V good starting point").
   Pfad     AO3401A R_DS(on) <= 85 mOhm @ VGS -2.5 V (AOS DS S.2), Halterkontakt 50 mOhm (ANNAHME).
-  Puffer   2 x 100 uF CL31A107MQHNNNE (C1/C2) + 2 DNM (C3/C4) + 10 uF (C5); DC-Bias: keine lokale Kurve
+  Puffer   2 bzw. 4 x 100 uF CL31A107MQHNNNE (C1-C4; Rev B Prototyp 4 bestueckt, D-013) + 10 uF (C5); DC-Bias: keine lokale Kurve
            (Register: Murata/Samsung-Kurve nicht ladbar) -> ANNAHME Restkapazitaet 50 % bei 3 V (wie scripts/energy_budget.py
            DCBIAS) und Toleranz -20 % (Katalog: M = +-20 %). ESR 5 mOhm je Kondensator (ANNAHME).
   Last     CC2340R52 mit DCDC ab VDDS >= 2.2 V, darunter automatisch GLDO (DS S.18 Tab. 7.4 Fussnote 1).
@@ -25,7 +25,12 @@ Modell (Schaltplan hardware/sensor/fluidi_sensor.kicad_sch, Netze VBAT/VDD):
            CPU 1.5 ms davor/danach (E1: CPU nicht gleichzeitig mit Funk, aber ohne Pause).
            VERB: Verbindung 50 ms (T_CONN, ANNAHME) als Ereigniszug im 7.5-ms-Intervall (kleinstes BLE-Intervall),
            je Ereignis RX 0.3 ms + TX 0.4 ms (ANNAHME), CPU davor/danach.
-           MESS: Messung 10 ms bei 3 mA (Q_MEAS in scripts/energy_budget.py, ANNAHME).
+           MESS (Rev B, Messkette D3 ueber P-FET Q2 an VDD, nicht ueber den DCDC): CPU/Timer 2.6 mA (DCDC) waehrend
+           der ganzen Messung (ANNAHME, CPU wach) + Messkette 10.2 mA (Oszillator + Teiler, MESSKETTE_SALZ Kap. 5;
+           SPICE osc_sim.py liefert <= Wert, konservativ) als Konstantstrom an VDD:
+             MESS: 4 Bursts x 0.6 ms (Kette ein, f0 + f1), dazwischen 30 ms Schlaf (Regel PINMAP FW-2);
+             MESSD: 16 x 0.6 ms = 9.6 ms am Stueck (wie MESSKETTE_SALZ Kap. 5 gerechnet, verletzt FW-2).
+           Einschaltstoss Q2: C21 + C25 (200 nF) aus dem Puffer, Ladungsteilung -> ca. 3 V x 0.2/160 = 4 mV (Handrechnung).
            LED: Blink 20 ms bei 3 mA (Regel Phase-3-Review 1.8).
            FLASH: Notspeichern nach Unterspannung (2 kB loeschen + schreiben, x 1.5).
 Kriterien: REQ-ENE-06 Einbruch <= 0.2 V bei R_int 100 Ohm; E1 Abschaltung 2.4 V unter Last, VDDS bleibt >= 2.2 V (DCDC);
@@ -45,13 +50,14 @@ import spicetools  # noqa: E402
 PESS_T = 1.5
 I = dict(sleep=(1.15e-6, 1.15e-6), hfxo=(0.4e-3, 0.4e-3), cpu=(2.6e-3, 4.1e-3), tx0=(5.1e-3, 9.0e-3),
          tx4=(7.9e-3, 7.9e-3 * 9.0 / 5.1), rx=(5.3e-3, 9.0e-3), meas=(3.0e-3, 3.0e-3), led=(3.0e-3, 3.0e-3),
-         fl_w=(8.3e-3, 8.3e-3), fl_e=(2.2e-3, 2.2e-3))
+         fl_w=(8.3e-3, 8.3e-3), fl_e=(2.2e-3, 2.2e-3), mcpu=(2.6e-3, 4.1e-3))
+ICHAIN = {"mcpu": 10.2e-3}   # Messkette D3 an VDD (nicht DCDC), nur im Zustand mcpu
 RINT = [20, 100, 130, 220, 500, 1000]
 CBUF = {"2x100uF nominal": 200e-6, "2x100uF DC-Bias 50%": 100e-6, "2x100uF DC-Bias 50%, -20%": 80e-6,
         "4x100uF DC-Bias 50%, -20%": 160e-6}
 VOCV = [2.7]
-KINDS = [("ADV", "tx0"), ("ADV", "tx4"), ("VERB", "tx0"), ("VERB", "tx4"), ("MESS", "-"), ("LED", "-"),
-         ("FLASH", "-")]
+KINDS = [("ADV", "tx0"), ("ADV", "tx4"), ("VERB", "tx0"), ("VERB", "tx4"), ("MESS", "-"), ("MESSD", "-"),
+         ("LED", "-"), ("FLASH", "-")]
 MODES = {"pess": PESS_T, "nom": 1.0}
 T0 = 1e-3  # Beginn des Ereignisses
 
@@ -71,7 +77,11 @@ def profile(kind, txkey="tx0", p=PESS_T):
             seq += [(0.3e-3 * p, "rx"), (0.4e-3 * p, txkey), (t_int - busy, "sleep")]
         seq += [(0.5e-3 * p, "cpu")]
     elif kind == "MESS":
-        seq = [(10e-3 * p, "meas")]
+        seq = []
+        for k in range(4):
+            seq += [(0.6e-3 * p, "mcpu")] + ([(30e-3, "sleep")] if k < 3 else [])
+    elif kind == "MESSD":
+        seq = [(16 * 0.6e-3 * p, "mcpu")]
     elif kind == "LED":
         seq = [(20e-3, "led")]
     elif kind == "FLASH":
@@ -82,20 +92,22 @@ def profile(kind, txkey="tx0", p=PESS_T):
 
 
 def pwl(seq, which):
-    """PWL-Punkte fuer DCDC- (0) bzw. GLDO-Strom (1) mit 1-us-Flanken."""
-    pts = [(0.0, I["sleep"][which]), (T0, I["sleep"][which])]
+    """PWL-Punkte fuer DCDC- (0) bzw. GLDO-Strom (1) bzw. Messkette an VDD ("ch") mit 1-us-Flanken."""
+    val = (lambda st: ICHAIN.get(st, 0.0)) if which == "ch" else (lambda st: I[st][which])  # noqa: E731
+    pts = [(0.0, val("sleep")), (T0, val("sleep"))]
     t = T0
     for dur, st in seq:
-        pts.append((t + 1e-6, I[st][which]))
+        pts.append((t + 1e-6, val(st)))
         t += dur
-        pts.append((t, I[st][which]))
-    pts.append((t + 1e-6, I["sleep"][which]))
+        pts.append((t, val(st)))
+    pts.append((t + 1e-6, val("sleep")))
     return pts, t
 
 
 def netlist(seq, vocv, rint, cbuf):
     p_dc, t_end = pwl(seq, 0)
     p_ldo, _ = pwl(seq, 1)
+    p_ch, _ = pwl(seq, "ch")
     fmt = lambda pts: " ".join(f"{t:.7g} {v:.6g}" for t, v in pts)  # noqa: E731
     c_each = cbuf / 2
     L = ["* fluidi supply_burst - erzeugt von supply_burst.py",
@@ -108,6 +120,8 @@ def netlist(seq, vocv, rint, cbuf):
          f"C5 vdd 0 5u IC={vocv}",
          f"VPDC pdc 0 PWL({fmt(p_dc)})",
          f"VPLDO pldo 0 PWL({fmt(p_ldo)})",
+         f"VPCH pch 0 PWL({fmt(p_ch)})",
+         "BCH vdd 0 I = v(pch)",
          "BLOAD vdd 0 I = (1/(1+exp(-(v(vdd)-2.2)/0.005))) * v(pdc)*3.0/max(v(vdd),1.0)"
          " + (1-1/(1+exp(-(v(vdd)-2.2)/0.005))) * v(pldo)"]
     tstop = t_end + 0.05
@@ -178,6 +192,7 @@ def main():
     print("| Puffer | R_int | VDDS min Regel A (schwerstes) | Regel B: VDDS min (FLASH nach Abschaltung) | DCDC >= 2.2 V (A/B) | kein Reset >= 1.71 V (A/B) |")
     print("|---|---|---|---|---|---|")
     regular = [("ADV", "tx0"), ("ADV", "tx4"), ("VERB", "tx0"), ("VERB", "tx4"), ("MESS", "-"), ("LED", "-")]
+    # MESSD (Messung am Stueck) ist eine Regelverletzung (FW-2) und nicht "regulaer"; Ausgabe nur in den Tabellen
     for cname in CBUF:
         for ri in RINT:
             adv = drop("pess", "ADV", "tx0", cname, ri)

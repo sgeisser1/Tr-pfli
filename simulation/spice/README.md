@@ -1,78 +1,99 @@
-# SPICE – Sensor Rev A (ngspice 42, Batch)
+# SPICE – Sensor Rev B (ngspice 42, Batch)
 
-Stand 2026-11-07, Schaltplan `hardware/sensor/fluidi_sensor.kicad_sch` (Rev A). Alle Läufe per Skript reproduzierbar:
+Stand 2026-11-07, Schaltplan `hardware/sensor/fluidi_sensor.kicad_sch` (**Rev B**: Messkette D3 nach D-018, Lastschalter
+Q2 an DIO11, TMP1075N im Kragen, 4 × 100 µF im Prototyp). Alle Läufe per Skript reproduzierbar:
 
 ```
-.venv/bin/python simulation/spice/supply/supply_burst.py          # (a) ca. 2 min
-.venv/bin/python simulation/spice/osc/osc_sim.py                  # (b) ca. 2 min
+.venv/bin/python simulation/spice/supply/supply_burst.py > simulation/spice/supply/supply_report.txt   # (a) ca. 2 min
+.venv/bin/python simulation/spice/osc/osc_sim.py                  # (b) ca. 8 min, schreibt osc/osc_report.txt
 .venv/bin/python simulation/spice/uart_backfeed/uart_backfeed.py  # (c) < 10 s
 ```
 
 Jedes Skript schreibt die Netzliste (`*.cir`, letzter Fall), eine CSV mit allen Fällen und PNG-Plots in seinen Ordner.
-Modellannahmen und Datenblattstellen stehen im Kopf des jeweiligen Skripts. `led_rgb/` stammt aus Phase 3.
+Modellannahmen und Datenblattstellen stehen im Kopf des jeweiligen Skripts. `led_rgb/` stammt aus Phase 3,
+`probe_osc/` aus der Entscheidungsvorlage Messkette (MESSKETTE_SALZ.md).
 
 ## (a) Versorgung: CR2032 + Puffer bei Funk-/Messlast (REQ-ENE-06, E1, OP-K6)
 
 Modell: Zelle Vocv 2.7 V (Lebensende, TI SWRA349 S.11) mit R_int 20…1000 Ω, AO3401A + Halter 0.135 Ω, Puffer C_eff
 200 / 100 / 80 / 160 µF (2 × 100 µF nominal / DC-Bias 50 % **ANNAHME** / zusätzlich −20 % / 4 × 100 µF mit DC-Bias und −20 %),
 CC2340 mit DCDC (konstante Leistung, **ANNAHME**) und GLDO unter 2.2 V. Ereignisse: Advertising 3 Kanäle (ADV),
-Verbindung 50 ms im 7.5-ms-Intervall (VERB), Messung 10 ms × 3 mA (MESS), LED 20 ms × 3 mA, Flash-Notspeichern.
-Funk-/CPU-Zeiten pessimistisch × 1.5 bzw. nominal.
+Verbindung 50 ms im 7.5-ms-Intervall (VERB), **Messung Rev B** (MESS: 4 Bursts × 0.6 ms, Messkette 10.2 mA direkt an VDD
+über Q2 + CPU 2.6 mA, dazwischen 30 ms Schlaf; MESSD: 9.6 ms am Stück), LED 20 ms × 3 mA, Flash-Notspeichern.
+Funk-/CPU-Zeiten pessimistisch × 1.5 bzw. nominal. Messkettenstrom 10.2 mA aus MESSKETTE_SALZ Kap. 5; (b) ergibt
+≤ 8.6 mA → konservativ.
 
-**Einbruch bei R_int = 100 Ω** (pess. / nom., Kriterium ≤ 0.2 V), Auszug:
+**Einbruch bei R_int = 100 Ω** (pess. / nom., Kriterium ≤ 0.2 V), Auszug (`supply/supply_report.txt`):
 
 | Ereignis | 2 × 100 µF nominal | 2 × 100 µF DC-Bias 50 %, −20 % (80 µF) | 4 × 100 µF DC-Bias 50 %, −20 % |
 |---|---|---|---|
 | ADV 0 dBm | 118 / 82 mV ✔ | **246 / 178 mV** ✘ / ✔ | 143 / 100 mV ✔ |
 | ADV +4 dBm | 142 / 98 mV ✔ | **298 / 214 mV** ✘ | 172 / 119 mV ✔ |
 | VERB +4 dBm | 120 / 80 mV ✔ | 157 / 105 mV ✔ | 129 / 86 mV ✔ |
-| MESS 10 ms × 3 mA | 180 / 132 mV ✔ | 302 / 246 mV ✘ | 210 / 157 mV |
+| **MESS Rev B** (4 × 0.6 ms, 30 ms Pause) | 72 / 49 mV ✔ | 136 / 92 mV ✔ | 82 / 56 mV ✔ |
+| MESSD (9.6 ms am Stück, Regelverletzung) | 697 / 503 mV ✘ | **1159 / 952 mV** ✘ | 812 / 603 mV ✘ |
 | LED 20 ms × 3 mA | 219 mV ✘ | 336 mV ✘ | 250 mV ✘ |
 
+Einbruch MESS über R_int (80 µF, pess.): 108 / 136 / 143 / 169 / 255 / 354 mV bei 20 / 100 / 130 / 220 / 500 / 1000 Ω,
+also ab 100 Ω immer kleiner als VERB +4 dBm (157 … 661 mV). MESSD erreicht 1.16 … 2.47 V.
+
 Bewertung:
-- **REQ-ENE-06 (Senden)**: Verbindungen erfüllt in allen Fällen. Das Advertising-Ereignis erfüllt 0.2 V mit 2 × 100 µF
-  nur, wenn der DC-Bias-Verlust kleiner ist als angenommen oder die Zeiten nominal sind; mit **4 × 100 µF** (C3/C4 bestückt)
-  in allen Fällen. Der Puffer-Bedarf wird von der CPU-Zeit direkt vor/nach dem Funk bestimmt (E1-Annahme).
-- MESS und LED sind lange Lasten (≫ τ = R·C ≈ 8 ms): Der Einbruch ist praktisch I·R_int, der Puffer hilft kaum.
-  Sie sind kein „Senden“, bestimmen aber die Abschaltlogik.
-- **E1, Abschaltung 2.4 V unter Last**: Misst die Firmware VDD nur nach dem Advertising (Regel A), kann ein späteres
-  LED-/Messereignis VDDS bis 2.01 V drücken (GLDO statt DCDC, aber kein Reset ≥ 1.71 V). Misst sie während der
-  Verbindung (schwerstes reguläres Ereignis) und gibt die LED nur über der Schwelle frei (Regel B), bleibt VDDS in allen
-  Fällen (R_int bis 1 kΩ, alle Puffer) **≥ 2.25 V**, das Notspeichern im Flash eingeschlossen. Ein Reset (1.71 V / BOD 1.67 V)
-  tritt in keinem gerechneten Fall auf.
+- **REQ-ENE-06 (Senden)**: unverändert gegenüber Rev A. Verbindungen erfüllt in allen Fällen; Advertising mit
+  **4 × 100 µF** (Rev B Prototyp bestückt, D-013) in allen Fällen.
+- **Neue Last Messkette D3** (P-FET Q2): ≈ 12.8 mA statt 3 mA. Am Stück gemessen (MESSD, so in MESSKETTE_SALZ
+  Kap. 5 mit 16 × 0.6 ms angenommen) wäre das mit Abstand das schwerste Ereignis (1.16–2.47 V Einbruch bei
+  R_int 100–1000 Ω → VDDS unter 1.71 V, Reset); Regel B würde es nicht abdecken. **Firmware-Regel FW-2 (PINMAP):** Burst ≤ 0.6 ms, ≥ 30 ms Schlaf, ≤ 4
+  Bursts. Damit bleibt MESS ab R_int 100 Ω unter VERB +4 dBm, und **Regel B** (Unterspannung in der Verbindung messen)
+  deckt sie mit ab: VDDS bleibt in allen gerechneten Fällen **≥ 2.25 V**, kein Reset.
+- Einschalten von Q2: C21 + C25 (200 nF) laden aus dem Puffer, Ladungsteilung ≈ 3 V × 0.2/160 µF ≈ 4 mV (Handrechnung).
+  DIO12 (SENS_PWR) trägt nur noch den TMP1075N (≤ 10 µA + Pull-ups).
 - Fallende Flanke VDD max. **0.16 mV/µs** < 1 mV/µs (DS S.18 Tab. 7.3 Fussnote 3).
 
-Folgerungen: (1) Prototyp Rev A mit **C3/C4 bestückt** aufbauen und am Muster mit 2 und 4 Kondensatoren messen (OP-K6),
-DC-Bias-Kurve CL31A107MQHNNNE beschaffen. (2) Firmware: Unterspannung während der Verbindung messen (Regel B), LED-Pulse
-≤ 5 ms mit Pausen, CPU-Arbeit nicht unmittelbar vor/nach dem Advertising. (3) R_int-Werte aus der Panasonic-Kurve sind
-abgelesen (**ANNAHME**); Pulsverhalten am Lebensende nur am Muster prüfbar (PROTOTYP-PRÜFUNG).
+Folgerungen: (1) Prototyp mit 4 × 100 µF; am Muster mit 2 und 4 messen (OP-K6). (2) Firmware: FW-2 Burstregel,
+Unterspannung während der Verbindung messen (Regel B), LED-Pulse ≤ 5 ms mit Pausen, CPU-Arbeit nicht unmittelbar
+vor/nach dem Advertising (PINMAP Kap. 3). (3) R_int-Werte abgelesen (**ANNAHME**), Pulsverhalten am Lebensende nur am
+Muster prüfbar (**PROTOTYP-PRÜFUNG**).
 
-Plots: `supply/supply_waveforms.png` (ADV, VERB, LED bei 100 / 1000 Ω), `supply/supply_drop.png` (Einbruch über R_int).
+Plots: `supply/supply_waveforms.png`, `supply/supply_drop.png`.
 
-## (b) Messoszillator SN74LVC1G14, Speisung über DIO12
+## (b) Messkette D3: RC-Oszillator SN74LVC1G14 + Teiler ÷8 (3 × SN74LVC1G80), Speisung über Q2
 
-Modell: Schmitt-Inverter mit Schwellen aus LVC-DS S.7 Tab. 5.5 (5 Ecken innerhalb der Grenzen), tpd 1.6–5.5 ns (S.8),
-Cpd 22 pF, R_out 40 Ω; SENS_PWR über 53 Ω (DIO12 High-Drive, CC2340-DS S.31) mit 2 × 100 nF; Knoten 10 pF + Cref im
-Aus-Zustand in Serie mit 6 pF Pinkapazität (DS S.32). Sonde **ANNAHME** bis Feldsimulation: trocken 30 pF, nass 100 pF,
-nass leitfähig (20 pF + 100 pF Isolation in Serie mit 1 kΩ bzw. 300 Ω).
+Modell (`osc/osc_sim.py`): Schmitt-Inverter mit Schwellen aus LVC1G14-DS S.7 Tab. 5.5 (5 Ecken), tpd 1.6–5.5 ns (S.8),
+Cpd 22 pF, R_out 40 Ω; OSC_PWR über Q2 (0.1 Ω **ANNAHME**) mit C21 + C25; Knoten 10 pF + TP5 0.5 pF (**ANNAHME**),
+Cref1 22 pF im Aus-Zustand in Serie mit 6 pF Pinkapazität; Ausgang belastet mit U4-CLK 3.5 pF + 1 pF.
+**Sonde nach `docs/interfaces/PROBE_CAPACITANCE.md` Kap. 3** (C0 7.05 pF ‖ Ci 99 pF – (ε'·1.72 pF ‖ Rs)).
+**Teiler in SPICE** als XSPICE `d_dff` (D an /Q, CLK→Q 3 ns **ANNAHME**, DS S.7: 1.3–4.2 ns bei 3.3 V).
+360 Fälle (R3 1 k / 10 k, VDD 3.0 / 2.4 V, 9 Sondenzustände, 5 Ecken, f0/f1), alle schwingen.
 
-| Sonde | f0 VDD 3.0 V (Ecken, typ) | f0 VDD 2.4 V | f1 / f2 typ 3.0 V |
+| Sonde (typ, VDD 3.0 V) | **R3 1 kΩ** f_osc [MHz] (Ecken 3.0 V) | MEAS_CLK = f/8 max [MHz] | **R3 10 kΩ** f_osc [MHz] (Ecken) |
 |---|---|---|---|
-| trocken 30 pF | 3.23–5.22 (4.14) MHz | 2.88–4.78 (3.72) | 3.15 / 1.54 |
-| nass 100 pF | 1.41–2.25 (1.79) MHz | 1.25–2.06 (1.60) | 1.58 / 1.03 |
-| nass leitfähig 1 kΩ | 1.53–3.46 (2.26) MHz | 1.28–2.89 (1.87) | 1.84 / 1.06 |
-| nass leitfähig 300 Ω | 1.28–2.19 (1.68) MHz | 1.12–1.97 (1.48) | 1.47 / 0.97 |
+| Luft | **27.4** (20.3–36.1) | 4.51 | 4.11 (3.21–5.18) |
+| trocken (ε' 4) | **24.2** (18.0–31.7) | 3.96 | 3.46 (2.71–4.36) |
+| Mitte, Leitungswasser | 20.3 (15.1–26.3) | 3.29 | 1.42 (0.92–2.24) |
+| nass, Leitungswasser | **14.9** (10.9–19.5) | 2.44 | 0.94 (0.72–1.24) |
+| nass, gedüngt low / normal | 9.1 / 8.1 | 1.60 / 1.34 | 0.86 / 0.86 |
+| Wasser verlustfrei / Leitungswasser | **10.8 / 9.8** | 1.73 / 1.62 | 1.28 / 0.87 |
 
-- Schwingt in allen 120 Fällen (+ 6 Fälle R3-Variation); Bereich 0.66–5.22 MHz, also unter der Zählgrenze (≈ 10–12 MHz, CONCEPTS 2.3).
-  Der Nassfall liegt mit R3 = 4.7 kΩ bei **1.8 MHz typ, also unter den geplanten 2 MHz**, weil die Aus-Kapazität der
-  beiden Cref-Zweige (≈ 10.4 pF) dazukommt. R3 = 3.9 kΩ ergäbe 4.93 / 2.15 MHz (typ). Dafür gibt es aber nur ein Extended-Teil
-  (C51721, JLC 2026-11-07), deshalb bleibt R3 auf 4.7 kΩ, bis die Feldsimulation die Sondenkapazität liefert.
-- Pegel an DIO24: high ≥ 2.98 / 2.39 V (VIH 0.8·VDDS erfüllt), low ≤ 9 mV. SENS_PWR sinkt um ≤ 20 mV, Strom ≤ 0.6 mA.
-- Ratiometrie (C_x aus f0/f1 mit festen Konstanten): systematisch +4 pF (Laufzeit tpd); Streuung über Schwellen-Ecken
-  und VDD zusammen ±0.7 pF trocken / ±0.75 pF nass, davon VDD 3.0 → 2.4 V allein ≈ 0.6 pF ≈ **0.9 % der Kalibrierspanne** → VDD-abhängige
-  Korrektur (CONCEPTS 2.3) nötig für REQ-MES-04/05. Leitfähige Erde verschiebt f deutlich (Salzthema REQ-MES-11, OP-K3).
+- **Zählgrenze:** MEAS_CLK ≤ **4.51 MHz** in allen Fällen (1 kΩ), Grenze ≈ 10–12 MHz (**ANNAHME**, CONCEPTS 2.3)
+  → Faktor ≥ 2.2 Reserve. Minimum 0.59 MHz (nass gedüngt, Ecke, 2.4 V). Mit 10 kΩ ≤ 0.65 MHz.
+- **Teiler:** SPICE-Teilerausgang = f_osc/8 auf ≤ 0.34 % (Mittelungsfehler über wenige Perioden) in 180 Fällen;
+  fclock ≤ 36.1 MHz ≪ 160 MHz, kürzester Puls OSZ_OUT 12.4 ns ≥ tw 2.5 ns (LVC1G80 S.6 Tab. 5.6).
+- **Abweichung zur Entscheidungsvorlage:** MESSKETTE_SALZ (D3) rechnet 36.1 / 17.4 MHz (Luft / nass). Mit den
+  Rev-B-Parasitics (Cref1-Aus-Kapazität 4.7 pF, Cpd, Ausgangslast) liegt typ **27.4 / 14.9 MHz** (−24 / −14 %).
+  Die Salzbewertung dort ist damit etwas zu günstig (tiefere Frequenz = mehr Leitfähigkeitseinfluss) → am Muster
+  im Becherversuch prüfen (OP-K3, **PROTOTYP-PRÜFUNG**). Option R3 kleiner (0.68 kΩ, MESSKETTE Kap. 5) erst
+  nach dem Becherversuch; Zählgrenze und tw dann neu rechnen.
+- **tpd-Einfluss** (typ, f0): df/f je ns = −8.3 % (Luft) … −4.2 % (nass) bei 1 kΩ, −1.3 … −0.3 % bei 10 kΩ.
+  Ohne Ratiometrie verschiebt +1 ns den Index in der Mitte um **+12.6 %-Punkte** (1 kΩ) bzw. +0.3 (10 kΩ).
+- **Ratiometrie** C_x = dC·T0/(T1−T0) − C_basis (dC 17.29 pF, C_basis 15.21 pF): Die Spanne trocken→nass bleibt
+  23.4–24.3 pF über alle Ecken (wahr 23.0 pF), aber ein Offset von ≈ +19 pF (Laufzeit) und **VDD 3.0 → 2.4 V
+  verschiebt C_x um −3.2 pF ≈ 13 % der Spanne** (10 kΩ: −0.27 pF). Exemplarstreuung (Ecken 7 pF) kalibriert die
+  Zwei-Punkt-Kalibrierung weg; der **VDD-Gang muss korrigiert werden** (FW-3, Batteriemonitor), Temperatur ebenso
+  (tpd-Drift im Modell nicht über VDD/T variiert → **PROTOTYP-PRÜFUNG**).
+- **Strom:** Oszillator ≤ 3.4 mA (SPICE) + Teiler ≤ 5.2 mA (Cpd 25 pF je FF, LVC1G80 S.8) = **≤ 8.6 mA** bei 3.0 V
+  (1 kΩ); OSC_PWR sinkt ≤ 0.5 mV (Q2). Mit 10 kΩ ≤ 1.2 mA.
 
-Plots: `osc/osc_waveforms.png`, `osc/osc_freq.png`.
+Plots: `osc/osc_waveforms.png` (OSZ_OUT, PROBE_SENSE, MEAS_CLK), `osc/osc_freq.png` (Frequenz je Sonde, beide R3).
 
 ## (c) Rückstrom über die UART-Pads (R2-A1, R2-A4)
 
@@ -101,6 +122,7 @@ Plot: `uart_backfeed/uart_backfeed.png`.
 |---|---|---|
 | SP-1 | DC-Bias-Kurve CL31A107MQHNNNE (bzw. Ersatztyp mit Kurve) beschaffen; Puffer am Muster mit 2 und 4 × 100 µF messen | Datenblatt, PROTOTYP-PRÜFUNG (OP-K6) |
 | SP-2 | Reale Stromprofile CC2340 (Advertising, Verbindung, Flash) am LaunchPad oder Muster messen, Faktor 1.5 ersetzen | PROTOTYP-PRÜFUNG |
-| SP-3 | Sondenkapazität aus `simulation/field`, danach R3 und Cref festlegen (Arbeitsbereich 2–6 MHz). Vorläufiges, **ungeprüftes** Feldergebnis `simulation/field/results/probe3d_gsg_h2.json` (Luft 12 / trocken 16 / nass 33 pF) ergibt mit R3 4.7 kΩ (Handlauf `osc_sim.netlist`, VDD 3.0 V): Luft 6.25 MHz typ (4.85–7.92), nass 3.93 MHz (3.07–4.95) → über 6 MHz, Spanne nur 21 pF ≈ Cref1; dann R3 grösser (z. B. 6.8 kΩ) und Cref1 kleiner wählen | Feldsimulation, Entscheid Elektronik |
-| SP-4 | Firmware-Regeln: Unterspannung während der Verbindung messen, LED-Pulse ≤ 5 ms, CPU nicht direkt am Funkburst | Firmware |
+| SP-3 | Messkette D3 am Muster: f_osc trocken/nass/Wasser, Strom OSC_PWR, VDD- und Temperaturgang von C_x (tpd), Vergleich R3 1 k / 10 k im Becherversuch (OP-K3); Abweichung zur Entscheidungsvorlage (Frequenz −14…−24 %) bewerten | PROTOTYP-PRÜFUNG |
+| SP-4 | Firmware-Regeln FW-1…FW-8 (PINMAP Kap. 3), insbesondere Burstregel FW-2 und Unterspannung in der Verbindung | Firmware |
 | SP-5 | R2-A4: Injektionsstrom in die ESD-Struktur bei 5.5 V an allen Pads, Funktionstest danach | PROTOTYP-PRÜFUNG |
+| SP-6 | Zählgrenze LGPT (≈ 10–12 MHz ANNAHME) am LaunchPad bestätigen; Reserve zu MEAS_CLK max 4.5 MHz | PROTOTYP-PRÜFUNG |

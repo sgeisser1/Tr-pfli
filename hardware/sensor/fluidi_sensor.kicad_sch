@@ -7,11 +7,11 @@
 	(title_block
 		(title "fluidi Sensor - Schaltplan")
 		(date "2026-11-07")
-		(rev "A")
+		(rev "B")
 		(company "fluidi (Projekt Tr-pfli)")
-		(comment 1 "Konzept A-32 (D-006): CC2340R52 + RC-Oszillator + TMP1075 + Panasonic CR2032")
+		(comment 1 "A-32 (D-006), Messkette D3 (D-018), Kopf V4 (D-019): CC2340R52, TMP1075N, CR2032")
 		(comment 2 "Generiert: hardware/sensor/gen/gen_schematic.py - nicht von Hand aendern")
-		(comment 3 "Revisionsstand Rev A, Silkscreen 'fluidi Rev A' im Layout")
+		(comment 3 "Revisionsstand Rev B, Silkscreen 'fluidi Rev B' im Layout")
 		(comment 4 "4 Lagen 1.6 mm, Economic PCBA, ENIG")
 	)
 	(lib_symbols
@@ -2738,36 +2738,30 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Sensor_Temperature:TMP1075DGK"
+		(symbol "74xGxx:74LVC1G80"
+			(pin_names
+				(offset 1.016)
+			)
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
 			(property "Reference" "U"
-				(at -6.35 6.35 0)
+				(at -5.08 10.16 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
 				)
 			)
-			(property "Value" "TMP1075DGK"
-				(at 6.35 6.35 0)
+			(property "Value" "74LVC1G80"
+				(at 7.62 -10.16 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
 				)
 			)
-			(property "Footprint" "Package_SO:VSSOP-8_3x3mm_P0.65mm"
-				(at 0 -6.985 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" "https://www.ti.com/lit/gpn/tmp1075"
+			(property "Footprint" ""
 				(at 0 0 0)
 				(effects
 					(font
@@ -2776,7 +2770,7 @@
 					(hide yes)
 				)
 			)
-			(property "Description" "I2C-bus digital temperature sensor and thermal watchdog, VSSOP-8"
+			(property "Datasheet" "http://www.ti.com/lit/sg/scyt129e/scyt129e.pdf"
 				(at 0 0 0)
 				(effects
 					(font
@@ -2785,7 +2779,7 @@
 					(hide yes)
 				)
 			)
-			(property "ki_keywords" "temperature sensor I2C single channel"
+			(property "Description" "Single D Flip-Flop, Inverted Output, Low-Voltage CMOS"
 				(at 0 0 0)
 				(effects
 					(font
@@ -2794,7 +2788,7 @@
 					(hide yes)
 				)
 			)
-			(property "ki_fp_filters" "VSSOP*3x3mm*P0.65mm*"
+			(property "ki_keywords" "Single D Flip-Flop CMOS"
 				(at 0 0 0)
 				(effects
 					(font
@@ -2803,7 +2797,170 @@
 					(hide yes)
 				)
 			)
-			(symbol "TMP1075DGK_0_1"
+			(property "ki_fp_filters" "SOT* SG*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "74LVC1G80_0_1"
+				(rectangle
+					(start -7.62 7.62)
+					(end 7.62 -7.62)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(symbol "74LVC1G80_1_1"
+				(pin input line
+					(at -12.7 5.08 0)
+					(length 5.08)
+					(name "D"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input clock
+					(at -12.7 -5.08 0)
+					(length 5.08)
+					(name "C"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at 0 12.7 270)
+					(length 5.08)
+					(name "VCC"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at 0 -12.7 90)
+					(length 5.08)
+					(name "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin output line
+					(at 12.7 5.08 180)
+					(length 5.08)
+					(name "~{Q}"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "fluidi:TMP1075NDRL"
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "U"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "TMP1075NDRLR"
+				(at 0 -2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" "Package_TO_SOT_SMD:SOT-563"
+				(at 0 -5.08 0)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" "docs/datasheets/TI_TMP1075_Datasheet_SBOS854F.pdf"
+				(at 0 -7.62 0)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "Temperatursensor I2C TMP1075N, SOT-563 (DRL); Pins DS S.4 Abb. 5-4, Tab. 5-1; V+ 1.62-3.6 V (S.5)"
+				(at 0 -10.16 0)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "TMP1075NDRL_0_1"
 				(rectangle
 					(start -7.62 5.08)
 					(end 7.62 -5.08)
@@ -2816,29 +2973,11 @@
 					)
 				)
 			)
-			(symbol "TMP1075DGK_1_1"
-				(pin input line
+			(symbol "TMP1075NDRL_1_1"
+				(pin bidirectional line
 					(at -10.16 2.54 0)
 					(length 2.54)
-					(name "A0"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "7"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin input line
-					(at -10.16 0 0)
-					(length 2.54)
-					(name "A1"
+					(name "SDA"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -2854,16 +2993,52 @@
 					)
 				)
 				(pin input line
-					(at -10.16 -2.54 0)
+					(at -10.16 0 0)
 					(length 2.54)
-					(name "A2"
+					(name "SCL"
 						(effects
 							(font
 								(size 1.27 1.27)
 							)
 						)
 					)
-					(number "5"
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -10.16 -2.54 0)
+					(length 2.54)
+					(name "A0"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin open_collector line
+					(at 10.16 0 180)
+					(length 2.54)
+					(name "ALERT"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -2881,7 +3056,7 @@
 							)
 						)
 					)
-					(number "8"
+					(number "5"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -2899,61 +3074,7 @@
 							)
 						)
 					)
-					(number "4"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin bidirectional line
-					(at 10.16 2.54 180)
-					(length 2.54)
-					(name "SDA"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin input line
-					(at 10.16 0 180)
-					(length 2.54)
-					(name "SCL"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
 					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin open_collector line
-					(at 10.16 -2.54 180)
-					(length 2.54)
-					(name "ALERT"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "3"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -4715,7 +4836,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp yes)
+		(dnp no)
 		(uuid "406da606-51f8-50ac-a960-26ce045bb89e")
 		(property "Reference" "C3"
 			(at 88.36 59.96 0)
@@ -4753,7 +4874,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "MLCC 100 uF 6.3 V X5R 1206; Reserve-Footprint E1 (GLDO-Fall), DNM"
+		(property "Description" "MLCC 100 uF 6.3 V X5R 1206; Puffer E1; Prototyp bestueckt (D-013), Serie nach Messung 2 oder 4"
 			(at 86.36 60.96 0)
 			(effects
 				(font
@@ -4954,7 +5075,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp yes)
+		(dnp no)
 		(uuid "dd4467d2-75d9-5976-abbc-7ce8dd338ff4")
 		(property "Reference" "C4"
 			(at 98.52 59.96 0)
@@ -4992,7 +5113,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "MLCC 100 uF 6.3 V X5R 1206; Reserve-Footprint E1, DNM"
+		(property "Description" "MLCC 100 uF 6.3 V X5R 1206; Puffer E1; Prototyp bestueckt (D-013), Serie nach Messung 2 oder 4"
 			(at 96.52 60.96 0)
 			(effects
 				(font
@@ -5623,7 +5744,7 @@
 		)
 		(uuid "799e285d-5027-56d8-b9f5-78436b9d4ef8")
 	)
-	(label "CREF2_CTL"
+	(label "OSC_EN_N"
 		(at 210.82 71.12 0)
 		(effects
 			(font
@@ -5631,7 +5752,7 @@
 			)
 			(justify left bottom)
 		)
-		(uuid "003703eb-8edf-55a8-b344-7a0890e69f9f")
+		(uuid "0fe9d8af-70ca-5813-9259-1cb45bf65bb6")
 	)
 	(wire
 		(pts
@@ -5770,7 +5891,7 @@
 		)
 		(uuid "cf326642-5333-5fe7-9db6-5640b77a7b23")
 	)
-	(label "OSZ_OUT"
+	(label "MEAS_CLK"
 		(at 210.82 88.9 0)
 		(effects
 			(font
@@ -5778,7 +5899,7 @@
 			)
 			(justify left bottom)
 		)
-		(uuid "da0155b3-eca1-544e-8f41-96195d7fbd09")
+		(uuid "6661a495-76cd-5057-a371-1a6729ec4f7e")
 	)
 	(wire
 		(pts
@@ -10479,8 +10600,416 @@
 		)
 	)
 	(symbol
+		(lib_id "fluidi:AO3401A")
+		(at 101.6 200.66 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "9affd42c-c357-550d-b094-b45cc39fab05")
+		(property "Reference" "Q2"
+			(at 101.6 198.12 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "AO3401A"
+			(at 101.6 203.66 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Package_TO_SOT_SMD:SOT-23"
+			(at 101.6 200.66 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "docs/datasheets/AOS_AO3401A_Datasheet_Rev3.1.pdf"
+			(at 101.6 200.66 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "P-MOSFET SOT-23; Lastschalter Messkette: S = VDD, D = OSC_PWR, G = DIO11 (low = an); Messkette ca. 10 mA > DIO12-Grenze"
+			(at 101.6 200.66 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C15127"
+			(at 101.6 200.66 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Hersteller" "Alpha & Omega"
+			(at 101.6 200.66 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "AO3401A"
+			(at 101.6 200.66 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "JLC" "Basic"
+			(at 101.6 200.66 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "c6f9833f-561c-5980-ab3a-ca7ba5430552")
+		)
+		(pin "3"
+			(uuid "8e2fbd8b-f844-56cc-bdf1-8674c9439319")
+		)
+		(pin "2"
+			(uuid "6a56ffb4-7b4d-585a-b4ef-a195947ee8ef")
+		)
+		(instances
+			(project "fluidi_sensor"
+				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
+					(reference "Q2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 101.6 195.58)
+			(xy 101.6 193.04)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "22afcdf4-6554-5a91-b22a-950cb00a1f16")
+	)
+	(label "OSC_EN_N"
+		(at 101.6 193.04 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "a29565a4-0715-5bb2-b676-afd98a9b51c7")
+	)
+	(wire
+		(pts
+			(xy 106.68 203.2)
+			(xy 109.22 203.2)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "875f9d84-e86c-5704-a542-cdb9f96fd562")
+	)
+	(label "OSC_PWR"
+		(at 109.22 203.2 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "b8ae2582-9319-5532-a30a-b7b0f9f487df")
+	)
+	(wire
+		(pts
+			(xy 96.52 203.2)
+			(xy 93.98 203.2)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d8b58ec0-9180-5604-bbbb-d25e5178b5e7")
+	)
+	(symbol
+		(lib_id "power:VDD")
+		(at 93.98 203.2 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(uuid "6201bb73-9947-5f19-8c56-3fcb69bce835")
+		(property "Reference" "#PWR037"
+			(at 93.98 203.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "VDD"
+			(at 90.98 203.2 0)
+			(effects
+				(font
+					(size 1 1)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 93.98 203.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 93.98 203.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "52e4de2e-a77a-531a-811f-dbd78ab6263a")
+		)
+		(instances
+			(project "fluidi_sensor"
+				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
+					(reference "#PWR037")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 121.92 203.2 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "01299373-75b9-5243-9ede-0398b2928ce1")
+		(property "Reference" "R13"
+			(at 123.92 202.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "100k"
+			(at 123.92 204.7 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
+			(at 121.92 203.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf"
+			(at 121.92 203.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "R 100 kOhm 1 % 0402; Gate-Pull-up Q2: haelt die Messkette im Reset/ROM-Bootloader aus (DIO11 = SPI-CS-Eingang, TRM S.464)"
+			(at 121.92 203.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C25741"
+			(at 121.92 203.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Hersteller" "UNI-ROYAL"
+			(at 121.92 203.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "0402WGF1003TCE"
+			(at 121.92 203.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "JLC" "Basic"
+			(at 121.92 203.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "a560d15a-350e-558d-9ac1-39d36dd79710")
+		)
+		(pin "2"
+			(uuid "494259bc-eb78-5ba5-b5d0-e094795ee8dd")
+		)
+		(instances
+			(project "fluidi_sensor"
+				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
+					(reference "R13")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 121.92 199.39)
+			(xy 121.92 196.85)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "59e088a5-9f07-5f3b-b67f-fac99ba69de9")
+	)
+	(symbol
+		(lib_id "power:VDD")
+		(at 121.92 196.85 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(uuid "2594f7ef-ecd6-5a5c-8fdf-e8938a0c3120")
+		(property "Reference" "#PWR038"
+			(at 121.92 196.85 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "VDD"
+			(at 121.92 193.85 0)
+			(effects
+				(font
+					(size 1 1)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 121.92 196.85 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 121.92 196.85 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "d90d36b7-4a22-5fb0-873a-f4f8bf3ecd20")
+		)
+		(instances
+			(project "fluidi_sensor"
+				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
+					(reference "#PWR038")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 121.92 207.01)
+			(xy 121.92 209.55)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0551ab33-c93c-51b2-b2c8-fb7e863d7fb5")
+	)
+	(label "OSC_EN_N"
+		(at 121.92 209.55 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "c96e1d95-e1ac-5349-ba8a-aba2533e197a")
+	)
+	(symbol
 		(lib_id "74xGxx:74LVC1G14")
-		(at 76.2 233.68 0)
+		(at 71.12 233.68 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -10488,7 +11017,7 @@
 		(dnp no)
 		(uuid "0c55002b-8733-5674-8273-d0a621e3fc42")
 		(property "Reference" "U2"
-			(at 82.2 227.18 0)
+			(at 77.12 227.18 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10497,7 +11026,7 @@
 			)
 		)
 		(property "Value" "SN74LVC1G14DCKR"
-			(at 82.2 241.68 0)
+			(at 77.12 241.68 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10506,7 +11035,7 @@
 			)
 		)
 		(property "Footprint" "Package_TO_SOT_SMD:SOT-353_SC-70-5"
-			(at 76.2 233.68 0)
+			(at 71.12 233.68 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10515,7 +11044,7 @@
 			)
 		)
 		(property "Datasheet" "docs/datasheets/TI_SN74LVC1G14_Datasheet_SCES218AA.pdf"
-			(at 76.2 233.68 0)
+			(at 71.12 233.68 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10523,8 +11052,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Schmitt-Inverter SC-70-5; RC-Oszillator 2-6 MHz, VCC aus DIO12 (ratiometrisch)"
-			(at 76.2 233.68 0)
+		(property "Description" "Schmitt-Inverter SC-70-5; RC-Schmitt-Oszillator 17-36 MHz (D3), VCC aus OSC_PWR (ratiometrisch zu VDD)"
+			(at 71.12 233.68 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10533,7 +11062,7 @@
 			)
 		)
 		(property "LCSC" "C35740"
-			(at 76.2 233.68 0)
+			(at 71.12 233.68 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10542,7 +11071,7 @@
 			)
 		)
 		(property "Hersteller" "Texas Instruments"
-			(at 76.2 233.68 0)
+			(at 71.12 233.68 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10551,7 +11080,7 @@
 			)
 		)
 		(property "MPN" "SN74LVC1G14DCKR"
-			(at 76.2 233.68 0)
+			(at 71.12 233.68 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10560,7 +11089,7 @@
 			)
 		)
 		(property "JLC" "Extended"
-			(at 76.2 233.68 0)
+			(at 71.12 233.68 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10594,89 +11123,89 @@
 	)
 	(wire
 		(pts
-			(xy 60.96 233.68)
-			(xy 58.42 233.68)
+			(xy 55.88 233.68)
+			(xy 53.34 233.68)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "67a3d083-0382-56e2-ad49-be8c6c5039f8")
+		(uuid "8be3eb50-7bbf-5f25-be26-1ae47a2c3e99")
 	)
 	(label "PROBE_SENSE"
-		(at 58.42 233.68 180)
+		(at 53.34 233.68 180)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify right bottom)
 		)
-		(uuid "086ee8f2-1d2b-580b-b8f2-e271469096a4")
+		(uuid "39ce47ea-aae2-5b76-81e0-da7d19ad3e2b")
 	)
 	(wire
 		(pts
-			(xy 71.12 223.52)
-			(xy 71.12 220.98)
+			(xy 66.04 223.52)
+			(xy 66.04 220.98)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "c8bd0e55-93cb-5a1f-aa5e-f7ff29ea9695")
+		(uuid "03443c07-b4dd-5324-b074-4ed7742c5054")
 	)
-	(label "SENS_PWR"
-		(at 71.12 220.98 90)
+	(label "OSC_PWR"
+		(at 66.04 220.98 90)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left bottom)
 		)
-		(uuid "962e5c91-3bbf-5c6c-a7a5-a8ac4ade7e8a")
+		(uuid "880e2197-e320-5496-a7dc-2a7a5e3c11dd")
 	)
 	(wire
 		(pts
-			(xy 88.9 233.68)
-			(xy 91.44 233.68)
+			(xy 83.82 233.68)
+			(xy 86.36 233.68)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "3fee3f4b-630e-5f10-81ba-18145d064878")
+		(uuid "0a541999-04ab-5cfc-b6a7-29ebf7d5f19d")
 	)
 	(label "OSZ_OUT"
-		(at 91.44 233.68 0)
+		(at 86.36 233.68 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left bottom)
 		)
-		(uuid "45a038a9-ab27-5c01-842b-65b676bd8995")
+		(uuid "81f2030a-1170-5a40-b318-255c8f0dec3d")
 	)
 	(wire
 		(pts
-			(xy 71.12 243.84)
-			(xy 71.12 246.38)
+			(xy 66.04 243.84)
+			(xy 66.04 246.38)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "53867d9d-a845-5b87-959f-ab25a1d5a844")
+		(uuid "072c4401-73bd-5c02-944f-20e8c33a2e9c")
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 71.12 246.38 0)
+		(at 66.04 246.38 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom no)
 		(on_board yes)
 		(dnp no)
-		(uuid "6201bb73-9947-5f19-8c56-3fcb69bce835")
-		(property "Reference" "#PWR037"
-			(at 71.12 246.38 0)
+		(uuid "3be091ed-c642-5bf0-bef3-2a4e915f30e1")
+		(property "Reference" "#PWR039"
+			(at 66.04 246.38 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10685,7 +11214,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 71.12 249.38 0)
+			(at 66.04 249.38 0)
 			(effects
 				(font
 					(size 1 1)
@@ -10693,7 +11222,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 71.12 246.38 0)
+			(at 66.04 246.38 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10702,7 +11231,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 71.12 246.38 0)
+			(at 66.04 246.38 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10711,12 +11240,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "52e4de2e-a77a-531a-811f-dbd78ab6263a")
+			(uuid "e2960874-882a-59eb-b84c-9bebb1214e09")
 		)
 		(instances
 			(project "fluidi_sensor"
 				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
-					(reference "#PWR037")
+					(reference "#PWR039")
 					(unit 1)
 				)
 			)
@@ -10724,7 +11253,7 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 66.04 203.2 90)
+		(at 60.96 203.2 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -10732,15 +11261,15 @@
 		(dnp no)
 		(uuid "4d077ae6-adee-5b6c-a809-f4c655022ecc")
 		(property "Reference" "R3"
-			(at 66.04 200.66 0)
+			(at 60.96 200.66 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Value" "4.7k"
-			(at 66.04 206.2 0)
+		(property "Value" "1k"
+			(at 60.96 206.2 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10748,7 +11277,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 66.04 203.2 0)
+			(at 60.96 203.2 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10757,7 +11286,7 @@
 			)
 		)
 		(property "Datasheet" "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf"
-			(at 66.04 203.2 0)
+			(at 60.96 203.2 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10765,8 +11294,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "R 4.7 kOhm 1 % 0402; Rueckkopplung (CONCEPTS 2.3)"
-			(at 66.04 203.2 0)
+		(property "Description" "R 1 kOhm 1 % 0402; Rueckkopplung D3 1 kOhm; fuer Vergleich Variante A auf 10 kOhm (0402WGF1002TCE C25744) umloetbar"
+			(at 60.96 203.2 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10774,8 +11303,8 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC" "C25900"
-			(at 66.04 203.2 0)
+		(property "LCSC" "C11702"
+			(at 60.96 203.2 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10784,7 +11313,7 @@
 			)
 		)
 		(property "Hersteller" "UNI-ROYAL"
-			(at 66.04 203.2 0)
+			(at 60.96 203.2 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10792,8 +11321,8 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "0402WGF4701TCE"
-			(at 66.04 203.2 0)
+		(property "MPN" "0402WGF1001TCE"
+			(at 60.96 203.2 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10802,7 +11331,7 @@
 			)
 		)
 		(property "JLC" "Basic"
-			(at 66.04 203.2 0)
+			(at 60.96 203.2 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10827,49 +11356,49 @@
 	)
 	(wire
 		(pts
-			(xy 62.23 203.2)
-			(xy 59.69 203.2)
+			(xy 57.15 203.2)
+			(xy 54.61 203.2)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "bf84a23c-fd0d-5720-809a-920bb63aaf26")
+		(uuid "378bf70b-b5bd-5f3a-bf3d-0ef12a48343c")
 	)
 	(label "PROBE_SENSE"
-		(at 59.69 203.2 180)
+		(at 54.61 203.2 180)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify right bottom)
 		)
-		(uuid "ce2b2afe-3828-50f4-9c14-479a3a92c223")
+		(uuid "93471698-d129-533c-a172-224ec94aa7f4")
 	)
 	(wire
 		(pts
-			(xy 69.85 203.2)
-			(xy 72.39 203.2)
+			(xy 64.77 203.2)
+			(xy 67.31 203.2)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "6d95d145-4c52-5276-9761-6f9e53c96d0a")
+		(uuid "d278c8de-e079-55c8-b185-1df168e2a7c0")
 	)
 	(label "OSZ_OUT"
-		(at 72.39 203.2 0)
+		(at 67.31 203.2 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left bottom)
 		)
-		(uuid "7471a61a-eebc-5a3f-bb8d-c91293a462a8")
+		(uuid "97e4b7eb-0c34-5591-a47f-79e434e54cd8")
 	)
 	(symbol
 		(lib_id "Device:C")
-		(at 106.68 223.52 0)
+		(at 101.6 243.84 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -10877,7 +11406,7 @@
 		(dnp no)
 		(uuid "1eb28502-2851-5952-9853-8c45a2ce9b71")
 		(property "Reference" "C21"
-			(at 108.68 222.52 0)
+			(at 103.6 242.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10886,7 +11415,7 @@
 			)
 		)
 		(property "Value" "100nF"
-			(at 108.68 225.02 0)
+			(at 103.6 245.34 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10895,7 +11424,7 @@
 			)
 		)
 		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
-			(at 106.68 223.52 0)
+			(at 101.6 243.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10904,7 +11433,7 @@
 			)
 		)
 		(property "Datasheet" "docs/datasheets/Samsung_CL05-Serie_Datasheet_LCSC-2023-04.pdf"
-			(at 106.68 223.52 0)
+			(at 101.6 243.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10913,7 +11442,7 @@
 			)
 		)
 		(property "Description" "MLCC 100 nF 16 V X7R 0402; an U2 VCC"
-			(at 106.68 223.52 0)
+			(at 101.6 243.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10922,7 +11451,7 @@
 			)
 		)
 		(property "LCSC" "C1525"
-			(at 106.68 223.52 0)
+			(at 101.6 243.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10931,7 +11460,7 @@
 			)
 		)
 		(property "Hersteller" "Samsung Electro-Mechanics"
-			(at 106.68 223.52 0)
+			(at 101.6 243.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10940,7 +11469,7 @@
 			)
 		)
 		(property "MPN" "CL05B104KO5NNNC"
-			(at 106.68 223.52 0)
+			(at 101.6 243.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10949,7 +11478,7 @@
 			)
 		)
 		(property "JLC" "Basic"
-			(at 106.68 223.52 0)
+			(at 101.6 243.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10974,47 +11503,47 @@
 	)
 	(wire
 		(pts
-			(xy 106.68 219.71)
-			(xy 106.68 217.17)
+			(xy 101.6 240.03)
+			(xy 101.6 237.49)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "0a6ae244-194b-5948-973b-65db7671c371")
+		(uuid "1720b4fa-8dae-5f71-8fbb-7adef935a00d")
 	)
-	(label "SENS_PWR"
-		(at 106.68 217.17 90)
+	(label "OSC_PWR"
+		(at 101.6 237.49 90)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left bottom)
 		)
-		(uuid "20476bb9-168b-59a1-8e15-448470052778")
+		(uuid "c0d608f9-7ba1-50e6-bda2-ea134042bbde")
 	)
 	(wire
 		(pts
-			(xy 106.68 227.33)
-			(xy 106.68 229.87)
+			(xy 101.6 247.65)
+			(xy 101.6 250.19)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "5aeee2a2-c2ba-5d5b-8239-a0b8ac358f0b")
+		(uuid "b8c73771-f2ab-5831-86c4-7871ac393b06")
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 106.68 229.87 0)
+		(at 101.6 250.19 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom no)
 		(on_board yes)
 		(dnp no)
-		(uuid "2594f7ef-ecd6-5a5c-8fdf-e8938a0c3120")
-		(property "Reference" "#PWR038"
-			(at 106.68 229.87 0)
+		(uuid "96581307-f690-59cf-90f9-27bb37d52a8e")
+		(property "Reference" "#PWR040"
+			(at 101.6 250.19 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11023,7 +11552,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 106.68 232.87 0)
+			(at 101.6 253.19 0)
 			(effects
 				(font
 					(size 1 1)
@@ -11031,7 +11560,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 106.68 229.87 0)
+			(at 101.6 250.19 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11040,7 +11569,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 106.68 229.87 0)
+			(at 101.6 250.19 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11049,12 +11578,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "d90d36b7-4a22-5fb0-873a-f4f8bf3ecd20")
+			(uuid "af198f88-25d7-5e73-8aba-402e34be30e5")
 		)
 		(instances
 			(project "fluidi_sensor"
 				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
-					(reference "#PWR038")
+					(reference "#PWR040")
 					(unit 1)
 				)
 			)
@@ -11105,7 +11634,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "MLCC 22 pF C0G 0402; Cref1 C0G, per DIO8 low zugeschaltet"
+		(property "Description" "MLCC 22 pF C0G 0402; Cref1 C0G, per DIO8 low zugeschaltet (Ratiometrie CONCEPTS 2.3)"
 			(at 38.1 243.84 0)
 			(effects
 				(font
@@ -11208,153 +11737,6 @@
 		(uuid "91f7ca62-3c1b-58c7-90c4-42224620381c")
 	)
 	(symbol
-		(lib_id "Device:C")
-		(at 20.32 243.84 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "1d28ed20-796d-5d7c-b2a6-02508479f8ea")
-		(property "Reference" "C23"
-			(at 22.32 242.84 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "100pF"
-			(at 22.32 245.34 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
-			(at 20.32 243.84 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "docs/datasheets/FH_0402CG-Serie_Datasheet_LCSC-2023-04.pdf"
-			(at 20.32 243.84 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "MLCC 100 pF C0G 0402; Cref2 C0G, per DIO11 low zugeschaltet (f2, Salzdiagnose)"
-			(at 20.32 243.84 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "LCSC" "C1546"
-			(at 20.32 243.84 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Hersteller" "FH (Fenghua)"
-			(at 20.32 243.84 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "MPN" "0402CG101J500NT"
-			(at 20.32 243.84 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "JLC" "Basic"
-			(at 20.32 243.84 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "f5903b3c-709b-5ba5-b081-2d6c35cbbc4d")
-		)
-		(pin "2"
-			(uuid "9313b975-b471-5da0-a9ac-d617255dd912")
-		)
-		(instances
-			(project "fluidi_sensor"
-				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
-					(reference "C23")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(wire
-		(pts
-			(xy 20.32 240.03)
-			(xy 20.32 237.49)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "231e3472-2e5e-52f2-9309-ee568461db16")
-	)
-	(label "PROBE_SENSE"
-		(at 20.32 237.49 90)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "baf8d5f5-0e89-5cd3-83de-56d573938a3f")
-	)
-	(wire
-		(pts
-			(xy 20.32 247.65)
-			(xy 20.32 250.19)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "da5cd9eb-7a72-569a-b459-ff85256c1d79")
-	)
-	(label "CREF2_CTL"
-		(at 20.32 250.19 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "abf21797-2a73-5b26-b37f-97ced371d904")
-	)
-	(symbol
 		(lib_id "fluidi:SONDE_ELEKTRODEN")
 		(at 25.4 213.36 0)
 		(unit 1)
@@ -11397,7 +11779,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "nicht bestueckt; Elektroden Innenlagen; Gegenelektrode/Guard = GND-Band"
+		(property "Description" "nicht bestueckt; Elektroden Innenlagen L2/L3 (REPORT Kap. 8); Gegenelektrode/Guard = GND"
 			(at 25.4 213.36 0)
 			(effects
 				(font
@@ -11497,8 +11879,8 @@
 		(in_bom no)
 		(on_board yes)
 		(dnp no)
-		(uuid "3be091ed-c642-5bf0-bef3-2a4e915f30e1")
-		(property "Reference" "#PWR039"
+		(uuid "fddd0bef-b40a-54e8-bc0e-5c00b0ced485")
+		(property "Reference" "#PWR041"
 			(at 35.56 213.36 0)
 			(effects
 				(font
@@ -11534,12 +11916,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "e2960874-882a-59eb-b84c-9bebb1214e09")
+			(uuid "43cc26fc-5fa6-5eac-81a8-77060d10aee3")
 		)
 		(instances
 			(project "fluidi_sensor"
 				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
-					(reference "#PWR039")
+					(reference "#PWR041")
 					(unit 1)
 				)
 			)
@@ -11547,15 +11929,15 @@
 	)
 	(symbol
 		(lib_id "Connector:TestPoint")
-		(at 111.76 248.92 0)
+		(at 15.24 259.08 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom no)
 		(on_board yes)
 		(dnp no)
-		(uuid "19888ec7-5a09-54bc-bf85-e30fa411b0dd")
-		(property "Reference" "TP4"
-			(at 113.76 247.92 0)
+		(uuid "09e4e734-9bc0-5414-a313-c49f1133e870")
+		(property "Reference" "TP5"
+			(at 17.24 258.08 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11563,8 +11945,8 @@
 				(justify left)
 			)
 		)
-		(property "Value" "OSZ_OUT"
-			(at 113.76 250.42 0)
+		(property "Value" "PROBE_SENSE"
+			(at 17.24 260.58 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11573,7 +11955,7 @@
 			)
 		)
 		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
-			(at 111.76 248.92 0)
+			(at 15.24 259.08 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11582,7 +11964,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 111.76 248.92 0)
+			(at 15.24 259.08 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11590,8 +11972,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "nicht bestueckt; Messpunkt Elektronikraum (nur messen)"
-			(at 111.76 248.92 0)
+		(property "Description" "nicht bestueckt; B-Seite Elektronikband: VNA-Messung Sonde (MESSKETTE_SALZ Kap. 6), nur messen"
+			(at 15.24 259.08 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11600,7 +11982,7 @@
 			)
 		)
 		(property "LCSC" ""
-			(at 111.76 248.92 0)
+			(at 15.24 259.08 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11609,7 +11991,7 @@
 			)
 		)
 		(property "Hersteller" "-"
-			(at 111.76 248.92 0)
+			(at 15.24 259.08 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11618,7 +12000,7 @@
 			)
 		)
 		(property "MPN" "Leiterplattenstruktur"
-			(at 111.76 248.92 0)
+			(at 15.24 259.08 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11627,7 +12009,1118 @@
 			)
 		)
 		(property "JLC" "-"
-			(at 111.76 248.92 0)
+			(at 15.24 259.08 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "30987dab-7dab-5192-b363-ad2c988c5652")
+		)
+		(instances
+			(project "fluidi_sensor"
+				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
+					(reference "TP5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 15.24 259.08)
+			(xy 15.24 261.62)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "22710e43-3fa2-5a94-bc38-de708201aeb3")
+	)
+	(label "PROBE_SENSE"
+		(at 15.24 261.62 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "95051801-7342-5022-8e7b-ebad7a154a59")
+	)
+	(symbol
+		(lib_id "74xGxx:74LVC1G80")
+		(at 147.32 233.68 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "cd90d5cd-f783-518b-9ed3-709bb0ae25f7")
+		(property "Reference" "U4"
+			(at 153.32 227.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "SN74LVC1G80DCKR"
+			(at 153.32 241.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Package_TO_SOT_SMD:SOT-353_SC-70-5"
+			(at 147.32 233.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "docs/datasheets/TI_SN74LVC1G80_Datasheet_SCES221T.pdf"
+			(at 147.32 233.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "D-Flipflop Q invertiert SC-70-5 (Teiler /2); Teiler /2 (D an Q invertiert, DS S.13 Tab. 7-1), fclock <= 160 MHz (S.6)"
+			(at 147.32 233.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C473331"
+			(at 147.32 233.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Hersteller" "Texas Instruments"
+			(at 147.32 233.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "SN74LVC1G80DCKR"
+			(at 147.32 233.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "JLC" "Extended"
+			(at 147.32 233.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "d0de3be0-9e50-50fe-a4d1-e01fbfd0c216")
+		)
+		(pin "2"
+			(uuid "6059f19a-2a5b-5a78-8e70-c78982ceb0e7")
+		)
+		(pin "5"
+			(uuid "f3e762b2-0e07-5888-ae3d-079945cd4bef")
+		)
+		(pin "3"
+			(uuid "d3cea240-a9d3-518e-8a0e-665292b37314")
+		)
+		(pin "4"
+			(uuid "13b117bf-b96d-5fa0-a7eb-eb7daf82ab42")
+		)
+		(instances
+			(project "fluidi_sensor"
+				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
+					(reference "U4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 134.62 228.6)
+			(xy 132.08 228.6)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "cdd2392b-971d-5565-b34b-19760b8d3a5c")
+	)
+	(label "DIV2"
+		(at 132.08 228.6 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "b415e195-2c8d-595a-8694-1c8976d1ed10")
+	)
+	(wire
+		(pts
+			(xy 134.62 238.76)
+			(xy 132.08 238.76)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "66ea796f-af8f-55e2-afd1-9c7d09f7a488")
+	)
+	(label "OSZ_OUT"
+		(at 132.08 238.76 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "3aa23083-85be-5858-b078-b5d89f2f5fb3")
+	)
+	(wire
+		(pts
+			(xy 147.32 220.98)
+			(xy 147.32 218.44)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1691eb7d-4586-590d-8d7f-748bfebf50b4")
+	)
+	(label "OSC_PWR"
+		(at 147.32 218.44 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "5528e469-4447-5fcf-8922-85fabd00a53b")
+	)
+	(wire
+		(pts
+			(xy 160.02 228.6)
+			(xy 162.56 228.6)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "de3faace-6b59-589f-8ef5-1a9a3edf0598")
+	)
+	(label "DIV2"
+		(at 162.56 228.6 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "016b1831-55a2-5bea-a8c2-ae11ecb363c6")
+	)
+	(wire
+		(pts
+			(xy 147.32 246.38)
+			(xy 147.32 248.92)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "66cdd504-bd6e-56d4-9d77-8632084f5af9")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 147.32 248.92 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(uuid "1abbbf8d-282a-5a1a-8149-837d7eeb8d89")
+		(property "Reference" "#PWR042"
+			(at 147.32 248.92 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 147.32 251.92 0)
+			(effects
+				(font
+					(size 1 1)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 147.32 248.92 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 147.32 248.92 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "18fb2ef1-f13e-59ca-b522-3909a2096cf7")
+		)
+		(instances
+			(project "fluidi_sensor"
+				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
+					(reference "#PWR042")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "74xGxx:74LVC1G80")
+		(at 187.96 233.68 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "c7fe3758-1af0-5cc2-ba7d-52a6757dc74a")
+		(property "Reference" "U5"
+			(at 193.96 227.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "SN74LVC1G80DCKR"
+			(at 193.96 241.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Package_TO_SOT_SMD:SOT-353_SC-70-5"
+			(at 187.96 233.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "docs/datasheets/TI_SN74LVC1G80_Datasheet_SCES221T.pdf"
+			(at 187.96 233.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "D-Flipflop Q invertiert SC-70-5 (Teiler /2); Teiler /4"
+			(at 187.96 233.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C473331"
+			(at 187.96 233.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Hersteller" "Texas Instruments"
+			(at 187.96 233.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "SN74LVC1G80DCKR"
+			(at 187.96 233.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "JLC" "Extended"
+			(at 187.96 233.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "23b54b02-2f4e-5d2e-8005-b993a288e359")
+		)
+		(pin "2"
+			(uuid "ba184f33-7ef0-54e7-a294-7bdf5cb55871")
+		)
+		(pin "5"
+			(uuid "ec93f97e-09f7-5888-b635-1e4e6b51e81e")
+		)
+		(pin "3"
+			(uuid "9adf413e-18f6-55a1-8fc9-901e08da57af")
+		)
+		(pin "4"
+			(uuid "9d8aaa6b-f550-5a68-9e94-6fe1fbe3c532")
+		)
+		(instances
+			(project "fluidi_sensor"
+				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
+					(reference "U5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 175.26 228.6)
+			(xy 172.72 228.6)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b50a959e-fc1c-5c7c-b13f-ddb43e3b72fd")
+	)
+	(label "DIV4"
+		(at 172.72 228.6 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "4c1c5230-ccfa-5dd7-9b8f-62d5bb5c60b8")
+	)
+	(wire
+		(pts
+			(xy 175.26 238.76)
+			(xy 172.72 238.76)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "975ae6da-472a-5c25-8974-9c86a731ceba")
+	)
+	(label "DIV2"
+		(at 172.72 238.76 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "11e4cca5-a799-5f9a-8346-289dcf209935")
+	)
+	(wire
+		(pts
+			(xy 187.96 220.98)
+			(xy 187.96 218.44)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3bc37b72-a607-53c3-ab58-4ea197ac96fe")
+	)
+	(label "OSC_PWR"
+		(at 187.96 218.44 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "5e86903f-5cf2-5b3d-81d4-6f497e5db394")
+	)
+	(wire
+		(pts
+			(xy 200.66 228.6)
+			(xy 203.2 228.6)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e0f00517-5bf7-552e-a5c4-fec38c7b33e1")
+	)
+	(label "DIV4"
+		(at 203.2 228.6 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "5749b7f7-a17c-5992-a181-c410df317f39")
+	)
+	(wire
+		(pts
+			(xy 187.96 246.38)
+			(xy 187.96 248.92)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b4710d05-b105-548f-a045-3e570aab2ef5")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 187.96 248.92 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(uuid "d7291e46-6b7c-5c31-ad62-ff63b522a90f")
+		(property "Reference" "#PWR043"
+			(at 187.96 248.92 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 187.96 251.92 0)
+			(effects
+				(font
+					(size 1 1)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 187.96 248.92 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 187.96 248.92 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "b03f5f32-acd5-5cfc-97e8-facfd525f91c")
+		)
+		(instances
+			(project "fluidi_sensor"
+				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
+					(reference "#PWR043")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "74xGxx:74LVC1G80")
+		(at 238.76 233.68 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "86b1a04e-b87d-54a6-bb69-1803aee1b886")
+		(property "Reference" "U6"
+			(at 244.76 227.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "SN74LVC1G80DCKR"
+			(at 244.76 241.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Package_TO_SOT_SMD:SOT-353_SC-70-5"
+			(at 238.76 233.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "docs/datasheets/TI_SN74LVC1G80_Datasheet_SCES221T.pdf"
+			(at 238.76 233.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "D-Flipflop Q invertiert SC-70-5 (Teiler /2); Teiler /8 -> DIO24"
+			(at 238.76 233.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C473331"
+			(at 238.76 233.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Hersteller" "Texas Instruments"
+			(at 238.76 233.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "SN74LVC1G80DCKR"
+			(at 238.76 233.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "JLC" "Extended"
+			(at 238.76 233.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "2744d46c-5255-5ac4-a138-de1aea0d5562")
+		)
+		(pin "2"
+			(uuid "5c9b2bab-9e9b-58f0-af7c-f1e9e07a2ed0")
+		)
+		(pin "5"
+			(uuid "9b8f729c-aaeb-5008-918d-b58043aaa470")
+		)
+		(pin "3"
+			(uuid "ca349b1a-d0ef-57b5-ad3a-c60b0012bf3a")
+		)
+		(pin "4"
+			(uuid "461b1ac7-321f-5b3a-b207-7addb98416ab")
+		)
+		(instances
+			(project "fluidi_sensor"
+				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
+					(reference "U6")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 226.06 228.6)
+			(xy 223.52 228.6)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "723d6b28-9da9-5a72-bba1-1daa3be5b4a9")
+	)
+	(label "MEAS_CLK"
+		(at 223.52 228.6 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "1af5dda2-32ea-57aa-9937-c5c721e4385e")
+	)
+	(wire
+		(pts
+			(xy 226.06 238.76)
+			(xy 223.52 238.76)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8fc6e241-ac68-58b4-bea9-f63625949a24")
+	)
+	(label "DIV4"
+		(at 223.52 238.76 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "522837a5-9bfe-5af3-8248-dfc470ee588a")
+	)
+	(wire
+		(pts
+			(xy 238.76 220.98)
+			(xy 238.76 218.44)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "329989b2-fb86-59fd-99c0-07ba27f22404")
+	)
+	(label "OSC_PWR"
+		(at 238.76 218.44 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "198cf2b9-babd-5257-8998-2c17158e2861")
+	)
+	(wire
+		(pts
+			(xy 251.46 228.6)
+			(xy 254 228.6)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1e9b6de2-871e-5f09-bd30-4293341fad23")
+	)
+	(label "MEAS_CLK"
+		(at 254 228.6 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "0f66d5fc-8142-5bea-93bc-5c173657d733")
+	)
+	(wire
+		(pts
+			(xy 238.76 246.38)
+			(xy 238.76 248.92)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9f8cc6b4-9c5d-5ee4-802a-a68d8688b0a6")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 238.76 248.92 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(uuid "35f90107-63b6-57a9-bdb5-5eea08fdfd5f")
+		(property "Reference" "#PWR044"
+			(at 238.76 248.92 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 238.76 251.92 0)
+			(effects
+				(font
+					(size 1 1)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 238.76 248.92 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 238.76 248.92 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "aef6fef6-183f-55e6-b8cf-eb2697ff1080")
+		)
+		(instances
+			(project "fluidi_sensor"
+				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
+					(reference "#PWR044")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 116.84 243.84 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "a3c25fbc-1634-51dc-abcb-b05bfd78e701")
+		(property "Reference" "C25"
+			(at 118.84 242.84 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "100nF"
+			(at 118.84 245.34 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
+			(at 116.84 243.84 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "docs/datasheets/Samsung_CL05-Serie_Datasheet_LCSC-2023-04.pdf"
+			(at 116.84 243.84 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "MLCC 100 nF 16 V X7R 0402; Abblock Teiler U4-U6 (nahe U4, hoechste Frequenz)"
+			(at 116.84 243.84 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C1525"
+			(at 116.84 243.84 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Hersteller" "Samsung Electro-Mechanics"
+			(at 116.84 243.84 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "CL05B104KO5NNNC"
+			(at 116.84 243.84 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "JLC" "Basic"
+			(at 116.84 243.84 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "64f6d4cc-b770-59f3-b69a-ed7323e03500")
+		)
+		(pin "2"
+			(uuid "72b65a1a-8013-5246-a4c3-d33a0ff262a6")
+		)
+		(instances
+			(project "fluidi_sensor"
+				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
+					(reference "C25")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 116.84 240.03)
+			(xy 116.84 237.49)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a136e216-0cdf-5209-aa6b-9975e1b7200f")
+	)
+	(label "OSC_PWR"
+		(at 116.84 237.49 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "46a03907-1f0b-5017-a225-ecae6aabcd3c")
+	)
+	(wire
+		(pts
+			(xy 116.84 247.65)
+			(xy 116.84 250.19)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "cd1b757e-6bbd-575b-9ac3-6f3b2cb21ccc")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 116.84 250.19 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(uuid "16c73ec0-089f-5c29-ab51-d9e9bd4d1fd5")
+		(property "Reference" "#PWR045"
+			(at 116.84 250.19 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 116.84 253.19 0)
+			(effects
+				(font
+					(size 1 1)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 116.84 250.19 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 116.84 250.19 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "a40906a3-35e4-529e-930d-834922fe1014")
+		)
+		(instances
+			(project "fluidi_sensor"
+				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
+					(reference "#PWR045")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector:TestPoint")
+		(at 264.16 248.92 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(uuid "19888ec7-5a09-54bc-bf85-e30fa411b0dd")
+		(property "Reference" "TP4"
+			(at 266.16 247.92 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "MEAS_CLK"
+			(at 266.16 250.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
+			(at 264.16 248.92 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 264.16 248.92 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "nicht bestueckt; B-Seite Elektronikband, f_osc/8 (nur messen)"
+			(at 264.16 248.92 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" ""
+			(at 264.16 248.92 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Hersteller" "-"
+			(at 264.16 248.92 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "Leiterplattenstruktur"
+			(at 264.16 248.92 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "JLC" "-"
+			(at 264.16 248.92 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11649,28 +13142,28 @@
 	)
 	(wire
 		(pts
-			(xy 111.76 248.92)
-			(xy 111.76 251.46)
+			(xy 264.16 248.92)
+			(xy 264.16 251.46)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "c8a43e3e-4a04-563a-ac85-6ee3fa087ae5")
+		(uuid "010239e1-cb8e-5da8-977e-1c9f5ff5f747")
 	)
-	(label "OSZ_OUT"
-		(at 111.76 251.46 270)
+	(label "MEAS_CLK"
+		(at 264.16 251.46 270)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify right bottom)
 		)
-		(uuid "7bd41d7b-b65c-5601-a66e-da884bae8cf1")
+		(uuid "e7c72c31-080a-5172-b41c-235c7ffb5b23")
 	)
 	(symbol
-		(lib_id "Sensor_Temperature:TMP1075DGK")
-		(at 157.48 228.6 0)
+		(lib_id "fluidi:TMP1075NDRL")
+		(at 55.88 121.92 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -11678,7 +13171,7 @@
 		(dnp no)
 		(uuid "43755a83-1a16-56b6-aeee-2feab72dc093")
 		(property "Reference" "U3"
-			(at 163.48 222.1 0)
+			(at 61.88 115.42 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11686,8 +13179,8 @@
 				(justify left)
 			)
 		)
-		(property "Value" "TMP1075DGKR"
-			(at 163.48 236.6 0)
+		(property "Value" "TMP1075NDRLR"
+			(at 61.88 129.92 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11695,8 +13188,8 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Package_SO:VSSOP-8_3x3mm_P0.65mm"
-			(at 157.48 228.6 0)
+		(property "Footprint" "Package_TO_SOT_SMD:SOT-563"
+			(at 55.88 121.92 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11705,7 +13198,7 @@
 			)
 		)
 		(property "Datasheet" "docs/datasheets/TI_TMP1075_Datasheet_SBOS854F.pdf"
-			(at 157.48 228.6 0)
+			(at 55.88 121.92 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11713,8 +13206,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Temperatursensor I2C VSSOP-8; Adresse 0x48 (A2..A0 = GND, DS S.14 Tab. 7-2); an der Dichtlinie"
-			(at 157.48 228.6 0)
+		(property "Description" "Temperatursensor I2C SOT-563 (TMP1075N, 1.62-3.6 V); im Sondenkragen (Option f, Freigabe S3-K2); Adresse 0x48 (A0 = GND, DS S.14 Tab. 7-3); ALERT offen"
+			(at 55.88 121.92 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11722,8 +13215,8 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC" "C2864807"
-			(at 157.48 228.6 0)
+		(property "LCSC" "C3663690"
+			(at 55.88 121.92 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11732,7 +13225,7 @@
 			)
 		)
 		(property "Hersteller" "Texas Instruments"
-			(at 157.48 228.6 0)
+			(at 55.88 121.92 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11740,8 +13233,8 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "TMP1075DGKR"
-			(at 157.48 228.6 0)
+		(property "MPN" "TMP1075NDRLR"
+			(at 55.88 121.92 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11750,7 +13243,7 @@
 			)
 		)
 		(property "JLC" "Extended"
-			(at 157.48 228.6 0)
+			(at 55.88 121.92 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11758,29 +13251,23 @@
 				(hide yes)
 			)
 		)
-		(pin "7"
-			(uuid "cdacb05a-8c72-5a41-a3df-34242fa3ea40")
-		)
 		(pin "6"
 			(uuid "b5dc6466-b8bd-59f4-8ab0-77465963a9ba")
-		)
-		(pin "5"
-			(uuid "26aeed13-66e2-5012-87bb-884d7e339081")
-		)
-		(pin "8"
-			(uuid "29cb0b65-a681-54b0-b2f1-f3dfe077858b")
-		)
-		(pin "4"
-			(uuid "02466d8e-99d5-5ced-bf54-3febaaef57e8")
 		)
 		(pin "1"
 			(uuid "a7f95e12-6c7f-5daf-918a-1b6014ee71fc")
 		)
-		(pin "2"
-			(uuid "6c65e6f8-547e-55f3-b10d-d498f695ced5")
+		(pin "4"
+			(uuid "02466d8e-99d5-5ced-bf54-3febaaef57e8")
 		)
 		(pin "3"
 			(uuid "3579da7d-eb3d-574a-abfe-21bf3ff57e5b")
+		)
+		(pin "5"
+			(uuid "26aeed13-66e2-5012-87bb-884d7e339081")
+		)
+		(pin "2"
+			(uuid "6c65e6f8-547e-55f3-b10d-d498f695ced5")
 		)
 		(instances
 			(project "fluidi_sensor"
@@ -11793,160 +13280,93 @@
 	)
 	(wire
 		(pts
-			(xy 157.48 220.98)
-			(xy 157.48 218.44)
+			(xy 45.72 119.38)
+			(xy 43.18 119.38)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "6c1d64be-35fb-5fcc-9448-2eaaac102de7")
-	)
-	(label "SENS_PWR"
-		(at 157.48 218.44 90)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "f20fefe7-917c-5bd3-9611-e10609bd0a91")
-	)
-	(wire
-		(pts
-			(xy 167.64 226.06)
-			(xy 170.18 226.06)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "696fe92f-6578-5444-8d84-c0792488fe2f")
+		(uuid "5e6b773b-7979-5e71-bb11-bd38bd7e9b59")
 	)
 	(label "I2C_SDA"
-		(at 170.18 226.06 0)
+		(at 43.18 119.38 180)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
-			(justify left bottom)
+			(justify right bottom)
 		)
-		(uuid "74aac1f5-6afd-555b-a4bd-ce6333d08520")
+		(uuid "ab1bbb51-a0a4-58dc-b479-2d02c5fd27df")
 	)
 	(wire
 		(pts
-			(xy 167.64 228.6)
-			(xy 170.18 228.6)
+			(xy 45.72 121.92)
+			(xy 43.18 121.92)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "92822daf-5f5a-5058-bd41-658e14805e1a")
+		(uuid "6a7c25ef-e2be-5700-9be8-52b1c6f2889e")
 	)
 	(label "I2C_SCL"
-		(at 170.18 228.6 0)
+		(at 43.18 121.92 180)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
-			(justify left bottom)
+			(justify right bottom)
 		)
-		(uuid "aedd425c-d839-5541-b00e-06bde5a0bc94")
+		(uuid "734bd6b7-0d35-5480-9e63-d58d6b5b6e38")
 	)
 	(no_connect
-		(at 167.64 231.14)
-		(uuid "b7e65b65-d69c-5b4b-926a-f065ab6f361f")
+		(at 66.04 121.92)
+		(uuid "d1e427ab-92ef-5f03-86f5-669c5f6976aa")
 	)
 	(wire
 		(pts
-			(xy 147.32 226.06)
-			(xy 144.78 226.06)
+			(xy 55.88 114.3)
+			(xy 55.88 111.76)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "f886c746-9af5-5f7d-bfa5-e79ed4592361")
+		(uuid "23ed388d-e008-55aa-8f41-06f156efc2c0")
+	)
+	(label "SENS_PWR"
+		(at 55.88 111.76 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "2e335956-23c5-5049-bcd9-0a375db76274")
 	)
 	(wire
 		(pts
-			(xy 147.32 228.6)
-			(xy 144.78 228.6)
+			(xy 45.72 124.46)
+			(xy 43.18 124.46)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "d5b4ccf9-6afc-578f-b574-b0a64d6ac18d")
-	)
-	(wire
-		(pts
-			(xy 147.32 231.14)
-			(xy 144.78 231.14)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "6fc579b1-f100-51bd-8be8-ab69cad48f1c")
-	)
-	(wire
-		(pts
-			(xy 144.78 226.06)
-			(xy 144.78 228.6)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "01e3b405-4f85-5a5d-8eef-72e007c4dc62")
-	)
-	(wire
-		(pts
-			(xy 144.78 228.6)
-			(xy 144.78 231.14)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "df18e389-c10c-5a35-97b2-6cd0b329722e")
-	)
-	(junction
-		(at 144.78 228.6)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "d8f73964-1f5e-5521-9cc7-6880fa68e461")
-	)
-	(junction
-		(at 144.78 231.14)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "58f857c2-9669-5d21-9f7f-ef6468d88d1a")
-	)
-	(wire
-		(pts
-			(xy 144.78 231.14)
-			(xy 144.78 233.68)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "c0ee75f8-6e32-5ce9-9268-ea0f359922b4")
+		(uuid "d277d1d9-4260-5963-81de-6a84ea3c334a")
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 144.78 233.68 0)
+		(at 43.18 124.46 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom no)
 		(on_board yes)
 		(dnp no)
-		(uuid "96581307-f690-59cf-90f9-27bb37d52a8e")
-		(property "Reference" "#PWR040"
-			(at 144.78 233.68 0)
+		(uuid "58a6976a-cffe-5bcc-8742-bdbacf9d22b4")
+		(property "Reference" "#PWR046"
+			(at 43.18 124.46 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11955,7 +13375,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 144.78 236.68 0)
+			(at 43.18 127.46 0)
 			(effects
 				(font
 					(size 1 1)
@@ -11963,7 +13383,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 144.78 233.68 0)
+			(at 43.18 124.46 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11972,7 +13392,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 144.78 233.68 0)
+			(at 43.18 124.46 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11981,12 +13401,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "af198f88-25d7-5e73-8aba-402e34be30e5")
+			(uuid "16b34da8-94c3-5703-a7a1-53c4a717cedf")
 		)
 		(instances
 			(project "fluidi_sensor"
 				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
-					(reference "#PWR040")
+					(reference "#PWR046")
 					(unit 1)
 				)
 			)
@@ -11994,26 +13414,26 @@
 	)
 	(wire
 		(pts
-			(xy 157.48 236.22)
-			(xy 157.48 238.76)
+			(xy 55.88 129.54)
+			(xy 55.88 132.08)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "b9839408-f103-5721-9c7c-2ceb1e4b1759")
+		(uuid "987dc04c-b524-5a3e-a718-8a1d2ae9d5c1")
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 157.48 238.76 0)
+		(at 55.88 132.08 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom no)
 		(on_board yes)
 		(dnp no)
-		(uuid "fddd0bef-b40a-54e8-bc0e-5c00b0ced485")
-		(property "Reference" "#PWR041"
-			(at 157.48 238.76 0)
+		(uuid "ad1e11f0-680a-5235-8669-ff687e5fd569")
+		(property "Reference" "#PWR047"
+			(at 55.88 132.08 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12022,7 +13442,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 157.48 241.76 0)
+			(at 55.88 135.08 0)
 			(effects
 				(font
 					(size 1 1)
@@ -12030,7 +13450,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 157.48 238.76 0)
+			(at 55.88 132.08 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12039,7 +13459,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 157.48 238.76 0)
+			(at 55.88 132.08 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12048,314 +13468,20 @@
 			)
 		)
 		(pin "1"
-			(uuid "43cc26fc-5fa6-5eac-81a8-77060d10aee3")
+			(uuid "3c5c8dab-4f57-5714-8a37-c0c12b1d4c6f")
 		)
 		(instances
 			(project "fluidi_sensor"
 				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
-					(reference "#PWR041")
+					(reference "#PWR047")
 					(unit 1)
 				)
 			)
 		)
-	)
-	(symbol
-		(lib_id "Device:R")
-		(at 182.88 213.36 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "eb3f0af3-6b09-50cf-acf5-6c857acfcf3b")
-		(property "Reference" "R4"
-			(at 184.88 212.36 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "4.7k"
-			(at 184.88 214.86 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 182.88 213.36 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf"
-			(at 182.88 213.36 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "R 4.7 kOhm 1 % 0402; I2C-Pull-up schaltbar"
-			(at 182.88 213.36 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "LCSC" "C25900"
-			(at 182.88 213.36 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Hersteller" "UNI-ROYAL"
-			(at 182.88 213.36 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "MPN" "0402WGF4701TCE"
-			(at 182.88 213.36 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "JLC" "Basic"
-			(at 182.88 213.36 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "55e7da27-17cb-5acd-a0ab-5d0f1b0fd9c2")
-		)
-		(pin "2"
-			(uuid "ec7bf18a-7aa5-5959-9dc3-fb00e15d9bf3")
-		)
-		(instances
-			(project "fluidi_sensor"
-				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
-					(reference "R4")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(wire
-		(pts
-			(xy 182.88 209.55)
-			(xy 182.88 207.01)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "931ce4c1-facf-5328-9707-db6d0d80ea93")
-	)
-	(label "SENS_PWR"
-		(at 182.88 207.01 90)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "1382fb6c-af53-5128-ae3c-39dd12837475")
-	)
-	(wire
-		(pts
-			(xy 182.88 217.17)
-			(xy 182.88 219.71)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "c5e6c05b-640d-5023-8892-87c59e5118b9")
-	)
-	(label "I2C_SDA"
-		(at 182.88 219.71 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "b5e9efeb-c4ed-5af7-8ab9-29a1a439278e")
-	)
-	(symbol
-		(lib_id "Device:R")
-		(at 190.5 213.36 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "fd11f6f2-3ed3-5068-989c-7f72554e0ab5")
-		(property "Reference" "R5"
-			(at 192.5 212.36 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "4.7k"
-			(at 192.5 214.86 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 190.5 213.36 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf"
-			(at 190.5 213.36 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "R 4.7 kOhm 1 % 0402; I2C-Pull-up schaltbar"
-			(at 190.5 213.36 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "LCSC" "C25900"
-			(at 190.5 213.36 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Hersteller" "UNI-ROYAL"
-			(at 190.5 213.36 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "MPN" "0402WGF4701TCE"
-			(at 190.5 213.36 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "JLC" "Basic"
-			(at 190.5 213.36 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "59862f2f-8604-5116-bb9e-988648b4f288")
-		)
-		(pin "2"
-			(uuid "5d3fe7f0-2abc-5b3c-a2bf-04390ce547c1")
-		)
-		(instances
-			(project "fluidi_sensor"
-				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
-					(reference "R5")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(wire
-		(pts
-			(xy 190.5 209.55)
-			(xy 190.5 207.01)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "24cd9521-c788-579c-b56c-b4c546df2c90")
-	)
-	(label "SENS_PWR"
-		(at 190.5 207.01 90)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "5095cbe9-a29e-5680-bec1-1645f6edfae7")
-	)
-	(wire
-		(pts
-			(xy 190.5 217.17)
-			(xy 190.5 219.71)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "a0d1ee73-13a7-5d2f-937d-de8450df89b9")
-	)
-	(label "I2C_SCL"
-		(at 190.5 219.71 270)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "c7ee1c7f-310a-57c3-b74b-ca53298c1a8e")
 	)
 	(symbol
 		(lib_id "Device:C")
-		(at 198.12 213.36 0)
+		(at 20.32 116.84 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -12363,7 +13489,7 @@
 		(dnp no)
 		(uuid "4253e06b-fd6b-57a3-9e3e-7a71085cbd4d")
 		(property "Reference" "C24"
-			(at 200.12 212.36 0)
+			(at 22.32 115.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12372,7 +13498,7 @@
 			)
 		)
 		(property "Value" "100nF"
-			(at 200.12 214.86 0)
+			(at 22.32 118.34 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12381,7 +13507,7 @@
 			)
 		)
 		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
-			(at 198.12 213.36 0)
+			(at 20.32 116.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12390,7 +13516,7 @@
 			)
 		)
 		(property "Datasheet" "docs/datasheets/Samsung_CL05-Serie_Datasheet_LCSC-2023-04.pdf"
-			(at 198.12 213.36 0)
+			(at 20.32 116.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12398,8 +13524,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "MLCC 100 nF 16 V X7R 0402; an U3 V+ (DS verlangt >= 0.01 uF)"
-			(at 198.12 213.36 0)
+		(property "Description" "MLCC 100 nF 16 V X7R 0402; an U3 V+ im Kragen (DS S.26 Kap. 8.3: typ. 0.01 uF, so nah wie moeglich)"
+			(at 20.32 116.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12408,7 +13534,7 @@
 			)
 		)
 		(property "LCSC" "C1525"
-			(at 198.12 213.36 0)
+			(at 20.32 116.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12417,7 +13543,7 @@
 			)
 		)
 		(property "Hersteller" "Samsung Electro-Mechanics"
-			(at 198.12 213.36 0)
+			(at 20.32 116.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12426,7 +13552,7 @@
 			)
 		)
 		(property "MPN" "CL05B104KO5NNNC"
-			(at 198.12 213.36 0)
+			(at 20.32 116.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12435,7 +13561,7 @@
 			)
 		)
 		(property "JLC" "Basic"
-			(at 198.12 213.36 0)
+			(at 20.32 116.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12460,47 +13586,47 @@
 	)
 	(wire
 		(pts
-			(xy 198.12 209.55)
-			(xy 198.12 207.01)
+			(xy 20.32 113.03)
+			(xy 20.32 110.49)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "8eab13dd-a077-55fe-810c-57bf4e70fe15")
+		(uuid "702a55ba-b8f7-517d-a379-67567a9904e5")
 	)
 	(label "SENS_PWR"
-		(at 198.12 207.01 90)
+		(at 20.32 110.49 90)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left bottom)
 		)
-		(uuid "9db14591-0813-5748-b5ca-5d1ae3797c82")
+		(uuid "c0a35779-a5ee-594a-b7e8-ec43ad98bd79")
 	)
 	(wire
 		(pts
-			(xy 198.12 217.17)
-			(xy 198.12 219.71)
+			(xy 20.32 120.65)
+			(xy 20.32 123.19)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "68ca1c4f-4ae6-5180-921d-a515e8093f81")
+		(uuid "b35c068f-9fd4-50d1-99b2-b0d8186a3a30")
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 198.12 219.71 0)
+		(at 20.32 123.19 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom no)
 		(on_board yes)
 		(dnp no)
-		(uuid "1abbbf8d-282a-5a1a-8149-837d7eeb8d89")
-		(property "Reference" "#PWR042"
-			(at 198.12 219.71 0)
+		(uuid "8c6ff533-d13c-583e-a565-f2824725df14")
+		(property "Reference" "#PWR048"
+			(at 20.32 123.19 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12509,7 +13635,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 198.12 222.71 0)
+			(at 20.32 126.19 0)
 			(effects
 				(font
 					(size 1 1)
@@ -12517,7 +13643,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 198.12 219.71 0)
+			(at 20.32 123.19 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12526,7 +13652,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 198.12 219.71 0)
+			(at 20.32 123.19 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12535,20 +13661,314 @@
 			)
 		)
 		(pin "1"
-			(uuid "18fb2ef1-f13e-59ca-b522-3909a2096cf7")
+			(uuid "8639a075-287a-5b19-8e58-b906aa7378f9")
 		)
 		(instances
 			(project "fluidi_sensor"
 				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
-					(reference "#PWR042")
+					(reference "#PWR048")
 					(unit 1)
 				)
 			)
 		)
 	)
 	(symbol
+		(lib_id "Device:R")
+		(at 91.44 106.68 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "eb3f0af3-6b09-50cf-acf5-6c857acfcf3b")
+		(property "Reference" "R4"
+			(at 93.44 105.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "4.7k"
+			(at 93.44 108.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
+			(at 91.44 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf"
+			(at 91.44 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "R 4.7 kOhm 1 % 0402; I2C-Pull-up schaltbar, im Elektronikband"
+			(at 91.44 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C25900"
+			(at 91.44 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Hersteller" "UNI-ROYAL"
+			(at 91.44 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "0402WGF4701TCE"
+			(at 91.44 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "JLC" "Basic"
+			(at 91.44 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "55e7da27-17cb-5acd-a0ab-5d0f1b0fd9c2")
+		)
+		(pin "2"
+			(uuid "ec7bf18a-7aa5-5959-9dc3-fb00e15d9bf3")
+		)
+		(instances
+			(project "fluidi_sensor"
+				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
+					(reference "R4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 91.44 102.87)
+			(xy 91.44 100.33)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "20e651ce-ab2a-560b-885f-084e9f1693b2")
+	)
+	(label "SENS_PWR"
+		(at 91.44 100.33 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "a15294ee-95c1-591e-94bc-0c35556ead05")
+	)
+	(wire
+		(pts
+			(xy 91.44 110.49)
+			(xy 91.44 113.03)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3784b5b1-5872-50e7-9e09-ba4e23ebdf4b")
+	)
+	(label "I2C_SDA"
+		(at 91.44 113.03 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "99b929a1-a455-59bc-b781-69b2ab3eb049")
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 101.6 106.68 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "fd11f6f2-3ed3-5068-989c-7f72554e0ab5")
+		(property "Reference" "R5"
+			(at 103.6 105.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "4.7k"
+			(at 103.6 108.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
+			(at 101.6 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf"
+			(at 101.6 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "R 4.7 kOhm 1 % 0402; I2C-Pull-up schaltbar, im Elektronikband"
+			(at 101.6 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C25900"
+			(at 101.6 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Hersteller" "UNI-ROYAL"
+			(at 101.6 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "0402WGF4701TCE"
+			(at 101.6 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "JLC" "Basic"
+			(at 101.6 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "59862f2f-8604-5116-bb9e-988648b4f288")
+		)
+		(pin "2"
+			(uuid "5d3fe7f0-2abc-5b3c-a2bf-04390ce547c1")
+		)
+		(instances
+			(project "fluidi_sensor"
+				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
+					(reference "R5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 101.6 102.87)
+			(xy 101.6 100.33)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e3c7820c-a96d-5025-a7c5-f02bc56915d4")
+	)
+	(label "SENS_PWR"
+		(at 101.6 100.33 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "c1402a8c-b500-59f2-98f3-3d2799261070")
+	)
+	(wire
+		(pts
+			(xy 101.6 110.49)
+			(xy 101.6 113.03)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "fccb4d7c-c97f-5337-8175-f66d34bc4da4")
+	)
+	(label "I2C_SCL"
+		(at 101.6 113.03 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "acf4c72c-c7f1-5497-9b20-0de3a6fce1c8")
+	)
+	(symbol
 		(lib_id "Device:LED_ARGB")
-		(at 269.24 228.6 0)
+		(at 314.96 193.04 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -12556,7 +13976,7 @@
 		(dnp no)
 		(uuid "cb99d622-d8aa-599f-acee-d191d3977d65")
 		(property "Reference" "D1"
-			(at 269.24 217.02 0)
+			(at 314.96 181.46 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12564,7 +13984,7 @@
 			)
 		)
 		(property "Value" "RGB 1615"
-			(at 269.24 219.02 0)
+			(at 314.96 183.46 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12572,7 +13992,7 @@
 			)
 		)
 		(property "Footprint" "fluidi:LED_RGB_TUOZHAN_1615"
-			(at 269.24 228.6 0)
+			(at 314.96 193.04 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12581,7 +14001,7 @@
 			)
 		)
 		(property "Datasheet" "docs/datasheets/TUOZHAN_P4-1615G2B2R4TS2-06T-001-24_Datasheet_A0.pdf"
-			(at 269.24 228.6 0)
+			(at 314.96 193.04 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12590,7 +14010,7 @@
 			)
 		)
 		(property "Description" "RGB-LED 1615 gem. Anode; gem. Anode an VDD (Phase-3-Review 1.3)"
-			(at 269.24 228.6 0)
+			(at 314.96 193.04 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12599,7 +14019,7 @@
 			)
 		)
 		(property "LCSC" "C7496855"
-			(at 269.24 228.6 0)
+			(at 314.96 193.04 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12608,7 +14028,7 @@
 			)
 		)
 		(property "Hersteller" "TUOZHAN"
-			(at 269.24 228.6 0)
+			(at 314.96 193.04 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12617,7 +14037,7 @@
 			)
 		)
 		(property "MPN" "P4-1615G2B2R4TS2-06T-001-24"
-			(at 269.24 228.6 0)
+			(at 314.96 193.04 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12626,7 +14046,7 @@
 			)
 		)
 		(property "JLC" "Extended"
-			(at 269.24 228.6 0)
+			(at 314.96 193.04 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12657,89 +14077,89 @@
 	)
 	(wire
 		(pts
-			(xy 264.16 223.52)
-			(xy 261.62 223.52)
+			(xy 309.88 187.96)
+			(xy 307.34 187.96)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "60eb7a0f-ecba-50c9-8647-f654121d32e4")
+		(uuid "8ab0ddf5-2bed-5c38-8958-fcc9bb9bb97d")
 	)
 	(label "LED_R_K"
-		(at 261.62 223.52 180)
+		(at 307.34 187.96 180)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify right bottom)
 		)
-		(uuid "52fe7d78-bc35-5caa-b778-c9ddbb64c858")
+		(uuid "bb04130b-9cde-5e5c-bd31-170abdecd543")
 	)
 	(wire
 		(pts
-			(xy 264.16 228.6)
-			(xy 261.62 228.6)
+			(xy 309.88 193.04)
+			(xy 307.34 193.04)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "c4b6990d-7e5a-5a96-a617-fad42e73b8c0")
+		(uuid "7826f014-c54e-57a0-bbdd-64c637534135")
 	)
 	(label "LED_G_K"
-		(at 261.62 228.6 180)
+		(at 307.34 193.04 180)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify right bottom)
 		)
-		(uuid "b5864f83-0ce2-5700-a685-2fb652b7f259")
+		(uuid "2fd6a77c-b008-586d-9775-524992713cfb")
 	)
 	(wire
 		(pts
-			(xy 264.16 233.68)
-			(xy 261.62 233.68)
+			(xy 309.88 198.12)
+			(xy 307.34 198.12)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "c5747dee-8423-5d15-8235-8b4b2a9496d5")
+		(uuid "4fef5318-890f-5989-b94f-37dc8632a611")
 	)
 	(label "LED_B_K"
-		(at 261.62 233.68 180)
+		(at 307.34 198.12 180)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify right bottom)
 		)
-		(uuid "b93c74c9-e128-544c-bcd3-7f4893e2a338")
+		(uuid "2c5b77a1-6fd9-5a0e-8f32-b4cda22f51f7")
 	)
 	(wire
 		(pts
-			(xy 274.32 228.6)
-			(xy 276.86 228.6)
+			(xy 320.04 193.04)
+			(xy 322.58 193.04)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "01d7bec6-6ed3-578a-bcc0-4d8bee1e38c5")
+		(uuid "8e3fb626-b184-5252-b7e0-250a5eff82e3")
 	)
 	(symbol
 		(lib_id "power:VDD")
-		(at 276.86 228.6 270)
+		(at 322.58 193.04 270)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom no)
 		(on_board yes)
 		(dnp no)
-		(uuid "d7291e46-6b7c-5c31-ad62-ff63b522a90f")
-		(property "Reference" "#PWR043"
-			(at 276.86 228.6 0)
+		(uuid "fe5358e9-ff25-5c08-9f11-f35e8a06b5b0")
+		(property "Reference" "#PWR049"
+			(at 322.58 193.04 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12748,7 +14168,7 @@
 			)
 		)
 		(property "Value" "VDD"
-			(at 279.86 228.6 0)
+			(at 325.58 193.04 0)
 			(effects
 				(font
 					(size 1 1)
@@ -12756,7 +14176,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 276.86 228.6 0)
+			(at 322.58 193.04 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12765,7 +14185,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 276.86 228.6 0)
+			(at 322.58 193.04 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12774,12 +14194,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "b03f5f32-acd5-5cfc-97e8-facfd525f91c")
+			(uuid "052892d6-784d-5631-b88d-cddb0c03f92d")
 		)
 		(instances
 			(project "fluidi_sensor"
 				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
-					(reference "#PWR043")
+					(reference "#PWR049")
 					(unit 1)
 				)
 			)
@@ -12787,7 +14207,7 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 233.68 213.36 90)
+		(at 284.48 177.8 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -12795,7 +14215,7 @@
 		(dnp no)
 		(uuid "74d225e9-7f4d-50ba-8777-d7cd66c2658b")
 		(property "Reference" "R6"
-			(at 233.68 210.82 0)
+			(at 284.48 175.26 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12803,7 +14223,7 @@
 			)
 		)
 		(property "Value" "470"
-			(at 233.68 216.36 0)
+			(at 284.48 180.8 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12811,7 +14231,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 233.68 213.36 0)
+			(at 284.48 177.8 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12820,7 +14240,7 @@
 			)
 		)
 		(property "Datasheet" "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf"
-			(at 233.68 213.36 0)
+			(at 284.48 177.8 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12829,7 +14249,7 @@
 			)
 		)
 		(property "Description" "R 470 Ohm 1 % 0402"
-			(at 233.68 213.36 0)
+			(at 284.48 177.8 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12838,7 +14258,7 @@
 			)
 		)
 		(property "LCSC" "C25117"
-			(at 233.68 213.36 0)
+			(at 284.48 177.8 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12847,7 +14267,7 @@
 			)
 		)
 		(property "Hersteller" "UNI-ROYAL"
-			(at 233.68 213.36 0)
+			(at 284.48 177.8 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12856,7 +14276,7 @@
 			)
 		)
 		(property "MPN" "0402WGF4700TCE"
-			(at 233.68 213.36 0)
+			(at 284.48 177.8 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12865,7 +14285,7 @@
 			)
 		)
 		(property "JLC" "Basic"
-			(at 233.68 213.36 0)
+			(at 284.48 177.8 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12890,49 +14310,49 @@
 	)
 	(wire
 		(pts
-			(xy 229.87 213.36)
-			(xy 227.33 213.36)
+			(xy 280.67 177.8)
+			(xy 278.13 177.8)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "7521cd27-cd3b-5bbc-9070-06ada8f2a268")
+		(uuid "9f06eae8-2f29-5290-95f6-304e8a02acd5")
 	)
 	(label "LED_R_UART_TX"
-		(at 227.33 213.36 180)
+		(at 278.13 177.8 180)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify right bottom)
 		)
-		(uuid "4aabe80a-1d48-5c72-a787-2effc9662e20")
+		(uuid "6ed5be3a-07c7-517c-88e6-d1d1761bc3cf")
 	)
 	(wire
 		(pts
-			(xy 237.49 213.36)
-			(xy 240.03 213.36)
+			(xy 288.29 177.8)
+			(xy 290.83 177.8)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "444a7daf-603f-5305-8948-7c13ceb6f90f")
+		(uuid "8ea4c0e8-323e-5250-9e37-6d907d6d033b")
 	)
 	(label "LED_R_K"
-		(at 240.03 213.36 0)
+		(at 290.83 177.8 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left bottom)
 		)
-		(uuid "cc0fa897-9d0d-5a4a-9268-5915133c0fc7")
+		(uuid "cdf83e68-684d-5fd1-9701-7db83b062013")
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 233.68 228.6 90)
+		(at 284.48 193.04 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -12940,7 +14360,7 @@
 		(dnp no)
 		(uuid "ae126f6b-740c-5755-89ca-0ad1b226213b")
 		(property "Reference" "R7"
-			(at 233.68 226.06 0)
+			(at 284.48 190.5 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12948,7 +14368,7 @@
 			)
 		)
 		(property "Value" "200"
-			(at 233.68 231.6 0)
+			(at 284.48 196.04 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12956,7 +14376,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 233.68 228.6 0)
+			(at 284.48 193.04 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12965,7 +14385,7 @@
 			)
 		)
 		(property "Datasheet" "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf"
-			(at 233.68 228.6 0)
+			(at 284.48 193.04 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12974,7 +14394,7 @@
 			)
 		)
 		(property "Description" "R 200 Ohm 1 % 0402"
-			(at 233.68 228.6 0)
+			(at 284.48 193.04 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12983,7 +14403,7 @@
 			)
 		)
 		(property "LCSC" "C25087"
-			(at 233.68 228.6 0)
+			(at 284.48 193.04 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12992,7 +14412,7 @@
 			)
 		)
 		(property "Hersteller" "UNI-ROYAL"
-			(at 233.68 228.6 0)
+			(at 284.48 193.04 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13001,7 +14421,7 @@
 			)
 		)
 		(property "MPN" "0402WGF2000TCE"
-			(at 233.68 228.6 0)
+			(at 284.48 193.04 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13010,7 +14430,7 @@
 			)
 		)
 		(property "JLC" "Basic"
-			(at 233.68 228.6 0)
+			(at 284.48 193.04 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13035,49 +14455,49 @@
 	)
 	(wire
 		(pts
-			(xy 229.87 228.6)
-			(xy 227.33 228.6)
+			(xy 280.67 193.04)
+			(xy 278.13 193.04)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "46472e9c-c379-555e-9dae-202e7fa96022")
+		(uuid "a83bba69-e178-5b08-8d70-d0e67a72f8bf")
 	)
 	(label "LED_G"
-		(at 227.33 228.6 180)
+		(at 278.13 193.04 180)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify right bottom)
 		)
-		(uuid "1ba669fd-e84f-5014-8e57-a526925b69fe")
+		(uuid "a8e23d69-e297-5137-90b1-35ff7f19cb25")
 	)
 	(wire
 		(pts
-			(xy 237.49 228.6)
-			(xy 240.03 228.6)
+			(xy 288.29 193.04)
+			(xy 290.83 193.04)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "03848ddc-1e1b-5525-b985-fab2ed66251b")
+		(uuid "cbf103fb-2df6-5b30-a6cd-285a4ae91f1b")
 	)
 	(label "LED_G_K"
-		(at 240.03 228.6 0)
+		(at 290.83 193.04 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left bottom)
 		)
-		(uuid "626c0df8-3e45-57ab-a181-218415445cb3")
+		(uuid "e215c078-cd28-5316-a061-4ddf44325ca5")
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 233.68 243.84 90)
+		(at 284.48 208.28 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -13085,7 +14505,7 @@
 		(dnp no)
 		(uuid "eb5a0bfd-0bd7-55d9-af31-9b2764712c36")
 		(property "Reference" "R8"
-			(at 233.68 241.3 0)
+			(at 284.48 205.74 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13093,7 +14513,7 @@
 			)
 		)
 		(property "Value" "100"
-			(at 233.68 246.84 0)
+			(at 284.48 211.28 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13101,7 +14521,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 233.68 243.84 0)
+			(at 284.48 208.28 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13110,7 +14530,7 @@
 			)
 		)
 		(property "Datasheet" "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf"
-			(at 233.68 243.84 0)
+			(at 284.48 208.28 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13119,7 +14539,7 @@
 			)
 		)
 		(property "Description" "R 100 Ohm 1 % 0402"
-			(at 233.68 243.84 0)
+			(at 284.48 208.28 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13128,7 +14548,7 @@
 			)
 		)
 		(property "LCSC" "C25076"
-			(at 233.68 243.84 0)
+			(at 284.48 208.28 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13137,7 +14557,7 @@
 			)
 		)
 		(property "Hersteller" "UNI-ROYAL"
-			(at 233.68 243.84 0)
+			(at 284.48 208.28 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13146,7 +14566,7 @@
 			)
 		)
 		(property "MPN" "0402WGF1000TCE"
-			(at 233.68 243.84 0)
+			(at 284.48 208.28 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13155,7 +14575,7 @@
 			)
 		)
 		(property "JLC" "Basic"
-			(at 233.68 243.84 0)
+			(at 284.48 208.28 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13180,49 +14600,49 @@
 	)
 	(wire
 		(pts
-			(xy 229.87 243.84)
-			(xy 227.33 243.84)
+			(xy 280.67 208.28)
+			(xy 278.13 208.28)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "b8aa0ad4-c13c-5e97-9d3a-73b366263f65")
+		(uuid "69e31564-da90-57cc-b227-a6815308bb89")
 	)
 	(label "LED_B_UART_RX"
-		(at 227.33 243.84 180)
+		(at 278.13 208.28 180)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify right bottom)
 		)
-		(uuid "b2e8d6ab-606b-5f4b-9b74-9cc852b0bece")
+		(uuid "aaf1903e-e015-547b-9b0b-7a0918b96550")
 	)
 	(wire
 		(pts
-			(xy 237.49 243.84)
-			(xy 240.03 243.84)
+			(xy 288.29 208.28)
+			(xy 290.83 208.28)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "ee49a8a2-0de9-5967-bd97-f6f0a8c7793f")
+		(uuid "d404f7a5-8c74-5c2f-88cd-f09488cd3b38")
 	)
 	(label "LED_B_K"
-		(at 240.03 243.84 0)
+		(at 290.83 208.28 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left bottom)
 		)
-		(uuid "091326ae-b0c2-59b7-8c93-096e565c500b")
+		(uuid "bf8b170a-9fd5-5762-83b2-cace7ba765fe")
 	)
 	(symbol
 		(lib_id "Switch:SW_Push")
-		(at 269.24 251.46 0)
+		(at 314.96 218.44 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -13230,32 +14650,23 @@
 		(dnp no)
 		(uuid "b73a28c8-6f13-5406-aa9d-d651dcad830d")
 		(property "Reference" "SW1"
-			(at 269.24 246.26 0)
+			(at 314.96 213.24 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Value" "TS-1187A"
-			(at 269.24 248.26 0)
+		(property "Value" "TS-1088"
+			(at 314.96 215.24 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Footprint" "Button_Switch_SMD:SW_Push_1P1T_XKB_TS-1187A"
-			(at 269.24 251.46 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "docs/datasheets/XKB_TS-1187A-B-A-B_Datasheet_LCSC-2023-04.pdf"
-			(at 269.24 251.46 0)
+		(property "Footprint" "Button_Switch_SMD:SW_SPST_TS-1088-xR020"
+			(at 314.96 218.44 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13263,8 +14674,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Taster SMD 5.1x5.1; nach GND, interner Pull-up; beim Einschalten gedrueckt = ROM-Bootloader"
-			(at 269.24 251.46 0)
+		(property "Datasheet" "docs/datasheets/XUNPU_TS-1088-AR02016_Datasheet_LCSC-2022-06.pdf"
+			(at 314.96 218.44 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13272,8 +14683,8 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC" "C318884"
-			(at 269.24 251.46 0)
+		(property "Description" "Taster SMD 3.9x3.0x2.0; nach GND, interner Pull-up; beim Einschalten gedrueckt = ROM-Bootloader; Hoehe 2.0 mm (Zunge +0.5 mm)"
+			(at 314.96 218.44 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13281,8 +14692,8 @@
 				(hide yes)
 			)
 		)
-		(property "Hersteller" "XKB Connection"
-			(at 269.24 251.46 0)
+		(property "LCSC" "C720477"
+			(at 314.96 218.44 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13290,8 +14701,17 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "TS-1187A-B-A-B"
-			(at 269.24 251.46 0)
+		(property "Hersteller" "XUNPU"
+			(at 314.96 218.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "TS-1088-AR02016"
+			(at 314.96 218.44 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13300,7 +14720,7 @@
 			)
 		)
 		(property "JLC" "Basic"
-			(at 269.24 251.46 0)
+			(at 314.96 218.44 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13325,47 +14745,47 @@
 	)
 	(wire
 		(pts
-			(xy 264.16 251.46)
-			(xy 261.62 251.46)
+			(xy 309.88 218.44)
+			(xy 307.34 218.44)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "d86a4d9b-431b-577a-a504-881291ae561c")
+		(uuid "d04da69d-9e7d-5d37-8bf8-7175809f94f5")
 	)
 	(label "BTN_BOOT_N"
-		(at 261.62 251.46 180)
+		(at 307.34 218.44 180)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify right bottom)
 		)
-		(uuid "4daf1c65-efac-5902-8ca2-dc72bf8a3422")
+		(uuid "140716ed-cfbe-5e10-a15c-92b9de733922")
 	)
 	(wire
 		(pts
-			(xy 274.32 251.46)
-			(xy 276.86 251.46)
+			(xy 320.04 218.44)
+			(xy 322.58 218.44)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "83aba692-1c80-5f8d-b334-100cfabf48bd")
+		(uuid "67c42130-adc0-5607-a29c-c4f5e235c52c")
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 276.86 251.46 90)
+		(at 322.58 218.44 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom no)
 		(on_board yes)
 		(dnp no)
-		(uuid "35f90107-63b6-57a9-bdb5-5eea08fdfd5f")
-		(property "Reference" "#PWR044"
-			(at 276.86 251.46 0)
+		(uuid "5afcd70f-2c7e-5c62-a3d8-4d2702aac53f")
+		(property "Reference" "#PWR050"
+			(at 322.58 218.44 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13374,7 +14794,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 279.86 251.46 0)
+			(at 325.58 218.44 0)
 			(effects
 				(font
 					(size 1 1)
@@ -13382,7 +14802,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 276.86 251.46 0)
+			(at 322.58 218.44 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13391,7 +14811,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 276.86 251.46 0)
+			(at 322.58 218.44 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13400,12 +14820,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "aef6fef6-183f-55e6-b8cf-eb2697ff1080")
+			(uuid "5e95e4b0-4741-5348-8d7c-7cbc338a65ef")
 		)
 		(instances
 			(project "fluidi_sensor"
 				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
-					(reference "#PWR044")
+					(reference "#PWR050")
 					(unit 1)
 				)
 			)
@@ -14358,8 +15778,8 @@
 		(in_bom no)
 		(on_board yes)
 		(dnp no)
-		(uuid "16c73ec0-089f-5c29-ab51-d9e9bd4d1fd5")
-		(property "Reference" "#PWR045"
+		(uuid "cf7d0330-2563-5cf6-ac1c-ce4ce57c5726")
+		(property "Reference" "#PWR051"
 			(at 386.08 144.78 0)
 			(effects
 				(font
@@ -14395,12 +15815,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "a40906a3-35e4-529e-930d-834922fe1014")
+			(uuid "8f587cb3-0c20-578d-8082-d103cafc5681")
 		)
 		(instances
 			(project "fluidi_sensor"
 				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
-					(reference "#PWR045")
+					(reference "#PWR051")
 					(unit 1)
 				)
 			)
@@ -14414,8 +15834,8 @@
 		(in_bom no)
 		(on_board yes)
 		(dnp no)
-		(uuid "e695fe65-7c22-5f13-9db2-a0fab2f7afd6")
-		(property "Reference" "#FLG46"
+		(uuid "55b04fa4-d1e7-5dfe-aa28-5fdf00d44cfc")
+		(property "Reference" "#FLG52"
 			(at 111.76 40.64 0)
 			(effects
 				(font
@@ -14451,12 +15871,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "5ce97ec3-bd02-5413-bbc3-1f7fc0386fa6")
+			(uuid "8e67ff79-9a8f-533a-98d6-5290f95a2290")
 		)
 		(instances
 			(project "fluidi_sensor"
 				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
-					(reference "#FLG46")
+					(reference "#FLG52")
 					(unit 1)
 				)
 			)
@@ -14481,8 +15901,8 @@
 		(in_bom no)
 		(on_board yes)
 		(dnp no)
-		(uuid "ad1e11f0-680a-5235-8669-ff687e5fd569")
-		(property "Reference" "#PWR047"
+		(uuid "b5e090a9-d9e2-5079-8e01-ae5513e83d75")
+		(property "Reference" "#PWR053"
 			(at 111.76 43.18 0)
 			(effects
 				(font
@@ -14518,12 +15938,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "3c5c8dab-4f57-5714-8a37-c0c12b1d4c6f")
+			(uuid "15c0f22f-88c7-5780-9845-f3d78866b70d")
 		)
 		(instances
 			(project "fluidi_sensor"
 				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
-					(reference "#PWR047")
+					(reference "#PWR053")
 					(unit 1)
 				)
 			)
@@ -14537,8 +15957,8 @@
 		(in_bom no)
 		(on_board yes)
 		(dnp no)
-		(uuid "3457a2a1-11a6-59c1-9acd-af1d0e3dcd4f")
-		(property "Reference" "#FLG48"
+		(uuid "2ca4cf35-f3a5-5340-89fc-eb2d498bf4a1")
+		(property "Reference" "#FLG54"
 			(at 111.76 66.04 0)
 			(effects
 				(font
@@ -14574,12 +15994,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "84af10fe-bafe-58c5-b68e-5c6893762c72")
+			(uuid "c5152008-6640-5c97-995c-e884ef990f9b")
 		)
 		(instances
 			(project "fluidi_sensor"
 				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
-					(reference "#FLG48")
+					(reference "#FLG54")
 					(unit 1)
 				)
 			)
@@ -14604,8 +16024,8 @@
 		(in_bom no)
 		(on_board yes)
 		(dnp no)
-		(uuid "fe5358e9-ff25-5c08-9f11-f35e8a06b5b0")
-		(property "Reference" "#PWR049"
+		(uuid "c77b91ef-06bf-5589-b7e4-3e4a8a8c83d6")
+		(property "Reference" "#PWR055"
 			(at 111.76 68.58 0)
 			(effects
 				(font
@@ -14641,12 +16061,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "052892d6-784d-5631-b88d-cddb0c03f92d")
+			(uuid "b93aa1a2-241e-5921-ae85-29484d80b0db")
 		)
 		(instances
 			(project "fluidi_sensor"
 				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
-					(reference "#PWR049")
+					(reference "#PWR055")
 					(unit 1)
 				)
 			)
@@ -14654,15 +16074,15 @@
 	)
 	(symbol
 		(lib_id "power:PWR_FLAG")
-		(at 116.84 213.36 0)
+		(at 111.76 101.6 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom no)
 		(on_board yes)
 		(dnp no)
-		(uuid "d1ad02b6-c08f-566d-8fd8-69e0661e8822")
-		(property "Reference" "#FLG50"
-			(at 116.84 213.36 0)
+		(uuid "e448eed9-7252-525d-ad9b-d63593dbe23c")
+		(property "Reference" "#FLG56"
+			(at 111.76 101.6 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14671,7 +16091,7 @@
 			)
 		)
 		(property "Value" "PWR_FLAG"
-			(at 116.84 210.36 0)
+			(at 111.76 98.6 0)
 			(effects
 				(font
 					(size 1 1)
@@ -14679,7 +16099,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 116.84 213.36 0)
+			(at 111.76 101.6 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14688,7 +16108,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 116.84 213.36 0)
+			(at 111.76 101.6 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14697,12 +16117,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "2f8e16a5-ef69-5db9-b36d-c494d7b1dbd6")
+			(uuid "b551c0f1-2473-553f-82a7-11792e3671b1")
 		)
 		(instances
 			(project "fluidi_sensor"
 				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
-					(reference "#FLG50")
+					(reference "#FLG56")
 					(unit 1)
 				)
 			)
@@ -14710,26 +16130,103 @@
 	)
 	(wire
 		(pts
-			(xy 116.84 213.36)
-			(xy 116.84 215.9)
+			(xy 111.76 101.6)
+			(xy 111.76 104.14)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "a955eb55-22ef-53ec-bd77-e5cd8d7a862e")
+		(uuid "4b096b6b-afb4-5b60-9210-2cb0f3ac7ad0")
 	)
 	(label "SENS_PWR"
-		(at 116.84 215.9 270)
+		(at 111.76 104.14 270)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify right bottom)
 		)
-		(uuid "adce07b7-381e-58af-a8a3-f14932b70aa4")
+		(uuid "81a7871e-e1ca-5201-a811-22e4c45e803c")
 	)
-	(text "ENERGIEPFAD\nCR2032 (Panasonic) im Keystone 3034, 90 Grad gedreht (Mechanik S-01)\n-> AO3401A Verpolschutz (D = Zelle+, S = VDD, G = GND) -> VDD, kein Regler\n(VDDS 1.71-3.8 V, DS S.18). Puffer 2 x 100 uF + 2 x DNM (E1).\nAbschaltung 2.4 V unter Last an der Zellklemme (E1), SPICE simulation/spice.\nKein Pad auf VBAT/VDD: AO3401A leitet in beide Richtungen (REQ-SAF-CC-03)."
+	(symbol
+		(lib_id "power:PWR_FLAG")
+		(at 132.08 213.36 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(uuid "bb8ccce7-2c0f-545f-a0e7-e717d1e0c37c")
+		(property "Reference" "#FLG57"
+			(at 132.08 213.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "PWR_FLAG"
+			(at 132.08 210.36 0)
+			(effects
+				(font
+					(size 1 1)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 132.08 213.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 132.08 213.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "acef370f-f028-561a-b7bd-400257c902d2")
+		)
+		(instances
+			(project "fluidi_sensor"
+				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
+					(reference "#FLG57")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 132.08 213.36)
+			(xy 132.08 215.9)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2e991260-f79c-562b-b68a-165a56ff647f")
+	)
+	(label "OSC_PWR"
+		(at 132.08 215.9 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "79d20be8-7f49-5596-9331-aade83e34e9a")
+	)
+	(text "ENERGIEPFAD\nCR2032 (Panasonic) im Keystone 3034, 90 Grad gedreht (Mechanik S-01)\n-> AO3401A Verpolschutz (D = Zelle+, S = VDD, G = GND) -> VDD, kein Regler\n(VDDS 1.71-3.8 V, DS S.18). Puffer 4 x 100 uF im Prototyp (D-013).\nAbschaltung 2.4 V unter Last an der Zellklemme (E1), SPICE simulation/spice.\nKein Pad auf VBAT/VDD: AO3401A leitet in beide Richtungen (REQ-SAF-CC-03)."
 		(exclude_from_sim no)
 		(at 10.16 12.7 0)
 		(effects
@@ -14751,7 +16248,7 @@
 		)
 		(uuid "14e1580d-52cb-533a-aa84-1424dd3a4446")
 	)
-	(text "HF  LC-Filter 1.5 pF / 2.7 nH / 1.5 pF, DC-Block 15 pF, Pi-Netz 0 R + 2 x DNM\n(HW-Guide S.5). ESD-Diode der Referenz (TPD1E0B04) nicht vorgesehen.\nAntenne AN043 oben, Keepout nach AN043, Platine dort 20 mm breit (S-02)."
+	(text "HF  LC-Filter 1.5 pF / 2.7 nH / 1.5 pF, DC-Block 15 pF, Pi-Netz 0 R + 2 x DNM\n(HW-Guide S.5). ESD-Diode der Referenz (TPD1E0B04) nicht vorgesehen.\nAntenne AN043 oben, Keepout nach AN043 (FLOORPLAN_OPTIONS Kap. 1)."
 		(exclude_from_sim no)
 		(at 254 12.7 0)
 		(effects
@@ -14762,7 +16259,7 @@
 		)
 		(uuid "648d16b7-05e8-50b0-83d3-39cca1031579")
 	)
-	(text "PROGRAMMIERUNG (REQ-SAF-CC-03, Auflagen R2-A1...A4)\nBarriere 1: Dummy-Zellen-Adapter einteilig, statt der Zelle im Halter,\n  Speisung nur ueber die Halterkontakte, VDD 1.8-2.0 V, 1.8-V-UART (R2-A2).\nBarriere 2: je Pad 2 x 100 k, beide im Elektronikraum, getrennte\n  Loetstoppoeffnungen, Abstand gegen Loetbruecke/Wasserfilm (R2-A3).\nGrenze (R2-A1): Fehlerfall <= 10 mA, Ladung <= 1 % C = 2.25 mAh\n  (Maxell Warnings S.2, Panasonic Handbook S.1).\nPads RX/TX im Zellfach ausserhalb der Zellflaeche, keine Vias (R2-W01).\nKein nRST-, SWD- oder VDD-Pad. ROM-Bootloader: SW1 (DIO21) beim\n  Einschalten gedrueckt, RX = DIO20, TX = DIO6 (TRM S.464).\nTP3 GND, TP4 OSZ_OUT: nur messen, keine Quelle (Abstimmung sicherheit)."
+	(text "PROGRAMMIERUNG (REQ-SAF-CC-03, Auflagen R2-A1...A4)\nBarriere 1: Dummy-Zellen-Adapter einteilig, statt der Zelle im Halter,\n  Speisung nur ueber die Halterkontakte, VDD 1.8-2.0 V, 1.8-V-UART (R2-A2).\nBarriere 2: je Pad 2 x 100 k, beide im Elektronikraum, getrennte\n  Loetstoppoeffnungen, Abstand gegen Loetbruecke/Wasserfilm (R2-A3).\nGrenze (R2-A1): Fehlerfall <= 10 mA, Ladung <= 1 % C = 2.25 mAh\n  (Maxell Warnings S.2, Panasonic Handbook S.1).\nPads RX/TX im Zellfach ausserhalb der Zellflaeche, keine Vias (R2-W01).\nKein nRST-, SWD- oder VDD-Pad. ROM-Bootloader: SW1 (DIO21) beim\n  Einschalten gedrueckt, RX = DIO20, TX = DIO6 (TRM S.464).\nTP3 GND (Fach); TP4 MEAS_CLK, TP5 PROBE_SENSE auf der B-Seite des\n  Elektronikbands: nur messen, keine Quelle (Abstimmung sicherheit)."
 		(exclude_from_sim no)
 		(at 264.16 76.2 0)
 		(effects
@@ -14773,38 +16270,38 @@
 		)
 		(uuid "0d74d443-4e36-52bf-a252-8391878e7c11")
 	)
-	(text "MESSKETTE  RC-Oszillator SN74LVC1G14, Y -> 4.7 k -> A\nSondenknoten PROBE_SENSE gegen GND-Band (Innenlagen).\nCref1 22 pF (DIO8) / Cref2 100 pF (DIO11): GPIO low = zu,\nsonst hochohmig + Eingangspuffer aus. SENS_PWR = DIO12 speist\nU2, U3 und I2C-Pull-ups. Knoten kurz, kein Testpad am Knoten."
+	(text "MESSKETTE D3 (D-018)  Q2 AO3401A schaltet OSC_PWR (DIO11 low = an, R13 haelt aus).\nU2 SN74LVC1G14: Y -> R3 1 k -> A, Sondenknoten PROBE_SENSE gegen GND (Innenlagen),\n17-36 MHz; R3 auf 10 k umloetbar (Variante A). Cref1 22 pF (DIO8 low = zu).\nTeiler /8: U4-U6 SN74LVC1G80, D an /Q -> MEAS_CLK (DIO24, T3C0). Cref2 entfaellt.\nTP5 PROBE_SENSE (B-Seite, VNA). Firmware: kein I2C waehrend der Messung."
 		(exclude_from_sim no)
-		(at 10.16 177.8 0)
+		(at 10.16 167.64 0)
 		(effects
 			(font
 				(size 1 1)
 			)
 			(justify left top)
 		)
-		(uuid "7341001f-f7c1-52be-a4d8-9a11b4c3668a")
+		(uuid "c44c70c5-8d96-54df-85c1-6e0b0610ebb4")
 	)
-	(text "TEMPERATUR  TMP1075DGKR an SENS_PWR,\nAdresse 0x48 (DS S.14). Pull-ups schaltbar.\nFirmware: SWD + Pulls DIO16/17 aus (E3)."
+	(text "TEMPERATUR  U3 TMP1075NDRLR + C24 im Sondenkragen\n(FLOORPLAN_OPTIONS Option f), R4/R5 im Band. SENS_PWR = DIO12.\nAdresse 0x48 (A0 = GND, DS S.14 Tab. 7-3). SWD + Pulls DIO16/17 aus (E3)."
 		(exclude_from_sim no)
-		(at 132.08 182.88 0)
+		(at 10.16 81.28 0)
 		(effects
 			(font
 				(size 1 1)
 			)
 			(justify left top)
 		)
-		(uuid "955f0781-d5b3-5dda-b440-e2b0b54c446a")
+		(uuid "2514f0d9-e18b-53be-b386-c34c7e9f924c")
 	)
-	(text "BEDIENUNG  RGB-LED gem. Anode an VDD,\nKathode ueber R an GPIO (low = an).\nDIO6 = LED_R + UART-TX, DIO20 = LED_B + UART-RX."
+	(text "BEDIENUNG  RGB-LED gem. Anode an VDD,\nKathode ueber R an GPIO (low = an).\nDIO6 = LED_R + UART-TX, DIO20 = LED_B + UART-RX.\nSW1 TS-1088 (H 2.0 mm) nach GND."
 		(exclude_from_sim no)
-		(at 213.36 182.88 0)
+		(at 259.08 154.94 0)
 		(effects
 			(font
 				(size 1 1)
 			)
 			(justify left top)
 		)
-		(uuid "a92d15ee-0a1e-5db9-b352-13e682b6b6a4")
+		(uuid "d325785f-ed70-53ef-8479-0d048dc789c2")
 	)
 	(sheet_instances
 		(path "/"

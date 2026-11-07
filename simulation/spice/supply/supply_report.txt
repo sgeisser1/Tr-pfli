@@ -1,0 +1,62 @@
+## REQ-ENE-06: Einbruch beim Senden, R_int = 100 Ohm, Vocv 2.7 V, Kriterium <= 0.2 V
+(Zellen: Funk-/CPU-Zeiten pessimistisch x1.5 / nominal x1.0)
+
+| Ereignis | 2x100uF nominal | 2x100uF DC-Bias 50% | 2x100uF DC-Bias 50%, -20% | 4x100uF DC-Bias 50%, -20% |
+|---|---|---|---|---|
+| ADV tx0 | 118 / 82 mV ok | 209 / 149 mV (ok nom.) | 246 / 178 mV (ok nom.) | 143 / 100 mV ok |
+| ADV tx4 | 142 / 98 mV ok | 252 / 179 mV (ok nom.) | 298 / 214 mV X | 172 / 119 mV ok |
+| VERB tx0 | 91 / 61 mV ok | 111 / 74 mV ok | 118 / 80 mV ok | 98 / 65 mV ok |
+| VERB tx4 | 120 / 80 mV ok | 147 / 98 mV ok | 157 / 105 mV ok | 129 / 86 mV ok |
+| MESS - | 72 / 49 mV ok | 114 / 77 mV ok | 136 / 92 mV ok | 82 / 56 mV ok |
+| MESSD - | 697 / 503 mV X | 1055 / 837 mV X | 1159 / 952 mV X | 812 / 603 mV X |
+| LED - | 219 / 219 mV X | 312 / 312 mV X | 336 / 336 mV X | 250 / 250 mV X |
+| FLASH - | 144 / 99 mV ok | 260 / 183 mV (ok nom.) | 310 / 220 mV X | 175 / 121 mV ok |
+
+## Einbruch [mV] je R_int, pessimistisch, Puffer 2x100uF DC-Bias 50%, -20%, Vocv 2.7 V
+
+| Ereignis | 20 Ohm | 100 Ohm | 130 Ohm | 220 Ohm | 500 Ohm | 1000 Ohm |
+|---|---|---|---|---|---|---|
+| ADV tx0 | 110 | 246 | 264 | 292 | 316 | 327 |
+| ADV tx4 | 137 | 298 | 320 | 353 | 384 | 396 |
+| VERB tx0 | 73 | 118 | 143 | 215 | 358 | 464 |
+| VERB tx4 | 92 | 157 | 191 | 286 | 477 | 661 |
+| MESS - | 108 | 136 | 143 | 169 | 255 | 354 |
+| MESSD - | 270 | 1159 | 1342 | 1671 | 2029 | 2199 |
+| LED - | 69 | 336 | 410 | 525 | 646 | 715 |
+| FLASH - | 160 | 310 | 330 | 360 | 387 | 399 |
+
+## E1: Abschaltung bei VDD < 2.4 V unter Last -> tiefster VDDS danach (pessimistisch)
+
+Regel A: Firmware misst VDD am Ende jedes ADV-Ereignisses (0 dBm). Regel B: Messung waehrend des schwersten
+regulaeren Ereignisses (Verbindung +4 dBm) und LED nur, wenn der letzte Wert >= 2.4 V + Einbruch_LED.
+Danach kann ein schwereres Ereignis hoechstens um (Einbruch_schwer - Einbruch_Mess) tiefer fallen.
+
+| Puffer | R_int | VDDS min Regel A (schwerstes) | Regel B: VDDS min (FLASH nach Abschaltung) | DCDC >= 2.2 V (A/B) | kein Reset >= 1.71 V (A/B) |
+|---|---|---|---|---|---|
+| 2x100uF nominal | 20 | 2.38 V (FLASH -) | 2.35 V | ja / ja | ja / ja |
+| 2x100uF nominal | 100 | 2.30 V (LED -) | 2.38 V | ja / ja | ja / ja |
+| 2x100uF nominal | 130 | 2.28 V (LED -) | 2.39 V | ja / ja | ja / ja |
+| 2x100uF nominal | 220 | 2.25 V (LED -) | 2.40 V | ja / ja | ja / ja |
+| 2x100uF nominal | 500 | 2.22 V (LED -) | 2.40 V | ja / ja | ja / ja |
+| 2x100uF nominal | 1000 | 2.20 V (LED -) | 2.40 V | ja / ja | ja / ja |
+| 2x100uF DC-Bias 50% | 20 | 2.36 V (FLASH -) | 2.33 V | ja / ja | ja / ja |
+| 2x100uF DC-Bias 50% | 100 | 2.30 V (LED -) | 2.29 V | ja / ja | ja / ja |
+| 2x100uF DC-Bias 50% | 130 | 2.25 V (LED -) | 2.31 V | ja / ja | ja / ja |
+| 2x100uF DC-Bias 50% | 220 | 2.16 V (LED -) | 2.37 V | nein / ja | ja / ja |
+| 2x100uF DC-Bias 50% | 500 | 2.09 V (LED -) | 2.40 V | nein / ja | ja / ja |
+| 2x100uF DC-Bias 50% | 1000 | 2.05 V (LED -) | 2.40 V | nein / ja | ja / ja |
+| 2x100uF DC-Bias 50%, -20% | 20 | 2.35 V (FLASH -) | 2.33 V | ja / ja | ja / ja |
+| 2x100uF DC-Bias 50%, -20% | 100 | 2.31 V (LED -) | 2.25 V | ja / ja | ja / ja |
+| 2x100uF DC-Bias 50%, -20% | 130 | 2.25 V (LED -) | 2.26 V | ja / ja | ja / ja |
+| 2x100uF DC-Bias 50%, -20% | 220 | 2.17 V (LED -) | 2.33 V | nein / ja | ja / ja |
+| 2x100uF DC-Bias 50%, -20% | 500 | 2.07 V (LED -) | 2.40 V | nein / ja | ja / ja |
+| 2x100uF DC-Bias 50%, -20% | 1000 | 2.01 V (LED -) | 2.40 V | nein / ja | ja / ja |
+| 4x100uF DC-Bias 50%, -20% | 20 | 2.37 V (FLASH -) | 2.34 V | ja / ja | ja / ja |
+| 4x100uF DC-Bias 50%, -20% | 100 | 2.29 V (LED -) | 2.35 V | ja / ja | ja / ja |
+| 4x100uF DC-Bias 50%, -20% | 130 | 2.27 V (LED -) | 2.37 V | ja / ja | ja / ja |
+| 4x100uF DC-Bias 50%, -20% | 220 | 2.22 V (LED -) | 2.40 V | ja / ja | ja / ja |
+| 4x100uF DC-Bias 50%, -20% | 500 | 2.17 V (LED -) | 2.40 V | nein / ja | ja / ja |
+| 4x100uF DC-Bias 50%, -20% | 1000 | 2.15 V (LED -) | 2.40 V | nein / ja | ja / ja |
+
+Groesste fallende Flanke VDD (alle Faelle): 0.1620 mV/us (Grenze 1 mV/us, DS S.18 Tab. 7.3 Fn. 3)
+Ergebnisse: simulation/spice/supply/supply_results.csv

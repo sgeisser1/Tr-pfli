@@ -10,6 +10,8 @@ RESR2 cb2 0 5m
 C5 vdd 0 5u IC=2.7
 VPDC pdc 0 PWL(0 1.15e-06 0.001 1.15e-06 0.001001 0.003 0.021 0.003 0.021001 1.15e-06)
 VPLDO pldo 0 PWL(0 1.15e-06 0.001 1.15e-06 0.001001 0.003 0.021 0.003 0.021001 1.15e-06)
+VPCH pch 0 PWL(0 0 0.001 0 0.001001 0 0.021 0 0.021001 0)
+BCH vdd 0 I = v(pch)
 BLOAD vdd 0 I = (1/(1+exp(-(v(vdd)-2.2)/0.005))) * v(pdc)*3.0/max(v(vdd),1.0) + (1-1/(1+exp(-(v(vdd)-2.2)/0.005))) * v(pldo)
 .control
 set wr_singlescale

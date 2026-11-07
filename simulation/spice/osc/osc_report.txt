@@ -1,0 +1,73 @@
+## R3 = 1 kOhm: f_osc (Cref aus) [MHz], min-max ueber 5 Schwellen-/tpd-Ecken (typ); MEAS_CLK = f/8
+
+| Sonde | VDD 3.0 V | VDD 2.4 V | MEAS_CLK max [MHz] | f1 (Cref1) typ 3.0 V |
+|---|---|---|---|---|
+| Luft | 20.27-36.05 (27.43) | 18.87-33.89 (25.54) | 4.51 | 19.56 |
+| trocken | 18.03-31.70 (24.24) | 16.69-29.69 (22.46) | 3.96 | 17.81 |
+| Mitte Leitung | 15.13-26.33 (20.25) | 13.76-24.48 (18.54) | 3.29 | 15.27 |
+| nass verlustfrei | 11.69-19.86 (15.42) | 10.64-18.40 (14.08) | 2.48 | 12.43 |
+| nass Leitung | 10.93-19.51 (14.90) | 9.58-17.91 (13.35) | 2.44 | 11.75 |
+| nass gedüngt low | 6.55-12.81 (9.14) | 5.70-11.29 (7.94) | 1.60 | 7.74 |
+| nass gedüngt normal | 6.09-10.73 (8.13) | 5.39-9.69 (7.22) | 1.34 | 7.10 |
+| Wasser verlustfrei | 8.30-13.82 (10.82) | 7.48-12.74 (9.81) | 1.73 | 9.22 |
+| Wasser Leitung | 7.08-12.93 (9.75) | 6.15-11.72 (8.58) | 1.62 | 8.21 |
+
+Gesamt R3 1 k: f_osc 4.75-36.05 MHz, MEAS_CLK max 4.51 MHz (Zaehlgrenze 10 MHz, ANNAHME), tw min 12.44 ns (>= 2.5 ns), fclock max 36.1 MHz (<= 160)
+Teiler in SPICE (XSPICE d_dff): MEAS_CLK*8/f_osc - 1 max 0.343 % ueber 180 Faelle
+VDD 3.0 V: Strom Oszillator <= 3.39 mA (SPICE) + Teiler <= 5.21 mA (Cpd-Rechnung) = 8.60 mA; OSC_PWR >= 2.9995 V
+VDD 2.4 V: Strom Oszillator <= 2.59 mA (SPICE) + Teiler <= 3.91 mA (Cpd-Rechnung) = 6.50 mA; OSC_PWR >= 2.3996 V
+
+## R3 = 10 kOhm: f_osc (Cref aus) [MHz], min-max ueber 5 Schwellen-/tpd-Ecken (typ); MEAS_CLK = f/8
+
+| Sonde | VDD 3.0 V | VDD 2.4 V | MEAS_CLK max [MHz] | f1 (Cref1) typ 3.0 V |
+|---|---|---|---|---|
+| Luft | 3.21-5.18 (4.11) | 2.85-4.74 (3.68) | 0.65 | 2.46 |
+| trocken | 2.71-4.36 (3.46) | 2.40-3.98 (3.10) | 0.55 | 2.21 |
+| Mitte Leitung | 0.92-2.24 (1.42) | 0.75-1.85 (1.14) | 0.28 | 1.07 |
+| nass verlustfrei | 1.53-2.44 (1.94) | 1.35-2.22 (1.73) | 0.30 | 1.47 |
+| nass Leitung | 0.72-1.24 (0.94) | 0.62-1.10 (0.82) | 0.15 | 0.81 |
+| nass gedüngt low | 0.68-1.09 (0.86) | 0.60-0.99 (0.77) | 0.14 | 0.76 |
+| nass gedüngt normal | 0.67-1.08 (0.86) | 0.59-0.98 (0.76) | 0.13 | 0.75 |
+| Wasser verlustfrei | 1.01-1.61 (1.28) | 0.89-1.46 (1.14) | 0.20 | 1.06 |
+| Wasser Leitung | 0.68-1.10 (0.87) | 0.60-1.00 (0.77) | 0.14 | 0.76 |
+
+Gesamt R3 10 k: f_osc 0.52-5.18 MHz, MEAS_CLK max 0.65 MHz (Zaehlgrenze 10 MHz, ANNAHME), tw min 85.80 ns (>= 2.5 ns), fclock max 5.2 MHz (<= 160)
+VDD 3.0 V: Strom Oszillator <= 0.48 mA (SPICE) + Teiler <= 0.75 mA (Cpd-Rechnung) = 1.23 mA; OSC_PWR >= 2.9997 V
+VDD 2.4 V: Strom Oszillator <= 0.36 mA (SPICE) + Teiler <= 0.55 mA (Cpd-Rechnung) = 0.90 mA; OSC_PWR >= 2.3997 V
+
+Keine Schwingung in 0 von 360 Faellen
+
+## Ratiometrie C_x = dC * T0/(T1-T0) - C_basis (feste Konstanten, ohne tpd-Korrektur), verlustfreie Sonde
+
+dC = 17.29 pF, C_basis = 15.21 pF
+
+| R3 | Sonde | C wahr [pF] | C_x VDD 3.0 typ | Streuung Ecken + VDD [pF] |
+|---|---|---|---|---|
+| 1 k | Luft | 8.7 | 27.7 | 22.1 ... 29.7 (7.6) |
+| 1 k | trocken | 13.6 | 32.7 | 27.0 ... 34.5 (7.5) |
+| 1 k | nass verlustfrei | 36.7 | 56.5 | 50.9 ... 57.9 (7.0) |
+| 1 k | Wasser verlustfrei | 64.9 | 84.3 | 78.6 ... 85.5 (6.8) |
+| 10 k | Luft | 8.7 | 10.5 | 10.1 ... 10.7 (0.6) |
+| 10 k | trocken | 13.6 | 15.3 | 14.8 ... 15.4 (0.6) |
+| 10 k | nass verlustfrei | 36.7 | 38.9 | 38.4 ... 39.1 (0.6) |
+| 10 k | Wasser verlustfrei | 64.9 | 66.6 | 66.0 ... 66.7 (0.6) |
+
+Die Abweichung C_x - C wahr ist der Laufzeitanteil (tpd) + Cout-Kopplung; die Zwei-Punkt-Kalibrierung absorbiert den Konstantanteil, die Streuung ueber Ecken/VDD bleibt (-> tpd-Korrektur, PROTOTYP-PRUEFUNG).
+
+## tpd-Einfluss (typ-Schwellen, VDD 3.0 V, f0): tpd 2 / 3 / 4 ns
+
+| R3 | Sonde | f [MHz] bei 2 / 3 / 4 ns | df/f je ns | Anteil 2 tpd an der Periode (3 ns) |
+|---|---|---|---|---|
+| 1 k | Luft | 29.91 / 27.43 / 25.37 | -8.3 % | 16 % |
+| 1 k | trocken | 26.18 / 24.24 / 22.60 | -7.4 % | 15 % |
+| 1 k | Mitte Leitung | 21.51 / 20.25 / 19.15 | -5.8 % | 12 % |
+| 1 k | nass Leitung | 15.56 / 14.91 / 14.31 | -4.2 % | 9 % |
+| 1 k | Wasser Leitung | 10.06 / 9.75 / 9.46 | -3.1 % | 6 % |
+| 10 k | Luft | 4.17 / 4.11 / 4.06 | -1.3 % | 2 % |
+| 10 k | trocken | 3.50 / 3.46 / 3.43 | -1.1 % | 2 % |
+| 10 k | Mitte Leitung | 1.43 / 1.42 / 1.41 | -0.5 % | 1 % |
+| 10 k | nass Leitung | 0.95 / 0.94 / 0.94 | -0.3 % | 1 % |
+| 10 k | Wasser Leitung | 0.87 / 0.87 / 0.87 | -0.3 % | 1 % |
+
+R3 1 k: Frequenzspanne trocken -> nass (Leitung) 9.34 MHz; tpd +1 ns verschiebt 'Mitte' um -1.180 MHz = +12.6 %-Punkte Index (ohne Ratiometrie)
+R3 10 k: Frequenzspanne trocken -> nass (Leitung) 2.52 MHz; tpd +1 ns verschiebt 'Mitte' um -0.007 MHz = +0.3 %-Punkte Index (ohne Ratiometrie)

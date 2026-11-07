@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""fluidi Sensor Rev A - projektspezifische KiCad-Bibliothek erzeugen.
+"""fluidi Sensor Rev B - projektspezifische KiCad-Bibliothek erzeugen.
 
 Erzeugt:
-  hardware/sensor/lib/fluidi.kicad_sym   (Symbole CC2340R52E0RGER, AO3401A, ANT_IFA_AN043, SONDE_ELEKTRODEN)
+  hardware/sensor/lib/fluidi.kicad_sym   (Symbole CC2340R52E0RGER, AO3401A, TMP1075NDRL, ANT_IFA_AN043,
+                                          SONDE_ELEKTRODEN)
   hardware/sensor/lib/fluidi.pretty/*.kicad_mod (Footprints LED 1615, Spule WPN201610H, Halter 3034 mit
                                                  kleinem Minuspad, Platzhalter Sonde)
 
@@ -10,6 +11,10 @@ Quellen (lokal, jeweils geprueft):
   CC2340R52 RGE-Pinbelegung   docs/datasheets/TI_CC2340R5_Datasheet_SWRS272F.pdf S.7 Abb. 6-2, S.9-16 Tab. 6-1..6-13,
                               Gehaeuse RGE0024B S.77-78 (Exposed Pad = Pin 25, 2.45 x 2.45 mm)
   AO3401A SOT-23 (1 G, 2 S, 3 D)  docs/datasheets/AOS_AO3401A_Datasheet_Rev3.1.pdf S.1 (SOT23 Top View)
+  TMP1075NDRL SOT-563 (1 SCL, 2 GND, 3 ALERT, 4 A0, 5 V+, 6 SDA)
+                              docs/datasheets/TI_TMP1075_Datasheet_SBOS854F.pdf S.4 Abb. 5-4 / Tab. 5-1;
+                              Land Pattern DRL0006A S.37 (6 x 0.67 x 0.3, Raster 0.5, Reihen 1.48) ~ KiCad SOT-563
+                              (0.675 x 0.35, Reihen 1.425)
   LED TUOZHAN 1615 (1 A, 2 R, 3 G, 4 B; Pads 0.5 x 0.8, Abstand 0.7 / 0.2)
                               docs/datasheets/TUOZHAN_P4-1615G2B2R4TS2-06T-001-24_Datasheet_A0.pdf S.4
   Sunlord WPN201610H (Land a 0.7, b 0.7, c 1.7) docs/datasheets/Sunlord_WPN201610H100MT_Datasheet_LCSC-2023-10.pdf S.2
@@ -143,6 +148,17 @@ def sym_ao3401a():
     return s
 
 
+def sym_tmp1075n():
+    pins = [pin("bidirectional", -10.16, 2.54, 0, "SDA", "6"), pin("input", -10.16, 0, 0, "SCL", "1"),
+            pin("input", -10.16, -2.54, 0, "A0", "4"), pin("open_collector", 10.16, 0, 180, "ALERT", "3"),
+            pin("power_in", 0, 7.62, 270, "V+", "5"), pin("power_in", 0, -7.62, 90, "GND", "2")]
+    g = [rect(-7.62, 5.08, 7.62, -5.08)]
+    return symbol("TMP1075NDRL", "U", "TMP1075NDRLR", "Package_TO_SOT_SMD:SOT-563",
+                  "docs/datasheets/TI_TMP1075_Datasheet_SBOS854F.pdf",
+                  "Temperatursensor I2C TMP1075N, SOT-563 (DRL); Pins DS S.4 Abb. 5-4, Tab. 5-1; V+ 1.62-3.6 V (S.5)",
+                  g, pins)
+
+
 def sym_antenna():
     g = [polyline([(0, 0), (0, 5.08)]), polyline([(-2.54, 5.08), (0, 2.54), (2.54, 5.08), (-2.54, 5.08)]),
          text("AN043 IFA", 6.35, 3.81)]
@@ -165,9 +181,9 @@ def sym_probe():
 
 
 def write_symbols():
-    syms = [sym_cc2340(), sym_ao3401a(), sym_antenna(), sym_probe()]
+    syms = [sym_cc2340(), sym_ao3401a(), sym_tmp1075n(), sym_antenna(), sym_probe()]
     # nicht bestueckbare Leiterplattenstrukturen aus der Stueckliste nehmen
-    for s in syms[2:]:
+    for s in syms[3:]:
         for i, x in enumerate(s):
             if isinstance(x, list) and x[0] == "in_bom":
                 s[i] = ["in_bom", "no"]
@@ -250,8 +266,9 @@ def fp_keystone3034():
                                "Hoehe 5.08 ~ 5.1 min, Katalog S.1 Fig. 1); Minuspad 4 x 4 mm (>= 3.96 mm SQ min) "
                                "nach Auflage R2-W01 Nr. 1, statt 17.8-mm-Kreis der Bibliothek")]
         if isinstance(x, list) and x[0] == "pad" and x[1] == "2":
+            # ohne Lotpaste wie die KiCad-Vorlage: Kontaktflaeche ENIG blank (A-32), kein Lothoecker unter der Zelle
             n[i] = ["pad", Q("2"), "smd", "rect", ["at", "0", "0"], ["size", "4", "4"],
-                    ["layers", Q("F.Cu"), Q("F.Paste"), Q("F.Mask")]]
+                    ["layers", Q("F.Cu"), Q("F.Mask")]]
         if isinstance(x, list) and x[0] == "generator":
             n[i] = ["generator", Q("fluidi_gen_lib")]
     n.append(fp_text("R2-W01: unter der Zelle nur Loetstopplack", 0, 4, "Cmts.User", 0.8))

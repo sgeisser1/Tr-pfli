@@ -60,19 +60,19 @@
   "2": "GND"
  },
  "C21": {
-  "1": "SENS_PWR",
+  "1": "OSC_PWR",
   "2": "GND"
  },
  "C22": {
   "1": "PROBE_SENSE",
   "2": "CREF1_CTL"
  },
- "C23": {
-  "1": "PROBE_SENSE",
-  "2": "CREF2_CTL"
- },
  "C24": {
   "1": "SENS_PWR",
+  "2": "GND"
+ },
+ "C25": {
+  "1": "OSC_PWR",
   "2": "GND"
  },
  "C3": {
@@ -126,6 +126,11 @@
   "2": "VDD",
   "3": "VBAT"
  },
+ "Q2": {
+  "1": "OSC_EN_N",
+  "2": "VDD",
+  "3": "OSC_PWR"
+ },
  "R1": {
   "1": "VDD",
   "2": "RSTN"
@@ -141,6 +146,10 @@
  "R12": {
   "1": "UART_RX_MID",
   "2": "UART_RX_PAD"
+ },
+ "R13": {
+  "1": "VDD",
+  "2": "OSC_EN_N"
  },
  "R2": {
   "1": "RF_ANT_DC",
@@ -188,13 +197,16 @@
   "1": "GND"
  },
  "TP4": {
-  "1": "OSZ_OUT"
+  "1": "MEAS_CLK"
+ },
+ "TP5": {
+  "1": "PROBE_SENSE"
  },
  "U1": {
   "1": "RF_PIN",
   "10": "BTN_BOOT_N",
   "11": "VDD",
-  "12": "OSZ_OUT",
+  "12": "MEAS_CLK",
   "13": "RSTN",
   "14": "X32P",
   "15": "X32N",
@@ -210,7 +222,7 @@
   "24": "VDD",
   "25": "GND",
   "3": "CREF1_CTL",
-  "4": "CREF2_CTL",
+  "4": "OSC_EN_N",
   "5": "SENS_PWR",
   "6": "LED_G",
   "7": "I2C_SDA",
@@ -221,16 +233,35 @@
   "2": "PROBE_SENSE",
   "3": "GND",
   "4": "OSZ_OUT",
-  "5": "SENS_PWR"
+  "5": "OSC_PWR"
  },
  "U3": {
-  "1": "I2C_SDA",
-  "2": "I2C_SCL",
+  "1": "I2C_SCL",
+  "2": "GND",
   "4": "GND",
-  "5": "GND",
-  "6": "GND",
-  "7": "GND",
-  "8": "SENS_PWR"
+  "5": "SENS_PWR",
+  "6": "I2C_SDA"
+ },
+ "U4": {
+  "1": "DIV2",
+  "2": "OSZ_OUT",
+  "3": "GND",
+  "4": "DIV2",
+  "5": "OSC_PWR"
+ },
+ "U5": {
+  "1": "DIV4",
+  "2": "DIV2",
+  "3": "GND",
+  "4": "DIV4",
+  "5": "OSC_PWR"
+ },
+ "U6": {
+  "1": "MEAS_CLK",
+  "2": "DIV4",
+  "3": "GND",
+  "4": "MEAS_CLK",
+  "5": "OSC_PWR"
  },
  "Y1": {
   "1": "X48P",
