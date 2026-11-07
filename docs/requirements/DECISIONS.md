@@ -200,3 +200,21 @@ Format: Nr. · Datum · Entscheid · Alternativen · Begründung · Quelle · St
   Startkalibrierung 13.3/40 pF bleibt ANNAHME bis zur Messung am Muster.
 - Git-Historie bereinigt (Auftraggeber-OK): FEM-/Elmer-Arbeitsdateien und 2 × 64-MB-FCStd aus allen Commits entfernt
   (Repo 427 → 247 MB), Tags unverändert, Sicherung der alten Historie als Bundle im Scratchpad.
+
+### D-023 · 2026-11-08 · Layout Rev B: Via-in-Pad im Zellfach (L-1) und Fachlänge V-K (L-2/LS-W1) (Projektleiter)
+- **L-1 Via-in-Pad im Zellfach zulässig mit Auflagen** (Entscheid Sicherheit, `docs/reviews/phase4_layout_revb_sicherheit.md`):
+  Clip-VBAT und Minuspad brauchen ein Via, weil das Schott kein Aussenkupfer zulässt; gefüllt und überkupfert (JLC
+  „Epoxy Filled & Capped“/POFV) erfüllt REQ-MECH-05. Auflagen A-1 (TP3/GND im Fach entfällt → 4 VIP; GND für den
+  Dummy-Adapter über das Minuspad), A-2 (POFV verbindlich in Bestellung, ohne POFV keine Bestellung), A-3 (Querschliff
+  am Muster), A-4 (Isolationswiderstand beim Flutungstest), A-5 (diese Notiz + PCB_OUTLINE Rev C Z4).
+  Alternative „TP1/TP2 auf B ins Band“ verworfen: POFV bleibt ohnehin nötig (kostengleich), und nach dem Schott-Verguss
+  wäre kein UART-Zugang mehr möglich.
+- **V-K Fach 0.7 mm länger** (Vorschlag Mechanik, `docs/reviews/phase4_kollision_mechanik.md`): Hülsenboden 2.0 → 1.3 mm,
+  Kragen/Tasche/Mutter/O-Ring-Nut 0.7 mm tiefer (Vergusskante z 1.3), Fach 24.2 mm, Zelle im Layout 0.35 mm tiefer.
+  Damit Clip-Pads ≥ 0.30 mm (RSS) zu beiden Vergusskanten (LS-W1). Aussenmasse unverändert.
+  Alternativen: Rev C nominal 0.20 mm je Seite (verfehlt LS-W1); „Zelle 0.4 mm tiefer“ allein (Pad 0.27 mm im Kragen).
+  Begründung: Sicherheit vor Kosten; V-K kostet nichts, ändert nur das Innere. **Bedingung:** FEM (Hülsenboden 1.3 mm,
+  Sonde mit Vergusskante z 1.3) erfüllt weiterhin REQ-MECH-10, sonst Vorlage an den Auftraggeber.
+- **M-4 Taster:** Tastenhub 0.6 → 0.8 mm und Quetschrippe an der Gabel umsetzen (Toleranzkette Spalt 0.05…0.61 mm).
+- **EP-2 LED:** Pulse ≤ 5 ms (FW-4); lange Leuchtphasen dadurch halb so hell (wahrgenommen ≈ 70–80 %, ANNAHME) –
+  akzeptiert für den Prototyp, PROTOTYP-PRÜFUNG E6 (Sichtbarkeit), ggf. Vorwiderstände anpassen.
