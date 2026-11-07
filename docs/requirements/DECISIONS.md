@@ -97,3 +97,12 @@ Format: Nr. · Datum · Entscheid · Alternativen · Begründung · Quelle · St
   blau/grau (Klick oder Schraube von unten), graues Teil nach unten abziehen → nur eine sichtbare Trennung.
   Machbarkeit (Dichtung, REQ-SAF-05, REQ-SAF-CC-04) wird geprüft.
 - Gateway in denselben Farben; Antenne möglichst intern statt Stabantenne (Machbarkeit wird geprüft).
+
+### D-010 · 2026-11-07 · Design P3 fluidi – Verfeinerung 1 (Auftraggeber)
+- **Sensor freigegeben wie Verfeinerung 1** („perfekt, genau wie gewünscht“): Grau **Option 1 warmes Hellgrau #B9B5AC**,
+  hellblaue Kappe und Taste, RGB-Tropfen, Logo Ton in Ton als Relief, Masse 28 × 13 × 48 mm, Sonde 20 mm, 5 mm Abstand.
+- **LED-Farben:** Grün = ok/Messung gesendet · Blau = giessen nötig (bei schwacher Zelle Gelb) · Rot = Batterie tief/Fehler ·
+  Gelb = Kopplung.
+- **Änderungswünsche:** (1) Gateway-LED als Tropfen, der wie beim Sensor aus dem blauen Teil „heraustropft“.
+  (2) Wortmarke: zwei blaue Tropfen sind zu viel, Schwarz ist zu hart → neue Varianten. (3) App-Icon als Kachel im
+  Sensor-Look: oben Blau, unten Warmgrau, grün leuchtender Tropfen an der Grenze.
