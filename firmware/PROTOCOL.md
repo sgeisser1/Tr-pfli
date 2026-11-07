@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | Dokument | `firmware/PROTOCOL.md` |
-| Protokollversion | **2** (Frame-Version 2, Advertising-Format 1, Datensatzformat 1, INFO-Format 2) |
+| Protokollversion | **2** (Frame-Version 2, Advertising-Format 1, Datensatzformat 1, `info_fmt` 1 – SESSION_INFO um `sec_cnt` erweitert) |
 | Dokumentversion | 0.2 – Überarbeitung nach Prüfrunde 1 (Software `phase4_protocol_software.md`, Sicherheit `phase4_sicherheit_kragen_firmware.md`, VETO F-K1); Änderungsliste Kap. 0 |
 | Datum | 2026-11-07 |
 | Ersteller | Firmware/Energie |
@@ -142,9 +142,9 @@ für ein Büro akzeptiert (**ANNAHME**, Sicherheits-Agent prüft).
    (**PROTOTYP-PRÜFUNG** OP-GW-8). MTU: das Gateway fordert so gross wie möglich an (BlueZ), der Sensor richtet
    Listen nach der ausgehandelten MTU; alle Nicht-Listen-Frames passen in MTU 23 nicht zwingend → **MTU ≥ 100 SOLL**,
    bei kleinerer MTU lehnt der Sensor nichts ab, sendet aber Listen mit 1 Datensatz je Frame.
+5. Nach Ende der Arbeit **sofort trennen**. Sitzung (ohne OTA) SOLL ≤ 12 Verbindungsereignisse dauern.
 6. **MUSS (Ä-15):** Das Gateway leitet aus Klartext-Frames `ERROR` (z. B. `NOT_PAIRED`, `LOCKED`) **keine
    Zustandsänderung** ab (kein Löschen von Schlüsseln, keine Entkopplung), sondern zeigt sie nur an.
-5. Nach Ende der Arbeit **sofort trennen**. Sitzung (ohne OTA) SOLL ≤ 12 Verbindungsereignisse dauern.
 
 ---
 
@@ -276,7 +276,7 @@ sequenceDiagram
 ```
 
 - `K_s = HKDF-SHA-256(IKM = K_link, salt = gw_nonce ‖ s_nonce, info = "fluidi-sess-v2", L = 16)`.
-- `gw_nonce`, `s_nonce`: je 8 Byte aus dem Zufallsgenerator (Sensor: Hardware-RNG; Gateway: `esp_fill_random`).
+- `gw_nonce`, `s_nonce`: je 8 Byte aus dem Zufallsgenerator (Sensor: Hardware-RNG; Gateway: `secrets.token_bytes`/`os.urandom`).
 - Der Sensor führt **keinen** Befehl aus, bevor ein gültiger SECURE-Frame des Gateways angekommen ist.
 - Kann der Sensor kein `s_nonce` aus dem Hardware-RNG gewinnen, sendet er kein HELLO_RSP und trennt (F-W4).
 
@@ -297,7 +297,7 @@ sequenceDiagram
 
 Ein Angreifer kann Verbindungen aufbauen, aber keine gültigen Frames senden. Sensor-Regeln (v2, Ä-4):
 - **Kryptografische Fehlversuche** (falsche `gateway_id` → NOT_PAIRED, ungültiger MIC/HMAC, falscher Zähler vor der
-  ersten gültigen Nachricht, Commitment-Verletzung): **3 in Folge** → 30 min nur nicht verbindbares Advertising
+  ersten gültigen Nachricht, Commitment-Verletzung bei PAIR_REVEAL – auch diese zählt in die Folge, N-1): **3 in Folge** → 30 min nur nicht verbindbares Advertising
   (`LOCKED`), Fehlercode `0x0B` im Fehlerprotokoll.
 - **Fristüberschreitungen** (kein HELLO, Kap. 3) zählen **nicht** als Fehlversuch, damit ein langsames Gateway sich
   nicht selbst aussperrt (K-1); **10 in Folge** → ebenfalls 30 min `LOCKED` (Energieschutz). Ein gültiger
@@ -328,7 +328,7 @@ bleiben gepuffert); die PWA zeigt `LOCKED` als Störung an.
 
 | Byte | Feld | Inhalt |
 |---|---|---|
-| 0 | `vt` | Bit 7–4: Frame-Version (**1**); Bit 3–0: Frame-Typ |
+| 0 | `vt` | Bit 7–4: Frame-Version (**2**); Bit 3–0: Frame-Typ → `vt` = 0x20 HELLO, 0x21 HELLO_RSP, 0x22 SECURE, 0x23 PAIR, 0x2F ERROR |
 
 | Frame-Typ | Name | Schutz | Richtung |
 |---|---|---|---|
@@ -342,15 +342,15 @@ Unbekannte Frame-Version → Sensor antwortet `ERROR {0x08 PROTO_VERSION, unters
 
 ### 5.2 Klartext-Frames
 
-**HELLO** (G→S), 18 Byte: `vt=0x10` · `proto_max` u8 (höchste vom Gateway unterstützte Protokollversion) ·
+**HELLO** (G→S), 18 Byte: `vt=0x20` · `proto_max` u8 (höchste vom Gateway unterstützte Protokollversion) ·
 `gateway_id` [8] · `gw_nonce` [8].
 
-**HELLO_RSP** (S→G), 10 Byte: `vt=0x11` · `proto` u8 (gewählte Version = min(proto_max, Sensor)) · `s_nonce` [8].
+**HELLO_RSP** (S→G), 10 Byte: `vt=0x21` · `proto` u8 (gewählte Version = min(proto_max, Sensor)) · `s_nonce` [8].
 Unmittelbar danach (nächste Notification) folgt SECURE#0 mit `SESSION_INFO`.
 
-**ERROR** (S→G), 3–4 Byte: `vt=0x1F` · `code` u8 (Kap. 11) · optional `detail` u8.
+**ERROR** (S→G), 2–3 Byte: `vt=0x2F` · `code` u8 (Kap. 11) · optional `detail` u8.
 
-**PAIR** (beide): `vt=0x13` · `pmsg` u8 · Nutzlast:
+**PAIR** (beide): `vt=0x23` · `pmsg` u8 · Nutzlast:
 
 | `pmsg` | Name | Richtung | Nutzlast | Länge |
 |---|---|---|---|---|
@@ -367,7 +367,7 @@ PAIR-Frames nimmt der Sensor **nur im Kopplungsmodus** an (sonst `ERROR 0x0A NOT
 
 | Byte | Feld |
 |---|---|
-| 0 | `vt = 0x12` |
+| 0 | `vt = 0x22` |
 | 1–4 | `ctr` u32 |
 | 5 … n−9 | Chiffrat von: `msg` u8 · `rid` u8 · Nutzlast |
 | n−8 … n−1 | MIC [8] |
@@ -389,7 +389,7 @@ tragen das `rid` der auslösenden Anfrage.
 | `0x11` | TIME_SET | G→S | `unix_ms` u64 · `tz_min` i16 (Versatz Lokalzeit zu UTC in min, inkl. Sommerzeit) | `0x91` · `status` u8 |
 | `0x12` | READ_RECORDS | G→S | `from_seq` u32 · `max` u16 (0 = alle) | 0…n × `0x92` RECORDS (5.6), zuletzt mit `more=0` |
 | `0x13` | ACK_RECORDS | G→S | `upto_seq` u32 (alle ≤ diesem Wert sind gespeichert) | `0x93` · `status` u8 · `oldest_unacked` u32 |
-| `0x14` | MEASURE | G→S | `purpose` u8 (0 normal, 1 Kalibrierung trocken, 2 Kalibrierung nass, 3 Diagnose) · `led` u8 (0 aus, 1 Quittung grün) | `0x94` · `status` u8 · `seq` u32 (Nummer des kommenden Datensatzes). **v2 (Ä-8):** Der Sensor misst erst **nach dem Trennen** (kein Funk während der Mess-Bursts, PINMAP FW-2), dann schnelles Advertising 2 s mit `DATA_PENDING`; das Gateway trennt nach der Antwort und liest `seq` in der nächsten Sitzung (Latenz ≈ 0.3 s + Wiederverbinden). Kalibrierung: Gateway sendet `samples` × MEASURE und mittelt robust (S-7) |
+| `0x14` | MEASURE | G→S | `purpose` u8 (0 normal, 1 Kalibrierung trocken, 2 Kalibrierung nass, 3 Diagnose) · `led` u8 (0 aus, 1 Quittung grün) | `0x94` · `status` u8 · `seq` u32 (Nummer des kommenden Datensatzes). **v2 (Ä-8):** Der Sensor misst erst **nach dem Trennen** (kein Funk während der Mess-Bursts, PINMAP FW-2), dann schnelles Advertising 2 s mit `DATA_PENDING`; das Gateway trennt nach der Antwort und liest `seq` in der nächsten Sitzung (Latenz ≈ 0.3 s + Wiederverbinden). **Regel (R-2): höchstens ein MEASURE je Sitzung, als letzte Anfrage**; ein weiteres MEASURE in derselben Sitzung liefert dieselbe `seq` und keine zweite Messung; folgt 0.3 s nach der Antwort kein Frame, trennt der Sensor selbst. Kalibrierung: Gateway sendet `samples` × MEASURE und mittelt robust (S-7) |
 | `0x15` | GET_SETTINGS | G→S | – | `0x95` · `settings_ver` u16 · TLV-Liste (Kap. 8) |
 | `0x16` | SET_SETTINGS | G→S | `settings_ver` u16 (neu) · TLV-Liste | `0x96` · `status` u8 · `bad_tlv_id` u8 (0 = alle ok) |
 | `0x17` | IDENTIFY | G→S | `seconds` u8 (1–30) | `0x97` · `status` |

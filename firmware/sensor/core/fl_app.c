@@ -55,10 +55,12 @@ static void dl_min(uint32_t *best, uint32_t now, uint32_t t, bool active)
 }
 
 /* ---------------- Persistenz ---------------- */
-static void save_counters(void) { fl_port_nv_write(FL_NV_COUNTERS, &A->cnt, sizeof A->cnt); }
-static void save_logmeta(void) { fl_port_nv_write(FL_NV_LOGMETA, &A->logmeta, sizeof A->logmeta); }
-static void save_settings(void) { fl_port_nv_write(FL_NV_SETTINGS, &A->set, sizeof A->set); }
-static void save_diag(void) { fl_port_nv_write(FL_NV_DIAG, &A->diag, sizeof A->diag); }
+/* N-2: waehrend des Starts bis zur ersten bestandenen Lastmessung wird nichts ins NV geschrieben */
+static bool s_nv_defer;
+static void save_counters(void) { if (!s_nv_defer) fl_port_nv_write(FL_NV_COUNTERS, &A->cnt, sizeof A->cnt); }
+static void save_logmeta(void) { if (!s_nv_defer) fl_port_nv_write(FL_NV_LOGMETA, &A->logmeta, sizeof A->logmeta); }
+static void save_settings(void) { if (!s_nv_defer) fl_port_nv_write(FL_NV_SETTINGS, &A->set, sizeof A->set); }
+static void save_diag(void) { if (!s_nv_defer) fl_port_nv_write(FL_NV_DIAG, &A->diag, sizeof A->diag); }
 
 static void diag_add(uint8_t code, uint8_t detail)
 {
@@ -172,7 +174,9 @@ int fl_app_measure(uint8_t cause, fl_record_t *rec)
     uint32_t ow = 0;
     if (A->mode == FL_MODE_UNDERVOLTAGE) { diag_add(FL_E_MEAS_LOW_BATT, 0); return FL_E_MEAS_LOW_BATT; }
     memset(&raw, 0, sizeof raw);
-    /* F-W5: kein Funk waehrend der Bursts: nur ohne Verbindung (Aufrufer), Advertising fuer die Messdauer aus */
+    /* F-W5: kein Funk waehrend der Bursts: nur ohne Verbindung (Aufrufer), Advertising fuer die Messdauer aus.
+     * N-3: der Stopp ist im Stack asynchron; zwischen Stopp und erstem Burst liegen >= 16 ms (TMP-Wandlung,
+     * FLUIDI_TMP_CONV_MS + SENS_PWR 1 ms), ein bereits geplantes ADV-Ereignis (3 Kanaele) ist nach wenigen ms vorbei. */
     if (A->adv_on_set) { fl_port_adv_set(NULL, 0, 0, false, false); A->adv_valid = false; A->adv_on_set = false; }
     bool f2 = FLUIDI_HAS_CREF2 && (cause == FL_CAUSE_DIAG || (A->set.diag_f2 && (A->meas_count % A->set.diag_f2) == 0));
     /* FW-2: max. 4 Bursts -> hoechstens 16 Teilbloecke je Konfiguration */
@@ -190,11 +194,13 @@ int fl_app_measure(uint8_t cause, fl_record_t *rec)
     fl_port_uptime(&rec->uptime_s, &frac);
     rec->c_probe = res.c_probe; rec->c_diag = res.c_diag; rec->temp = res.temp;
     rec->vbat_mv = res.vbat_mv; rec->cause = cause; rec->flags = res.flags;
+    check_battery(res.vbat_mv);                          /* N-2: Lastpruefung vor dem Flash-Schreiben */
+    if (A->mode == FL_MODE_UNDERVOLTAGE) return FL_E_MEAS_LOW_BATT;
+    s_nv_defer = false;
     int rc = fl_log_append(&A->log, rec, &ow);
     if (rc) diag_add(FL_E_FLASH_FAIL, 0);
     if (ow) { diag_add(FL_E_LOG_OVERWRITTEN, ow > 255 ? 255 : (uint8_t)ow); save_logmeta(); }
     A->water = fl_water_needed(res.c_probe, A->set.water_raw);
-    check_battery(res.vbat_mv);
     return rc;
 }
 
@@ -261,14 +267,20 @@ static void handshake_timeout(void)
     disconnect();
 }
 
-static void handshake_failed(uint8_t code)
+/* kryptografischer Fehlversuch (PROTOCOL 4.5): 3 in Folge -> 30 min LOCKED */
+static void crypto_fail(uint8_t code, uint8_t detail)
 {
     A->cnt.auth_fail++;
-    diag_add(code, 0);
+    diag_add(code, detail);
     if (++A->fail_streak >= LOCK_AFTER_FAILS) {
         A->locked = true; A->locked_until = fl_port_ms() + LOCK_MS; A->fail_streak = 0;
         diag_add(FL_E_LOCKED, 0);
     }
+}
+
+static void handshake_failed(uint8_t code)
+{
+    crypto_fail(code, 0);
     disconnect();
 }
 
@@ -511,7 +523,7 @@ static void on_pair(const uint8_t *f, uint16_t len)
         if (A->sess != FL_SESS_PAIR_RSP_SENT || n < FL_PAIR_REVEAL_LEN) { pair_fail(); return; }
         fl_pair_commit(A->pr_req, A->pr_req + 8, p, c);
         if (!fl_ct_equal(c, A->pr_req + 72, 32)) {            /* Commitment verletzt: Abbruch + Fehlversuch */
-            A->cnt.auth_fail++; diag_add(FL_E_AUTH_FAIL, 2); pair_fail(); return; }
+            crypto_fail(FL_E_AUTH_FAIL, 2); pair_fail(); return; }        /* N-1: zaehlt in fail_streak */
         fl_pair_transcript(A->pr_req, A->pr_rsp, p, A->transcript);
         fl_pair_keys(A->z_pair, p, A->pr_rsp + 75, A->gw_id_new, A->addr, A->k_link_new, A->k_conf);
         fl_wipe(A->z_pair, 32);
@@ -723,12 +735,13 @@ void fl_app_init(void)
     if (A->reset_reason == FL_RR_POWER_ON || A->reset_reason == FL_RR_PIN) abn = 0;   /* Zellwechsel / Nutzer */
     else if (abnormal && abn < FL_RET_ABN_MASK) abn++;
     A->vbat_rest = fl_port_vbat_mv();
+    if (A->vbat_rest == 0) A->vbat_rest = fl_port_vbat_mv();       /* N-4: Lesefehler einmal wiederholen */
     A->vbat_load = A->vbat_rest;
     if (was_uv) A->reset_reason = FL_RR_UNDERVOLTAGE;
     uint32_t newret = abn;
     /* Nach Unterspannung oder Brownout nur mit Erholung weiterlaufen (Ruhewert, Hysterese); nach Power-on ab 2.4 V */
     uint16_t vmin = (was_uv || A->reset_reason == FL_RR_BROWNOUT) ? UV_RECOVER_MV : UV_MV;
-    if (A->vbat_rest && A->vbat_rest < vmin) {
+    if (A->vbat_rest < vmin) {                                      /* N-4: 0 (Lesefehler) gilt als Unterspannung */
         if (A->reset_reason == FL_RR_PIN || was_uv) {        /* Wecken per Taster: Rot 1 x 30 ms (Kap. 10.2) */
             fl_port_led(FL_COL_RED, 100);
             fl_port_delay_ms(30);
@@ -744,8 +757,9 @@ void fl_app_init(void)
         return;
     }
     fl_port_retained_set(newret);
+    s_nv_defer = true;
 
-    /* 2) Persistente Daten */
+    /* 2) Persistente Daten (Schreiben erst nach der ersten Lastmessung, N-2) */
     fl_port_ble_addr(A->addr);
     fl_port_fw_version(A->fw_ver, &A->fw_build, &A->sec_cnt);
     if (fl_port_nv_read(FL_NV_SETTINGS, &A->set, sizeof A->set) || !fl_settings_valid(&A->set)) {
@@ -791,7 +805,6 @@ void fl_app_init(void)
         }
         A->cnt.ota_expect = 0;
     }
-    save_counters();
     now = fl_port_ms();
     A->test_deadline_ms = now + TEST_CONFIRM_MS;
     A->charge_ref_ms = now;
@@ -800,8 +813,10 @@ void fl_app_init(void)
 
     /* Selbsttest = erste Messung (L11) */
     fl_record_t rec;
-    fl_app_measure(FL_CAUSE_AUTO, &rec);
+    fl_app_measure(FL_CAUSE_AUTO, &rec);                 /* erste Lastmessung (check_battery) */
     if (A->mode == FL_MODE_UNDERVOLTAGE) return;
+    s_nv_defer = false;                                  /* N-2: erst jetzt alles Aufgelaufene schreiben */
+    save_settings(); save_diag(); save_counters();
     now = fl_port_ms();
     A->mode = A->pair.paired ? FL_MODE_NORMAL : FL_MODE_UNPAIRED;
     fl_led_play(&A->led, (A->last_meas_ok && A->tmp_ok) ? FL_LED_L11_START_OK : FL_LED_L11_START_FAIL, now, A->vbat_load, 0);

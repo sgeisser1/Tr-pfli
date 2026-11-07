@@ -72,3 +72,21 @@ Das ist PROTOCOL.md Kap. 0, Ä-1…Ä-16. Kurz:
 - Fristen wie in Kap. 3.
 
 Referenz und Vektoren: `firmware/tools/fluidi_proto.py`, `firmware/sensor/tests/gen_vectors.py`.
+
+## 4 Runde 2 – Restbefunde (2026-11-07)
+
+Nachweis: `make` 0 Fehler, `make check` grün (1503 C-Prüfungen, 17 + 3 Python-Tests, MITM v2 0.39 %); Gateway-Tests
+`firmware/gateway` 62 Tests ok (1 übersprungen). Die Python-Referenz `fluidi_proto.py` ist **unverändert**.
+
+| Nr | Antwort | Umsetzung |
+|---|---|---|
+| N-1 | **umgesetzt** | Eine Commitment-Verletzung bei PAIR_REVEAL zählt jetzt in `fail_streak` (gemeinsame Funktion `crypto_fail`), so wie PROTOCOL 4.5 und das Gateway. Host-Test: 3 Verletzungen in Folge führen zu `LOCKED`. |
+| N-2 | **umgesetzt** | Ab dem Start bis zur ersten bestandenen Lastmessung schreibt die Firmware nichts ins NV (`s_nv_defer`); auch der Datensatz wird erst nach der Lastprüfung geschrieben. Ein POR-Zyklus am Lebensende, bei dem der Ruhewert genügt, die Last aber zusammenbricht, schreibt damit 0 NV-Einträge (Host-Test). PP-11 ist um den Einbruch unter POR, den gemeldeten Neustartgrund und die NV-Schreibzahl je Zyklus ergänzt. |
+| N-3 | **umgesetzt (begründet, ohne Warten auf Ereignis)** | Zwischen Advertising-Stopp und erstem Burst liegen konstruktiv ≥ 16 ms (SENS_PWR 1 ms + TMP-Wandlung 15 ms, FW-1). Ein schon geplantes ADV-Ereignis dauert nur wenige ms. Begründung im Code (`fl_app_measure`). Messung bei gleichzeitigem ADV bleibt PP-2. |
+| N-4 | **umgesetzt** | Liefert der Batteriemonitor beim Start 0, wird einmal wiederholt; ist der Wert weiter 0, gilt das als Unterspannung (Abschaltung ohne NV-Schreiben, Wecken per Taster). Host-Test. |
+| N-5 | **umgesetzt** | PROTOCOL 4.3: Das Gateway verwendet `secrets.token_bytes`/`os.urandom`. |
+| R-1 | **umgesetzt** | PROTOCOL 5.1–5.3: Frame-Version 2, `vt` 0x20/0x21/0x22/0x23/0x2F; ERROR hat 2–3 Byte. |
+| R-2 | **umgesetzt** | PROTOCOL 5.4: höchstens ein MEASURE je Sitzung, als letzte Anfrage; ein zweites liefert dieselbe `seq`; der Sensor trennt 0.3 s nach der Antwort, wenn kein Frame folgt. |
+| R-3 | **umgesetzt** | Einheitlich `info_fmt` 1 (Felder nur angehängt); der Kopf ist korrigiert. |
+| R-4 | **umgesetzt** | Nummerierung in Kap. 2.5 korrigiert (5 vor 6); ESP-Reste in 1, 4.1 und 4.3 entfernt. |
+| R-5 | **angenommen, keine Änderung** | `SAS_COLORS` in der Referenz ist ASCII („gruen“), die Anzeige macht die PWA. |

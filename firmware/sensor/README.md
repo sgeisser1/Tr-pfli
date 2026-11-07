@@ -140,7 +140,7 @@ mitgelinkt). **Offen FW-O1:** ungenutzte Stack-Funktionen ueber `build_component
 | PP-7 | MCUboot Swap-using-Move, Rueckfall ohne Bestaetigung, Sicherheitszaehler, `boot_set_pending` aus der Anwendung waehrend BLE |
 | PP-8 | Batteriemonitor-Werte im Verbindungsereignis (FW-5); Shutdown/Wake DIO21 |
 | PP-9 | CCFG Serie (`--lock`): Bootloader wirklich gesperrt, OTA funktioniert weiter |
-| PP-11 | Reset-Schleife (F-W3): Quelle 2.0–2.4 V ueber 100–300 Ω, Taster gedrueckt; Mittelstrom, NV-Schreibzahl, Retention-Register nach Brownout |
+| PP-11 | Reset-Schleife (F-W3): Quelle 2.0–2.4 V ueber 100–300 Ω, Taster gedrueckt; Mittelstrom, NV-Schreibzahl, Retention-Register nach Brownout; **EOL-Quelle mit Einbruch unter die POR-Schwelle**: gemeldeter Neustartgrund (POWER_ON statt Brownout?), NV-Schreibzahl je Zyklus (Soll 0 bis zur ersten bestandenen Lastmessung, N-2), Ladung je Boot inkl. MCUboot-ECDSA |
 | PP-12 | MCUboot akzeptiert das zusaetzliche geschuetzte TLV 0xA0; Verbindungsparameter-Anfrage des Sensors wird von BlueZ angenommen |
 | PP-10 | Ruhestrom nach FW-8 (Ziel lt. Energiebudget), Ladung je Ereignis → `Q_ADV_UC`, `Q_CONN_UC`, `Q_MEAS_UC` in `core/fl_app.c` |
 

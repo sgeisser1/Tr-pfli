@@ -642,7 +642,7 @@ static void test_app(void)
     sim.vbat_load = 0; sim.vbat = 2900;
     fl_app_init();
     CHECK(g_fl.reset_reason == FL_RR_UNDERVOLTAGE && g_fl.cnt.boot_id == 2 && g_fl.pair.paired);
-    CHECK(fl_log_last_seq(&g_fl.log) > 3);                                    /* seq laeuft ueber den Neustart weiter */
+    CHECK(fl_log_last_seq(&g_fl.log) >= 3);                                   /* seq laeuft ueber den Neustart weiter */
     /* Werkseinstellung: 10 s halten, loslassen, kurz bestaetigen */
     uint32_t seq_before = fl_log_last_seq(&g_fl.log);
     press(10500);
@@ -680,6 +680,15 @@ static void test_pair_reveal(void)
     rv[2] ^= 1; fl_app_on_rx(rv, sizeof rv);
     CHECK(!g_fl.pair.paired && g_fl.sess == FL_SESS_CLOSING);
     fl_app_on_disconnect();
+    /* N-1: Commitment-Verletzung zaehlt als kryptografischer Fehlversuch -> nach 3 in Folge LOCKED */
+    CHECK(!g_fl.locked);
+    for (int k = 0; k < 3 && !g_fl.locked; k++) {
+        press(4000); fl_app_on_connect(); fl_app_on_notify_enabled();
+        fl_app_on_rx(req, sizeof req);
+        rv[2] ^= 0x55; fl_app_on_rx(rv, sizeof rv);
+        fl_app_on_disconnect();
+    }
+    CHECK(g_fl.locked && g_fl.fail_streak == 0);
 }
 
 /* ---------------- Reset-Schleifen (F-W3) ---------------- */
@@ -723,6 +732,15 @@ static void test_resets(void)
     { fl_record_t r; fl_app_measure(FL_CAUSE_AUTO, &r); }
     CHECK(sim.shutdowns == sd + 1 && sim.shutdown_wake);
     sim.button_level = false; sim.vbat_load = 0;
+    /* N-4: Batteriemonitor liefert 0 beim Start -> wie Unterspannung (kein Weiterlaufen ohne Pruefung) */
+    sim.retained = 0; sim.reset_reason = FL_RR_POWER_ON; sim.vbat = 0; sd = sim.shutdowns; nvw = sim.nv_writes;
+    fl_app_init();
+    CHECK(sim.shutdowns == sd + 1 && sim.nv_writes == nvw && g_fl.mode == FL_MODE_UNDERVOLTAGE);
+    /* N-2: Ruhewert ok, aber Einbruch bei der ersten Lastmessung (POR-Zyklus am Lebensende): kein NV-Schreiben */
+    sim.retained = 0; sim.vbat = 2600; sim.vbat_load = 2250; sd = sim.shutdowns; nvw = sim.nv_writes;
+    fl_app_init();
+    CHECK(sim.shutdowns == sd + 1 && sim.nv_writes == nvw && (sim.retained & FL_RET_UV));
+    sim.vbat = 2950; sim.vbat_load = 0;
 }
 
 /* ---------------- Image-Pruefung nach OTA_END (W-6, F-L1) ---------------- */

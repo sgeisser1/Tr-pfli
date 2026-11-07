@@ -92,7 +92,7 @@ int fl_port_measure(fl_meas_raw_t *raw, uint8_t n, bool with_t2)
     raw->has_t2 = with_t2;
     return 0;
 }
-uint16_t fl_port_vbat_mv(void) { return sim.vbat_load ? sim.vbat_load : sim.vbat; }
+uint16_t fl_port_vbat_mv(void) { return sim.vbat; }   /* Ruhewert; Lastwert nur in fl_port_measure */
 
 /* ---- LED ---- */
 void fl_port_led(uint8_t col, uint8_t level)
