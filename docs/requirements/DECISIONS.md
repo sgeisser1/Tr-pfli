@@ -125,3 +125,27 @@ Format: Nr. · Datum · Entscheid · Alternativen · Begründung · Quelle · St
   Für die Serie wird nach Messung von DC-Bias und Leckstrom am Muster entschieden (2 oder 4); die pessimistische
   Laufzeit mit 4 × 100 µF und Datenblatt-Leckgrenze liegt unter 12 Monaten (CONCEPTS v0.2: 11.9) – deshalb nur Prototyp.
 - **Status:** gültig bis Messung am Prototyp
+
+### D-014 · 2026-11-07 · Gateway-Plattform: Raspberry Pi Zero 2 W
+- **Entscheid (Auftraggeber):** Gateway auf **Raspberry Pi Zero 2 W** (beim Auftraggeber vorhanden) statt ESP32-S3,
+  „so sind wir flexibler, was genau wir dann damit bauen wollen“ (Plattform für Analyse, Speicherung, Tracking, Dashboard,
+  spätere ML-Auswertungen). Ersetzt die Gateway-Wahl aus D-006 und RB-05 („Pi nur wenn nötig“ – jetzt begründet).
+- **Bluetooth:** zuerst das eingebaute BLE des Pi Zero 2 W; **XIAO nRF52840 Sense** (vorhanden) als Option für einen
+  separaten BLE-Empfänger per USB, falls Koexistenz WLAN/BLE oder Reichweite nicht genügen.
+- **Folgen:** Gateway-Software in Python (SQLite, HTTPS, systemd, SD-Schutz), OTA zum Sensor per Python-SMP-Client;
+  Gateway-Gehäuse G1 wird auf den Pi Zero 2 W (65 × 30 mm, Micro-USB-Speisung) angepasst, Optik bleibt;
+  ESP-IDF nicht mehr nötig.
+- **Status:** gültig
+
+### D-015 · 2026-11-07 · Software-Wünsche des Auftraggebers (Grundlage Software-Konzept)
+- **Nutzer:** hauptsächlich der Auftraggeber (einziger Admin, App auf seinem Handy). Optional eine **öffentliche
+  Nur-Lese-Ansicht/Dashboard** im Firmennetz für Kollegen (eigener Port/Route, ohne Login, abschaltbar).
+- **Alltag:** ein Blick genügt, um den Zustand aller Pflanzen zu kennen; **Benachrichtigungen bei kritischen Zuständen**.
+- **Funktionen:** Übersicht mit Ampel im Tropfen; Verläufe und Analysen; **Prognosen** (nächstes Giessen);
+  **Giess-Tagebuch** (Button „gegossen“ + automatische Erkennung); **Pflanzenprofile** (Name, Art/Typ, Visualisierung,
+  Substrat, artspezifische Feuchtebereiche); **Raumplan** mit Pflanzenpositionen und Fenstern; **Dashboard-Modus**
+  (auch für Kollegen); **Statistiken** inkl. Akku/Stromverbrauch der Sensoren; Sensor- und Batterieverwaltung;
+  **verspielte Elemente** erwünscht; Daten später für **ML und Auswertungen** nutzbar.
+- **Gestaltung:** modern, „super cool“, einfach und intuitiv, Apple-Design als Vorbild; **hell/dunkel/automatisch**;
+  primär Handy, aber auch am PC gut; Farbschema aus Referenzbildern übernehmbar (weiche Hellblau-Verläufe,
+  Glas-Karten, schwebende untere Navigation; grüne Botanik-Referenzen) – eigene Vorschläge erwünscht.
