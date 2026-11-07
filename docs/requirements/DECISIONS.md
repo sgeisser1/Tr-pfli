@@ -193,3 +193,10 @@ Format: Nr. · Datum · Entscheid · Alternativen · Begründung · Quelle · St
   (2) **Efeutute → Regime A „trocken“**, weil beide Quellen „abtrocknen lassen“ nennen.
 - Offen: belegte Abtrocknungstiefe für Yucca, Olive, Alocasia, Kentia; widersprüchliche Quellen bei Ficus benjamina, Hoya, Basilikum
   (in der Tabelle vermerkt). Zitate vor Verwendung in der App stichprobenweise gegenlesen.
+
+### D-022 · 2026-11-07 · Gateway-Details (Projektleiter)
+- `public_read` (Lesen ohne Login über die API) ab Werk **aus**; Kollegen sehen nur das öffentliche **Dashboard auf HTTP-Port 8080**
+  (nur lesen, abschaltbar). Einrichtungscode beim ersten Start wird vom Installationsskript per SSH angezeigt (SSH danach aus).
+  Startkalibrierung 13.3/40 pF bleibt ANNAHME bis zur Messung am Muster.
+- Git-Historie bereinigt (Auftraggeber-OK): FEM-/Elmer-Arbeitsdateien und 2 × 64-MB-FCStd aus allen Commits entfernt
+  (Repo 427 → 247 MB), Tags unverändert, Sicherung der alten Historie als Bundle im Scratchpad.
