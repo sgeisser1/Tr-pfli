@@ -184,3 +184,12 @@ Format: Nr. · Datum · Entscheid · Alternativen · Begründung · Quelle · St
 - **Feuchteprofile:** drei Klassen trocken / mittel / feucht, ergänzt um eine recherchierte Artenliste mit
   **Giessverhalten** (z. B. „gut durchgiessen, dann abtrocknen lassen bis …“ vs. „gleichmässig feucht halten“) mit Quellen.
 - **Raumplan:** ein Raum für Rev A; der Auftraggeber liefert später einen genaueren Plan.
+
+### D-021 · 2026-11-07 · Pflanzenprofile (Projektleiter)
+- 40 Artenprofile mit Regime A (abtrocknen lassen) / B (oberste Schicht abtrocknen) / C (gleichmässig feucht) / D (Sonderfall),
+  65 Quellen (Universitäts-Merkblätter, RHS, NYBG, AOS): `docs/software/PFLANZENPROFILE.md`, `app/data/species.json`.
+  Schwellen sind Startwerte (ANNAHME): A 15 %, B 30 %, C 45 %, Ziel nach Giessen ≥ 80 %, Winterfaktor Nov–Feb.
+- **Entscheide:** (1) „Zu nass“ wird erst **48 h nach einer Giessung** geprüft (sonst Fehlalarm nach jeder korrekten Giessung).
+  (2) **Efeutute → Regime A „trocken“**, weil beide Quellen „abtrocknen lassen“ nennen.
+- Offen: belegte Abtrocknungstiefe für Yucca, Olive, Alocasia, Kentia; widersprüchliche Quellen bei Ficus benjamina, Hoya, Basilikum
+  (in der Tabelle vermerkt). Zitate vor Verwendung in der App stichprobenweise gegenlesen.
