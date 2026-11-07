@@ -154,3 +154,8 @@ Format: Nr. · Datum · Entscheid · Alternativen · Begründung · Quelle · St
 - **Entscheid (Auftraggeber):** Option a – REQ-MECH-10 axial 50 N gilt **mit geführter Spitze**; Anleitung: in fester Erde
   vorstechen. FEM (simulation/fem/REPORT.md): Knicklast frei 29 N (SF 0.58), geführt 236 N (SF 4.7).
 - **Alternativen:** 2.0-mm-Platine (≈ +40–90 USD je Bestellung, Standard-PCBA), Versteifung/breitere Sonde (Designänderung).
+
+### D-017 · 2026-11-07 · Raumklima-Sensor im Gateway (Wunsch Auftraggeber)
+- Im Pi-Gateway wird ein Sensor für **Lufttemperatur und Luftfeuchte** eingeplant (I²C-Breakout am GPIO-Header,
+  Typ in Phase 4 Welle 2, z. B. Sensirion SHT4x-Klasse). Thermisch getrennte, belüftete Kammer im Gehäuse.
+  Daten fliessen in Dashboard/Analysen (Raumklima vs. Austrocknung der Töpfe).
