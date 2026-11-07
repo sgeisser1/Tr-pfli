@@ -11,7 +11,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-#define FL_PROTO_VERSION        1
+#define FL_PROTO_VERSION        2   /* v2 (PROTOCOL.md 0.2): Kopplung mit Commitment/Reveal (VETO F-K1) */
 #define FL_ADV_FMT              1
 #define FL_INFO_FMT             1
 #define FL_REC_FMT              1
@@ -27,12 +27,13 @@
 /* PAIR-Nachrichten (Kap. 5.2) */
 #define FL_PAIR_REQ             0x01
 #define FL_PAIR_RSP             0x02
-#define FL_PAIR_SHOW            0x03
+#define FL_PAIR_REVEAL          0x03   /* v2: ersetzt PAIR_SHOW, Nutzlast gw_nonce[16] */
 #define FL_PAIR_CONFIRM_S       0x04
 #define FL_PAIR_CONFIRM_G       0x05
 #define FL_PAIR_DONE            0x06
-#define FL_PAIR_REQ_LEN         88
+#define FL_PAIR_REQ_LEN         104  /* gateway_id[8] . gw_pub[64] . commit[32] */
 #define FL_PAIR_RSP_LEN         91
+#define FL_PAIR_REVEAL_LEN      16
 
 /* Nachrichten in SECURE-Frames (Kap. 5.4) */
 #define FL_MSG_SESSION_INFO     0x01
@@ -65,7 +66,7 @@ enum {
     FL_E_FLASH_FAIL = 0x30, FL_E_LOG_OVERWRITTEN = 0x31, FL_E_NVS_RESTORED = 0x32,
     FL_E_OTA_BATT_LOW = 0x40, FL_E_OTA_TOO_LARGE = 0x41, FL_E_OTA_BAD_OFFSET = 0x42, FL_E_OTA_HASH = 0x43,
     FL_E_OTA_SIGNATURE = 0x44, FL_E_OTA_ROLLBACK = 0x45, FL_E_OTA_FLASH = 0x46, FL_E_OTA_ABORTED = 0x47,
-    FL_E_OTA_NOT_STARTED = 0x48, FL_E_OTA_REVERTED = 0x49,
+    FL_E_OTA_NOT_STARTED = 0x48, FL_E_OTA_REVERTED = 0x49, FL_E_OTA_HW_MISMATCH = 0x4A,
     FL_E_WDT_RESET = 0x50, FL_E_BROWNOUT = 0x51, FL_E_HARDFAULT = 0x52, FL_E_BUTTON_STUCK = 0x53,
     FL_E_LFXT_FAIL = 0x54, FL_E_UNDERVOLTAGE = 0x55
 };
@@ -120,9 +121,10 @@ size_t fl_adv_build(uint8_t out[31], const uint8_t addr_le[6], uint8_t state, ui
                     uint32_t seq_last, const uint8_t gw_hint[2]);
 void fl_gw_hint(const uint8_t gateway_id[8], uint8_t out[2]);
 
-/* Kopplung (Kap. 4.2) */
+/* Kopplung (Kap. 4.2, v2 mit Commitment) */
+void fl_pair_commit(const uint8_t gateway_id[8], const uint8_t gw_pub[64], const uint8_t gw_nonce[16], uint8_t c[32]);
 void fl_pair_transcript(const uint8_t req_payload[FL_PAIR_REQ_LEN], const uint8_t rsp_payload[FL_PAIR_RSP_LEN],
-                        uint8_t out[32]);
+                        const uint8_t gw_nonce[FL_PAIR_REVEAL_LEN], uint8_t out[32]);
 void fl_pair_keys(const uint8_t z[32], const uint8_t gw_nonce[16], const uint8_t s_nonce[16],
                   const uint8_t gateway_id[8], const uint8_t sensor_addr[6], uint8_t k_link[16], uint8_t k_conf[16]);
 void fl_pair_sas(const uint8_t transcript[32], uint8_t digits[5]);   /* 0 rot, 1 gruen, 2 gelb */
@@ -139,6 +141,11 @@ int fl_secure_seal(const uint8_t k_s[16], uint8_t dir, uint32_t ctr, const uint8
  * Rueckgabe: Klartextlaenge (>= 2) oder -FL_E_* */
 int fl_secure_open(const uint8_t k_s[16], uint8_t dir, uint32_t expect_ctr, const uint8_t sensor_addr[6],
                    const uint8_t *frame, size_t len, uint8_t *plain);
+
+/* Variante fuer W-2 (OTA_DATA per Write Without Response): akzeptiert ctr in [min_ctr, min_ctr + max_gap];
+ * *ctr_out = empfangener Zaehler. Der Aufrufer MUSS pruefen, dass eine Luecke nur bei msg = OTA_DATA vorkommt. */
+int fl_secure_open_ge(const uint8_t k_s[16], uint8_t dir, uint32_t min_ctr, uint32_t max_gap, const uint8_t sensor_addr[6],
+                      const uint8_t *frame, size_t len, uint8_t *plain, uint32_t *ctr_out);
 
 #define FL_DIR_G2S              0x00
 #define FL_DIR_S2G              0x01

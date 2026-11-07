@@ -42,10 +42,10 @@ def main(out):
     fw = bytes([0, 1, 0, 0])
     req = fp.pair_req_payload(gw_id, gw_pub, gw_nonce)
     rsp = fp.pair_rsp_payload(addr, 0x0B, fw, s_pub, s_nonce)
-    tr = fp.transcript(req, rsp)
+    tr = fp.transcript(req, rsp, gw_nonce)
     k_link, k_conf = fp.pair_keys(z, gw_nonce, s_nonce, gw_id, addr)
     h += [carr("V_GWPUB", gw_pub), carr("V_SPUB", s_pub), carr("V_Z", z), carr("V_GWNONCE16", gw_nonce),
-          carr("V_SNONCE16", s_nonce), carr("V_PAIRREQ", req), carr("V_PAIRRSP", rsp), carr("V_TRANSCRIPT", tr),
+          carr("V_SNONCE16", s_nonce), carr("V_PAIRREQ", req), carr("V_COMMIT", fp.commit(gw_id, gw_pub, gw_nonce)), carr("V_PAIRRSP", rsp), carr("V_TRANSCRIPT", tr),
           carr("V_KLINK", k_link), carr("V_KCONF", k_conf), carr("V_SAS", bytes(fp.sas(tr))),
           carr("V_MAC_S", fp.confirm_mac(k_conf, "S", tr)), carr("V_MAC_G", fp.confirm_mac(k_conf, "G", tr))]
     # --- Sitzung ---

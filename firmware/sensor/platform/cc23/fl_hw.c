@@ -24,6 +24,7 @@
 #include DeviceFamily_constructPath(inc/hw_types.h)
 #include DeviceFamily_constructPath(inc/hw_lgpt.h)
 #include DeviceFamily_constructPath(inc/hw_systim.h)
+#include DeviceFamily_constructPath(inc/hw_pmctl.h)
 #include DeviceFamily_constructPath(driverlib/pmctl.h)
 #include "ti_drivers_config.h"
 #include "ti/ble/app_util/framework/bleapputil_api.h"
@@ -34,6 +35,7 @@
 #include "fl_app.h"
 #include "fl_port.h"
 #include "fl_nvstore.h"
+#include "fl_ota.h"
 #include "fl_platform.h"
 #include "../../config/fluidi_board.h"
 #include "../../config/fluidi_flash_layout.h"
@@ -49,6 +51,7 @@ void fl_port_uptime(uint32_t *s, uint16_t *frac)
 static uint32_t systim_us(void) { return HWREG(SYSTIM_BASE + SYSTIM_O_TIME1U); }
 static void delay_us(uint32_t us) { uint32_t t0 = systim_us(); while (systim_us() - t0 < us) { } }
 static void sleep_ms(uint32_t ms) { vTaskDelay(pdMS_TO_TICKS(ms)); }   /* Task schlaeft -> Standby */
+void fl_port_delay_ms(uint32_t ms) { delay_us(ms * 1000u); }
 
 /* ======================= Pins / Ruhezustand ======================= */
 static void pins_sleep_state(void)
@@ -356,14 +359,13 @@ bool fl_port_image_confirmed(void)
     if (boot_read_swap_state_by_id(FLASH_AREA_IMAGE_PRIMARY(0), &st) != 0) return true;
     return st.image_ok == BOOT_FLAG_SET || st.magic != BOOT_MAGIC_GOOD;   /* Werks-Image (--confirm) */
 }
-void fl_port_fw_version(uint8_t v[4], uint32_t *b)
+static int mem_read(void *c, uint32_t off, void *buf, size_t len) { (void)c; memcpy(buf, (const void *)(FL_SLOT0_BASE + off), len); return 0; }
+static const fl_flash_t fl_slot0_mem = {mem_read, NULL, NULL, NULL, FL_SLOT0_SIZE, FL_FLASH_SECTOR};
+void fl_port_fw_version(uint8_t v[4], uint32_t *b, uint32_t *sec_cnt)
 {
-    const struct image_header *h = (const struct image_header *)FL_SLOT0_BASE;
-    if (h->ih_magic == IMAGE_MAGIC) {
-        v[0] = h->ih_ver.iv_major; v[1] = h->ih_ver.iv_minor;
-        v[2] = (uint8_t)h->ih_ver.iv_revision; v[3] = (uint8_t)(h->ih_ver.iv_revision >> 8);
-        *b = h->ih_ver.iv_build_num;
-    } else { memset(v, 0, 4); *b = 0; }
+    fl_img_info_t in;
+    if (fl_img_parse(&fl_slot0_mem, 0, &in) == 0) { memcpy(v, in.ver, 4); *b = in.build; *sec_cnt = in.sec_cnt; }
+    else { memset(v, 0, 4); *b = 0; *sec_cnt = 0; }
 }
 
 /* ======================= System ======================= */
@@ -376,17 +378,29 @@ uint8_t fl_port_reset_reason(void)
     if (r == PMCTL_RESET_WATCHDOG) return FL_RR_WATCHDOG;
     if (r == PMCTL_RESET_SYSTEM || r == PMCTL_RESET_CPU) return FL_RR_SOFTWARE;
     if (r == PMCTL_RESET_LOCKUP) return FL_RR_HARDFAULT;
-    if (r == PMCTL_RESET_PIN) return FL_RR_PIN;
+    if (r == PMCTL_RESET_PIN || r == PMCTL_RESET_SHUTDOWN_IO) return FL_RR_PIN;   /* Wecken per Taster = Nutzer */
     if (r == PMCTL_RESET_VDDS || r == PMCTL_RESET_VDDR) return FL_RR_BROWNOUT;
     return FL_RR_POWER_ON;
 }
 void fl_port_reboot(void) { PMCTLResetSystem(); }
 void fl_port_shutdown(void)
 {
-    /* Unterspannung (FW-5): alles aus, Wecken nur ueber Taster (Shutdown-Wakeup low an DIO21) */
+    /* Unterspannung (FW-5) / Reset-Schleife (F-W3): alles aus, Wecken ueber Taster (Shutdown-Wakeup low an DIO21).
+     * Ist der Taster JETZT gedrueckt (klemmt), Pull-up aus und kein Wecken -> nur Zellwechsel (F-W3b). */
     pins_sleep_state();
-    GPIO_setConfig(FLUIDI_DIO_BUTTON, GPIO_CFG_IN_PU | GPIO_CFG_SHUTDOWN_WAKE_LOW);
+    GPIO_setConfig(FLUIDI_DIO_BUTTON, GPIO_CFG_IN_PU);
+    delay_us(200);
+    if (GPIO_read(FLUIDI_DIO_BUTTON) == 0) GPIO_setConfig(FLUIDI_DIO_BUTTON, GPIO_CFG_NO_DIR);
+    else GPIO_setConfig(FLUIDI_DIO_BUTTON, GPIO_CFG_IN_PU | GPIO_CFG_SHUTDOWN_WAKE_LOW);
     Power_shutdown(0, 0);
+}
+
+/* Retention-Register PMCTL.AONRSTA1 (18 bit, ueberlebt Reset/Shutdown, Power-on = 0; TRM 8.4.2, S.459-460) */
+uint32_t fl_port_retained_get(void) { return HWREG(PMCTL_BASE + PMCTL_O_AONRSTA1) & PMCTL_AONRSTA1_FLAG_M; }
+void fl_port_retained_set(uint32_t v)
+{
+    HWREG(PMCTL_BASE + PMCTL_O_AONRCLR1) = PMCTL_AONRSTA1_FLAG_M & ~v;
+    HWREG(PMCTL_BASE + PMCTL_O_AONRSET1) = v & PMCTL_AONRSTA1_FLAG_M;
 }
 
 /* ======================= Zeitplanung ======================= */
@@ -431,4 +445,5 @@ void fl_platform_early_init(void)
     BatteryMonitor_init();
 }
 
+/* fataler Fehler: Neustart OHNE 'geplant'-Bit -> zaehlt als abnormal, nach 3 Abschaltung (F-W3c) */
 void fl_platform_fatal(uint8_t code) { (void)code; PMCTLResetSystem(); }

@@ -1,3 +1,6 @@
 # Build-Ergebnisse (reproduzierbar mit make; siehe README.md)
 build/
 tests/build/
+# Schluessel: nie Produktionsschluessel einchecken (F-W1); nur der DEV-Schluessel ist erlaubt
+*.pem
+!keys/DEV_ONLY_*.pem

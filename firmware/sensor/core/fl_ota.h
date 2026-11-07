@@ -31,6 +31,21 @@ int  fl_ota_data(fl_ota_t *o, const uint8_t *p, size_t len, uint8_t prog[5]);
 /* OTA_END: Rueckgabe Status (0 = Image vollstaendig, SHA ok). */
 uint8_t fl_ota_end(fl_ota_t *o, const uint8_t *p, size_t len);
 void fl_ota_abort(fl_ota_t *o);
+/* Kopf und geschuetzte TLVs eines MCUboot-Images im Flash lesen (W-6, F-L1) */
+#define FL_TLV_SEC_CNT   0x50
+#define FL_TLV_HW_REV    0xA0      /* fluidi: Platinenrevision, geschuetztes TLV (imgtool --custom-tlv 0xA0) */
+typedef struct {
+    bool valid;
+    uint8_t ver[4];               /* major, minor, patch u16 LE (wie fw_ver) */
+    uint32_t build, sec_cnt, img_size;
+    int16_t hw_rev;               /* -1 = nicht vorhanden */
+} fl_img_info_t;
+int fl_img_parse(const fl_flash_t *f, uint32_t base, fl_img_info_t *info);
+/* Pruefung nach OTA_END: Kopf gueltig, Version > laufend, Sicherheitszaehler >= laufend, hw_rev passt.
+ * Rueckgabe 0 oder FL_E_OTA_*. */
+uint8_t fl_ota_check_image(const fl_flash_t *f, const uint8_t run_ver[4], uint32_t run_build, uint32_t run_sec_cnt,
+                           uint8_t hw_rev);
+
 /* Version a > b ? (major.minor.patch, dann build) */
 bool fl_ver_newer(const uint8_t a[4], uint32_t ab, const uint8_t b[4], uint32_t bb);
 

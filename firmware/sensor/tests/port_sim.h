@@ -20,7 +20,8 @@ typedef struct {
     uint8_t rng_q[64]; size_t rng_q_len, rng_q_pos; uint32_t rng_ctr;
     uint8_t nv[SIM_NV_MAX][256]; uint16_t nv_len[SIM_NV_MAX]; uint32_t nv_writes;
     bool ota_pending, image_confirmed;
-    uint8_t fw_ver[4]; uint32_t fw_build;
+    uint8_t fw_ver[4]; uint32_t fw_build, sec_cnt;
+    uint32_t retained; bool rng_fail; bool shutdown_wake;
     uint8_t reset_reason;
     uint32_t reboots, shutdowns, wdt_kicks;
     bool pullup, button_level;

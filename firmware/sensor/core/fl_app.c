@@ -11,14 +11,19 @@ fl_app_t g_fl;
 #define A (&g_fl)
 
 /* ---- Konstanten ---- */
-#define HELLO_TIMEOUT_MS       500u          /* Kap. 3 */
-#define IDLE_TIMEOUT_MS        3000u
+/* Fristen v2 (PROTOCOL 0.2 Kap. 3, Befunde K-1/K-2/W-9 Software-Pruefung): gateway-tauglich fuer BlueZ/bleak */
+#define HELLO_AFTER_CCCD_MS    1000u         /* HELLO/PAIR_REQ nach CCCD-Write */
+#define HELLO_ABS_MS           5000u         /* absolute Grenze ab Verbindungsaufbau (Dienstsuche BlueZ) */
+#define IDLE_TIMEOUT_MS        5000u
 #define IDLE_TIMEOUT_OTA_MS    30000u
-#define SESSION_MAX_MS         10000u
+#define SESSION_MAX_MS         30000u        /* ohne OTA/Kopplung */
 #define PAIRING_MODE_MS        120000u       /* Kap. 2.1 */
-#define PAIR_CONFIRM_MS        60000u        /* Kap. 4.2 */
+#define PAIR_STEP_MS           15000u        /* PAIR_REQ -> REVEAL (ECDH am Gateway) */
+#define PAIR_CONFIRM_MS        60000u        /* Kap. 4.2: Farbvergleich */
+#define PAIR_TOTAL_MS          90000u        /* gesamte Kopplungsverbindung */
 #define LOCK_MS                (30u * 60000u) /* Kap. 4.5 */
-#define LOCK_AFTER_FAILS       3u
+#define LOCK_AFTER_FAILS       3u            /* nur kryptografische Fehler */
+#define LOCK_AFTER_TIMEOUTS    10u           /* Fristueberschreitungen (Energieschutz, ohne Gateway-Selbstaussperrung) */
 #define FAST_ADV_MS            2000u
 #define FAST_ADV_INT_MS        100u
 #define PAIR_ADV_INT_MS        500u
@@ -140,8 +145,9 @@ static void update_adv(uint32_t now)
 static void enter_undervoltage(void)
 {
     diag_add(FL_E_UNDERVOLTAGE, 0);
-    A->cnt.pad = 1;                     /* Merker: naechster Start meldet reset_reason 6 */
+    A->cnt.charge_uc = A->charge_uc;
     save_counters(); save_logmeta();
+    fl_port_retained_set(fl_port_retained_get() | FL_RET_UV);   /* naechster Start meldet reset_reason 6 */
     A->mode = FL_MODE_UNDERVOLTAGE;
     fl_port_adv_set(NULL, 0, 0, false, false);
     fl_led_stop(&A->led); fl_port_led(FL_COL_OFF, 0);
@@ -166,6 +172,8 @@ int fl_app_measure(uint8_t cause, fl_record_t *rec)
     uint32_t ow = 0;
     if (A->mode == FL_MODE_UNDERVOLTAGE) { diag_add(FL_E_MEAS_LOW_BATT, 0); return FL_E_MEAS_LOW_BATT; }
     memset(&raw, 0, sizeof raw);
+    /* F-W5: kein Funk waehrend der Bursts: nur ohne Verbindung (Aufrufer), Advertising fuer die Messdauer aus */
+    if (A->adv_on_set) { fl_port_adv_set(NULL, 0, 0, false, false); A->adv_valid = false; A->adv_on_set = false; }
     bool f2 = FLUIDI_HAS_CREF2 && (cause == FL_CAUSE_DIAG || (A->set.diag_f2 && (A->meas_count % A->set.diag_f2) == 0));
     /* FW-2: max. 4 Bursts -> hoechstens 16 Teilbloecke je Konfiguration */
     uint8_t nb = A->set.avg_count > FL_MEAS_BLOCKS_MAX_FW2 ? FL_MEAS_BLOCKS_MAX_FW2 : A->set.avg_count;
@@ -233,6 +241,26 @@ static void disconnect(void)
     if (A->sess != FL_SESS_CLOSING) { A->sess = FL_SESS_CLOSING; fl_port_ble_disconnect(); }
 }
 
+static void planned_reboot(void)
+{
+    A->cnt.charge_uc = A->charge_uc;
+    save_counters(); save_logmeta();
+    fl_port_retained_set((fl_port_retained_get() & ~FL_RET_ABN_MASK) | FL_RET_PLANNED);
+    if (A->connected) fl_port_ble_disconnect();
+    fl_port_reboot();
+}
+
+/* Fristueberschreitung: KEIN kryptografischer Fehlversuch (K-1); eigener Zaehler gegen Batterie-Leerziehen */
+static void handshake_timeout(void)
+{
+    diag_add(FL_E_TIMEOUT, 1);
+    if (++A->timeout_streak >= LOCK_AFTER_TIMEOUTS) {
+        A->locked = true; A->locked_until = fl_port_ms() + LOCK_MS; A->timeout_streak = 0;
+        diag_add(FL_E_LOCKED, 1);
+    }
+    disconnect();
+}
+
 static void handshake_failed(uint8_t code)
 {
     A->cnt.auth_fail++;
@@ -249,7 +277,7 @@ size_t fl_app_session_info(uint8_t *o, bool ext)
 {
     uint32_t up; uint16_t frac;
     fl_port_uptime(&up, &frac);
-    memset(o, 0, 64);
+    memset(o, 0, 68);
     o[0] = FL_INFO_FMT;
     memcpy(o + 1, A->fw_ver, 4);
     fl_put_u32(o + 5, A->fw_build);
@@ -271,12 +299,13 @@ size_t fl_app_session_info(uint8_t *o, bool ext)
     o[41] = FL_REC_FMT;
     fl_put_u16(o + 42, fl_log_capacity(&A->log));
     fl_put_u32(o + 44, A->logmeta.lost_records);
-    if (!ext) return 48;
-    fl_put_u32(o + 48, A->meas_count);
-    fl_put_u32(o + 52, A->adv_count);
-    fl_put_u32(o + 56, A->conn_count);
-    fl_put_u32(o + 60, A->led.on_ms_total);
-    return 64;
+    fl_put_u32(o + 48, A->sec_cnt);                     /* v2 (W-6): installierter Sicherheitszaehler */
+    if (!ext) return 52;
+    fl_put_u32(o + 52, A->meas_count);
+    fl_put_u32(o + 56, A->adv_count);
+    fl_put_u32(o + 60, A->conn_count);
+    fl_put_u32(o + 64, A->led.on_ms_total);
+    return 68;
 }
 
 /* ---------------- Datensatzstrom (Kap. 5.6) ---------------- */
@@ -343,12 +372,18 @@ static void dispatch(uint8_t msg, uint8_t rid, const uint8_t *p, size_t n)
         r[0] = 0; fl_put_u32(r + 1, fl_log_oldest_unacked(&A->log));
         sec_send(FL_RSP(msg), rid, r, 5); break; }
     case FL_MSG_MEASURE: {
+        /* v2 (F-W5): keine Messung waehrend Funk. Antwort {status, seq} -> Sensor trennt, misst, schnelles
+         * Advertising mit DATA_PENDING; das Gateway liest den Datensatz `seq` in der naechsten Sitzung. */
         if (n < 2) { err_rsp(rid, FL_E_BAD_LENGTH, 0); break; }
-        fl_record_t rec;
-        int rc = fl_app_measure(cause_of_purpose(p[0]), &rec);
-        r[0] = (uint8_t)rc; fl_record_encode(&rec, r + 1);
-        if (p[1] == 1) A->after_disc_led = FL_LED_L2_BUFFERED;     /* Quittung gruen 1 x */
-        sec_send(FL_RSP(msg), rid, r, 1 + FL_REC_LEN); break; }
+        if (A->mode == FL_MODE_UNDERVOLTAGE) { r[0] = FL_E_MEAS_LOW_BATT; fl_put_u32(r + 1, NONE32); }
+        else {
+            A->meas_pending = true; A->meas_pending_cause = cause_of_purpose(p[0]);
+            r[0] = 0; fl_put_u32(r + 1, A->log.next_seq);
+            if (p[1] == 1) A->after_disc_led = FL_LED_L2_BUFFERED;   /* Quittung gruen 1 x */
+        }
+        sec_send(FL_RSP(msg), rid, r, 5);
+        if (r[0] == 0) A->t_last_rx = now - IDLE_TIMEOUT_MS + 300u;   /* ohne weiteren Frame nach 0.3 s trennen */
+        break; }
     case FL_MSG_GET_SETTINGS: sec_send(FL_RSP(msg), rid, r, fl_settings_encode(&A->set, r, sizeof r)); break;
     case FL_MSG_SET_SETTINGS: {
         if (n < 2) { err_rsp(rid, FL_E_BAD_LENGTH, 0); break; }
@@ -387,11 +422,14 @@ static void dispatch(uint8_t msg, uint8_t rid, const uint8_t *p, size_t n)
         break;
     case FL_MSG_OTA_END: {
         uint8_t st = fl_ota_end(&A->ota, p, n);
+        /* F-L1/W-6: Version, Sicherheitszaehler und hw_rev aus dem Kopf/TLV in Slot 1 pruefen */
+        if (st == 0) st = fl_ota_check_image(fl_port_slot1_flash(), A->fw_ver, A->fw_build, A->sec_cnt, FLUIDI_HW_REV);
+        if (st != 0 && st != FL_E_OTA_HASH) fl_port_slot1_flash()->erase(fl_port_slot1_flash()->ctx, 0);
         if (st == 0 && fl_port_ota_request_test() != 0) st = FL_E_OTA_FLASH;
         r[0] = st; sec_send(FL_RSP(msg), rid, r, 1);
         if (st == 0) {
             A->cnt.ota_expect = 1; memcpy(A->cnt.ota_ver, A->ota.version, 4); A->cnt.ota_build = A->ota.build;
-            save_counters(); save_logmeta();
+            A->cnt.charge_uc = A->charge_uc; save_counters(); save_logmeta();
             A->reboot_pending = true; A->reboot_at = now + 1000u;
         } else { A->cnt.ota_result = st; save_counters(); }
         break; }
@@ -415,7 +453,7 @@ static void dispatch(uint8_t msg, uint8_t rid, const uint8_t *p, size_t n)
 /* ---------------- Kopplung (Kap. 4.2) ---------------- */
 static void pair_fail(void)
 {
-    fl_wipe(A->k_link_new, 16); fl_wipe(A->k_conf, 16);
+    fl_wipe(A->k_link_new, 16); fl_wipe(A->k_conf, 16); fl_wipe(A->z_pair, 32);
     fl_led_play(&A->led, FL_LED_L7_PAIR_FAIL, fl_port_ms(), A->vbat_load, 0);
     A->mode = A->mode_before_pairing;
     disconnect();
@@ -425,7 +463,7 @@ static void pair_try_finish(void)
 {
     if (!(A->pair_user_ok && A->pair_gw_ok)) return;
     fl_pairing_t np;
-    fl_port_rng((uint8_t *)&np, sizeof np);                     /* Fuellbyte zufaellig (PROTOCOL 4.6) */
+    if (fl_port_rng((uint8_t *)&np, sizeof np)) { pair_fail(); return; }   /* Fuellbyte zufaellig (4.6), F-W4 */
     np.paired = 1; memcpy(np.gateway_id, A->gw_id_new, 8); memcpy(np.k_link, A->k_link_new, 16);
     A->pair = np;
     fl_port_nv_write(FL_NV_PAIR, &A->pair, sizeof A->pair);
@@ -448,32 +486,40 @@ static void on_pair(const uint8_t *f, uint16_t len)
     uint16_t n = (uint16_t)(len - 2);
     switch (f[1]) {
     case FL_PAIR_REQ: {
+        /* v2: gateway_id . gw_pub . C = SHA-256("fluidi-commit" | gateway_id | gw_pub | gw_nonce) – gw_nonce folgt
+         * erst nach PAIR_RSP (PAIR_REVEAL). Damit legt jede Seite ihre Nonce fest, bevor sie die andere kennt. */
         if (n < FL_PAIR_REQ_LEN || A->sess != FL_SESS_WAIT_HELLO) { pair_fail(); return; }
-        uint8_t priv[32], spub[64], z[32], *rsp = A->pr_rsp;
+        uint8_t priv[32], spub[64], *rsp = A->pr_rsp;
         memcpy(A->pr_req, p, FL_PAIR_REQ_LEN);
         memcpy(A->gw_id_new, p, 8);
         memcpy(rsp, A->addr, 6);
         rsp[6] = FLUIDI_HW_REV;
         memcpy(rsp + 7, A->fw_ver, 4);
-        if (fl_port_ecdh_keygen(priv, spub) || fl_port_rng(rsp + 75, 16)) { pair_fail(); return; }
+        if (fl_port_ecdh_keygen(priv, spub) || fl_port_rng(rsp + 75, 16)) { fl_wipe(priv, 32); pair_fail(); return; }
         memcpy(rsp + 11, spub, 64);
-        if (fl_port_ecdh_shared(priv, p + 8, z)) { fl_wipe(priv, 32); pair_fail(); return; }
+        int e = fl_port_ecdh_shared(priv, p + 8, A->z_pair);
         fl_wipe(priv, 32);
-        fl_pair_transcript(A->pr_req, rsp, A->transcript);
-        fl_pair_keys(z, p + 72, rsp + 75, A->gw_id_new, A->addr, A->k_link_new, A->k_conf);
-        fl_wipe(z, 32);
-        fl_pair_sas(A->transcript, A->sas);
+        if (e) { pair_fail(); return; }
         uint8_t out[2 + FL_PAIR_RSP_LEN] = {FL_VT(FL_FT_PAIR), FL_PAIR_RSP};
         memcpy(out + 2, rsp, FL_PAIR_RSP_LEN);
         send_raw(out, sizeof out);
-        A->sess = FL_SESS_PAIR_RSP_SENT; A->t_last_rx = now;
+        A->sess = FL_SESS_PAIR_RSP_SENT; A->t_last_rx = now; A->t_pair_start = now;
+        A->pair_deadline = now + PAIR_STEP_MS;
         break; }
-    case FL_PAIR_SHOW:
-        if (A->sess != FL_SESS_PAIR_RSP_SENT) { pair_fail(); return; }
+    case FL_PAIR_REVEAL: {
+        uint8_t c[32];
+        if (A->sess != FL_SESS_PAIR_RSP_SENT || n < FL_PAIR_REVEAL_LEN) { pair_fail(); return; }
+        fl_pair_commit(A->pr_req, A->pr_req + 8, p, c);
+        if (!fl_ct_equal(c, A->pr_req + 72, 32)) {            /* Commitment verletzt: Abbruch + Fehlversuch */
+            A->cnt.auth_fail++; diag_add(FL_E_AUTH_FAIL, 2); pair_fail(); return; }
+        fl_pair_transcript(A->pr_req, A->pr_rsp, p, A->transcript);
+        fl_pair_keys(A->z_pair, p, A->pr_rsp + 75, A->gw_id_new, A->addr, A->k_link_new, A->k_conf);
+        fl_wipe(A->z_pair, 32);
+        fl_pair_sas(A->transcript, A->sas);
         A->sess = FL_SESS_PAIR_SHOWING; A->pair_user_ok = A->pair_gw_ok = false;
         A->pair_deadline = now + PAIR_CONFIRM_MS;
         fl_led_play_sas(&A->led, A->sas, now, PAIR_CONFIRM_MS);
-        break;
+        break; }
     case FL_PAIR_CONFIRM_G: {
         uint8_t mac[16];
         if (A->sess != FL_SESS_PAIR_SHOWING || n < 16) { pair_fail(); return; }
@@ -501,9 +547,15 @@ void fl_app_on_connect(void)
 {
     uint32_t now = fl_port_ms();
     A->connected = true; A->sess = FL_SESS_WAIT_HELLO; A->authed = false; A->ota_in_session = false;
-    A->t_conn = now; A->t_last_rx = now; A->stream = false; A->txq_n = 0;
+    A->t_conn = now; A->t_last_rx = now; A->stream = false; A->txq_n = 0; A->cccd_on = false;
     A->conn_count++; A->charge_uc += Q_CONN_UC;
-    A->adv_valid = false;
+    A->adv_valid = false; A->adv_on_set = false;
+}
+
+void fl_app_on_notify_enabled(void)
+{
+    if (!A->connected || A->cccd_on) return;
+    A->cccd_on = true; A->t_cccd = fl_port_ms(); A->t_last_rx = A->t_cccd;
 }
 
 void fl_app_on_disconnect(void)
@@ -514,6 +566,12 @@ void fl_app_on_disconnect(void)
     fl_wipe(A->k_s, 16);
     /* Spannung unter Last waehrend der Verbindung (PINMAP Kap. 3): Port liefert Minimum seit Verbindungsbeginn */
     check_battery(fl_port_vbat_mv());
+    if (A->meas_pending && A->mode != FL_MODE_UNDERVOLTAGE) {   /* F-W5: Messung jetzt, ohne Funk */
+        fl_record_t rec;
+        A->meas_pending = false;
+        fl_app_measure(A->meas_pending_cause, &rec);
+        A->fast_adv_until = fl_port_ms() + FAST_ADV_MS;
+    }
     if (A->after_disc_led != FL_LED_NONE && !fl_led_busy(&A->led)) {
         fl_led_play(&A->led, A->after_disc_led, now, A->vbat_load, 0);
         A->after_disc_led = FL_LED_NONE;
@@ -533,26 +591,30 @@ void fl_app_on_rx(const uint8_t *f, uint16_t len)
         if (!A->pair.paired || !fl_ct_equal(f + 2, A->pair.gateway_id, 8)) {
             send_error(FL_E_NOT_PAIRED, 0, false); handshake_failed(FL_E_NOT_PAIRED); return; }
         uint8_t rsp[10] = {FL_VT(FL_FT_HELLO_RSP), (uint8_t)(f[1] < FL_PROTO_VERSION ? f[1] : FL_PROTO_VERSION)};
-        fl_port_rng(rsp + 2, 8);
+        if (fl_port_rng(rsp + 2, 8)) { diag_add(FL_E_AUTH_FAIL, 3); disconnect(); return; }   /* F-W4: ohne RNG keine Sitzung */
         fl_session_key(A->pair.k_link, f + 10, rsp + 2, A->k_s);
         A->ctr_rx = 0; A->ctr_tx = 0;
         send_raw(rsp, sizeof rsp);
-        uint8_t info[64];
+        uint8_t info[72];
         size_t n = fl_app_session_info(info, false);
         sec_send(FL_MSG_SESSION_INFO, 0, info, n);
         A->sess = FL_SESS_SECURE_WAIT; A->t_last_rx = now;
         break; }
     case FL_FT_SECURE: {
         if (A->sess != FL_SESS_SECURE_WAIT && A->sess != FL_SESS_SECURE) { handshake_failed(FL_E_NOT_ALLOWED); return; }
-        int n = fl_secure_open(A->k_s, FL_DIR_G2S, A->ctr_rx, A->addr, f, len, plain);
+        uint32_t got = A->ctr_rx;
+        /* W-2: waehrend OTA darf der Zaehler springen (verlorene Write-Without-Response), nur fuer OTA_DATA */
+        int n = A->ota_in_session ? fl_secure_open_ge(A->k_s, FL_DIR_G2S, A->ctr_rx, 64, A->addr, f, len, plain, &got)
+                                  : fl_secure_open(A->k_s, FL_DIR_G2S, A->ctr_rx, A->addr, f, len, plain);
+        if (n >= 0 && got != A->ctr_rx && plain[0] != FL_MSG_OTA_DATA) n = -FL_E_BAD_COUNTER;
         if (n < 0) {
             if (A->sess == FL_SESS_SECURE_WAIT) handshake_failed((uint8_t)-n);
             else { A->cnt.auth_fail++; diag_add((uint8_t)-n, 0); disconnect(); }
             return;
         }
-        A->ctr_rx++; A->t_last_rx = now;
+        A->ctr_rx = got + 1; A->t_last_rx = now;
         if (A->sess == FL_SESS_SECURE_WAIT) {
-            A->sess = FL_SESS_SECURE; A->authed = true; A->fail_streak = 0;
+            A->sess = FL_SESS_SECURE; A->authed = true; A->fail_streak = 0; A->timeout_streak = 0;
             A->had_contact = true; A->last_contact_ms = now;
         }
         dispatch(plain[0], plain[1], plain + 2, (size_t)n - 2);
@@ -582,6 +644,7 @@ static void button_event(fl_btn_event_t ev, uint32_t now)
     case FL_BTN_EV_SHORT:
         if (A->sess == FL_SESS_PAIR_SHOWING && !A->pair_user_ok) { pair_user_confirm(); break; }
         if (A->mode == FL_MODE_UNDERVOLTAGE) { fl_led_play(&A->led, FL_LED_UV_BTN, now, A->vbat_load, 0); break; }
+        if (A->connected) { A->meas_pending = true; A->meas_pending_cause = FL_CAUSE_BUTTON; break; }   /* F-W5 */
         fl_app_measure(FL_CAUSE_BUTTON, &rec);
         if (A->mode == FL_MODE_UNDERVOLTAGE) break;
         if (!A->pair.paired) { fl_led_play(&A->led, FL_LED_L15_UNPAIRED_BTN, now, A->vbat_load, 0); break; }
@@ -601,7 +664,7 @@ static void button_event(fl_btn_event_t ev, uint32_t now)
     case FL_BTN_EV_FACTORY_RESET:
         fl_led_play(&A->led, FL_LED_L14_RESET, now, 0, 0);
         fl_app_factory_reset();
-        A->reboot_pending = true; A->reboot_at = now + 1100u;
+        A->reboot_pending = true; A->reboot_at = now + 1100u;   /* gewollt: planned_reboot */
         break;
     case FL_BTN_EV_STUCK:
         A->stuck = true; A->cnt.button_stuck++; diag_add(FL_E_BUTTON_STUCK, 0);
@@ -635,15 +698,56 @@ void fl_app_factory_reset(void)
 }
 
 /* ---------------- Start ---------------- */
+static void boot_shutdown(void)
+{
+    /* Abschaltung ohne jedes Flash-Schreiben (F-W3a); Wecken nur per Taster, bei gedruecktem Taster nur Zellwechsel */
+    A->mode = FL_MODE_UNDERVOLTAGE;
+    fl_port_led(FL_COL_OFF, 0);
+    fl_port_shutdown();
+}
+
 void fl_app_init(void)
 {
     uint32_t now;
     memset(A, 0, sizeof *A);
     fl_led_init(&A->led);
     fl_btn_init(&A->btn);
-    fl_port_ble_addr(A->addr);
-    fl_port_fw_version(A->fw_ver, &A->fw_build);
 
+    /* 1) Spannung und Neustartgrund ZUERST, vor jedem Flash-Schreiben (F-W3a) */
+    A->reset_reason = fl_port_reset_reason();
+    uint32_t ret = fl_port_retained_get();
+    uint32_t abn = ret & FL_RET_ABN_MASK;
+    bool planned = (ret & FL_RET_PLANNED) != 0, was_uv = (ret & FL_RET_UV) != 0, was_backoff = (ret & FL_RET_BACKOFF) != 0;
+    bool abnormal = A->reset_reason == FL_RR_WATCHDOG || A->reset_reason == FL_RR_BROWNOUT ||
+                    A->reset_reason == FL_RR_HARDFAULT || (A->reset_reason == FL_RR_SOFTWARE && !planned);
+    if (A->reset_reason == FL_RR_POWER_ON || A->reset_reason == FL_RR_PIN) abn = 0;   /* Zellwechsel / Nutzer */
+    else if (abnormal && abn < FL_RET_ABN_MASK) abn++;
+    A->vbat_rest = fl_port_vbat_mv();
+    A->vbat_load = A->vbat_rest;
+    if (was_uv) A->reset_reason = FL_RR_UNDERVOLTAGE;
+    uint32_t newret = abn;
+    /* Nach Unterspannung oder Brownout nur mit Erholung weiterlaufen (Ruhewert, Hysterese); nach Power-on ab 2.4 V */
+    uint16_t vmin = (was_uv || A->reset_reason == FL_RR_BROWNOUT) ? UV_RECOVER_MV : UV_MV;
+    if (A->vbat_rest && A->vbat_rest < vmin) {
+        if (A->reset_reason == FL_RR_PIN || was_uv) {        /* Wecken per Taster: Rot 1 x 30 ms (Kap. 10.2) */
+            fl_port_led(FL_COL_RED, 100);
+            fl_port_delay_ms(30);
+        }
+        fl_port_retained_set(newret | FL_RET_UV);
+        boot_shutdown();
+        return;
+    }
+    /* Reset-Schleife: >= 3 abnormale Neustarts ohne 10 min stabilen Betrieb -> Abschaltung (F-W3a/c) */
+    if (abn >= FL_ABN_MAX) {
+        fl_port_retained_set((newret & ~FL_RET_ABN_MASK) | FL_RET_BACKOFF);
+        boot_shutdown();
+        return;
+    }
+    fl_port_retained_set(newret);
+
+    /* 2) Persistente Daten */
+    fl_port_ble_addr(A->addr);
+    fl_port_fw_version(A->fw_ver, &A->fw_build, &A->sec_cnt);
     if (fl_port_nv_read(FL_NV_SETTINGS, &A->set, sizeof A->set) || !fl_settings_valid(&A->set)) {
         bool had = fl_port_nv_read(FL_NV_SETTINGS, &A->set, sizeof A->set) == 0;
         fl_settings_defaults(&A->set);
@@ -660,11 +764,13 @@ void fl_app_init(void)
     if (fl_log_init(&A->log, fl_port_log_flash(), &A->logmeta)) diag_add(FL_E_FLASH_FAIL, 1);
 
     A->cnt.boot_id++;
-    A->reset_reason = fl_port_reset_reason();
-    if (A->cnt.pad == 1) { A->reset_reason = FL_RR_UNDERVOLTAGE; A->cnt.pad = 0; }
-    if (A->reset_reason == FL_RR_WATCHDOG) { A->cnt.wdt_resets++; diag_add(FL_E_WDT_RESET, 0); }
-    if (A->reset_reason == FL_RR_BROWNOUT) { A->cnt.brownouts++; diag_add(FL_E_BROWNOUT, 0); }
-    if (A->reset_reason == FL_RR_HARDFAULT) diag_add(FL_E_HARDFAULT, 0);
+    /* S-5: entnommene Ladung nur bei Power-on (Zellwechsel) nullen */
+    if (fl_port_reset_reason() == FL_RR_POWER_ON && !was_uv) A->cnt.charge_uc = 0;
+    A->charge_uc = A->cnt.charge_uc;
+    if (A->reset_reason == FL_RR_WATCHDOG) { A->cnt.wdt_resets++; diag_add(FL_E_WDT_RESET, (uint8_t)abn); }
+    if (A->reset_reason == FL_RR_BROWNOUT) { A->cnt.brownouts++; diag_add(FL_E_BROWNOUT, (uint8_t)abn); }
+    if (A->reset_reason == FL_RR_HARDFAULT) diag_add(FL_E_HARDFAULT, (uint8_t)abn);
+    if (was_backoff) { A->cnt.backoffs++; diag_add(FL_E_HARDFAULT, 0xBF); }     /* Reset-Schleife war aktiv */
     for (uint8_t i = 0; i < A->diag.count; i++) {
         uint8_t c = A->diag.e[i].code;
         if ((c >= 0x20 && c <= 0x32) || (c >= 0x50 && c <= 0x55)) A->error_active = true;
@@ -689,20 +795,8 @@ void fl_app_init(void)
     now = fl_port_ms();
     A->test_deadline_ms = now + TEST_CONFIRM_MS;
     A->charge_ref_ms = now;
+    A->last_charge_save = now;
     fl_port_tx_power(A->set.tx_power_dbm);
-
-    /* Unterspannung: nach Abschaltung nur mit Erholung weiterlaufen (Ruhewert, Hysterese) */
-    A->vbat_rest = fl_port_vbat_mv();
-    A->vbat_load = A->vbat_rest;
-    if (A->reset_reason == FL_RR_UNDERVOLTAGE && A->vbat_rest && A->vbat_rest < UV_RECOVER_MV) {
-        A->mode = FL_MODE_UNDERVOLTAGE;
-        fl_port_led(FL_COL_RED, 100);                /* Rot 1 x 30 ms auf Tastendruck (Kap. 10.2) */
-        uint32_t t0 = fl_port_ms(); while (fl_port_ms() - t0 < 30u) { }
-        fl_port_led(FL_COL_OFF, 0);
-        A->cnt.pad = 1; save_counters();
-        fl_port_shutdown();
-        return;
-    }
 
     /* Selbsttest = erste Messung (L11) */
     fl_record_t rec;
@@ -727,20 +821,27 @@ uint32_t fl_app_process(void)
     uint32_t el = now - A->charge_ref_ms;
     if (el >= 1000u) { A->charge_uc += (uint32_t)(((uint64_t)el * I_SLEEP_NA) / 1000000u); A->charge_ref_ms = now - (el % 1000u); }
 
-    if (A->reboot_pending && due(now, A->reboot_at) && !fl_led_busy(&A->led)) {
-        save_counters(); save_logmeta();
-        if (A->connected) fl_port_ble_disconnect();
-        fl_port_reboot();
+    if (A->reboot_pending && due(now, A->reboot_at) && !fl_led_busy(&A->led)) planned_reboot();
+
+    /* F-W3: nach 10 min stabilem Betrieb Zaehler abnormaler Neustarts nullen */
+    if (!A->stable_done && now >= FL_STABLE_MS) {
+        A->stable_done = true;
+        fl_port_retained_set(fl_port_retained_get() & ~(FL_RET_ABN_MASK | FL_RET_BACKOFF | FL_RET_UV | FL_RET_PLANNED));
     }
+    /* S-5: Ladungsschaetzung alle 6 h sichern */
+    if (now - A->last_charge_save >= 6u * 3600u * 1000u) { A->last_charge_save = now; A->cnt.charge_uc = A->charge_uc; save_counters(); }
 
     /* Sitzungsfristen (Kap. 3, 4.2) */
     if (A->connected && A->sess != FL_SESS_CLOSING) {
         uint32_t idle = A->ota_in_session ? IDLE_TIMEOUT_OTA_MS : IDLE_TIMEOUT_MS;
-        if (A->sess == FL_SESS_WAIT_HELLO && due(now, A->t_conn + HELLO_TIMEOUT_MS) && A->mode != FL_MODE_PAIRING)
-            handshake_failed(FL_E_TIMEOUT);
-        else if (A->sess == FL_SESS_PAIR_SHOWING && due(now, A->pair_deadline)) { diag_add(FL_E_TIMEOUT, 2); pair_fail(); }
-        else if (A->sess != FL_SESS_PAIR_SHOWING && due(now, A->t_last_rx + idle)) { diag_add(FL_E_TIMEOUT, 0); disconnect(); }
-        else if (!A->ota_in_session && A->mode != FL_MODE_PAIRING && due(now, A->t_conn + SESSION_MAX_MS)) disconnect();
+        bool pairing = A->sess == FL_SESS_PAIR_RSP_SENT || A->sess == FL_SESS_PAIR_SHOWING;
+        if (A->sess == FL_SESS_WAIT_HELLO &&
+            (due(now, A->t_conn + HELLO_ABS_MS) || (A->cccd_on && due(now, A->t_cccd + HELLO_AFTER_CCCD_MS))))
+            handshake_timeout();
+        else if (pairing && (due(now, A->pair_deadline) || due(now, A->t_pair_start + PAIR_TOTAL_MS))) {
+            diag_add(FL_E_TIMEOUT, 2); pair_fail(); }
+        else if (!pairing && A->sess != FL_SESS_WAIT_HELLO && due(now, A->t_last_rx + idle)) { diag_add(FL_E_TIMEOUT, 0); disconnect(); }
+        else if (!A->ota_in_session && !pairing && due(now, A->t_conn + SESSION_MAX_MS)) disconnect();
     }
     if (A->mode == FL_MODE_PAIRING && !A->connected && due(now, A->pairing_until)) {
         A->mode = A->mode_before_pairing == FL_MODE_PAIRING ? FL_MODE_UNPAIRED : A->mode_before_pairing;
@@ -774,7 +875,12 @@ uint32_t fl_app_process(void)
         A->next_minute_ms += 60000u;
         if (due(now, A->next_minute_ms)) A->next_minute_ms = now + 60000u;
         if (!A->connected && !fl_led_busy(&A->led) && A->mode == FL_MODE_NORMAL) {
-            fl_periodic_in_t in = {A->error_active, A->batt_low, A->water, A->set.water_led != 0, A->time_valid,
+            bool day_ok = true;
+            if (A->time_valid) {                               /* W-7: Wochentage, 1970-01-01 war ein Donnerstag */
+                int64_t d = local_ms(now) / 86400000; int wd = (int)((d % 7 + 7 + 3) % 7);   /* 0 = Montag */
+                day_ok = (A->set.led_weekdays >> wd) & 1;
+            }
+            fl_periodic_in_t in = {A->error_active, A->batt_low, A->water, A->set.water_led != 0 && day_ok, A->time_valid,
                                    minute_of_day(now), A->set.led_win_start, A->set.led_win_end, A->minute_counter};
             fl_led_pattern_t p = fl_led_periodic(&in);
             if (p != FL_LED_NONE) fl_led_play(&A->led, p, now, A->vbat_load, 0);
@@ -789,7 +895,7 @@ uint32_t fl_app_process(void)
                 A->after_disc_led = FL_LED_L17_OTA_OK;
             }
         } else if (due(now, A->test_deadline_ms) && !A->connected) {
-            save_counters(); save_logmeta(); fl_port_reboot();   /* MCUboot faellt zurueck */
+            planned_reboot();                                  /* MCUboot faellt zurueck */
         }
     }
 
@@ -819,10 +925,12 @@ uint32_t fl_app_process(void)
     dl_min(&best, now, A->locked_until, A->locked);
     dl_min(&best, now, A->reboot_at, A->reboot_pending);
     dl_min(&best, now, A->test_deadline_ms, A->image_test);
+    dl_min(&best, now, FL_STABLE_MS, !A->stable_done);
     if (A->connected) {
-        dl_min(&best, now, A->t_conn + HELLO_TIMEOUT_MS, A->sess == FL_SESS_WAIT_HELLO);
+        dl_min(&best, now, A->t_conn + HELLO_ABS_MS, A->sess == FL_SESS_WAIT_HELLO);
+        dl_min(&best, now, A->t_cccd + HELLO_AFTER_CCCD_MS, A->sess == FL_SESS_WAIT_HELLO && A->cccd_on);
         dl_min(&best, now, A->t_last_rx + (A->ota_in_session ? IDLE_TIMEOUT_OTA_MS : IDLE_TIMEOUT_MS), true);
-        dl_min(&best, now, A->pair_deadline, A->sess == FL_SESS_PAIR_SHOWING);
+        dl_min(&best, now, A->pair_deadline, A->sess == FL_SESS_PAIR_SHOWING || A->sess == FL_SESS_PAIR_RSP_SENT);
         dl_min(&best, now, A->t_conn + SESSION_MAX_MS, !A->ota_in_session);
     }
     return best;

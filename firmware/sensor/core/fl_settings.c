@@ -38,6 +38,7 @@ void fl_settings_user_defaults(fl_settings_t *s)
     s->batt_low_flag = 0;
     s->ota_min_mv = 2700;
     s->diag_f2 = 6;
+    s->led_weekdays = 0x7F;
 }
 
 void fl_settings_defaults(fl_settings_t *s)
@@ -72,6 +73,7 @@ static int one_tlv(fl_settings_t *d, uint8_t id, uint8_t len, const uint8_t *v)
     case 0x0C: if (len != 1 || v[0] > 1) return FL_E_BAD_PARAM; d->batt_low_flag = v[0]; return 0;
     case 0x0D: if (len != 2 || !in_range(fl_get_u16(v), 2500, 3000)) return FL_E_BAD_PARAM; d->ota_min_mv = fl_get_u16(v); return 0;
     case 0x0E: if (len != 1) return FL_E_BAD_PARAM; d->diag_f2 = v[0]; return 0;
+    case 0x0F: if (len != 1 || v[0] > 0x7F) return FL_E_BAD_PARAM; d->led_weekdays = v[0]; return 0;
     /* Werkskalibrierung (Erweiterung) */
     case 0x10: if (len != 2 || !in_range(fl_get_u16(v), 500, 5000)) return FL_E_BAD_PARAM; d->cal.cref_eff = fl_get_u16(v); return 0;
     case 0x11: if (len != 2 || fl_get_u16(v) > 5000) return FL_E_BAD_PARAM; d->cal.cpar = fl_get_u16(v); return 0;
@@ -131,6 +133,7 @@ size_t fl_settings_encode(const fl_settings_t *s, uint8_t *o, size_t max)
     p = put(o, p, max, 0x0C, &s->batt_low_flag, 1);
     fl_put_u16(b, s->ota_min_mv); p = put(o, p, max, 0x0D, b, 2);
     p = put(o, p, max, 0x0E, &s->diag_f2, 1);
+    p = put(o, p, max, 0x0F, &s->led_weekdays, 1);
     fl_put_u16(b, s->cal.cref_eff); p = put(o, p, max, 0x10, b, 2);
     fl_put_u16(b, s->cal.cpar); p = put(o, p, max, 0x11, b, 2);
     fl_put_u16(b, s->cal.td0_ps); p = put(o, p, max, 0x12, b, 2);

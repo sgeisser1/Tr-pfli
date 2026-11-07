@@ -90,7 +90,9 @@ static void test_proto(void)
     fl_gw_hint(V_GWID, hint); CHECK_MEM(hint, V_GWHINT, 2);
     CHECK(fl_adv_build(adv, V_ADDR, 0x05, 2950, 0x123456, hint) == 29);
     CHECK(sizeof V_ADV == 29); CHECK_MEM(adv, V_ADV, 29);
-    fl_pair_transcript(V_PAIRREQ, V_PAIRRSP, tr); CHECK_MEM(tr, V_TRANSCRIPT, 32);
+    { uint8_t c[32]; fl_pair_commit(V_GWID, V_GWPUB, V_GWNONCE16, c); CHECK_MEM(c, V_COMMIT, 32);
+      CHECK_MEM(V_PAIRREQ + 72, V_COMMIT, 32); }                                   /* Commitment v2 (F-K1) */
+    fl_pair_transcript(V_PAIRREQ, V_PAIRRSP, V_GWNONCE16, tr); CHECK_MEM(tr, V_TRANSCRIPT, 32);
     fl_pair_keys(V_Z, V_GWNONCE16, V_SNONCE16, V_GWID, V_ADDR, kl, kc);
     CHECK_MEM(kl, V_KLINK, 16); CHECK_MEM(kc, V_KCONF, 16);
     fl_pair_sas(tr, sas); CHECK_MEM(sas, V_SAS, 5);
@@ -460,6 +462,7 @@ static void gw_hello(const uint8_t gwid[8])
     uint8_t h[18] = {FL_VT(FL_FT_HELLO), 1};
     memcpy(h + 2, gwid, 8); memcpy(h + 10, V_GN8, 8);
     fl_app_on_connect();
+    fl_app_on_notify_enabled();
     fl_app_on_rx(h, 18);
     int i = find_tx(FL_VT(FL_FT_HELLO_RSP), 0);
     if (i >= 0) fl_session_key(V_KLINK, V_GN8, sim.tx[i] + 2, k_s);
@@ -488,15 +491,18 @@ static void test_app(void)
     fl_app_on_connect();
     sim.tx_n = 0;
     sim_rng_queue(V_SNONCE16, 16);
-    uint8_t req[2 + 88] = {FL_VT(FL_FT_PAIR), FL_PAIR_REQ};
-    memcpy(req + 2, V_PAIRREQ, 88);
+    uint8_t req[2 + 104] = {FL_VT(FL_FT_PAIR), FL_PAIR_REQ};
+    memcpy(req + 2, V_PAIRREQ, 104);
     fl_app_on_rx(req, sizeof req);
     idx = find_tx(FL_VT(FL_FT_PAIR), 0);
     CHECK(idx >= 0 && sim.tx[idx][1] == FL_PAIR_RSP && sim.tx_len[idx] == 93);
     /* PAIR_RSP-Nutzlast muss byte-genau der Python-Referenz entsprechen (fw 0.1.0, hw 0x0B) */
     CHECK(idx >= 0 && memcmp(sim.tx[idx] + 2, V_PAIRRSP, 91) == 0);
-    uint8_t show[2] = {FL_VT(FL_FT_PAIR), FL_PAIR_SHOW};
-    fl_app_on_rx(show, 2);
+    advance(8000);                                       /* Nutzer/Gateway brauchen Zeit: keine 3-s-Trennung (K-2) */
+    CHECK(sim.disconnect_req == 0 && g_fl.sess == FL_SESS_PAIR_RSP_SENT);
+    uint8_t show[2 + 16] = {FL_VT(FL_FT_PAIR), FL_PAIR_REVEAL};
+    memcpy(show + 2, V_GWNONCE16, 16);
+    fl_app_on_rx(show, sizeof show);
     CHECK(g_fl.sess == FL_SESS_PAIR_SHOWING && g_fl.led.active == FL_LED_L5_SAS);
     CHECK(memcmp(g_fl.sas, V_SAS, 5) == 0);
     /* Gateway bestaetigt zuerst -> noch nicht gespeichert */
@@ -523,7 +529,7 @@ static void test_app(void)
     gw_hello(V_GWID);
     idx = 0;
     int n = gw_recv(&idx, plain);
-    CHECK(n == 2 + 48 && plain[0] == FL_MSG_SESSION_INFO && plain[2] == 1);
+    CHECK(n == 2 + 52 && plain[0] == FL_MSG_SESSION_INFO && plain[2] == 1);
     CHECK(plain[2 + 9] == 0x0B && fl_get_u16(plain + 2 + 11) == 1);         /* hw_rev, boot_id */
     uint32_t last = fl_get_u32(plain + 2 + 19), oldest = fl_get_u32(plain + 2 + 23);
     CHECK(last == 0 && oldest == 0);                                          /* Startmessung (Selbsttest) */
@@ -548,8 +554,10 @@ static void test_app(void)
     sim.c_probe_pf = 44.1;
     uint8_t ms[2] = {2, 0};
     gw_send_secure(FL_MSG_MEASURE, ms, 2);
-    n = gw_recv(&idx, plain); CHECK(n == 2 + 21 && plain[0] == 0x94 && plain[2] == 0);
-    fl_record_decode(plain + 3, &rec); CHECK(rec.cause == FL_CAUSE_CAL_WET && abs((int)rec.c_probe - 4410) <= 4);
+    uint32_t mc0 = sim.meas_calls;
+    n = gw_recv(&idx, plain); CHECK(n == 2 + 5 && plain[0] == 0x94 && plain[2] == 0);
+    uint32_t meas_seq = fl_get_u32(plain + 3);
+    CHECK(meas_seq == 1 && sim.meas_calls == mc0);                            /* F-W5: keine Messung waehrend Funk */
     /* SET_SETTINGS (water_raw = 30 pF, ungueltiger zweiter Satz) / GET_SETTINGS */
     uint8_t ss[2 + 4 + 6] = {0, 0, 0x05, 2, 0xB8, 0x0B, 0x07, 4, 0, 0, 0xA0, 0x05}; fl_put_u16(ss, 3);   /* LED-Fenster ganztags */
     gw_send_secure(FL_MSG_SET_SETTINGS, ss, sizeof ss);
@@ -561,7 +569,7 @@ static void test_app(void)
     n = gw_recv(&idx, plain); CHECK(n > 10 && plain[0] == 0x95 && fl_get_u16(plain + 2) == 3);
     /* GET_INFO (erweitert), unbekannter Befehl, GET_DIAG */
     gw_send_secure(FL_MSG_GET_INFO, NULL, 0);
-    n = gw_recv(&idx, plain); CHECK(n == 2 + 64 && plain[0] == 0x90 && fl_get_u32(plain + 2 + 48) == 2);
+    n = gw_recv(&idx, plain); CHECK(n == 2 + 68 && plain[0] == 0x90 && fl_get_u32(plain + 2 + 52) == 1 && fl_get_u32(plain + 2 + 48) == 0);
     gw_send_secure(0x55, NULL, 0);
     n = gw_recv(&idx, plain); CHECK(plain[0] == 0xFF && plain[2] == FL_E_UNKNOWN_CMD);
     gw_send_secure(FL_MSG_GET_DIAG, NULL, 0);
@@ -572,6 +580,8 @@ static void test_app(void)
     fl_app_on_rx(f, (uint16_t)fl);
     CHECK(sim.disconnect_req == disc + 1);
     fl_app_on_disconnect();
+    CHECK(sim.meas_calls == mc0 + 1 && fl_log_read(&g_fl.log, meas_seq, &rec) == 0);   /* Messung nach dem Trennen */
+    CHECK(rec.cause == FL_CAUSE_CAL_WET && abs((int)rec.c_probe - 4410) <= 4);
     advance(1000);
 
     /* Fremdes Gateway: 3 Fehlversuche -> Sperre 30 min (nicht verbindbar) */
@@ -584,10 +594,36 @@ static void test_app(void)
     CHECK(g_fl.locked && !sim.adv_conn && (sim.adv[23] & FL_ST_LOCKED));
     advance(31u * 60000u);
     CHECK(!g_fl.locked && sim.adv_conn);
-    /* HELLO-Frist 0.5 s */
+    /* HELLO-Fristen v2 (K-1): 1 s ab CCCD, 5 s absolut; Zeitueberschreitung ist KEIN Fehlversuch */
+    uint16_t af = g_fl.cnt.auth_fail;
     fl_app_on_connect(); disc = sim.disconnect_req;
-    advance(600);
-    CHECK(sim.disconnect_req == disc + 1);
+    advance(4000); CHECK(sim.disconnect_req == disc);                        /* BlueZ-Dienstsuche darf dauern */
+    advance(1100); CHECK(sim.disconnect_req == disc + 1);
+    fl_app_on_disconnect();
+    fl_app_on_connect(); fl_app_on_notify_enabled(); disc = sim.disconnect_req;
+    advance(1100); CHECK(sim.disconnect_req == disc + 1);
+    fl_app_on_disconnect();
+    for (int i = 0; i < 5; i++) { fl_app_on_connect(); advance(5100); fl_app_on_disconnect(); }
+    CHECK(g_fl.cnt.auth_fail == af && !g_fl.locked);                          /* keine Selbstaussperrung */
+    /* RNG-Ausfall beim HELLO: keine Sitzung (F-W4) */
+    sim.rng_fail = true; sim.tx_n = 0; disc = sim.disconnect_req;
+    gw_hello(V_GWID);
+    CHECK(find_tx(FL_VT(FL_FT_HELLO_RSP), 0) < 0 && find_tx(FL_VT(FL_FT_SECURE), 0) < 0 && sim.disconnect_req == disc + 1);
+    fl_app_on_disconnect(); sim.rng_fail = false;
+    /* OTA_DATA mit Zaehlerluecke (W-2) wird angenommen, andere Nachrichten mit Luecke nicht */
+    sim.tx_n = 0; gw_hello(V_GWID); idx = 0; gw_recv(&idx, plain);
+    { static uint8_t img[600]; uint8_t b[48] = {0}, d[4 + 200];
+      for (unsigned i = 0; i < sizeof img; i++) img[i] = (uint8_t)i;
+      fl_put_u32(b, sizeof img); b[4] = 0; b[5] = 2; fl_sha256(img, sizeof img, b + 16);
+      gw_send_secure(FL_MSG_OTA_BEGIN, b, 48);
+      n = gw_recv(&idx, plain); CHECK(n == 2 + 7 && plain[2] == 0);
+      fl_put_u32(d, 0); memcpy(d + 4, img, 200); gw_send_secure(FL_MSG_OTA_DATA, d, 204);
+      g_ctr_tx++;                                                            /* ein Frame ging verloren */
+      fl_put_u32(d, 200); memcpy(d + 4, img + 200, 200); gw_send_secure(FL_MSG_OTA_DATA, d, 204);
+      CHECK(g_fl.connected && g_fl.sess == FL_SESS_SECURE && g_fl.ota.next_off == 400);   /* Luecke angenommen */
+      disc = sim.disconnect_req; g_ctr_tx++;
+      gw_send_secure(FL_MSG_GET_INFO, NULL, 0);
+      CHECK(sim.disconnect_req == disc + 1); }                               /* Luecke ausserhalb OTA_DATA */
     fl_app_on_disconnect();
     /* Giessen noetig: periodische LED (Messung unter Schwelle) */
     sim.c_probe_pf = 25.0;
@@ -619,6 +655,106 @@ static void test_app(void)
     CHECK(r2.seq == seq_before + 1);                                          /* seq behalten */
 }
 
+
+/* ---------------- Kopplung: Commitment-Verletzung (F-K1) ---------------- */
+static void test_pair_reveal(void)
+{
+    puts("[pair] Reveal passt nicht zum Commitment -> Abbruch + Fehlversuch");
+    sim_reset_all(); sim.outlier_block = -1;
+    fl_app_init();
+    advance(1000);
+    press(4000);
+    CHECK(g_fl.mode == FL_MODE_PAIRING);
+    fl_app_on_connect(); fl_app_on_notify_enabled();
+    uint8_t req[2 + 104] = {FL_VT(FL_FT_PAIR), FL_PAIR_REQ};
+    memcpy(req + 2, V_PAIRREQ, 104);
+    fl_app_on_rx(req, sizeof req);
+    uint16_t af = g_fl.cnt.auth_fail;
+    uint8_t rv[2 + 16] = {FL_VT(FL_FT_PAIR), FL_PAIR_REVEAL};
+    memcpy(rv + 2, V_GWNONCE16, 16); rv[2] ^= 1;                         /* Angreifer aendert seine Nonce */
+    fl_app_on_rx(rv, sizeof rv);
+    CHECK(g_fl.cnt.auth_fail == af + 1 && !g_fl.pair.paired && g_fl.led.active == FL_LED_L7_PAIR_FAIL);
+    CHECK(g_fl.sess == FL_SESS_CLOSING);
+    /* PAIR_REVEAL ohne vorheriges PAIR_REQ wird abgelehnt */
+    fl_app_on_disconnect(); press(4000); fl_app_on_connect(); fl_app_on_notify_enabled();
+    rv[2] ^= 1; fl_app_on_rx(rv, sizeof rv);
+    CHECK(!g_fl.pair.paired && g_fl.sess == FL_SESS_CLOSING);
+    fl_app_on_disconnect();
+}
+
+/* ---------------- Reset-Schleifen (F-W3) ---------------- */
+static void test_resets(void)
+{
+    puts("[reset] Reset-Schleife, Brownout bei schwacher Zelle, Taster klemmt bei Abschaltung, geplanter Neustart");
+    sim_reset_all(); sim.outlier_block = -1;
+    fl_app_init();                                       /* Power-on */
+    CHECK(sim.shutdowns == 0 && (sim.retained & FL_RET_ABN_MASK) == 0);
+    sim.reset_reason = FL_RR_WATCHDOG; fl_app_init(); CHECK(sim.shutdowns == 0 && (sim.retained & FL_RET_ABN_MASK) == 1);
+    sim.reset_reason = FL_RR_HARDFAULT; fl_app_init(); CHECK(sim.shutdowns == 0 && (sim.retained & FL_RET_ABN_MASK) == 2);
+    uint32_t nvw = sim.nv_writes;
+    sim.reset_reason = FL_RR_SOFTWARE; fl_app_init();    /* fataler Fehler (nicht geplant) = 3. abnormaler Start */
+    CHECK(sim.shutdowns == 1 && (sim.retained & FL_RET_BACKOFF) && sim.nv_writes == nvw);   /* ohne Flash-Schreiben */
+    sim.reset_reason = FL_RR_PIN; fl_app_init();         /* Nutzer weckt per Taster */
+    CHECK(sim.shutdowns == 1 && (sim.retained & FL_RET_ABN_MASK) == 0 && g_fl.cnt.backoffs == 1);
+    /* geplanter Neustart zaehlt nicht */
+    sim.retained |= FL_RET_PLANNED; sim.reset_reason = FL_RR_SOFTWARE; fl_app_init();
+    CHECK((sim.retained & FL_RET_ABN_MASK) == 0 && !(sim.retained & FL_RET_PLANNED));
+    /* stabiler Betrieb 10 min nullt den Zaehler */
+    sim.reset_reason = FL_RR_WATCHDOG; fl_app_init(); CHECK((sim.retained & FL_RET_ABN_MASK) == 1);
+    advance(FL_STABLE_MS + 1000); CHECK((sim.retained & FL_RET_ABN_MASK) == 0);
+    /* Brownout mit schwacher Zelle: sofort aus, kein NV-Schreiben, keine Messung */
+    sim.reset_reason = FL_RR_BROWNOUT; sim.vbat = 2500; nvw = sim.nv_writes;
+    uint32_t mc = sim.meas_calls, sd = sim.shutdowns;
+    fl_app_init();
+    CHECK(sim.shutdowns == sd + 1 && sim.nv_writes == nvw && sim.meas_calls == mc && (sim.retained & FL_RET_UV));
+    /* Wecken per Taster bei weiterhin schwacher Zelle: kurz rot, wieder aus */
+    sim.reset_reason = FL_RR_PIN; fl_app_init(); CHECK(sim.shutdowns == sd + 2 && sim.nv_writes == nvw);
+    /* Erholt (Zellwechsel = Power-on, Retention 0) */
+    sim.retained = 0; sim.reset_reason = FL_RR_POWER_ON; sim.vbat = 2950; fl_app_init(); CHECK(g_fl.mode != FL_MODE_UNDERVOLTAGE);
+    /* Unterspannung waehrend Tastendruck, Taster bleibt gedrueckt: Abschaltung OHNE Tasterwecken */
+    sd = sim.shutdowns;
+    sim.vbat_load = 2250; sim.button_level = true; fl_app_on_button(true);
+    advance(200);
+    fl_app_on_button(false);                              /* Flanke gemeldet, Kontakt klemmt aber (Pegel low) */
+    CHECK(sim.shutdowns == sd + 1 && g_fl.mode == FL_MODE_UNDERVOLTAGE && !sim.shutdown_wake && !sim.pullup);
+    /* Gegenprobe: Taster losgelassen -> Wecken per Taster bleibt aktiv */
+    sim.retained = 0; sim.reset_reason = FL_RR_POWER_ON; sim.vbat_load = 0; sim.button_level = false; fl_app_init();
+    sim.vbat_load = 2250; sd = sim.shutdowns;
+    { fl_record_t r; fl_app_measure(FL_CAUSE_AUTO, &r); }
+    CHECK(sim.shutdowns == sd + 1 && sim.shutdown_wake);
+    sim.button_level = false; sim.vbat_load = 0;
+}
+
+/* ---------------- Image-Pruefung nach OTA_END (W-6, F-L1) ---------------- */
+static void put_img(uint8_t maj, uint8_t min, uint16_t rev, uint32_t build, uint32_t sc, int hw)
+{
+    uint8_t *m = sim_slot1();
+    memset(m, 0xFF, 0x1000);
+    memset(m, 0, 0x100);
+    fl_put_u32(m, 0x96f3b83du); fl_put_u16(m + 8, 0x100);
+    uint16_t prot = 4 + 8 + (hw >= 0 ? 5 : 0);
+    fl_put_u16(m + 10, prot); fl_put_u32(m + 12, 0x200);
+    m[20] = maj; m[21] = min; fl_put_u16(m + 22, rev); fl_put_u32(m + 24, build);
+    uint8_t *t = m + 0x300;
+    fl_put_u16(t, 0x6908); fl_put_u16(t + 2, prot);
+    fl_put_u16(t + 4, 0x50); fl_put_u16(t + 6, 4); fl_put_u32(t + 8, sc);
+    if (hw >= 0) { fl_put_u16(t + 12, 0xA0); fl_put_u16(t + 14, 1); t[16] = (uint8_t)hw; }
+}
+
+static void test_img_check(void)
+{
+    puts("[ota] Kopf-/TLV-Pruefung: Version, Sicherheitszaehler, hw_rev");
+    sim_reset_all();
+    uint8_t run[4] = {0, 1, 0, 0};
+    put_img(0, 2, 0, 1, 1, 0x0B); CHECK(fl_ota_check_image(fl_port_slot1_flash(), run, 5, 1, 0x0B) == 0);
+    fl_img_info_t in; CHECK(fl_img_parse(fl_port_slot1_flash(), 0, &in) == 0 && in.sec_cnt == 1 && in.hw_rev == 0x0B);
+    CHECK(fl_ota_check_image(fl_port_slot1_flash(), run, 5, 1, 0x0A) == FL_E_OTA_HW_MISMATCH);
+    CHECK(fl_ota_check_image(fl_port_slot1_flash(), run, 5, 2, 0x0B) == FL_E_OTA_ROLLBACK);   /* Zaehler kleiner */
+    put_img(0, 1, 0, 1, 1, 0x0B); CHECK(fl_ota_check_image(fl_port_slot1_flash(), run, 5, 0, 0x0B) == FL_E_OTA_ROLLBACK);
+    put_img(0, 2, 0, 1, 1, -1); CHECK(fl_ota_check_image(fl_port_slot1_flash(), run, 5, 0, 0x0B) == FL_E_OTA_HW_MISMATCH);
+    sim_slot1()[0] = 0; CHECK(fl_ota_check_image(fl_port_slot1_flash(), run, 5, 0, 0x0B) == FL_E_OTA_HASH);
+}
+
 int main(void)
 {
     test_crypto();
@@ -630,6 +766,9 @@ int main(void)
     test_ui();
     test_ota();
     test_app();
+    test_pair_reveal();
+    test_resets();
+    test_img_check();
     printf("\nErgebnis: %d Pruefungen bestanden, %d fehlgeschlagen\n", g_pass, g_fail);
     return g_fail ? 1 : 0;
 }

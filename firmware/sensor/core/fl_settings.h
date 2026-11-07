@@ -37,6 +37,7 @@ typedef struct {
     uint8_t  batt_low_flag;
     uint16_t ota_min_mv;
     uint8_t  diag_f2;
+    uint8_t  led_weekdays;  /* 0x0F: Bit0 = Montag .. Bit6 = Sonntag (v2, W-7) */
     fl_cal_t cal;
 } fl_settings_t;
 

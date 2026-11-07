@@ -3,11 +3,11 @@
 | | |
 |---|---|
 | Dokument | `firmware/PROTOCOL.md` |
-| Protokollversion | **1** (Frame-Version 1, Advertising-Format 1, Datensatzformat 1) |
-| Dokumentversion | 0.1 – Entwurf zur Prüfung (Phase 4, Welle 1) |
+| Protokollversion | **2** (Frame-Version 2, Advertising-Format 1, Datensatzformat 1, INFO-Format 2) |
+| Dokumentversion | 0.2 – Überarbeitung nach Prüfrunde 1 (Software `phase4_protocol_software.md`, Sicherheit `phase4_sicherheit_kragen_firmware.md`, VETO F-K1); Änderungsliste Kap. 0 |
 | Datum | 2026-11-07 |
 | Ersteller | Firmware/Energie |
-| Gegenseite | Software-Agent (Gateway XIAO ESP32-S3 Plus, ESP-IDF v6.1, NimBLE) |
+| Gegenseite | Software-Agent (Gateway Raspberry Pi Zero 2 W, BlueZ, Python `bleak`, `cryptography`; D-014) |
 | Grundlagen | `docs/requirements/REQUIREMENTS.md` v1.0; `DECISIONS.md` D-006 (A-32), D-010 (LED-Farben); `docs/concepts/CONCEPTS.md` 1, 2.2, 2.7, 2.8, 5.3; `docs/concepts/research_gateway.md` 2.4, 3; `docs/reviews/phase3_rgb_antenne_elektronik.md` 1.4–1.8 |
 
 Kennzeichnungen: **ANNAHME** = nicht belegt; **PROTOTYP-PRÜFUNG** = erst am Muster nachweisbar;
@@ -20,11 +20,37 @@ und Gateway-Firmware (`firmware/gateway/`). Änderungen nur mit Erhöhung der be
 
 ---
 
+## 0 Änderungen 0.1 → 0.2 (für die Gegenseite)
+
+Protokoll **v1 wurde nie ausgeliefert**; v2 ersetzt es vollständig (keine Abwärtskompatibilität nötig, Kap. 13).
+Umsetzung Sensor: `firmware/sensor/` (Tests `make check`), Referenz: `firmware/tools/fluidi_proto.py`.
+
+| Nr | Kapitel | Änderung | Grund (Befund) |
+|---|---|---|---|
+| Ä-1 | 4.2, 5.2 | **Kopplung mit Commitment/Reveal:** PAIR_REQ trägt `commit` statt `gw_nonce`; neue Nachricht **PAIR_REVEAL** (`pmsg 0x03`, ersetzt PAIR_SHOW) legt `gw_nonce` nach PAIR_RSP offen; Transkript = REQ‖RSP‖REVEAL; HKDF-info `fluidi-pair-v2` | F-K1 (VETO): MITM 200/200 → mit v2 0.39 % in 10 000 Läufen (`firmware/tools/test_pairing_mitm.py`) |
+| Ä-2 | 5.1, 13 | Frame-/Protokollversion **2** (`vt` = 0x2t); Sitzungsschlüssel-info `fluidi-sess-v2` | Ä-1 ist inkompatibel |
+| Ä-3 | 3 | Fristen: HELLO/PAIR_REQ ≤ **1 s nach CCCD-Write** und ≤ **5 s nach Verbindungsaufbau**; ohne Frame **5 s**; Sitzung ≤ **30 s**; Kopplung 15 s bis REVEAL, 60 s Farbvergleich, ≤ 90 s gesamt | K-1, K-2, W-9 (BlueZ-Dienstsuche, Farbvergleich, Nachlieferung) |
+| Ä-4 | 4.5 | Nur **kryptografische** Fehler zählen als Fehlversuch (3 → Sperre); Fristüberschreitungen separat (10 in Folge → Sperre) | K-1 (keine Selbstaussperrung) |
+| Ä-5 | 2.5 | Sensor fordert selbst 7.5–15 ms Verbindungsintervall an (Peripheral Request); MTU/Intervall nicht vom Gateway verlangt | W-1 |
+| Ä-6 | 4.4, 9.3 | Zählerlücken nur für **OTA_DATA** zulässig (≤ 64), sonst Trennung | W-2 |
+| Ä-7 | 4.3/4.4/5.2 | `sensor_addr` LSB zuerst; `payload()` = ohne `vt`/`pmsg` | W-3 |
+| Ä-8 | 5.4 | **MEASURE** antwortet `{status, seq}`; der Sensor misst **nach dem Trennen** (kein Funk während der Messung), Datensatz in der nächsten Sitzung | F-W5 |
+| Ä-9 | 5.5 | SESSION_INFO 52 Byte: `sec_cnt` u32 bei Offset 48; INFO-Erweiterung ab Offset **52** | W-6 |
+| Ä-10 | 9.1/9.6/11 | MCUboot-TLV **0xA0 `hw_rev`** (geschützt); Sensor prüft nach OTA_END Version, Sicherheitszähler und `hw_rev` aus Slot 1 (Fehler **0x4A** neu) | W-6, F-L1 |
+| Ä-11 | 8 | TLV **0x0F `led_weekdays`**; TLV 0x10–0x16 Werkskalibrierung; Vergleichsrichtungen festgelegt; nicht gesendete ids bleiben | W-7, W-5, S-3 |
+| Ä-12 | 6 | Kopplung quittiert nichts (Altdaten werden geliefert); MEASURE-Datensätze normal quittieren; `max` ≤ 110 je READ | W-4, S-2, W-9 |
+| Ä-13 | 6.3/6.4 | Ringspeicher garantiert 840 Datensätze; NV geteilt (BLE-Stack 4 kB / fluidi 4 kB) | Implementierung |
+| Ä-14 | 5.5 | `charge_uc` nichtflüchtig, Nullung nur bei Power-on (Zellwechsel) | S-5 |
+| Ä-15 | 2.5, 5.1 | MUSS: Gateway leitet aus Klartext-ERROR keine Zustandsänderung ab | W-8 |
+| Ä-16 | 9.3, 7, 13 | OTA_BEGIN-`sha256` = SHA-256 der **ganzen Datei**; TIME_SET auch bei Änderung `tz_min`; Export siehe GATEWAY_API Kap. 9 | S-1, S-4, S-6 |
+
+---
+
 ## 1 Überblick und Grundsätze
 
 | Thema | Festlegung | Begründung |
 |---|---|---|
-| Funk | Bluetooth LE 4.2+/5, 1M PHY, Legacy-Advertising | CC2340 und ESP32-S3 unterstützen beides; Legacy-Advertising wird von jedem Scanner gesehen |
+| Funk | Bluetooth LE 4.2+/5, 1M PHY, Legacy-Advertising | CC2340 und Pi Zero 2 W (BlueZ) unterstützen beides; Legacy-Advertising wird von jedem Scanner gesehen |
 | Rollen | **Sensor = Peripheral/Advertiser** (GATT-Server), **Gateway = Central/Scanner** (GATT-Client) | Der Sensor schläft und bestimmt selbst, wann er erreichbar ist (Energie); das Gateway ist dauernd versorgt und scannt dauernd (`research_gateway.md` 2.4) |
 | Wer verbindet? | Nur das Gateway, und **nur wenn es etwas zu tun hat** (Daten liegen an, Befehl wartet, Zeit/Einstellungen veraltet) | Eine Verbindung kostet so viel wie ≈ 18 Advertising-Ereignisse (Kap. 12) |
 | Sicherheit | **Anwendungsschicht**: individueller Schlüssel pro Sensor (ECDH beim Koppeln), jede Sitzung mit frischem Sitzungsschlüssel, AES-128-CCM für alle Befehle und Daten. **Kein BLE-Bonding** | Kap. 4.1 |
@@ -111,9 +137,13 @@ für ein Büro akzeptiert (**ANNAHME**, Sicherheits-Agent prüft).
    - `OTA_TEST` gesetzt (das neue Image braucht eine Sitzung zur Bestätigung, Kap. 9.5).
 3. Sonst **nicht verbinden**. Höchstens **3 gleichzeitige** Verbindungen, Rest in Warteschlange
    (`research_gateway.md` 2.4).
-4. Verbindungsparameter (Gateway setzt sie): Verbindungsintervall **7.5–15 ms**, Slave Latency 0,
-   Supervision Timeout **1 s**, ATT-MTU anfordern **247**, Data Length Extension 251 Byte, 1M PHY
-   (2M PHY nur während OTA, SOLL).
+4. Verbindungsparameter (v2, Ä-5): Der **Sensor** fordert nach dem Verbindungsaufbau selbst 7.5–15 ms,
+   Latenz 0, Supervision 2 s an (Peripheral Connection Parameter Request); das Gateway (BlueZ) nimmt an
+   (**PROTOTYP-PRÜFUNG** OP-GW-8). MTU: das Gateway fordert so gross wie möglich an (BlueZ), der Sensor richtet
+   Listen nach der ausgehandelten MTU; alle Nicht-Listen-Frames passen in MTU 23 nicht zwingend → **MTU ≥ 100 SOLL**,
+   bei kleinerer MTU lehnt der Sensor nichts ab, sendet aber Listen mit 1 Datensatz je Frame.
+6. **MUSS (Ä-15):** Das Gateway leitet aus Klartext-Frames `ERROR` (z. B. `NOT_PAIRED`, `LOCKED`) **keine
+   Zustandsänderung** ab (kein Löschen von Schlüsseln, keine Entkopplung), sondern zeigt sie nur an.
 5. Nach Ende der Arbeit **sofort trennen**. Sitzung (ohne OTA) SOLL ≤ 12 Verbindungsereignisse dauern.
 
 ---
@@ -134,9 +164,21 @@ Regeln:
   (Datensätze) passen sich der MTU an.
 - Die Attribute haben **keine** Link-Layer-Sicherheitsanforderung; der Sensor lehnt BLE-Pairing
   (SMP) ab. Alle Sicherheit liegt in den Frames (Kap. 4).
-- Ablauf: Gateway verbindet → MTU-Austausch → CCCD von TX auf Notify → HELLO (Kap. 4.3).
-- Sensor trennt, wenn nach Verbindungsaufbau **0.5 s** kein gültiges HELLO kommt (normal ≈ 4 Verbindungsereignisse), nach **3 s** ohne
-  gültigen Frame (ausser OTA: 30 s) und spätestens nach **10 s** Sitzungsdauer (ausser OTA).
+- Ablauf: Gateway verbindet → (Dienstsuche, MTU) → CCCD von TX auf Notify → HELLO bzw. PAIR_REQ.
+- **Fristen v2 (Ä-3), Sensor trennt:**
+
+  | Phase | Frist | Zählt als Fehlversuch? |
+  |---|---|---|
+  | Verbindungsaufbau → erster Frame (HELLO/PAIR_REQ) | **1 s nach CCCD-Write**, höchstens **5 s** nach Verbindungsaufbau | nein (eigener Zähler, Kap. 4.5) |
+  | Sitzung: ohne gültigen Frame | **5 s** (OTA: 30 s) | nein |
+  | Sitzung gesamt (ohne OTA/Kopplung) | **30 s** | nein |
+  | Kopplung: PAIR_RSP → PAIR_REVEAL | **15 s** (ECDH am Gateway) | nein |
+  | Kopplung: PAIR_REVEAL → beide Bestätigungen | **60 s** (Farbvergleich, keine Frames nötig) | nein |
+  | Kopplung gesamt | **90 s** | nein |
+
+  Begründung: BlueZ macht bei nicht gebondeten Geräten eine Dienstsuche, deren Dauer das Gateway nicht steuert
+  (Prüfung Software K-1); der Farbvergleich braucht Zeit ohne Frames (K-2); Nachlieferung von bis zu 110
+  Datensätzen je Block (W-9). Energie: Kap. 4.5.
 
 ---
 
@@ -149,18 +191,17 @@ Regeln:
 | MITM-Schutz | Sensor hat weder Display noch Tastatur → nur „Just Works“, **kein** MITM-Schutz | Vergleich einer Farbfolge (LED ↔ PWA) + Tastendruck + PWA-Bestätigung (REQ-RF-05) |
 | Bindung an Gateway (REQ-RF-06) | Bond gilt für die BLE-Identität des Gateway-Chips | Schlüssel gehört zur `gateway_id`; Befehle nur mit gültigem MIC dieses Schlüssels |
 | Gateway-Ersatz (UC-14, REQ-GW-06) | Bonds hängen an Chip/Stack, Backup/Restore heikel | Schlüssel liegen in der Gateway-Datenbank → Backup einspielen genügt |
-| Anzahl Sensoren | NimBLE speichert standardmässig 3 Bonds (`CONFIG_BT_NIMBLE_MAX_BONDS`, `research_gateway.md` 2.4) | unbegrenzt (Datenbank) |
+| Anzahl Sensoren | Bonds liegen im BLE-Stack des Gateways (BlueZ), Backup/Restore an den Controller gebunden | unbegrenzt (Datenbank) |
 | Replay-Schutz | Link-Layer | pro Sitzung frischer Schlüssel + Zähler (Kap. 4.4) |
 | Aufwand | im Stack | eigene Implementierung → nur Standardverfahren (ECDH P-256, HKDF-SHA-256, HMAC-SHA-256, AES-CCM) mit Testvektoren (Kap. 14) |
 
-Verfügbarkeit auf dem Sensor (SDK 9.23.00.27, Pfade im SDK): ECDH P-256 in Software
-(`source/ti/drivers/ecdh/ECDHLPF3SW.c`), SHA-256 in Software (`source/ti/drivers/sha2/SHA2LPF3SW.c`),
-AES-CCM mit Hardware-AES (`source/ti/drivers/aesccm/AESCCMXXF3.c`; AES-Beschleuniger und RNG:
-`TI_CC2340R5_Datasheet_SWRS272F.pdf` S. 1; CCM 256 B in ≈ 60 µs: TRM S. 835). Gateway: mbedTLS
-(ESP-IDF) bietet alle Verfahren. ECDH-Rechenzeit auf dem Cortex-M0+ (nur beim Koppeln):
+Verfügbarkeit auf dem Sensor (SDK 9.23.00.27): ECDH P-256 in Software (TI-Treiber ECDH, `ECDHLPF3SW`),
+SHA-256/HMAC/HKDF und CCM-Modus in der Firmware (`firmware/sensor/core/fl_crypto.c`, geprüft mit FIPS-/RFC-Vektoren),
+AES-Block in Hardware (TI-Treiber AESECB; AES-Beschleuniger und RNG: `TI_CC2340R5_Datasheet_SWRS272F.pdf` S. 1).
+Gateway: Python `cryptography` (D-014). ECDH-Rechenzeit auf dem Cortex-M0+ (nur beim Koppeln):
 **PROTOTYP-PRÜFUNG** (ANNAHME ≤ 3 s).
 
-### 4.2 Koppeln (REQ-RF-05)
+### 4.2 Koppeln (REQ-RF-05) – v2 mit Commitment (Ä-1, VETO F-K1)
 
 Voraussetzung: Sensor im Kopplungsmodus (Taster ≥ 3 s, LED gelb 1 Hz), Advertising mit `PAIRING`.
 Die PWA zeigt nur Sensoren im Kopplungsmodus; der Nutzer wählt `fluidi-XXXX`.
@@ -172,11 +213,13 @@ sequenceDiagram
   participant S as Sensor
   U->>S: Taster >= 3 s (Kopplungsmodus, gelb 1 Hz)
   U->>G: PWA: fluidi-XXXX koppeln
-  G->>S: verbinden, PAIR_REQ {gateway_id, gw_pub, gw_nonce}
+  Note over G: gw_nonce zufaellig, C = SHA-256("fluidi-commit"|gateway_id|gw_pub|gw_nonce)
+  G->>S: verbinden, PAIR_REQ {gateway_id, gw_pub, C}
   S->>G: PAIR_RSP {sensor_addr, hw_rev, fw_ver, s_pub, s_nonce}
+  G->>S: PAIR_REVEAL {gw_nonce}
+  Note over S: prueft C (sonst Abbruch + Fehlversuch)
   Note over G,S: beide: Z = ECDH(P-256), K_link, K_conf = HKDF(...), SAS = 5 Farben
-  G->>S: PAIR_SHOW
-  S-->>U: LED zeigt Farbfolge (z. B. rot-gruen-gelb-gelb-rot)
+  S-->>U: LED zeigt Farbfolge
   G-->>U: PWA zeigt dieselbe Folge
   U->>S: kurzer Tastendruck = "Farben stimmen"
   S->>G: PAIR_CONFIRM_S {HMAC(K_conf, "S" | transcript)}
@@ -186,24 +229,33 @@ sequenceDiagram
   Note over G,S: beide speichern K_link erst jetzt; LED gruen 1 s
 ```
 
-Berechnungen (alle Seiten identisch):
-- `transcript = SHA-256(payload(PAIR_REQ) ‖ payload(PAIR_RSP))`
+Berechnungen (alle Seiten identisch; `payload()` = Nutzlast **ohne** `vt` und `pmsg`, `sensor_addr` LSB zuerst):
+- `C = SHA-256("fluidi-commit" ‖ gateway_id ‖ gw_pub ‖ gw_nonce)` (32 Byte, in PAIR_REQ).
+- `transcript = SHA-256(payload(PAIR_REQ) ‖ payload(PAIR_RSP) ‖ payload(PAIR_REVEAL))` (104 + 91 + 16 Byte).
 - `Z` = ECDH-P-256-Geheimnis (32 Byte, x-Koordinate), Schlüsselpaare **einmalig pro Kopplung** zufällig.
-- `K_link ‖ K_conf = HKDF-SHA-256(IKM = Z, salt = gw_nonce ‖ s_nonce, info = "fluidi-pair-v1" ‖ gateway_id ‖ sensor_addr, L = 32)`
+- `K_link ‖ K_conf = HKDF-SHA-256(IKM = Z, salt = gw_nonce ‖ s_nonce, info = "fluidi-pair-v2" ‖ gateway_id ‖ sensor_addr, L = 32)`
   → K_link = Byte 0–15 (AES-128), K_conf = Byte 16–31.
 - **SAS (Farbfolge):** `h = SHA-256("fluidi-sas" ‖ transcript)`; `n = (h[0] | h[1] << 8) mod 243`;
-  5 Ziffern zur Basis 3 (höchstwertige zuerst): 0 = **Rot**, 1 = **Grün**, 2 = **Gelb**. Blau wird nicht
-  verwendet (bei schwacher Zelle unsicher sichtbar, `phase3_rgb_antenne_elektronik.md` 1.4).
+  5 Ziffern zur Basis 3 (höchstwertige zuerst): 0 = **Rot**, 1 = **Grün**, 2 = **Gelb**.
 - `PAIR_CONFIRM_x.mac = HMAC-SHA-256(K_conf, "S" bzw. "G" ‖ transcript)`, erste 16 Byte.
+
+Warum das genügt: Das Gateway legt `gw_nonce` per Commitment fest, **bevor** es `s_nonce` sieht; der Sensor legt
+`s_nonce` fest, **bevor** `gw_nonce` offengelegt wird. Ein Mittelsmann muss auf beiden Seiten seine Nonce festlegen,
+bevor er die der Gegenseite kennt, und kann die Farbfolgen nicht mehr aufeinander abstimmen (Prinzip wie Bluetooth
+LE Secure Connections „Numeric Comparison“ bzw. ZRTP). Erfolgswahrscheinlichkeit je Versuch **1/243 ≈ 0.41 %**;
+Angriffstest mit dem Vorgehen des Sicherheits-Prüfers: **0.39 % in 10 000 Läufen**
+(`firmware/tools/test_pairing_mitm.py`, Teil von `make check`). Jeder gescheiterte Versuch ist für den Nutzer sichtbar
+(rote LED L7, PWA-Fehler) und das Kopplungsfenster ist auf 120 s begrenzt (Restrisiko F-L2, für Eigengebrauch akzeptiert).
 
 Regeln:
 - Sensor speichert `K_link` und `gateway_id` **erst**, wenn (a) sein eigener Tastendruck erfolgt ist **und**
   (b) ein gültiges `PAIR_CONFIRM_G` vorliegt. Gateway speichert erst nach PWA-Bestätigung **und**
   gültigem `PAIR_CONFIRM_S`. Ein bestehender Schlüssel wird dabei ersetzt (Neukopplung).
-- Abbruch: 60 s nach `PAIR_SHOW` ohne beide Bestätigungen, ungültiger MAC oder Trennung → beide verwerfen
-  alles, Sensor LED rot 3×, zurück in den vorherigen Zustand.
-- Restrisiko: Ein aktiver Angreifer im Funkbereich während des 2-min-Fensters bleibt mit
-  Wahrscheinlichkeit 1/243 unentdeckt, sofern der Nutzer die Farben vergleicht (**Sicherheits-Agent prüft**).
+- `PAIR_REVEAL` mit falschem `gw_nonce` (C passt nicht), ungültiger MAC, Fristablauf (Kap. 3) oder Trennung → beide
+  verwerfen alles, Sensor LED rot 3×, zurück in den vorherigen Zustand. Eine Commitment-Verletzung zählt als
+  kryptografischer Fehlversuch.
+- Das Gateway MUSS `gw_nonce` je Kopplung neu zufällig wählen und darf PAIR_REVEAL erst nach Empfang von PAIR_RSP senden.
+- Ohne funktionierenden Zufallsgenerator bricht der Sensor ab (F-W4).
 
 `gateway_id`: 8 zufällige Byte, vom Gateway beim ersten Start erzeugt, Teil des Backups (REQ-SYS-11).
 
@@ -223,27 +275,36 @@ sequenceDiagram
   end
 ```
 
-- `K_s = HKDF-SHA-256(IKM = K_link, salt = gw_nonce ‖ s_nonce, info = "fluidi-sess-v1", L = 16)`.
+- `K_s = HKDF-SHA-256(IKM = K_link, salt = gw_nonce ‖ s_nonce, info = "fluidi-sess-v2", L = 16)`.
 - `gw_nonce`, `s_nonce`: je 8 Byte aus dem Zufallsgenerator (Sensor: Hardware-RNG; Gateway: `esp_fill_random`).
 - Der Sensor führt **keinen** Befehl aus, bevor ein gültiger SECURE-Frame des Gateways angekommen ist.
+- Kann der Sensor kein `s_nonce` aus dem Hardware-RNG gewinnen, sendet er kein HELLO_RSP und trennt (F-W4).
 
 ### 4.4 SECURE-Frames (AES-128-CCM)
 
 - Schlüssel `K_s`, **MIC 8 Byte**, Nonce 13 Byte = `dir` (1) ‖ `ctr` (4, LE) ‖ `sensor_addr` (6) ‖ `00 00`
   mit `dir` = `0x00` Gateway→Sensor, `0x01` Sensor→Gateway.
 - `ctr` beginnt je Richtung und Sitzung bei 0 und steigt um 1 je Frame. Empfänger akzeptiert **nur
-  `ctr` = erwarteter Wert** (keine Lücken; BLE-Verbindungen sind verlustfrei und geordnet) → Replay
-  innerhalb der Sitzung unmöglich; Replay aus alten Sitzungen scheitert am frischen `K_s`.
+  `ctr` = erwarteter Wert** → Replay innerhalb der Sitzung unmöglich; Replay aus alten Sitzungen scheitert am
+  frischen `K_s`. **Ausnahme (Ä-6, W-2):** Hat das Gateway OTA_BEGIN erfolgreich gestellt, akzeptiert der Sensor
+  Gateway→Sensor-Frames mit `erwartet ≤ ctr ≤ erwartet + 64`, aber **nur wenn die Nachricht OTA_DATA ist**
+  (verlorene Write-Without-Response); danach gilt `erwartet = ctr + 1` (streng monoton, keine Nonce doppelt).
+  Fehlende Daten holt Go-back-N über `offset` (Kap. 9.3) nach.
 - Assoziierte Daten (AAD) = die ersten 5 Byte des Frames (Kopf + `ctr`).
 - Ein ungültiger MIC beendet die Sitzung sofort (Sensor trennt) und zählt als Fehlversuch (Kap. 4.5).
 
 ### 4.5 Schutz gegen Batterie-Entleerung durch Fremde
 
-Ein Angreifer kann Verbindungen aufbauen, aber keine gültigen Frames senden. Sensor-Regeln:
-0.5 s Frist für HELLO, sofortige Trennung bei Fehlern; **nach 3 fehlgeschlagenen Handshakes in Folge**
-30 min nur nicht verbindbares Advertising (`LOCKED`), Fehlercode `0x0B` im Fehlerprotokoll. Ein
-Fehlversuch kostet ≈ 0.25 mC (0.5 s bei 7.5-ms-Verbindungsintervall, ≈ 3.5 µC je Verbindungsereignis,
-**ANNAHME**) → dauerhaft angegriffen höchstens 6 Versuche/h ≈ 36 mC/Tag ≈ 0.4 µA (pess. ≈ 1 µA).
+Ein Angreifer kann Verbindungen aufbauen, aber keine gültigen Frames senden. Sensor-Regeln (v2, Ä-4):
+- **Kryptografische Fehlversuche** (falsche `gateway_id` → NOT_PAIRED, ungültiger MIC/HMAC, falscher Zähler vor der
+  ersten gültigen Nachricht, Commitment-Verletzung): **3 in Folge** → 30 min nur nicht verbindbares Advertising
+  (`LOCKED`), Fehlercode `0x0B` im Fehlerprotokoll.
+- **Fristüberschreitungen** (kein HELLO, Kap. 3) zählen **nicht** als Fehlversuch, damit ein langsames Gateway sich
+  nicht selbst aussperrt (K-1); **10 in Folge** → ebenfalls 30 min `LOCKED` (Energieschutz). Ein gültiger
+  SECURE-Frame setzt beide Zähler zurück.
+- Energie bei Dauerangriff: ≤ 10 Verbindungen à ≤ 5 s je 30 min. Mit ≈ 3.5 µC je Verbindungsereignis bei 7.5–15 ms
+  (**ANNAHME**) ≈ 1.2–2.3 mC je Versuch → ≤ 46 mC/h ≈ 13 µA im Angriffsfall (vorher 0.4 µA). Das ist der Preis für
+  K-1; ein dauernder Angriff ist in der PWA als `LOCKED`/Fehlversuche sichtbar. **PROTOTYP-PRÜFUNG** (Energiemessplan E10).
 Restrisiko: Während der Sperre ist der Sensor auch für das echte Gateway nicht erreichbar (die Daten
 bleiben gepuffert); die PWA zeigt `LOCKED` als Störung an.
 
@@ -293,9 +354,9 @@ Unmittelbar danach (nächste Notification) folgt SECURE#0 mit `SESSION_INFO`.
 
 | `pmsg` | Name | Richtung | Nutzlast | Länge |
 |---|---|---|---|---|
-| `0x01` | PAIR_REQ | G→S | `gateway_id`[8] · `gw_pub`[64] (X‖Y, big-endian wie SEC1 ohne 0x04) · `gw_nonce`[16] | 88 |
-| `0x02` | PAIR_RSP | S→G | `sensor_addr`[6] · `hw_rev` u8 · `fw_ver`[4] · `s_pub`[64] · `s_nonce`[16] | 91 |
-| `0x03` | PAIR_SHOW | G→S | – | 0 |
+| `0x01` | PAIR_REQ | G→S | `gateway_id`[8] · `gw_pub`[64] (X‖Y, big-endian wie SEC1 ohne 0x04) · `commit`[32] | 104 |
+| `0x02` | PAIR_RSP | S→G | `sensor_addr`[6] (LSB zuerst) · `hw_rev` u8 · `fw_ver`[4] · `s_pub`[64] · `s_nonce`[16] | 91 |
+| `0x03` | PAIR_REVEAL | G→S | `gw_nonce`[16] (erst nach PAIR_RSP; Sensor prüft `commit`, zeigt danach die Farbfolge) | 16 |
 | `0x04` | PAIR_CONFIRM_S | S→G | `mac`[16] | 16 |
 | `0x05` | PAIR_CONFIRM_G | G→S | `mac`[16] | 16 |
 | `0x06` | PAIR_DONE | S→G | `status` u8 (Fehlercode, 0 = ok) | 1 |
@@ -328,7 +389,7 @@ tragen das `rid` der auslösenden Anfrage.
 | `0x11` | TIME_SET | G→S | `unix_ms` u64 · `tz_min` i16 (Versatz Lokalzeit zu UTC in min, inkl. Sommerzeit) | `0x91` · `status` u8 |
 | `0x12` | READ_RECORDS | G→S | `from_seq` u32 · `max` u16 (0 = alle) | 0…n × `0x92` RECORDS (5.6), zuletzt mit `more=0` |
 | `0x13` | ACK_RECORDS | G→S | `upto_seq` u32 (alle ≤ diesem Wert sind gespeichert) | `0x93` · `status` u8 · `oldest_unacked` u32 |
-| `0x14` | MEASURE | G→S | `purpose` u8 (0 normal, 1 Kalibrierung trocken, 2 Kalibrierung nass, 3 Diagnose) · `led` u8 (0 aus, 1 Quittung grün) | `0x94` · `status` u8 · Datensatz [20] (5.6) |
+| `0x14` | MEASURE | G→S | `purpose` u8 (0 normal, 1 Kalibrierung trocken, 2 Kalibrierung nass, 3 Diagnose) · `led` u8 (0 aus, 1 Quittung grün) | `0x94` · `status` u8 · `seq` u32 (Nummer des kommenden Datensatzes). **v2 (Ä-8):** Der Sensor misst erst **nach dem Trennen** (kein Funk während der Mess-Bursts, PINMAP FW-2), dann schnelles Advertising 2 s mit `DATA_PENDING`; das Gateway trennt nach der Antwort und liest `seq` in der nächsten Sitzung (Latenz ≈ 0.3 s + Wiederverbinden). Kalibrierung: Gateway sendet `samples` × MEASURE und mittelt robust (S-7) |
 | `0x15` | GET_SETTINGS | G→S | – | `0x95` · `settings_ver` u16 · TLV-Liste (Kap. 8) |
 | `0x16` | SET_SETTINGS | G→S | `settings_ver` u16 (neu) · TLV-Liste | `0x96` · `status` u8 · `bad_tlv_id` u8 (0 = alle ok) |
 | `0x17` | IDENTIFY | G→S | `seconds` u8 (1–30) | `0x97` · `status` |
@@ -367,9 +428,11 @@ tragen das `rid` der auslösenden Anfrage.
 | 41 | 1 | `rec_fmt` | Datensatzformat (1) |
 | 42 | 2 | `log_capacity` | Ringspeicher-Kapazität in Datensätzen |
 | 44 | 4 | `lost_records` | Zähler überschriebener, nie quittierter Datensätze |
+| 48 | 4 | `sec_cnt` | **v2 (Ä-9):** MCUboot-Sicherheitszähler des laufenden Images |
 
-Ab Offset 48 SOLL INFO (nur `0x90`) zusätzlich liefern: `meas_count` u32, `adv_count` u32, `conn_count` u32,
-`led_ms` u32 (Grundlage für die Ladungsschätzung im Gateway).
+SESSION_INFO = 52 Byte. INFO (`0x90`) liefert ab Offset **52** zusätzlich: `meas_count` u32, `adv_count` u32,
+`conn_count` u32, `led_ms` u32 (68 Byte). `charge_uc` ist nichtflüchtig und wird nur bei Power-on (Zellwechsel)
+genullt, nicht bei Watchdog/Brownout (S-5).
 
 ### 5.6 Datensatz (Messwert) und RECORDS
 
@@ -428,6 +491,10 @@ sequenceDiagram
 
 ### 6.2 Regeln
 
+0. **v2 (Ä-12):** Kopplung ändert den Ring nicht: Datensätze von vor der Kopplung werden an das (neue) Gateway
+   geliefert; das Gateway ordnet sie anhand der Zeit zu oder verwirft sie (W-4). Datensätze aus MEASURE werden wie
+   alle anderen quittiert (S-2). Das Gateway SOLL `READ_RECORDS.max` ≤ 110 wählen und je Block quittieren (W-9).
+
 1. Jede Messung (automatisch, Taster, Gateway, Kalibrierung) erzeugt **einen** Datensatz mit neuer `seq`
    und wird **vor** dem Senden nichtflüchtig gespeichert.
 2. Das Gateway quittiert mit `ACK_RECORDS` **erst nach** dauerhaftem Speichern in seiner Datenbank.
@@ -443,14 +510,15 @@ sequenceDiagram
 ### 6.3 Kapazität
 
 Ringspeicher **24 kB = 12 Sektoren à 2 kB** (Sektorgrösse `TI_CC2340R5_Datasheet_SWRS272F.pdf` S. 20,
-Tab. 7.11), ein Sektor bleibt zum Löschen frei → 11 × 102 = **1122 Datensätze** (Kopf 8 Byte je Sektor,
-ANNAHME interne Ablage mit CRC).
+Tab. 7.11); Eintrag 24 Byte (Datensatz + CRC16), 84 je Sektor, ein Sektor stets frei → **garantiert 840**
+Datensätze (bis 924), gemeldet als `log_capacity`. Tabelle unten mit 840 nachgerechnet.
 
 | Messungen/Tag | Pufferdauer | REQ-LOG-01 (60 Tage bei 6/Tag) |
 |---|---|---|
-| 6 (Werk) + 2 manuell | **140 Tage** | ✔ |
-| 18 | 62 Tage | ✔ |
-| 96 (Maximum REQ-SYS-04) | 11.7 Tage | nicht verlangt; PWA warnt bei > 18/Tag |
+| 6 (Werk) + 2 manuell | **105 Tage** | ✔ |
+| 14 | 60 Tage | ✔ (Grenze) |
+| 18 | 46 Tage | nicht verlangt; PWA warnt bei > 14/Tag |
+| 96 (Maximum REQ-SYS-04) | 8.7 Tage | nicht verlangt |
 
 Flash-Verschleiss: bei 96/Tag wird jeder Sektor alle ≈ 12 Tage gelöscht → ≈ 30 Löschungen/Jahr
 ≪ 60 000 Zyklen je Sektor (DS S. 20, Tab. 7.11). Maximal 83 Schreibvorgänge je Zeile vor dem Löschen
@@ -468,7 +536,8 @@ belegt mit 2 × 0x3D000 den ganzen Flash; für Einstellungen und Ringspeicher we
 | MCUboot | 0x00000 | 0x06000 (24 kB) | Bootloader; letzter Sektor 0x05800 = Sicherheitszähler (BIMINFO, Kap. 9.6) |
 | Slot primär | 0x06000 | 0x39000 (228 kB) | laufende Anwendung (Swap-using-Move: 1 Sektor grösser als sekundär) |
 | Slot sekundär | 0x3F000 | 0x38800 (226 kB) | Update-Ziel |
-| Einstellungen/Schlüssel | 0x77800 | 0x02000 (8 kB) | doppelt gepuffert (NVS) |
+| BLE-Stack-NV | 0x77800 | 0x01000 (4 kB) | nvocmp (Stack-intern, kein Bonding) |
+| fluidi-NV: Einstellungen/Schlüssel/Zähler | 0x78800 | 0x01000 (4 kB) | A/B, stromausfallsicher (`fl_nvstore`) |
 | Ringspeicher | 0x79800 | 0x06000 (24 kB) | Datensätze, `seq`/`boot_id`-Zähler, Fehlerprotokoll |
 | Reserve | 0x7F800 | 0x00800 | – |
 
@@ -497,9 +566,9 @@ läuft im Standby, DS S. 1). Das Gateway ordnet zu.
      markieren (obere Grenze = Start der nächsten `boot_id`, falls bekannt).
 3. Synchronpunkte nur mit gültiger Gateway-Zeit (`gw_time_valid`, REQ-GW-09); sonst wird der Punkt
    gespeichert, aber erst nach Zeitabgleich des Gateways verwendet.
-4. **TIME_SET** dient nur der LED-Logik im Sensor (Tagesfenster „Giessen nötig“, Messzeitpunkte an der
+4. **TIME_SET** dient nur der LED-Logik im Sensor (Tagesfenster und Wochentage „Giessen nötig“, Messzeitpunkte an der
    Tageszeit ausrichten). Gateway sendet TIME_SET bei Sitzungen, wenn die letzte > 6 h zurückliegt,
-   und nach jedem Neustart des Sensors (`reset_reason`).
+   nach jedem Neustart des Sensors (`reset_reason`) und wenn sich `tz_min` ändert (Sommer-/Winterzeit, S-4).
 5. Genauigkeit: Quarz-Budget 48 ppm bei 5–45 °C (CONCEPTS 1) → 60 Tage ohne Gateway ≤ 4.2 min,
    14 Tage ≤ 1.0 min (Grenzen ±5 / ±2 min); mit Interpolation in der Praxis besser. **PROTOTYP-PRÜFUNG.**
 
@@ -512,6 +581,8 @@ nicht alle Sensoren gleichzeitig funken. Ohne Zeit: ab Start im Intervall.
 ## 8 Einstellungen (SET_SETTINGS / GET_SETTINGS)
 
 TLV: `id` u8 · `len` u8 · Wert. Unbekannte `id` → `bad_tlv_id`, nichts wird übernommen (atomar).
+Nicht enthaltene `id` behalten ihren Wert (S-3). **Vergleichsrichtungen (W-5):** die Kapazität steigt mit der
+Feuchte → „Giessen nötig“ bei `c_probe < water_raw`, `air` bei `c_probe < air_raw`, `flooded` bei `c_probe > flood_raw`.
 `settings_ver` setzt das Gateway (steigt bei jeder Änderung); der Sensor meldet sie in SESSION_INFO.
 
 | id | Name | Typ | Bereich | Werk | Anforderung |
@@ -529,7 +600,17 @@ TLV: `id` u8 · `len` u8 · Wert. Unbekannte `id` → `bad_tlv_id`, nichts wird 
 | 0x0B | `air_raw` / `flood_raw` | u16 + u16 | 0.01 pF; 0 = aus | 0 / 0 | REQ-MES-12 |
 | 0x0C | `batt_low_flag` | u8 | 1 = Gateway meldet Restlaufzeit < 30 Tage → LED-Muster | 0 | REQ-ENE-05 |
 | 0x0D | `ota_min_mv` | u16 | 2500–3000 | **2700** | REQ-FW-02 (Kap. 9.2) |
-| 0x0E | `diag_f2` | u8 | 0 aus / n = jede n-te Messung mit f2 | 6 | REQ-MES-11 (Salzerkennung) |
+| 0x0E | `diag_f2` | u8 | 0 aus / n = jede n-te Messung mit f2 (Rev B: ohne Wirkung) | 6 | REQ-MES-11 (Salzerkennung) |
+| 0x0F | `led_weekdays` | u8 | Bit 0 = Montag … Bit 6 = Sonntag (Lokalzeit) | 0x7F | W-7 |
+| 0x10 | `cref_eff` | u16 | 0.01 pF, 500–5000 (Werkskalibrierung) | 1729 | D-018, PINMAP FW-3 |
+| 0x11 | `cpar` | u16 | 0.01 pF, 0–5000 | 1521 | dto. |
+| 0x12 | `td0_ps` | u16 | ps, 0–30000 | 0 | dto. |
+| 0x13 | `td_kv` | i16 | ps/V | 0 | dto. |
+| 0x14 | `td_kt` | i16 | ps/K | 0 | dto. |
+| 0x15 | `c_kv` | i16 | 0.01 pF/V: C += c_kv·(3.0 V − VDD) | 533 | FW-3 (SPICE −3.2 pF bei 2.4 V) |
+| 0x16 | `c_kt` | i16 | 0.001 pF/K | 0 | FW-3 |
+
+TLV 0x10–0x16 bleiben bei Werkseinstellung und UNPAIR erhalten (Werkskalibrierung, `simulation/spice/osc/osc_report.txt`).
 
 Ohne `batt_low_flag` zeigt der Sensor „Batterie tief“ selbst, wenn `vbat_load` dreimal in Folge
 < **2.55 V** war (Rückfall ohne Gateway; Schwelle **ANNAHME**, Kennlinie PROTOTYP-PRÜFUNG).
@@ -547,7 +628,7 @@ Ohne `batt_low_flag` zeigt der Sensor „Batterie tief“ selbst, wenn `vbat_loa
 | Signatur | **ECDSA P-256** (MCUboot-TI-Port, Schlüsselvorlage `root-ec-p256.pem` im SDK; Prüfung in Software) | REQ-FW-04 |
 | Signieren | `imgtool sign` (imgtool 2.2.0rc1 aus dem SDK) **nur auf dem Entwickler-PC**, Schlüssel offline (nicht im Repo, nicht auf dem Gateway) | REQ-FW-04 |
 | Anti-Rollback | MCUboot-Sicherheitszähler (`antiRollbackProtection`, für CC23X0 wählbar), TI-Port speichert ihn im letzten MCUboot-Sektor (`boot/ti/source/mcuboot_app/security_cnt.c`, BIMINFO); `imgtool sign --security-counter N` | löst OP-K8 teilweise; Zusammenspiel mit Swap/Rückfall = **PROTOTYP-PRÜFUNG** |
-| Dateiformat am Gateway | signiertes MCUboot-Image `fluidi-sensor-<major>.<minor>.<patch>+<build>.bin` (Kopf mit Version, TLV mit SHA-256 und Signatur). Das Gateway liest Version und Sicherheitszähler aus Kopf/TLV und **prüft die Signatur mit dem öffentlichen Schlüssel**, bevor es verteilt | `research_gateway.md` 3.2 |
+| Dateiformat am Gateway | signiertes MCUboot-Image `fluidi-sensor-<major>.<minor>.<patch>+<build>.bin` (Kopf mit Version, geschützte TLVs **0x50 Sicherheitszähler** und **0xA0 `hw_rev` u8** (v2, Ä-10), TLV mit SHA-256 und Signatur). Das Gateway liest Version, Zähler und `hw_rev` und **prüft die Signatur mit dem öffentlichen Schlüssel**, bevor es verteilt (Vorlage `firmware/sensor/tools/verify_image.py`) | `research_gateway.md` 3.2 |
 
 ### 9.2 Voraussetzungen (prüft der Sensor bei OTA_BEGIN)
 
@@ -582,7 +663,10 @@ sequenceDiagram
 ```
 
 **OTA_BEGIN** (`0x20`): `size` u32 · `version` [4] (wie `fw_ver`) · `build` u32 · `sec_cnt` u32 ·
-`sha256` [32] (über das ganze signierte Image).
+`sha256` [32] = SHA-256 der **ganzen Datei** (nicht der MCUboot-Hash, S-1).
+**Nach OTA_END (v2, Ä-10, F-L1):** Der Sensor liest Kopf und geschützte TLVs aus Slot 1 und lehnt ab, wenn
+Version ≤ laufend oder Sicherheitszähler < laufend (`0x45`) oder `hw_rev` fehlt/≠ eigene (`0x4A`); Slot 1 wird dann
+ungültig gemacht.
 **OTA_BEGIN_RSP** (`0xA0`): `status` u8 · `resume_offset` u32 (0 = neu; > 0 = Fortsetzung, wenn `sha256`
 gleich einem angefangenen Update der letzten 24 h) · `window` u8 (Anzahl OTA_DATA bis zur nächsten
 Fortschrittsmeldung, Werk 16) · `chunk_max` u8 (max. Datenbyte je OTA_DATA).
@@ -726,6 +810,7 @@ MCUboot (CONCEPTS 2.8); dann hat der Taster beim Start keine Sonderfunktion.
 | 0x47 | OTA_ABORTED | abgebrochen (Befehl, Trennung > 24 h, neue Kopplung) | `ota_result` |
 | 0x48 | OTA_NOT_STARTED | OTA_DATA/END ohne OTA_BEGIN | ERR_RSP |
 | 0x49 | OTA_REVERTED | neues Image nicht bestätigt, Rückfall auf altes | `ota_result` |
+| 0x4A | OTA_HW_MISMATCH | TLV 0xA0 `hw_rev` fehlt oder passt nicht (v2) | OTA_END_RSP, `ota_result` |
 | 0x50 | WDT_RESET | Watchdog-Neustart (REQ-FW-07) | `reset_reason`, Fehlerprotokoll |
 | 0x51 | BROWNOUT | Brownout-Neustart | dto. |
 | 0x52 | HARDFAULT | Absturz; `detail` = Kennung der Stelle | dto. |
@@ -756,7 +841,7 @@ Funktionen `adv_event_charge`, `conn_charge`, `ota_charge`; CC2340R5-Parameter a
 | Koppeln (einmalig): Advertising 500 ms × 120 s, ECDH, LED L4/L5 | ≈ 0.03 mAh | ≈ 0.05 mAh | – | **ANNAHME** ECDH ≤ 3 s × 2.6 mA |
 | Zeitsynchronisierung | in Datensitzung enthalten (+1 Verbindungsereignis) | | | – |
 | OTA 200 kB (einmal pro Jahr) | 0.056 mAh | 0.060 mAh | – | `ota_charge`; ≈ 0.03 % von 225 mAh (REQ-FW-05 ≤ 2 %) |
-| Fehlversuch eines Fremden (Verbindung, 0.5 s Frist) | ≈ 0.25 mC | ≈ 0.6 mC | nur bei Angriff: max. 6/h durch Sperre → ≤ 36 mC/Tag (0.4 µA) | Kap. 4.5; **ANNAHME** 3.5 µC je Verbindungsereignis |
+| Fehlversuch eines Fremden (Verbindung, ≤ 5 s Frist, v2) | ≈ 1.2 mC | ≈ 2.3 mC | nur bei Angriff: ≤ 20 Versuche/h durch die beiden Sperren → ≤ 46 mC/h (≈ 13 µA) | Kap. 4.5; **ANNAHME** 3.5 µC je Verbindungsereignis |
 
 Summe Funk + Messung + LED im Standardprofil (real/pess, ohne Schlaf): ≈ 55 / 150 mC/Tag
 ≈ **0.6 / 1.7 µA** Mittel. Schlaf und Leckströme dominieren (Modell). **PROTOTYP-PRÜFUNG:** Ladung je
@@ -769,19 +854,22 @@ Ereignis mit Shunt/Power-Profiler messen (Energiemessplan folgt), Modellwerte `T
 
 | Gegenstand | Version | Ort | Regel |
 |---|---|---|---|
-| Protokoll / Frames | 1 | `vt` Bit 7–4, HELLO `proto_max` | inkompatible Änderung → neue Version; Sensor unterstützt mindestens die aktuelle und die vorherige |
+| Protokoll / Frames | **2** | `vt` Bit 7–4, HELLO `proto_max` | inkompatible Änderung → neue Version; Sensor unterstützt mindestens die aktuelle und die vorherige **ausgelieferte** (v1 wurde nie ausgeliefert, Sensor-Firmware 0.1 spricht nur v2) |
 | Advertising-Format | 1 | MSD `adv_fmt` | – |
-| SESSION_INFO | 1 | `info_fmt` | neue Felder nur anhängen |
+| SESSION_INFO | 1 | `info_fmt` | neue Felder nur anhängen (v2: `sec_cnt` angehängt, INFO-Erweiterung verschoben) |
 | Datensatz | 1 | INFO `rec_fmt` | geändertes Layout → neue Nummer; Gateway speichert `rec_fmt` je Datensatz |
 | Einstellungen | – | TLV-`id` | neue `id` statt Bedeutungsänderung |
 | Firmware | `major.minor.patch+build` | MCUboot-Kopf, SESSION_INFO | Sicherheitszähler separat |
-| Export (CSV, REQ-SYS-09) | 1 | erste Zeile `# fluidi-export v1` | Spalten (Gateway): `sensor_id, plant, seq, time_utc, time_quality, moisture_pct, c_probe_pf, temp_c, vbat_v, cause, flags` – Festlegung durch Software-Agent |
+| Export (CSV, REQ-SYS-09) | – | – | Festlegung durch Software-Agent: `docs/interfaces/GATEWAY_API.md` Kap. 9 (S-6) |
 
 ---
 
 ## 14 Testvektoren und Prüfung (für beide Seiten)
 
-- Python-Referenz (`firmware/tools/fluidi_proto.py`, vorhanden seit Welle 2): erzeugt und prüft alle Frames, HKDF/CCM-
+- Angriffstest Kopplung (`firmware/tools/test_pairing_mitm.py`): MITM nach dem Vorgehen des Sicherheits-Prüfers,
+  v1 ohne Commitment ≥ 99 % erfolgreich (Gegenprobe), v2 ≤ 1 % in 10 000 Läufen (gemessen 0.39 %).
+- Testvektoren v2 (Commitment, Transkript, K_link/K_conf, SAS, MACs, K_s, SECURE-Frame): `firmware/sensor/tests/gen_vectors.py`.
+- Python-Referenz (`firmware/tools/fluidi_proto.py`, Protokoll v2): erzeugt und prüft alle Frames, HKDF/CCM-
   Testvektoren (RFC 5869 Testfall 1 für HKDF-SHA-256, RFC 3610 Paket 1 bzw. NIST SP 800-38C für CCM),
   SAS-Berechnung. Beide Firmwares MÜSSEN diese Vektoren in Unit-Tests bestehen.
 - Interop-Test: Sensor-Muster ↔ Gateway: Koppeln, 1000 Sitzungen, Trennung in jeder Phase (Duplikat-/
@@ -826,19 +914,7 @@ Ereignis mit Shunt/Power-Profiler messen (Energiemessplan folgt), Modellwerte `T
 | FW-P7 | Company-ID 0xFFFF: Zulässigkeit für Eigengebrauch bestätigen | Sicherheit/Orchestrator |
 | FW-P8 | P_MISS aus Koexistenztest (OP-K12) → `adv_interval`-Werkseinstellung | Software, Prototyp |
 
-## 17 Präzisierungen aus der Implementierung (Firmware Welle 2, 2026-11-07 – zur Prüfung durch Software- und Sicherheits-Agent)
+## 17 Präzisierungen aus der Implementierung
 
-Kompatible Ergänzungen bzw. Festlegungen bisher offener Details; die Protokollversion bleibt 1.
-Umsetzung: `firmware/sensor/` (Kern `core/`, Host-Tests gegen `firmware/tools/fluidi_proto.py`).
-
-| Nr | Punkt | Festlegung |
-|---|---|---|
-| P-1 | Byte-Reihenfolge `sensor_addr` (PAIR_RSP, HKDF-info, CCM-Nonce) | **LSB zuerst** wie im BLE-Link-Layer (TI-Stack, NimBLE, BlueZ-Rohdaten): 80:6F:B0:12:AB:CD → `CD AB 12 B0 6F 80` |
-| P-2 | Werkskalibrierung Messkette (Rev B, D-018, PINMAP FW-3) | neue TLV-ids in SET/GET_SETTINGS: `0x10 cref_eff` u16 0.01 pF (Start 1729), `0x11 cpar` u16 0.01 pF (1521), `0x12 td0_ps` u16 (0), `0x13 td_kv` i16 ps/V (0), `0x14 td_kt` i16 ps/K (0), `0x15 c_kv` i16 0.01 pF/V (533 = 5.33 pF/V), `0x16 c_kt` i16 0.001 pF/K (0). Bleiben bei Werkseinstellung/UNPAIR erhalten. Startwerte: `simulation/spice/osc/osc_report.txt` |
-| P-3 | `c_diag` (Rev B) | immer `0xFFFF` (Cref2 entfällt, PINMAP Rev B); `diag_f2` wird ignoriert |
-| P-4 | Ringspeicher (6.3) | interne Ablage 24 Byte/Eintrag (Datensatz + CRC16), ein Sektor stets frei: `log_capacity` = **840** (garantiert, bis 924) |
-| P-5 | Flash-Aufteilung (6.4) | 0x77800 BLE-Stack-NV 4 kB, 0x78800 fluidi-NV 4 kB (statt 8 kB gemeinsam); übrige Bereiche unverändert |
-| P-6 | `ERROR` bei falscher Frame-Version | 3 Byte `vt=0x1F · 0x08 · 1` (detail = unterstützte Version), danach Trennen |
-| P-7 | Nach `PAIR_DONE` | Verbindung bleibt offen, bis das Gateway trennt (3 s ohne Frame → Sensor trennt); `HELLO` ist in dieser Verbindung erlaubt |
-| P-8 | `MEASURE.led = 1` | Quittung Grün 1 × 30 ms (L2-Muster) **nach** dem Trennen (keine LED während Funk) |
-| P-9 | Images prüfen | `firmware/sensor/tools/verify_image.py` (Kopf, SHA-256-TLV, ECDSA-P256, Sicherheitszähler) – Vorlage für das Gateway; imgtool 2.2.0rc1 `verify` ist defekt |
+Alle Punkte aus der Fassung 0.1 Kap. 17 (P-1…P-9) sind in Kap. 0 (Ä-7, Ä-11, Ä-13) und in die betroffenen Kapitel
+übernommen. Antworten auf die Prüfbefunde: `docs/reviews/phase4_firmware_response.md`.

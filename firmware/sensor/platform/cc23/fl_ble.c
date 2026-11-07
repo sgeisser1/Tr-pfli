@@ -51,6 +51,8 @@ static void rx_in_ctx(char *p)
     fl_platform_reschedule();
 }
 
+static void cccd_in_ctx(char *p) { (void)p; fl_app_on_notify_enabled(); fl_platform_reschedule(); }
+
 static bStatus_t fl_read_cb(uint16_t conn, gattAttribute_t *a, uint8_t *v, uint16_t *len, uint16_t off, uint16_t max,
                             uint8_t method)
 {
@@ -61,8 +63,12 @@ static bStatus_t fl_read_cb(uint16_t conn, gattAttribute_t *a, uint8_t *v, uint1
 
 static bStatus_t fl_write_cb(uint16_t conn, gattAttribute_t *a, uint8_t *v, uint16_t len, uint16_t off, uint8_t method)
 {
-    if (a->type.len == ATT_BT_UUID_SIZE && BUILD_UINT16(a->type.uuid[0], a->type.uuid[1]) == GATT_CLIENT_CHAR_CFG_UUID)
-        return GATTServApp_ProcessCCCWriteReq(conn, a, v, len, off, GATT_CLIENT_CFG_NOTIFY);
+    if (a->type.len == ATT_BT_UUID_SIZE && BUILD_UINT16(a->type.uuid[0], a->type.uuid[1]) == GATT_CLIENT_CHAR_CFG_UUID) {
+        bStatus_t st = GATTServApp_ProcessCCCWriteReq(conn, a, v, len, off, GATT_CLIENT_CFG_NOTIFY);
+        if (st == SUCCESS && len >= 1 && (v[0] & GATT_CLIENT_CFG_NOTIFY))
+            BLEAppUtil_invokeFunction(cccd_in_ctx, NULL);      /* K-1: HELLO-Frist ab CCCD-Write */
+        return st;
+    }
     if (a->type.len == ATT_UUID_SIZE && memcmp(a->type.uuid, flRxUUID, ATT_UUID_SIZE) == 0) {
         if (off != 0) return ATT_ERR_ATTR_NOT_LONG;
         if (len == 0 || len > 247) return ATT_ERR_INVALID_VALUE_SIZE;
@@ -166,6 +172,11 @@ static void conn_evt(uint32 event, BLEAppUtil_msgHdr_t *p)
         gapEstLinkReqEvent_t *e = (gapEstLinkReqEvent_t *)p;
         if (e->hdr.status == SUCCESS) {
             s_conn = e->connectionHandle; s_mtu = 23; s_adv_on = false;
+            /* W-1: Sensor fordert selbst kurze Verbindungsintervalle an (BlueZ setzt sie nicht vom Gateway aus):
+             * 7.5-15 ms, Latenz 0, Supervision 2 s. Annahme durch BlueZ = PROTOTYP-PRUEFUNG. */
+            gapUpdateLinkParamReq_t u = {.connectionHandle = s_conn, .intervalMin = 6, .intervalMax = 12,
+                                         .connLatency = 0, .connTimeout = 200};
+            GAP_UpdateLinkParamReq(&u);
             fl_platform_conn_vbat_reset();
             fl_app_on_connect();
         }

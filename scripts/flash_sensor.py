@@ -13,9 +13,16 @@ Protokoll nach docs/datasheets/TI_CC23xx_TechnicalReferenceManual_SWCU193A.pdf K
 Sicherheit (CONCEPTS 2.7, Auflagen R2-A1..A4): nur mit Dummy-Zellen-Adapter (keine Zelle im Halter), UART-Pegel
 1.8-2.0 V (PINMAP Rev B, DIO20), 2 x 100 kOhm je Pad -> hoechstens 57600 Baud (Werkzeug erzwingt das).
 
-Serie (--lock): schreibt die CCFG mit gesperrtem Bootloader (pBldrVtor = FORBID, bldrEnabled = 0) und gesperrtem
-SWD (allowDebugPort = FORBID, debugCfg.authorization = FORBID), CRCs neu berechnet (TRM Tab. 8-35, S. 460;
-hw_ccfg.h im SDK). Danach ist eine Neuprogrammierung ueber die Pads NICHT mehr moeglich (nur OTA). PROTOTYP-PRUEFUNG.
+Serie (--lock, Befunde F-W1/F-W2 Sicherheitspruefung): nur zusammen mit --expect-key-fp <Fingerabdruck des
+PRODUKTIONS-Signierschluessels>; das Werkzeug liest den in MCUboot eingebauten oeffentlichen Schluessel aus dem Hex,
+vergleicht den Fingerabdruck und lehnt den DEV-Schluessel ab. Serien-CCFG:
+  - pBldrVtor = FORBID, bldrEnabled = 0 (TRM Tab. 8-35, S. 460)
+  - allowDebugPort, allowFlashProgram, allowToolsClientMode, allowReturnToFactory = FORBID; debugCfg.authorization
+    und allowBldr = FORBID (TRM 8.1.8/8.2.2; hw_ccfg.h). allowChipErase bleibt (loescht auch die Schluessel).
+  - Schreib-/Loeschschutz (WEPRA, sticky-0): Sektoren 0-10 = MCUboot-Code; Sektor 11 (0x5800, BIMINFO/
+    Sicherheitszaehler) bleibt beschreibbar; CCFG-Sektor geschuetzt.
+CRCs werden neu berechnet. Danach ist eine Neuprogrammierung ueber die Pads NICHT mehr moeglich (nur OTA).
+Wirksamkeit am Muster: PROTOTYP-PRUEFUNG PP-9.
 
 Ohne Hardware: --sim (simuliertes Geraet, gleicher Bytestrom) bzw. --dry-run (nur Plan ausgeben).
 Unit-Tests: scripts/test_flash_sensor.py.
@@ -23,6 +30,8 @@ Unit-Tests: scripts/test_flash_sensor.py.
 from __future__ import annotations
 
 import argparse
+import hashlib
+import os
 import struct
 import sys
 import time
@@ -41,6 +50,9 @@ CHUNK = 248
 # CCFG-Offsets (SDK source/ti/devices/cc23x0r5/inc/hw_ccfg.h)
 CCFG_PBLDR, CCFG_BLDRPARAM, CCFG_BOOT_CRC = 0x000, 0x004, 0x00C
 CCFG_PERM, CCFG_MAIN_CRC = 0x018, 0x74C
+CCFG_WEPRA, CCFG_WEPRB, CCFG_WEPRAUX = 0x020, 0x024, 0x028
+MCUBOOT_CODE_SECTORS = 11            # 0x0000-0x57FF; Sektor 11 = BIMINFO bleibt frei (security_cnt.c)
+PERM_FORBID_MASK = 0xF00F0F0F        # allowDebugPort 31:28, allowFlashProgram 19:16, ToolsClient 11:8, RTF 3:0
 CCFG_DBG, CCFG_DBG_CRC = 0x7D0, 0x7FC
 CRC_RANGES = [(0x000, 0x00C, CCFG_BOOT_CRC), (0x010, 0x74C, CCFG_MAIN_CRC), (0x7D0, 0x7FC, CCFG_DBG_CRC)]
 PBLDR_FORBID = 0xFFFFFFFC
@@ -181,13 +193,17 @@ def ccfg_fix_crcs(c: bytearray):
 
 
 def ccfg_lock(c: bytearray) -> bytearray:
-    """Serie: ROM-Bootloader und SWD sperren (TRM Tab. 8-35; hw_ccfg.h)."""
+    """Serie: ROM-Bootloader, SWD/SACI-Programmierung sperren, MCUboot-Sektoren schreibschuetzen (siehe Kopf)."""
     c = bytearray(c)
     struct.pack_into("<I", c, CCFG_PBLDR, PBLDR_FORBID)
     p = struct.unpack_from("<I", c, CCFG_BLDRPARAM)[0] & ~0x1            # bldrEnabled = 0
     struct.pack_into("<I", c, CCFG_BLDRPARAM, p)
-    perm = struct.unpack_from("<I", c, CCFG_PERM)[0] & 0x0FFFFFFF        # allowDebugPort (31:28) = FORBID
+    perm = struct.unpack_from("<I", c, CCFG_PERM)[0] & ~PERM_FORBID_MASK & 0xFFFFFFFF
     struct.pack_into("<I", c, CCFG_PERM, perm)
+    wepra = struct.unpack_from("<I", c, CCFG_WEPRA)[0] & ~((1 << MCUBOOT_CODE_SECTORS) - 1) & 0xFFFFFFFF
+    struct.pack_into("<I", c, CCFG_WEPRA, wepra)                         # sticky-0: 0 = geschuetzt
+    aux = struct.unpack_from("<I", c, CCFG_WEPRAUX)[0] & ~0x1 & 0xFFFFFFFF   # ccfgSector geschuetzt
+    struct.pack_into("<I", c, CCFG_WEPRAUX, aux)
     c[CCFG_DBG] = 0x00                                                   # debugCfg.authorization = DBGFORBID
     c[CCFG_DBG + 1] = 0x00                                               # allowBldr = FORBID
     ccfg_fix_crcs(c)
@@ -197,8 +213,52 @@ def ccfg_lock(c: bytearray) -> bytearray:
 def ccfg_describe(c: bytes) -> str:
     pb, bp = struct.unpack_from("<II", c, 0)
     perm = struct.unpack_from("<I", c, CCFG_PERM)[0]
-    return "pBldrVtor=%#010x bldrEnabled=%d pinTrig=%d DIO%d SWD=%s dbgAuth=%#04x" % (
-        pb, bp & 1, (bp >> 1) & 1, (bp >> 16) & 0x3F, "erlaubt" if (perm >> 28) == 0xA else "GESPERRT", c[CCFG_DBG])
+    wepra = struct.unpack_from("<I", c, CCFG_WEPRA)[0]
+    return "pBldrVtor=%#010x bldrEnabled=%d pinTrig=%d DIO%d SWD=%s FlashProg=%s WEPRA=%#010x dbgAuth=%#04x" % (
+        pb, bp & 1, (bp >> 1) & 1, (bp >> 16) & 0x3F, "erlaubt" if (perm >> 28) == 0xA else "GESPERRT",
+        "erlaubt" if ((perm >> 16) & 0xF) == 0xA else "GESPERRT", wepra, c[CCFG_DBG])
+
+
+# ---- Schluessel-Fingerabdruck (F-W1) ----
+EC_P256_SPKI_PREFIX = bytes.fromhex("3059301306072a8648ce3d020106082a8648ce3d030107034200")
+DEV_KEY = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "firmware", "sensor", "keys",
+                       "DEV_ONLY_fluidi_signing_ec-p256.pem")
+
+
+def key_fp(der: bytes) -> str:
+    """wie firmware/sensor/tools/key_fingerprint.py: SHA-256(SubjectPublicKeyInfo), erste 16 Hex"""
+    return hashlib.sha256(der).hexdigest()[:16]
+
+
+def dev_key_fp() -> str:
+    from cryptography.hazmat.primitives import serialization
+    k = serialization.load_pem_private_key(open(DEV_KEY, "rb").read(), None).public_key()
+    return key_fp(k.public_bytes(serialization.Encoding.DER, serialization.PublicFormat.SubjectPublicKeyInfo))
+
+
+def mcuboot_key_fps(flash: bytes, end: int = 0x6000):
+    """oeffentliche P-256-Schluessel (91-Byte-DER), die im MCUboot-Bereich eingebaut sind"""
+    fps, i = [], 0
+    while True:
+        i = flash.find(EC_P256_SPKI_PREFIX, i, end)
+        if i < 0:
+            return fps
+        fps.append(key_fp(bytes(flash[i:i + 91])))
+        i += 1
+
+
+def check_lock_key(flash: bytes, expect_fp):
+    """--lock nur mit Produktionsschluessel: genau ein eingebauter Schluessel, == expect_fp, != DEV"""
+    if not expect_fp:
+        raise BootloaderError("--lock verlangt --expect-key-fp <Fingerabdruck des Produktionsschluessels>")
+    fps = mcuboot_key_fps(flash)
+    if len(fps) != 1:
+        raise BootloaderError("MCUboot-Schluessel nicht eindeutig gefunden (%d)" % len(fps))
+    if fps[0] == dev_key_fp():
+        raise BootloaderError("MCUboot enthaelt den DEV-Schluessel – Sperren verweigert (F-W1)")
+    if fps[0] != expect_fp.lower():
+        raise BootloaderError("Schluessel-Fingerabdruck %s != erwartet %s" % (fps[0], expect_fp))
+    return fps[0]
 
 
 # ----------------------------------------------------------------------------------------------------------
@@ -330,11 +390,12 @@ class SimDevice:
 # ----------------------------------------------------------------------------------------------------------
 # Ablauf
 # ----------------------------------------------------------------------------------------------------------
-def program(link: Link, hexfile: str, lock: bool, out=print, do_reset: bool = True):
+def program(link: Link, hexfile: str, lock: bool, out=print, do_reset: bool = True, expect_fp=None):
     flash, used, ccfg = load_hex(hexfile)
     if ccfg is None:
         raise BootloaderError("Hex enthaelt keine CCFG (MCUboot-Build pruefen)")
     if lock:
+        out("[flash] Produktionsschluessel %s bestaetigt" % check_lock_key(flash, expect_fp))
         ccfg = ccfg_lock(ccfg)
     runs = sector_runs(used)
     total = sum(s for _, s in runs)
@@ -361,20 +422,30 @@ def program(link: Link, hexfile: str, lock: bool, out=print, do_reset: bool = Tr
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("action", choices=["info", "erase", "program", "verify"])
-    ap.add_argument("--hex", default="firmware/sensor/build/fluidi-sensor-factory.hex")
+    ap.add_argument("--hex", help="Werks-Hex aus firmware/sensor/build/fluidi-sensor-factory-*.hex")
     ap.add_argument("--port", help="serielle Schnittstelle, z. B. /dev/ttyUSB0")
     ap.add_argument("--baud", type=int, default=57600)
-    ap.add_argument("--lock", action="store_true", help="Serie: Bootloader und SWD per CCFG sperren (irreversibel)")
+    ap.add_argument("--lock", action="store_true", help="Serie: Bootloader/SWD/Programmierung sperren (irreversibel)")
+    ap.add_argument("--expect-key-fp", help="Fingerabdruck des Produktions-Signierschluessels (make release zeigt ihn)")
     ap.add_argument("--sim", action="store_true", help="simuliertes Geraet statt Hardware")
     ap.add_argument("--dry-run", action="store_true", help="nur Plan anzeigen, nichts senden")
     ap.add_argument("--yes", action="store_true", help="Sicherheitsabfrage ueberspringen")
     a = ap.parse_args(argv)
+    if a.action in ("program", "verify") or a.dry_run:
+        if not a.hex:
+            ap.error("--hex fehlt")
     if a.baud > MAX_BAUD:
         ap.error("hoechstens %d Baud (2 x 100 kOhm je Pad, CONCEPTS 2.7)" % MAX_BAUD)
     if a.dry_run:
         flash, used, ccfg = load_hex(a.hex)
         for addr, size in sector_runs(used):
             print("[plan] DOWNLOAD_CRC %#07x %6d B crc32=%08x" % (addr, size, crc32(bytes(flash[addr:addr + size]))))
+        if a.lock:
+            try:
+                print("[plan] Schluessel %s" % check_lock_key(flash, a.expect_key_fp))
+            except BootloaderError as e:
+                print("[plan] FEHLER:", e)
+                return 2
         if ccfg:
             c = ccfg_lock(ccfg) if a.lock else ccfg
             print("[plan] CCFG %s crc32=%08x" % (ccfg_describe(c), crc32(bytes(c))))
@@ -400,7 +471,7 @@ def main(argv=None):
         elif a.action == "erase":
             link.sync(); link.chip_erase(); print("[erase] ok")
         elif a.action == "program":
-            program(link, a.hex, a.lock)
+            program(link, a.hex, a.lock, expect_fp=a.expect_key_fp)
         elif a.action == "verify":
             flash, used, ccfg = load_hex(a.hex)
             link.sync()

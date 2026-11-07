@@ -67,12 +67,25 @@ size_t fl_adv_build(uint8_t o[31], const uint8_t addr_le[6], uint8_t state, uint
     return FL_ADV_LEN;
 }
 
-void fl_pair_transcript(const uint8_t req[FL_PAIR_REQ_LEN], const uint8_t rsp[FL_PAIR_RSP_LEN], uint8_t out[32])
+void fl_pair_commit(const uint8_t gateway_id[8], const uint8_t gw_pub[64], const uint8_t gw_nonce[16], uint8_t out[32])
+{
+    fl_sha256_ctx c;
+    fl_sha256_init(&c);
+    fl_sha256_update(&c, "fluidi-commit", 13);
+    fl_sha256_update(&c, gateway_id, 8);
+    fl_sha256_update(&c, gw_pub, 64);
+    fl_sha256_update(&c, gw_nonce, 16);
+    fl_sha256_final(&c, out);
+}
+
+void fl_pair_transcript(const uint8_t req[FL_PAIR_REQ_LEN], const uint8_t rsp[FL_PAIR_RSP_LEN],
+                        const uint8_t gw_nonce[FL_PAIR_REVEAL_LEN], uint8_t out[32])
 {
     fl_sha256_ctx c;
     fl_sha256_init(&c);
     fl_sha256_update(&c, req, FL_PAIR_REQ_LEN);
     fl_sha256_update(&c, rsp, FL_PAIR_RSP_LEN);
+    fl_sha256_update(&c, gw_nonce, FL_PAIR_REVEAL_LEN);
     fl_sha256_final(&c, out);
 }
 
@@ -81,7 +94,7 @@ void fl_pair_keys(const uint8_t z[32], const uint8_t gw_nonce[16], const uint8_t
 {
     uint8_t salt[32], info[14 + 8 + 6], okm[32];
     memcpy(salt, gw_nonce, 16); memcpy(salt + 16, s_nonce, 16);
-    memcpy(info, "fluidi-pair-v1", 14); memcpy(info + 14, gateway_id, 8); memcpy(info + 22, sensor_addr, 6);
+    memcpy(info, "fluidi-pair-v2", 14); memcpy(info + 14, gateway_id, 8); memcpy(info + 22, sensor_addr, 6);
     fl_hkdf_sha256(salt, 32, z, 32, info, sizeof info, okm, 32);
     memcpy(k_link, okm, 16); memcpy(k_conf, okm + 16, 16);
     fl_wipe(okm, sizeof okm);
@@ -116,7 +129,7 @@ void fl_session_key(const uint8_t k_link[16], const uint8_t gw_nonce[8], const u
 {
     uint8_t salt[16];
     memcpy(salt, gw_nonce, 8); memcpy(salt + 8, s_nonce, 8);
-    fl_hkdf_sha256(salt, 16, k_link, 16, (const uint8_t *)"fluidi-sess-v1", 14, k_s, 16);
+    fl_hkdf_sha256(salt, 16, k_link, 16, (const uint8_t *)"fluidi-sess-v2", 14, k_s, 16);
 }
 
 static void make_nonce(uint8_t n[13], uint8_t dir, uint32_t ctr, const uint8_t addr[6])
@@ -152,4 +165,14 @@ int fl_secure_open(const uint8_t k_s[16], uint8_t dir, uint32_t expect_ctr, cons
     make_nonce(nonce, dir, ctr, addr);
     if (fl_ccm_decrypt(k_s, nonce, f, 5, f + 5, clen, plain, f + len - FL_MIC_LEN, FL_MIC_LEN)) return -FL_E_AUTH_FAIL;
     return (int)clen;
+}
+
+int fl_secure_open_ge(const uint8_t k_s[16], uint8_t dir, uint32_t min_ctr, uint32_t max_gap, const uint8_t addr[6],
+                      const uint8_t *f, size_t len, uint8_t *plain, uint32_t *ctr_out)
+{
+    if (len < FL_SECURE_OVERHEAD) return -FL_E_BAD_LENGTH;
+    uint32_t ctr = fl_get_u32(f + 1);
+    if (ctr < min_ctr || ctr - min_ctr > max_gap) return -FL_E_BAD_COUNTER;
+    *ctr_out = ctr;
+    return fl_secure_open(k_s, dir, ctr, addr, f, len, plain);
 }

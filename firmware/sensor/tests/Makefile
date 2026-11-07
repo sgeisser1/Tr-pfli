@@ -22,6 +22,7 @@ $(B)/test_fluidi: $(SRC) $(B)/vectors.h $(wildcard $(CORE)/*.h) port_sim.h
 run: $(B)/test_fluidi
 	./$(B)/test_fluidi
 	$(PYTHON) -m unittest discover -s ../../../scripts -p "test_flash_sensor.py" -q
+	$(PYTHON) -m unittest discover -s ../../tools -p "test_pairing_mitm.py" -q
 
 clean:
 	rm -rf $(B)

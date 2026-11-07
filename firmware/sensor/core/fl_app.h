@@ -16,7 +16,9 @@ typedef enum { FL_MODE_UNPAIRED = 0, FL_MODE_PAIRING, FL_MODE_NORMAL, FL_MODE_UN
 
 typedef enum {
     FL_SESS_NONE = 0, FL_SESS_WAIT_HELLO, FL_SESS_SECURE_WAIT, FL_SESS_SECURE,
-    FL_SESS_PAIR_RSP_SENT, FL_SESS_PAIR_SHOWING, FL_SESS_CLOSING
+    FL_SESS_PAIR_RSP_SENT,   /* PAIR_RSP gesendet, warte auf PAIR_REVEAL (v2) */
+    FL_SESS_PAIR_SHOWING,    /* Farbfolge, warte auf Taster + PAIR_CONFIRM_G */
+    FL_SESS_CLOSING
 } fl_sess_state_t;
 
 /* nichtfluechtige Zaehler (FL_NV_COUNTERS) */
@@ -28,7 +30,18 @@ typedef struct {
     uint8_t  pad;
     uint8_t  ota_ver[4];
     uint32_t ota_build;
+    uint32_t charge_uc;                  /* S-5: nichtfluechtig, Nullung nur bei Power-on (Zellwechsel) */
+    uint16_t backoffs;                   /* F-W3: Abschaltungen wegen Reset-Schleife */
+    uint16_t pad2;
 } fl_counters_t;
+
+/* Bits im Retention-Register (PMCTL.AONRSTA1, 18 bit, ueberlebt Reset und Shutdown, nicht Power-on; TRM 8.4.2) */
+#define FL_RET_ABN_MASK   0x0Fu      /* Zaehler aufeinanderfolgender abnormaler Neustarts (F-W3) */
+#define FL_RET_PLANNED    0x10u      /* gewollter Neustart (REBOOT, OTA, Werkseinstellung, Rueckfall) */
+#define FL_RET_UV         0x20u      /* Abschaltung wegen Unterspannung */
+#define FL_RET_BACKOFF    0x40u      /* Abschaltung wegen Reset-Schleife */
+#define FL_ABN_MAX        3u
+#define FL_STABLE_MS      (10u * 60000u)
 
 /* Kopplungsdaten (FL_NV_PAIR); Schluesselbereich mit Zufallsbyte aufgefuellt (PROTOCOL.md 4.6) */
 typedef struct {
@@ -58,7 +71,11 @@ typedef struct {
     fl_mode_t mode, mode_before_pairing;
     uint32_t pairing_until;
     bool locked; uint32_t locked_until;
-    uint8_t fail_streak;
+    uint8_t fail_streak, timeout_streak;
+    bool stable_done;
+    uint32_t sec_cnt;
+    uint32_t last_charge_save;
+    bool meas_pending; uint8_t meas_pending_cause;   /* F-W5: Messung erst nach dem Trennen */
     bool error_active, batt_low, water;
     uint8_t low_count, uv_count;
     uint16_t vbat_load, vbat_rest;
@@ -86,7 +103,8 @@ typedef struct {
     /* Verbindung / Sitzung */
     bool connected;
     fl_sess_state_t sess;
-    uint32_t t_conn, t_last_rx, sess_deadline;
+    uint32_t t_conn, t_last_rx, t_cccd, t_pair_start;
+    bool cccd_on;
     uint8_t k_s[16];
     uint32_t ctr_rx, ctr_tx;
     bool authed, ota_in_session;
@@ -94,7 +112,7 @@ typedef struct {
     bool stream; uint8_t stream_rid; uint32_t stream_next; uint32_t stream_left;
     uint8_t txq[3][247]; uint16_t txq_len[3]; uint8_t txq_n;      /* Frames, die auf freien BLE-Puffer warten */
     /* Kopplung */
-    uint8_t pr_req[88], pr_rsp[91], transcript[32], k_link_new[16], k_conf[16], gw_id_new[8];
+    uint8_t pr_req[104], pr_rsp[91], transcript[32], k_link_new[16], k_conf[16], gw_id_new[8], z_pair[32];
     uint8_t sas[5];
     bool pair_user_ok, pair_gw_ok;
     uint32_t pair_deadline;
@@ -108,6 +126,7 @@ extern fl_app_t g_fl;
 
 void     fl_app_init(void);
 void     fl_app_on_connect(void);
+void     fl_app_on_notify_enabled(void);    /* CCCD von TX auf Notify geschrieben (K-1) */
 void     fl_app_on_disconnect(void);
 void     fl_app_on_rx(const uint8_t *data, uint16_t len);
 void     fl_app_on_button(bool pressed);

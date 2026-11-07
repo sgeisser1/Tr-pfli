@@ -11,14 +11,34 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import flash_sensor as fs  # noqa: E402
 
-FACTORY = os.path.join(HERE, "..", "firmware", "sensor", "build", "fluidi-sensor-factory.hex")
+import glob  # noqa: E402
+_f = sorted(glob.glob(os.path.join(HERE, "..", "firmware", "sensor", "build", "fluidi-sensor-factory-*.hex")))
+FACTORY = _f[-1] if _f else "/nonexistent"
 MCUBOOT_HEX = os.path.join(HERE, "..", "firmware", "sensor", "build", "mcuboot", "mcuboot.hex")
 
 
-def make_hex(path, with_ccfg=True):
+def spki(key):
+    from cryptography.hazmat.primitives import serialization
+    return key.public_key().public_bytes(serialization.Encoding.DER, serialization.PublicFormat.SubjectPublicKeyInfo)
+
+
+def prod_key():
+    from cryptography.hazmat.primitives.asymmetric import ec
+    return ec.derive_private_key(0x1234567, ec.SECP256R1())
+
+
+def dev_key():
+    from cryptography.hazmat.primitives import serialization
+    return serialization.load_pem_private_key(open(fs.DEV_KEY, "rb").read(), None)
+
+
+def make_hex(path, with_ccfg=True, key=None):
     from intelhex import IntelHex
     ih = IntelHex()
-    ih.frombytes(bytes((i * 7) & 0xFF for i in range(5000)), offset=0)
+    boot = bytearray((i * 7) & 0xFF for i in range(5000))
+    if key is not None:
+        boot[0x800:0x800 + 91] = spki(key)                 # eingebauter oeffentlicher Schluessel (wie fluidi_keys.c)
+    ih.frombytes(bytes(boot), offset=0)
     ih.frombytes(bytes((i * 3 + 1) & 0xFF for i in range(3000)), offset=0x6000)
     if with_ccfg:
         c = bytearray(b"\xff" * fs.CCFG_SIZE)
@@ -91,18 +111,47 @@ class TestProgram(unittest.TestCase):
             fs.program(fs.Link(dev), self.hex, lock=False, out=lambda m: None)
 
     def test_lock_disables_bootloader(self):
+        h = os.path.join(self.tmp, "p.hex")
+        make_hex(h, key=prod_key())
+        fp = fs.key_fp(spki(prod_key()))
         dev = fs.SimDevice()
-        fs.program(fs.Link(dev), self.hex, lock=True, out=lambda m: None)
+        fs.program(fs.Link(dev), h, lock=True, out=lambda m: None, expect_fp=fp)
         c = bytes(dev.ccfg)
         self.assertEqual(struct.unpack_from("<I", c, 0)[0], fs.PBLDR_FORBID)
         self.assertEqual(struct.unpack_from("<I", c, 4)[0] & 1, 0)
-        self.assertEqual(struct.unpack_from("<I", c, fs.CCFG_PERM)[0] >> 28, 0)
+        perm = struct.unpack_from("<I", c, fs.CCFG_PERM)[0]
+        self.assertEqual(perm >> 28, 0)                       # SWD
+        self.assertEqual((perm >> 16) & 0xF, 0)               # FlashProgram (SACI)
+        self.assertEqual((perm >> 8) & 0xF, 0)                # ToolsClientMode
+        self.assertEqual(perm & 0xF, 0)                       # ReturnToFactory
+        self.assertEqual((perm >> 12) & 0xF, 0xA)             # ChipErase bleibt (loescht Schluessel)
+        wepra = struct.unpack_from("<I", c, fs.CCFG_WEPRA)[0]
+        self.assertEqual(wepra & 0x7FF, 0)                    # Sektoren 0-10 (MCUboot) geschuetzt
+        self.assertEqual((wepra >> 11) & 1, 1)                # Sektor 11 BIMINFO beschreibbar
+        self.assertEqual(wepra >> 12, 0xFFFFF)                # Slots/NV beschreibbar (OTA)
+        self.assertEqual(struct.unpack_from("<I", c, fs.CCFG_WEPRAUX)[0] & 1, 0)   # CCFG-Sektor geschuetzt
         for a, b, at in fs.CRC_RANGES:                       # CRCs konsistent
             self.assertEqual(struct.unpack_from("<I", c, at)[0], fs.crc32(c[a:b]))
         link = fs.Link(dev)                                  # nach Reset: Bootloader nimmt nichts mehr an
         link.sync()
         with self.assertRaises(fs.BootloaderError):
             link.chip_erase()
+
+    def test_lock_refuses_dev_key(self):
+        h = os.path.join(self.tmp, "d.hex")
+        make_hex(h, key=dev_key())
+        with self.assertRaises(fs.BootloaderError) as e:
+            fs.program(fs.Link(fs.SimDevice()), h, lock=True, out=lambda m: None, expect_fp=fs.dev_key_fp())
+        self.assertIn("DEV", str(e.exception))
+
+    def test_lock_requires_matching_fingerprint(self):
+        h = os.path.join(self.tmp, "p2.hex")
+        make_hex(h, key=prod_key())
+        for fp in (None, "0123456789abcdef"):
+            dev = fs.SimDevice()
+            with self.assertRaises(fs.BootloaderError):
+                fs.program(fs.Link(dev), h, lock=True, out=lambda m: None, expect_fp=fp)
+            self.assertFalse(dev.erased)                      # vor jedem Schreiben abgebrochen
 
     def test_missing_ccfg_refused(self):
         h = os.path.join(self.tmp, "n.hex")
@@ -116,7 +165,7 @@ class TestProgram(unittest.TestCase):
 
     def test_cli_sim_and_dry_run(self):
         self.assertEqual(fs.main(["program", "--sim", "--hex", self.hex]), 0)
-        self.assertEqual(fs.main(["program", "--dry-run", "--hex", self.hex, "--lock"]), 0)
+        self.assertEqual(fs.main(["program", "--dry-run", "--hex", self.hex, "--lock"]), 2)   # ohne Fingerabdruck
 
 
 @unittest.skipUnless(os.path.exists(MCUBOOT_HEX), "MCUboot-Build fehlt (make in firmware/sensor)")
@@ -135,6 +184,14 @@ class TestRealBuild(unittest.TestCase):
         self.assertEqual((bp >> 2) & 1, 0)                # aktiv low
         self.assertEqual((bp >> 16) & 0x3F, 21)           # DIO21 (Taster)
         self.assertEqual((bp >> 24) & 7, 0)               # UART RX DIO20 / TX DIO6
+
+    @unittest.skipUnless(os.path.exists(FACTORY), "Werks-Hex fehlt")
+    def test_factory_with_dev_key_cannot_be_locked(self):
+        flash, _, _ = fs.load_hex(FACTORY)
+        self.assertEqual(fs.mcuboot_key_fps(flash), [fs.dev_key_fp()])
+        self.assertIn(fs.dev_key_fp(), os.path.basename(FACTORY))          # Fingerabdruck im Dateinamen
+        with self.assertRaises(fs.BootloaderError):
+            fs.check_lock_key(flash, fs.dev_key_fp())
 
     @unittest.skipUnless(os.path.exists(FACTORY), "Werks-Hex fehlt")
     def test_program_factory_hex_in_sim(self):

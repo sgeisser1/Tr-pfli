@@ -94,3 +94,42 @@ void fl_ota_abort(fl_ota_t *o)
     if (o->f && o->erased_to) o->f->erase(o->f->ctx, 0);
     o->active = false;
 }
+
+int fl_img_parse(const fl_flash_t *f, uint32_t base, fl_img_info_t *in)
+{
+    uint8_t h[32], t[4];
+    memset(in, 0, sizeof *in);
+    in->hw_rev = -1;
+    if (f->read(f->ctx, base, h, 32) || fl_get_u32(h) != 0x96f3b83du) return -1;
+    uint16_t hdr = fl_get_u16(h + 8), prot = fl_get_u16(h + 10);
+    in->img_size = fl_get_u32(h + 12);
+    in->ver[0] = h[20]; in->ver[1] = h[21]; in->ver[2] = h[22]; in->ver[3] = h[23];
+    in->build = fl_get_u32(h + 24);
+    uint32_t p = base + hdr + in->img_size;
+    if (hdr < 32 || p + 4 > base + f->size) return -1;
+    if (prot) {
+        if (f->read(f->ctx, p, t, 4) || fl_get_u16(t) != 0x6908 || fl_get_u16(t + 2) != prot) return -1;
+        uint32_t end = p + prot, q = p + 4;
+        while (q + 4 <= end) {
+            uint8_t v[4] = {0};
+            if (f->read(f->ctx, q, t, 4)) return -1;
+            uint16_t ty = fl_get_u16(t), ln = fl_get_u16(t + 2);
+            if (ln <= 4 && f->read(f->ctx, q + 4, v, ln)) return -1;
+            if (ty == FL_TLV_SEC_CNT && ln == 4) in->sec_cnt = fl_get_u32(v);
+            if (ty == FL_TLV_HW_REV && ln >= 1) in->hw_rev = v[0];
+            q += 4u + ln;
+        }
+    }
+    in->valid = true;
+    return 0;
+}
+
+uint8_t fl_ota_check_image(const fl_flash_t *f, const uint8_t run_ver[4], uint32_t run_build, uint32_t run_sec_cnt,
+                           uint8_t hw_rev)
+{
+    fl_img_info_t in;
+    if (fl_img_parse(f, 0, &in)) return FL_E_OTA_HASH;
+    if (!fl_ver_newer(in.ver, in.build, run_ver, run_build) || in.sec_cnt < run_sec_cnt) return FL_E_OTA_ROLLBACK;
+    if (in.hw_rev != hw_rev) return FL_E_OTA_HW_MISMATCH;
+    return 0;
+}

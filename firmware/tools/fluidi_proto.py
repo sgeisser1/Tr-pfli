@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""fluidi – Python-Referenz des Funkprotokolls (firmware/PROTOCOL.md, Protokollversion 1).
+"""fluidi – Python-Referenz des Funkprotokolls (firmware/PROTOCOL.md 0.2, Protokollversion 2).
 
 Unabhaengige Implementierung mit der Bibliothek `cryptography` (HKDF, HMAC, AES-CCM, ECDH P-256).
 Dient (1) als Gegenprobe fuer die Unit-Tests der Sensor-Firmware (firmware/sensor/tests) und
@@ -20,9 +20,9 @@ from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.ciphers.aead import AESCCM
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 
-PROTO = 1
+PROTO = 2
 FT_HELLO, FT_HELLO_RSP, FT_SECURE, FT_PAIR, FT_ERROR = 0x0, 0x1, 0x2, 0x3, 0xF
-PAIR_REQ, PAIR_RSP, PAIR_SHOW, PAIR_CONFIRM_S, PAIR_CONFIRM_G, PAIR_DONE = 1, 2, 3, 4, 5, 6
+PAIR_REQ, PAIR_RSP, PAIR_REVEAL, PAIR_CONFIRM_S, PAIR_CONFIRM_G, PAIR_DONE = 1, 2, 3, 4, 5, 6
 DIR_G2S, DIR_S2G = 0, 1
 MIC_LEN = 8
 SAS_COLORS = ("rot", "gruen", "gelb")
@@ -65,21 +65,32 @@ def parse_adv(data: bytes) -> dict:
     return out
 
 
-# ---------------- Kopplung (Kap. 4.2) ----------------
+# ---------------- Kopplung (Kap. 4.2, v2 mit Commitment/Reveal) ----------------
+def commit(gateway_id: bytes, gw_pub64: bytes, gw_nonce16: bytes) -> bytes:
+    """C = SHA-256("fluidi-commit" | gateway_id | gw_pub | gw_nonce) – in PAIR_REQ statt gw_nonce."""
+    return hashlib.sha256(b"fluidi-commit" + gateway_id + gw_pub64 + gw_nonce16).digest()
+
+
 def pair_req_payload(gateway_id: bytes, gw_pub64: bytes, gw_nonce16: bytes) -> bytes:
-    return gateway_id + gw_pub64 + gw_nonce16
+    """PAIR_REQ-Nutzlast (104 Byte): gateway_id . gw_pub . commit (gw_nonce bleibt geheim bis PAIR_REVEAL)."""
+    return gateway_id + gw_pub64 + commit(gateway_id, gw_pub64, gw_nonce16)
+
+
+def check_reveal(req: bytes, gw_nonce16: bytes) -> bool:
+    return hmac.compare_digest(commit(req[:8], req[8:72], gw_nonce16), req[72:104])
 
 
 def pair_rsp_payload(addr_le: bytes, hw_rev: int, fw_ver4: bytes, s_pub64: bytes, s_nonce16: bytes) -> bytes:
     return addr_le + bytes([hw_rev]) + fw_ver4 + s_pub64 + s_nonce16
 
 
-def transcript(req: bytes, rsp: bytes) -> bytes:
-    return hashlib.sha256(req + rsp).digest()
+def transcript(req: bytes, rsp: bytes, reveal: bytes) -> bytes:
+    """SHA-256(payload(PAIR_REQ) | payload(PAIR_RSP) | payload(PAIR_REVEAL)); payload = ohne vt und pmsg."""
+    return hashlib.sha256(req + rsp + reveal).digest()
 
 
 def pair_keys(z: bytes, gw_nonce: bytes, s_nonce: bytes, gateway_id: bytes, addr_le: bytes) -> tuple[bytes, bytes]:
-    okm = hkdf(z, gw_nonce + s_nonce, b"fluidi-pair-v1" + gateway_id + addr_le, 32)
+    okm = hkdf(z, gw_nonce + s_nonce, b"fluidi-pair-v2" + gateway_id + addr_le, 32)
     return okm[:16], okm[16:]
 
 
@@ -110,7 +121,7 @@ def ecdh(priv: ec.EllipticCurvePrivateKey, peer64: bytes) -> bytes:
 
 # ---------------- Sitzung (Kap. 4.3/4.4) ----------------
 def session_key(k_link: bytes, gw_nonce8: bytes, s_nonce8: bytes) -> bytes:
-    return hkdf(k_link, gw_nonce8 + s_nonce8, b"fluidi-sess-v1", 16)
+    return hkdf(k_link, gw_nonce8 + s_nonce8, b"fluidi-sess-v2", 16)
 
 
 def nonce(direction: int, ctr: int, addr_le: bytes) -> bytes:

@@ -63,6 +63,7 @@ void sim_reset_all(void)
 
 /* ---- Zeit ---- */
 uint32_t fl_port_ms(void) { return sim.ms; }
+void fl_port_delay_ms(uint32_t ms) { sim.ms += ms; }
 void fl_port_uptime(uint32_t *s, uint16_t *frac) { *s = sim.ms / 1000u; *frac = (uint16_t)((sim.ms % 1000u) * 65536u / 1000u); }
 
 /* ---- Messkette: Oszillatormodell T = k*(C + Cpar + Cref?) + td, Rev B mit Teiler 8 ---- */
@@ -123,6 +124,7 @@ void fl_port_tx_power(int8_t dbm) { sim.tx_power = dbm; }
 /* ---- Krypto ---- */
 int fl_port_rng(uint8_t *b, size_t n)
 {
+    if (sim.rng_fail) { memset(b, 0, n); return -1; }
     for (size_t i = 0; i < n; i++) {
         if (sim.rng_q_len) { b[i] = sim.rng_q[sim.rng_q_pos++]; if (sim.rng_q_pos >= sim.rng_q_len) sim.rng_q_len = 0, sim.rng_q_pos = 0; }
         else b[i] = (uint8_t)(0x5A ^ (sim.rng_ctr++ * 37u));
@@ -160,12 +162,14 @@ const fl_flash_t *fl_port_slot1_flash(void) { return &fl_slot1_dev; }
 int fl_port_ota_request_test(void) { sim.ota_pending = true; return 0; }
 int fl_port_ota_confirm(void) { sim.image_confirmed = true; return 0; }
 bool fl_port_image_confirmed(void) { return sim.image_confirmed; }
-void fl_port_fw_version(uint8_t v[4], uint32_t *b) { memcpy(v, sim.fw_ver, 4); *b = sim.fw_build; }
+void fl_port_fw_version(uint8_t v[4], uint32_t *b, uint32_t *sc) { memcpy(v, sim.fw_ver, 4); *b = sim.fw_build; *sc = sim.sec_cnt; }
 
 /* ---- System ---- */
 uint8_t fl_port_reset_reason(void) { return sim.reset_reason; }
 void fl_port_reboot(void) { sim.reboots++; }
-void fl_port_shutdown(void) { sim.shutdowns++; }
+void fl_port_shutdown(void) { sim.shutdowns++; sim.shutdown_wake = !sim.button_level; sim.pullup = !sim.button_level; }
+uint32_t fl_port_retained_get(void) { return sim.retained; }
+void fl_port_retained_set(uint32_t v) { sim.retained = v & 0x3FFFFu; }
 void fl_port_wdt_kick(void) { sim.wdt_kicks++; }
 void fl_port_button_pullup(bool on) { sim.pullup = on; }
 bool fl_port_button_pressed(void) { return sim.button_level; }
