@@ -6,3 +6,9 @@ __pycache__/
 *-backups/
 *.lck
 fp-info-cache
+simulation/fem/work/
+simulation/**/work/
+*.frd
+*.dat
+*.sta
+*.cvg
