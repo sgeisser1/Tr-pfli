@@ -339,6 +339,139 @@ class MockApiTest(unittest.TestCase):
         s.close()
 
 
+    # ---------------------------------------------------------------- Konzept-Erweiterung
+    def test_profiles_and_species(self):
+        c = Client(self.base)
+        st, sp = c.json("GET", "/api/v1/species")
+        self.check("/species", "get", 200, sp)
+        self.assertGreaterEqual(len(sp), 10)
+        self.assertTrue(all(x["source"] == "startwert" and "ANNAHME" in x["note"] for x in sp))
+        st, plants = c.json("GET", "/api/v1/plants")
+        moods = {p["mood"] for p in plants}
+        self.assertTrue({"happy", "thirsty", "confused", "sleepy", "unknown"} <= moods, moods)
+        c.login()
+        st, p = c.json("PATCH", "/api/v1/plants/1", {"species": "monstera", "upper_pct": 72, "location": "Fenster",
+                                                     "pot": {"diameter_cm": 24, "material": "ton", "drainage": True}})
+        self.assertEqual(st, 200)
+        self.check("/plants/{plant_id}", "patch", 200, p)
+        self.assertEqual(p["pot"]["material"], "ton")
+        st, e = c.json("PATCH", "/api/v1/plants/1", {"upper_pct": 31})  # zu nahe an der Schwelle
+        self.assertEqual(st, 400)
+        st, e = c.json("PATCH", "/api/v1/plants/1", {"species": "triffid"})
+        self.assertEqual(st, 400)
+
+    def test_forecast(self):
+        c = Client(self.base)
+        st, f = c.json("GET", "/api/v1/plants/1/forecast")
+        self.assertEqual(st, 200)
+        self.check("/plants/{plant_id}/forecast", "get", 200, f)
+        self.assertEqual(f["state"], "ok")
+        self.assertTrue(f["days_low"] <= f["days"] <= f["days_high"])
+        self.assertTrue(f["curve"]["t"])
+        self.assertEqual(c.json("GET", "/api/v1/plants/2/forecast")[1]["state"], "due")       # Ficus trocken
+        self.assertEqual(c.json("GET", "/api/v1/plants/6/forecast")[1]["state"], "not_applicable")  # Luft
+        self.assertEqual(c.json("GET", "/api/v1/plants/8/forecast")[1]["state"], "not_applicable")  # ohne Sensor
+        now = int(time.time())
+        st, s = c.json("GET", f"/api/v1/plants/1/series?from={now - 60 * 86400}&to={now}")
+        self.assertTrue(any(e["type"] == "watering" for e in s["events"]))
+
+    def test_journal_watering_flow(self):
+        c = Client(self.base)
+        st, j = c.json("GET", "/api/v1/plants/9/journal?limit=50")
+        self.check("/plants/{plant_id}/journal", "get", 200, j)
+        self.assertTrue(any(e["source"] == "sensor" for e in j))
+        self.assertEqual(c.json("POST", "/api/v1/plants/9/journal", {"type": "watering"})[0], 401)
+        c.login()
+        st, e = c.json("POST", "/api/v1/plants/9/journal", {"type": "watering", "amount_ml": 400})
+        self.assertEqual(st, 201)
+        self.check("/plants/{plant_id}/journal", "post", 201, e)
+        for _ in range(30):  # Mock: Sensor misst nach ~2.5 s den Sprung
+            st, j = c.json("GET", "/api/v1/plants/9/journal?limit=5")
+            top = next(x for x in j if x["id"] == e["id"])
+            if top["sensor_confirmed"]:
+                break
+            time.sleep(0.3)
+        self.assertTrue(top["sensor_confirmed"])
+        self.assertGreater(top["delta_pct"], 15)
+        st, p = c.json("GET", "/api/v1/plants/9")
+        self.assertIsNotNone(p["last_watered"])
+        # erkannte Giessung verwerfen, eigene löschen
+        det = next(x for x in c.json("GET", "/api/v1/plants/1/journal?limit=100")[1] if x["source"] == "sensor")
+        st, x = c.json("PATCH", f"/api/v1/journal/{det['id']}", {"status": "rejected"})
+        self.assertEqual(st, 200)
+        self.check("/journal/{entry_id}", "patch", 200, x)
+        ids = [x["id"] for x in c.json("GET", "/api/v1/plants/1/journal?limit=1000")[1]]
+        self.assertNotIn(det["id"], ids)
+        self.assertEqual(c.json("DELETE", f"/api/v1/journal/{det['id']}")[0], 409)
+        self.assertEqual(c.json("DELETE", f"/api/v1/journal/{e['id']}")[0], 204)
+        self.assertEqual(c.json("DELETE", "/api/v1/journal/j99999")[0], 404)
+        st, err = c.json("POST", "/api/v1/plants/1/journal", {"type": "watering", "t": "2099-01-01T00:00:00Z"})
+        self.assertEqual(st, 400)
+
+    def test_roomplan(self):
+        c = Client(self.base)
+        st, plan = c.json("GET", "/api/v1/roomplan")
+        self.check("/roomplan", "get", 200, plan)
+        c.login()
+        plan["rooms"][0]["plants"][0]["x_cm"] = 100
+        st, new = c.json("PUT", "/api/v1/roomplan", plan)
+        self.assertEqual(st, 200)
+        self.check("/roomplan", "put", 200, new)
+        self.assertEqual(new["version"], plan["version"] + 1)
+        self.assertEqual(c.json("PUT", "/api/v1/roomplan", plan)[0], 409)  # veraltete Version
+        bad = json.loads(json.dumps(new))
+        bad["rooms"][0]["plants"][0]["x_cm"] = 99999
+        self.assertEqual(c.json("PUT", "/api/v1/roomplan", bad)[0], 400)
+        bad = json.loads(json.dumps(new))
+        bad["rooms"][0]["openings"].append({"type": "window", "wall": "n", "offset_cm": 600, "length_cm": 200})
+        self.assertEqual(c.json("PUT", "/api/v1/roomplan", bad)[0], 400)
+
+    def test_stats_alerts(self):
+        c = Client(self.base)
+        st, s = c.json("GET", "/api/v1/stats?days=90")
+        self.assertEqual(st, 200)
+        self.check("/stats", "get", 200, s)
+        self.assertEqual(len(s["waterings_per_week"]), 12)
+        for x in s["sensors"]:
+            self.assertLess(x["energy"]["avg_ua"], 8.0)  # REQ-ENE-09 (Modell)
+        st, a = c.json("GET", "/api/v1/alerts")
+        self.check("/alerts", "get", 200, a)
+        self.assertEqual(a[0]["level"], "critical")
+        self.assertTrue({"air", "battery_low", "stale", "needs_water"} <= {x["kind"] for x in a})
+
+    def test_dashboard_public_switch(self):
+        S = M.Handler.S
+        c = Client(self.base)
+        st, d = c.json("GET", "/api/v1/dashboard")
+        self.assertEqual(st, 200)
+        self.check("/dashboard", "get", 200, d)
+        self.assertNotIn("fluidi-", json.dumps(d["plants"]))  # keine Sensor-IDs
+        S.settings["public_read"] = False
+        try:
+            self.assertEqual(c.json("GET", "/api/v1/dashboard")[0], 401)
+            S.settings["dashboard"]["public"] = True
+            self.assertEqual(c.json("GET", "/api/v1/dashboard")[0], 200)
+            self.assertEqual(c.json("GET", "/api/v1/plants")[0], 401)  # nur das Dashboard ist öffentlich
+            S.settings["dashboard"]["enabled"] = False
+            self.assertEqual(c.json("GET", "/api/v1/dashboard")[0], 404)
+        finally:
+            S.settings["public_read"] = True
+            S.settings["dashboard"].update(enabled=True, public=False)
+
+    def test_notification_settings(self):
+        c = Client(self.base)
+        c.login()
+        st, se = c.json("PATCH", "/api/v1/settings", {"notifications": {"email": {"enabled": True, "host": "smtp.firma.local",
+                                                                                   "password": "geheim", "to": "a@firma.ch"}}})
+        self.assertEqual(st, 200)
+        self.check("/settings", "patch", 200, se)
+        self.assertTrue(se["notifications"]["email"]["password_set"])
+        self.assertNotIn("password", se["notifications"]["email"])
+        st, e = c.json("PATCH", "/api/v1/settings", {"notifications": {"webpush": {"enabled": True}}})
+        self.assertEqual(st, 409)  # gesperrt bis Entscheid (REQ-APP-10)
+        self.assertEqual(c.req("GET", "/concept/")[0], 200)
+
+
 class SpecTest(unittest.TestCase):
     def test_all_spec_paths_have_mock_route(self):
         if SPEC is None:

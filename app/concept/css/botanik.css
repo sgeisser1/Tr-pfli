@@ -1,0 +1,110 @@
+/* Entwurf B „fluidi Botanik“: frisches Grün, üppige Pflanzen-Illustrationen, grosse kräftige Typografie
+   (Referenz 2 hell, Referenz 3 dunkel). Wasser bleibt blau (LED-Farbe „giessen“). */
+html[data-theme="botanik"] {
+  --bg: linear-gradient(172deg, #dfeAd5 0%, #eef3e8 34%, #f7f8f3 100%);
+  --surface: #ffffff;
+  --surface-2: #f1f4ec;
+  --surface-3: #e1e8d9;
+  --border: rgba(40, 70, 40, 0.07);
+  --shadow: 0 16px 36px rgba(40, 72, 40, 0.1), 0 2px 4px rgba(40, 72, 40, 0.04);
+  --radius: 28px;
+  --radius-sm: 18px;
+  --text: #14231a; --text-2: #3f5446; --text-3: #607266;
+  --accent: #2c6a4c; --accent-2: #4f9467; --on-accent: #fff; --hl: #3e8e4b;
+  --ok: #2c7a3e; --dry: #1a6fa8; --alert: #b93a2f;
+  --ok-soft: rgba(92, 168, 84, 0.16); --dry-soft: rgba(74, 168, 222, 0.16); --alert-soft: rgba(208, 69, 58, 0.12); --off-soft: rgba(120, 130, 110, 0.16);
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, "Segoe UI Variable Display", "Segoe UI", Roboto, sans-serif;
+  --h1: clamp(2.05rem, 7.6vw, 3.2rem);
+  --h1-weight: 800;
+  --h1-track: -0.04em;
+  --big-weight: 800;
+  --nav-bg: rgba(232, 240, 225, 0.82); --nav-fg: #2f4a3a; --nav-active-bg: linear-gradient(145deg, #1f4d3a, #3a7752); --nav-active-fg: #fff;
+  --fab-glow: rgba(44, 106, 76, 0.4);
+  --side-bg: rgba(255, 255, 255, 0.4); --side-border: rgba(40, 70, 40, 0.06); --side-active-bg: linear-gradient(145deg, #1f4d3a, #3a7752); --side-active-fg: #fff; --side-radius: 999px; --side-hover: rgba(44, 106, 76, 0.07);
+  --glow-o: 0.25; --glow-blur: 8px;
+  --seg-on: linear-gradient(145deg, #1f4d3a, #3a7752); --seg-on-fg: #fff;
+  --leaf: #3e8e4b; --leaf-hi: #93d36f; --leaf-2: #1f5a33; --leaf-3: #cdeeb6; --stem: #4f7d3c; --vein: rgba(235, 255, 225, 0.55);
+  --pot: #efebe3; --pot-a: #ffffff; --pot-c: #d2cbbe; --rim: #f7f4ee; --soil: #5a4636;
+  --floor: #f6f8f2; --wall: #2c4a36; --furn: #e6ecdf; --sun: #ffcf4d;
+  --flower: #fbe3ef; --flower-2: #b8417a;
+  --sheet-bg: #fbfcf9; --toast-bg: #1f4d3a;
+}
+html[data-theme="botanik"] body { background: var(--bg); background-attachment: fixed; }
+html[data-theme="botanik"] .blob { opacity: 0.9; }
+html[data-theme="botanik"] .b1 { width: 460px; height: 300px; right: -120px; top: -90px; background: #bcd9a8; transform: rotate(-24deg); border-radius: 60% 40% 60% 40%; }
+html[data-theme="botanik"] .b2 { width: 260px; height: 260px; left: -100px; top: 40%; background: #d9e9cc; }
+html[data-theme="botanik"] .b3 { display: none; }
+@media (max-width: 899px) {
+  html[data-theme="botanik"] .nav-links { -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.9); box-shadow: 0 14px 30px rgba(40, 72, 40, 0.18); }
+  html[data-theme="botanik"] .nav-a { border: 1px solid rgba(47, 74, 58, 0.14); }
+  html[data-theme="botanik"] .nav-a[aria-current="page"] { border-color: transparent; padding: 0 18px 0 16px; }
+  html[data-theme="botanik"] .nav-a[aria-current="page"] .nav-t { display: inline; text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.78rem; }
+}
+@media (min-width: 900px) { html[data-theme="botanik"] .nav { -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); } }
+html[data-theme="botanik"] .fab { background: linear-gradient(145deg, #4f9467, #1f4d3a); }
+html[data-theme="botanik"] .btn.primary { background: linear-gradient(110deg, #1b4433, #3a7752); box-shadow: 0 10px 22px rgba(31, 77, 58, 0.28); }
+html[data-theme="botanik"] .btn.water { background: linear-gradient(110deg, #1b4433, #3a7752); color: #fff; }
+html[data-theme="botanik"] .btn.ghost { background: #fff; border-color: rgba(40, 70, 40, 0.12); }
+html[data-theme="botanik"] .hero { background: linear-gradient(120deg, #ffffff 0%, #f1f7ea 100%); min-height: 210px; }
+html[data-theme="botanik"] .hero-deco { display: block; position: absolute; right: -34px; bottom: -40px; opacity: 0.95; pointer-events: none; }
+html[data-theme="botanik"] .hero-deco svg { width: 230px; height: 288px; }
+html[data-theme="botanik"] .hero-text { padding-right: 150px; }
+@media (min-width: 900px) { html[data-theme="botanik"] .hero-text { padding-right: 200px; } }
+@media (max-width: 560px) { html[data-theme="botanik"] .hero-deco { right: -60px; bottom: -70px; opacity: 0.3; } html[data-theme="botanik"] .hero-text { padding-right: 0; } }
+html[data-theme="botanik"] .hero-h em { font-style: normal; color: var(--hl); }
+html[data-theme="botanik"] .hero .kicker { text-transform: none; }
+html[data-theme="botanik"] .pcard { grid-template-columns: 118px 1fr; padding-left: 10px; }
+html[data-theme="botanik"] .pc-art { background: radial-gradient(ellipse at 50% 80%, #e8f2df 0%, #e8f2df 55%, transparent 56%); border-radius: 22px; }
+html[data-theme="botanik"] .pc-art svg { width: 116px; height: 145px; }
+html[data-theme="botanik"] .pc-title { font-weight: 800; letter-spacing: -0.02em; font-size: 1.18rem; }
+html[data-theme="botanik"] .pc-val .big { font-weight: 800; letter-spacing: -0.05em; }
+html[data-theme="botanik"] .ph h1 { font-weight: 800; }
+html[data-theme="botanik"] .sec-title { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.03em; }
+html[data-theme="botanik"] .card-title { font-weight: 750; letter-spacing: -0.01em; font-size: 1.1rem; }
+html[data-theme="botanik"] .phero { background: linear-gradient(160deg, #f4f9ee, #ffffff 60%); }
+html[data-theme="botanik"] .phero-art svg { width: 220px; height: 275px; }
+html[data-theme="botanik"] .kpi-ic, html[data-theme="botanik"] .chan-ic { background: #e8f2df; color: #2c6a4c; border-radius: 14px; }
+html[data-theme="botanik"] .range-fill { background: linear-gradient(90deg, #7cc488, #2c6a4c); }
+html[data-theme="botanik"] .range-mark { border-color: #2c6a4c; }
+html[data-theme="botanik"] .d-clock { font-weight: 800; letter-spacing: -0.05em; }
+html[data-theme="botanik"] .switch input:checked + .knob { background: #3a7752; }
+
+/* dunkel: Waldgrün mit Glas (Referenz 3) */
+html[data-theme="botanik"][data-scheme="dark"] {
+  --bg: radial-gradient(ellipse at 70% 0%, #24502f 0%, #13261a 42%, #0b140e 100%);
+  --surface: rgba(255, 255, 255, 0.06);
+  --surface-2: rgba(255, 255, 255, 0.07);
+  --surface-3: rgba(255, 255, 255, 0.14);
+  --border: rgba(214, 240, 200, 0.14);
+  --shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+  --text: #eef5ec; --text-2: #c2d3c2; --text-3: #94a894;
+  --accent: #9fe07f; --accent-2: #c9f2b0; --on-accent: #10200f; --hl: #a6e884;
+  --ok: #8fdc8a; --dry: #7fc9f2; --alert: #ff8f84;
+  --ok-soft: rgba(120, 210, 110, 0.18); --dry-soft: rgba(74, 168, 222, 0.22); --alert-soft: rgba(208, 69, 58, 0.24); --off-soft: rgba(200, 210, 190, 0.14);
+  --nav-bg: rgba(20, 38, 26, 0.7); --nav-fg: #cfe3cc; --nav-active-bg: #f2f7ef; --nav-active-fg: #10200f;
+  --side-bg: rgba(0, 0, 0, 0.15); --side-border: rgba(214, 240, 200, 0.08); --side-active-bg: #f2f7ef; --side-active-fg: #10200f; --side-hover: rgba(255, 255, 255, 0.05);
+  --seg-on: #f2f7ef; --seg-on-fg: #10200f;
+  --glow-o: 0.7; --glow-blur: 11px;
+  --leaf: #3f9a4a; --leaf-hi: #a8e36f; --leaf-2: #1c4f2a; --leaf-3: #d3f4b8;
+  --pot: #e8e3da; --pot-a: #fbf9f5; --pot-c: #b8b0a2; --rim: #f2eee7; --soil: #3a2c22;
+  --floor: rgba(255, 255, 255, 0.04); --wall: #cfe3cc; --furn: rgba(255, 255, 255, 0.07);
+  --sheet-bg: #15281b; --toast-bg: #2c5a3c;
+}
+html[data-theme="botanik"][data-scheme="dark"] .b1 { background: #3f7a3a; opacity: 0.45; }
+html[data-theme="botanik"][data-scheme="dark"] .b2 { background: #2d5a2f; opacity: 0.4; }
+html[data-theme="botanik"][data-scheme="dark"] .card,
+html[data-theme="botanik"][data-scheme="dark"] .kpi,
+html[data-theme="botanik"][data-scheme="dark"] .d-tile { -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); }
+html[data-theme="botanik"][data-scheme="dark"] .hero,
+html[data-theme="botanik"][data-scheme="dark"] .phero { background: linear-gradient(140deg, rgba(160, 230, 120, 0.12), rgba(255, 255, 255, 0.03)); }
+html[data-theme="botanik"][data-scheme="dark"] .btn.primary,
+html[data-theme="botanik"][data-scheme="dark"] .btn.water { background: #f2f7ef; color: #10200f; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35); }
+html[data-theme="botanik"][data-scheme="dark"] .btn.ghost { background: rgba(255, 255, 255, 0.06); border-color: rgba(214, 240, 200, 0.16); }
+html[data-theme="botanik"][data-scheme="dark"] .fab { background: #f2f7ef; color: #1f4d3a; }
+@media (max-width: 899px) { html[data-theme="botanik"][data-scheme="dark"] .nav-a { border-color: rgba(214, 240, 200, 0.18); } }
+html[data-theme="botanik"][data-scheme="dark"] .pc-art { background: radial-gradient(ellipse at 50% 80%, rgba(160, 230, 120, 0.1) 0%, rgba(160, 230, 120, 0.1) 55%, transparent 56%); }
+html[data-theme="botanik"][data-scheme="dark"] .kpi-ic, html[data-theme="botanik"][data-scheme="dark"] .chan-ic { background: rgba(160, 230, 120, 0.12); color: #a6e884; }
+html[data-theme="botanik"][data-scheme="dark"] .range-fill { background: linear-gradient(90deg, #5fae63, #a6e884); }
+html[data-theme="botanik"][data-scheme="dark"] .range-mark { border-color: #a6e884; }
+html[data-theme="botanik"][data-scheme="dark"] .rm-halo, html[data-theme="botanik"][data-scheme="dark"] .rm-labbg { fill: #1a3322; }
+html[data-theme="botanik"][data-scheme="dark"] .switch input:checked + .knob { background: #5fae63; }

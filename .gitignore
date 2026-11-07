@@ -14,3 +14,4 @@ simulation/**/work/
 *.cvg
 docs/design/references/
 simulation/field/elmer3d/
+app/docs/concept/

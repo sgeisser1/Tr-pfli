@@ -40,12 +40,14 @@ from zoneinfo import ZoneInfo
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import fluidi_calc as C  # noqa: E402
+import fluidi_analysis as AN  # noqa: E402
 
 APP_DIR = Path(__file__).resolve().parent.parent
 OPENAPI = APP_DIR / "api" / "openapi.yaml"
 STATIC_ALLOW = {"index.html", "manifest.webmanifest", "sw.js", "favicon.ico"}
-STATIC_DIRS = {"css", "js", "vendor", "icons", "img"}
+STATIC_DIRS = {"css", "js", "vendor", "icons", "img", "concept"}
 API = "/api/v1"
+CSP_FRAME_ANY = False  # nur --allow-framing (Screenshots im Geräterahmen)
 CSP = ("default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; "
        "connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; "
        "frame-ancestors 'none'; base-uri 'none'; form-action 'self'")
@@ -154,6 +156,18 @@ class State:
             "mqtt": {"enabled": False, "host": "", "port": 1883, "tls": False, "username": "",
                      "password_set": False, "base_topic": "fluidi", "discovery": True,
                      "discovery_prefix": "homeassistant"},
+            "notifications": {
+                "in_app": True, "badge": True,
+                "quiet_hours": {"enabled": True, "start": "19:00", "end": "07:30"},
+                "rules": {"needs_water": True, "needs_water_delay_h": 6, "critical": True,
+                          "battery_low": True, "offline_h": 24, "daily_summary": "08:00"},
+                "email": {"enabled": False, "host": "", "port": 587, "security": "starttls", "username": "",
+                          "password_set": False, "from": "", "to": ""},
+                "ntfy": {"enabled": False, "url": "", "topic": "fluidi"},
+                "webpush": {"enabled": False, "allowed": False},
+            },
+            "dashboard": {"enabled": True, "public": False, "port": 8443, "title": "Pflanzen im Büro",
+                          "show_names": True, "rotate_s": 20},
         }
         self.network = {"ssid": "Buero-WLAN", "connected": True, "rssi_dbm": -58, "ip": "192.168.10.47",
                         "hostname": "fluidi.local", "mdns": True, "pending_change": None}
@@ -170,7 +184,14 @@ class State:
         self.records: dict[str, list] = {}
         self.assign: list[dict] = []
         self.next_plant = 1
+        self.water_truth: dict[int, list] = {}
+        self.journal: dict[str, dict] = {}
+        self.journal_status: dict[tuple, str] = {}
+        self.next_journal = 0
+        self.cache: dict = {}
+        self.roomplan = None
         self._generate()
+        self.roomplan = default_roomplan()
         self.log("info", "boot", "Gateway gestartet (Mock)")
 
     # ---------------------------------------------------------------- Hilfen
@@ -197,22 +218,27 @@ class State:
         r = self.rng
         t_end = now()
         specs = [
-            # name, substrate, threshold, sensor, start moisture now, drying %/d, extras
-            ("Monstera", "erde", 30, "fluidi-1A2B", 58, 5.0, {}),
-            ("Ficus lyrata", "erde", 35, "fluidi-2C4D", 27, 6.0, {}),
-            ("Bogenhanf", "granulat", 15, "fluidi-3E5F", 41, 3.0, {"battery": (2610, 12, 21)}),
-            ("Efeutute", "erde", 30, "fluidi-4A61", 71, 7.0, {"rssi": -91}),
-            ("Kaktus Fensterbank", "granulat", 10, "fluidi-5B72", 22, 2.5, {"default_cal": True, "sun": True}),
-            ("Zitronenbaum", "erde", 40, "fluidi-6C83", 50, 6.5, {"air": True}),
-            ("Calathea", "erde", 45, "fluidi-7D94", 62, 8.0, {"stale_h": 52}),
-            ("Orchidee", "granulat", 20, None, None, 0, {}),
+            # name, substrate, threshold, sensor, start moisture now, drying %/d, extras (Profil)
+            ("Monstera", "erde", 30, "fluidi-1A2B", 58, 5.0, {"species": "monstera", "upper": 75, "pot": (24, "kunststoff"), "loc": "Fenster Süd", "notes": "Neues Blatt im Oktober"}),
+            ("Ficus lyrata", "erde", 35, "fluidi-2C4D", 27, 6.0, {"species": "ficus_lyrata", "upper": 70, "pot": (28, "keramik"), "loc": "Ecke beim Fenster"}),
+            ("Bogenhanf", "granulat", 15, "fluidi-3E5F", 41, 3.0, {"battery": (2610, 12, 21), "species": "sansevieria", "upper": 50, "pot": (16, "keramik"), "loc": "Empfang"}),
+            ("Efeutute", "erde", 30, "fluidi-4A61", 71, 7.0, {"rssi": -91, "species": "epipremnum", "upper": 75, "pot": (14, "kunststoff"), "loc": "Regal hinten"}),
+            ("Kaktus Fensterbank", "granulat", 10, "fluidi-5B72", 22, 2.5, {"default_cal": True, "sun": True, "species": "kaktus", "upper": 45, "pot": (10, "ton"), "loc": "Fensterbank Süd"}),
+            ("Zitronenbaum", "erde", 40, "fluidi-6C83", 50, 6.5, {"air": True, "species": "zitrus", "upper": 75, "pot": (30, "ton"), "loc": "Fenster West"}),
+            ("Calathea", "erde", 45, "fluidi-7D94", 62, 8.0, {"stale_h": 52, "species": "calathea", "upper": 80, "pot": (17, "keramik"), "loc": "Besprechung"}),
+            ("Orchidee", "granulat", 20, None, None, 0, {"species": "orchidee", "upper": 60, "pot": (12, "kunststoff"), "loc": "Fensterbank Ost"}),
+            ("Glücksfeder", "erde", 15, "fluidi-9F16", 36, 2.8, {"species": "zamioculcas", "upper": 55, "pot": (20, "keramik"), "loc": "Pult Anna"}),
+            ("Grünlilie", "erde", 35, "fluidi-A027", 41, 7.5, {"species": "chlorophytum", "upper": 75, "pot": (14, "kunststoff"), "loc": "Hängeampel"}),
         ]
         for name, sub, thr, sid, m_now, rate, ex in specs:
             pid = self.next_plant
             self.next_plant += 1
+            pot = ex.get("pot", (None, None))
             self.plants[pid] = {"id": pid, "name": name, "substrate": sub, "threshold_pct": thr,
-                                "water_led": "inherit", "notes": "", "sensor_id": sid,
-                                "created": C.iso(t_end - 400 * 86400)}
+                                "water_led": "inherit", "notes": ex.get("notes", ""), "sensor_id": sid,
+                                "created": C.iso(t_end - 400 * 86400), "species": ex.get("species"),
+                                "upper_pct": ex.get("upper"), "location": ex.get("loc", ""),
+                                "pot": {"diameter_cm": pot[0], "material": pot[1], "drainage": True}}
             if not sid:
                 continue
             true_dry = (41000 if sub == "erde" else 42500) + r.uniform(-800, 800)
@@ -240,8 +266,9 @@ class State:
                 else:
                     self.cal[sid][s2] = self._default_cal(s2)
             self.assign.append({"sensor": sid, "plant": pid, "from": t_end - 365 * 86400, "to": None})
-            self.records[sid] = self._history(sid, sub, m_now, rate, t_end - last_offset, ex)
+            self.records[sid] = self._history(sid, sub, m_now, rate, t_end - last_offset, ex, thr, pid)
         self.sensors["fluidi-7D94"]["buffered_records"] = None  # unbekannt: seit 52 h kein Kontakt
+        self._journal_seed(t_end)
 
     def _default_cal(self, sub):
         dry, wet = (41000, 26000) if sub == "erde" else (42000, 29000)
@@ -270,8 +297,9 @@ class State:
             temp += 6 + 3 * math.sin((lt.hour - 11) / 4 * math.pi)
         return round(temp, 2)
 
-    def _history(self, sid, sub, m_now, rate, t_last, ex):
-        """Rückwärts von „jetzt“: Feuchte steigt rückwärts (trocknet vorwärts), Giessen = Sprung."""
+    def _history(self, sid, sub, m_now, rate, t_last, ex, thr=30, pid=None):
+        """Rückwärts von „jetzt“: exponentielle Austrocknung m(t) = m0·exp(−k·t) (Konzept Kap. 7),
+        rückwärts betrachtet steigt die Feuchte; Giessen = Sprung. k ≈ rate/40 pro Tag, Jahreszeit ±35 %."""
         r = self.rng
         per_day = 6
         step = 86400 / per_day
@@ -279,15 +307,18 @@ class State:
         m = float(m_now)
         recs = []
         water_at = r.uniform(75, 90)
+        k_base = rate / 40.0
+        waters = self.water_truth.setdefault(pid, [])
         while t > t_last - 365 * 86400:
             lt = datetime.fromtimestamp(t, self.tz)
             seasonal = 1.0 + 0.35 * math.sin((lt.timetuple().tm_yday - 110) / 365 * 2 * math.pi)
             temp = self._temp_at(t, ex.get("sun", False))
             recs.append({"t": int(t), "raw": self._raw_from(sid, m, temp), "temp": temp, "flags": 0, "source": "auto"})
-            m += rate * seasonal / per_day * r.uniform(0.7, 1.3)
+            m *= math.exp(k_base * seasonal / per_day * r.uniform(0.85, 1.15))
             if m >= water_at:  # rückwärts betrachtet: vor dem Giessen war es trocken
-                m = r.uniform(8, 34)
-                water_at = r.uniform(72, 92)
+                waters.append(t - r.uniform(0.1, 0.9) * step)
+                m = max(5.0, r.uniform(thr - 12, thr + 5))
+                water_at = r.uniform(72, 90)
             t -= step
         recs.reverse()
         # einige manuelle Messungen und nachgelieferte Werte (Gateway-Ausfall)
@@ -300,6 +331,103 @@ class State:
             for rec in recs[-2:]:
                 rec["raw"] = int(self.sensors[sid]["true"]["dry"] * 1.06)
         return recs
+
+    def _journal_seed(self, t_end):
+        """Tagebuch: Knopf „gegossen“ bei ~60 % der Giessungen, Dünger, Umtopfen, Notizen."""
+        r = self.rng
+        for pid, ws in self.water_truth.items():
+            for w in ws:
+                if t_end - w < 200 * 86400 and r.random() < 0.6:
+                    self._journal_add(pid, w - r.uniform(0, 2) * 3600, "watering", "button",
+                                      amount_ml=r.choice([None, 250, 300, 500]))
+            for i in range(1, 7):
+                if pid in (1, 2, 6) and r.random() < 0.8:
+                    self._journal_add(pid, t_end - i * 30 * 86400 - r.uniform(0, 5) * 86400, "fertilizing", "manual",
+                                      note="Flüssigdünger, halbe Dosis")
+        self._journal_add(1, t_end - 150 * 86400, "repotting", "manual", note="In 24-cm-Topf umgetopft, frische Erde")
+        self._journal_add(6, t_end - 3 * 3600, "note", "manual", note="Sensor beim Umstellen herausgerutscht?")
+        self._journal_add(4, t_end - 20 * 86400, "note", "manual", note="Ableger ins Wasserglas gestellt")
+
+    def _journal_add(self, pid, t, typ, source, note="", amount_ml=None):
+        self.next_journal += 1
+        e = {"id": f"j{self.next_journal}", "plant_id": pid, "t": int(t), "type": typ, "source": source,
+             "status": "confirmed", "note": note, "amount_ml": amount_ml}
+        self.journal[e["id"]] = e
+        return e
+
+    # ---------------------------------------------------------------- Auswertung (Konzept Kap. 7)
+    def analysis(self, pid):
+        """Gültige Punkte, erkannte Giessungen, Prognose (gecacht bis zur nächsten Änderung)."""
+        if pid in self.cache:
+            return self.cache[pid]
+        p = self.plants[pid]
+        now_s = now()
+        pts = []
+        for sid, rec in self.plant_records(pid, now_s - 400 * 86400, now_s + 60):
+            ev = C.evaluate(rec["raw"], rec["temp"], self.cal[sid][p["substrate"]], p["threshold_pct"])
+            if ev["moisture_state"] in ("ok", "dry") and ev["moisture_pct"] is not None:
+                pts.append((rec["t"], ev["moisture_pct"]))
+        buttons = [e["t"] for e in self.journal.values() if e["plant_id"] == pid and e["type"] == "watering"
+                   and e["source"] == "button" and e["status"] != "rejected"]
+        events = AN.detect_waterings(pts, buttons)
+        rejected = {k[1] for k, v in self.journal_status.items() if k[0] == pid and v == "rejected"}
+        events_ok = [e for e in events if e["t"] not in rejected]
+        fc = AN.forecast(pts, events_ok, p["threshold_pct"], now_s, p.get("upper_pct"))
+        lr = self.last_record(pid)
+        latest_state = None
+        if lr:
+            latest_state = C.evaluate(lr[1]["raw"], lr[1]["temp"], self.cal[lr[0]][p["substrate"]], p["threshold_pct"])["moisture_state"]
+        stale = bool(p["sensor_id"]) and lr is not None and C.is_stale(lr[1]["t"], now_s, self.per_day(p["sensor_id"]))
+        if not p["sensor_id"]:
+            fc.update(state="not_applicable", explanation="Kein Sensor zugeordnet.", next_water=None, days=None,
+                      days_low=None, days_high=None, confidence=None)
+        elif latest_state not in ("ok", "dry") or stale:
+            fc.update(state="not_applicable", next_water=None, days=None, days_low=None, days_high=None, confidence=None,
+                      explanation="Aktueller Wert unsicher (Sensor nicht in der Erde, überflutet oder keine neuen Werte) – keine Prognose.")
+        last_w = None
+        cand = [e["t"] for e in events_ok] + buttons
+        if cand:
+            last_w = max(cand)
+        res = {"points": pts, "events": events, "events_ok": events_ok, "forecast": fc, "last_watered": last_w,
+               "stale": stale, "latest_state": latest_state}
+        self.cache[pid] = res
+        return res
+
+    def journal_for(self, pid):
+        """Tagebuch = gespeicherte Einträge + vom Sensor erkannte Giessungen (abgeleitet)."""
+        a = self.analysis(pid)
+        out = []
+        merged = {}
+        for e in a["events"]:
+            if e["button_t"] is not None:
+                merged[e["button_t"]] = e
+        for e in self.journal.values():
+            if e["plant_id"] != pid:
+                continue
+            o = {**e, "t": C.iso(e["t"]), "delta_pct": None, "before_pct": None, "after_pct": None,
+                 "sensor_confirmed": False, "uncertain_time": False}
+            if e["type"] == "watering" and e["t"] in merged:
+                ev = merged[e["t"]]
+                o.update(delta_pct=C.round1(ev["delta"]), before_pct=C.round1(ev["before"]),
+                         after_pct=C.round1(ev["peak"]), sensor_confirmed=True)
+            out.append(o)
+        for ev in a["events"]:
+            if ev["button_t"] is not None:
+                continue
+            st = self.journal_status.get((pid, ev["t"]), "unconfirmed")
+            out.append({"id": f"s{pid}-{ev['t']}", "plant_id": pid, "t": C.iso(ev["t"]), "type": "watering",
+                        "source": "sensor", "status": st, "note": "", "amount_ml": None,
+                        "delta_pct": C.round1(ev["delta"]), "before_pct": C.round1(ev["before"]),
+                        "after_pct": C.round1(ev["peak"]), "sensor_confirmed": True,
+                        "uncertain_time": ev["uncertain_time"]})
+        for asg in self.assign:
+            if asg["plant"] == pid:
+                out.append({"id": f"x{pid}-{int(asg['from'])}", "plant_id": pid, "t": C.iso(asg["from"]),
+                            "type": "sensor_change", "source": "system", "status": "confirmed",
+                            "note": f"Sensor {asg['sensor']} zugeordnet", "amount_ml": None, "delta_pct": None,
+                            "before_pct": None, "after_pct": None, "sensor_confirmed": False, "uncertain_time": False})
+        out.sort(key=lambda x: x["t"], reverse=True)
+        return out
 
     # ---------------------------------------------------------------- Ableitungen
     def per_day(self, sid=None):
@@ -367,7 +495,20 @@ class State:
                        "sensor_error": (s["error"]["text"] if s and s["error"] else None)},
             "battery": self.battery_out(s), "signal": self.signal_out(s),
             "calibration": cal_state, "created": p["created"],
+            "species": p.get("species"), "upper_pct": p.get("upper_pct"), "location": p.get("location", ""),
+            "pot": p.get("pot"), **self.plant_extras(p, latest, stale, s),
         }
+
+    def plant_extras(self, p, latest, stale, s):
+        a = self.analysis(p["id"])
+        fc = a["forecast"]
+        st = latest["moisture_state"] if latest else None
+        m = latest["moisture_pct"] if latest else None
+        md = AN.mood(st, m, p["threshold_pct"], p.get("upper_pct"), stale, bool(p["sensor_id"]),
+                     bool(s and s["error"]), fc.get("days"))
+        return {"forecast": {k: fc[k] for k in ("state", "next_water", "days", "days_low", "days_high", "confidence")}
+                | {"next_water": C.iso(fc["next_water"]) if fc["next_water"] else None},
+                "last_watered": C.iso(a["last_watered"]) if a["last_watered"] else None, "mood": md}
 
     def sensor_out(self, s):
         return {
@@ -433,6 +574,7 @@ class State:
                     moist_raw = self._raw_from(sid, max(0.0, m_prev - 0.2), temp)
                 rec = {"t": int(now()), "raw": moist_raw, "temp": temp, "flags": 1, "source": source}
                 self.records[sid].append(rec)
+                self.cache.clear()
                 s["last_seen"] = now()
                 reading = self.reading(sid, rec, p) if p else None
                 self.job_update(j, state="done", progress=1.0, message="Neuer Messwert empfangen",
@@ -477,7 +619,7 @@ class Handler(BaseHTTPRequestHandler):
     def _common_headers(self):
         self.send_header("X-Content-Type-Options", "nosniff")
         self.send_header("Referrer-Policy", "no-referrer")
-        self.send_header("Content-Security-Policy", CSP)
+        self.send_header("Content-Security-Policy", CSP.replace("frame-ancestors 'none'", "frame-ancestors *") if CSP_FRAME_ANY else CSP)
         self.send_header("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
 
     def send_json(self, status, obj, headers=None):
@@ -551,6 +693,8 @@ class Handler(BaseHTTPRequestHandler):
         if ".." in parts or not (rel in STATIC_ALLOW or parts[0] in STATIC_DIRS):
             # SPA: unbekannte Pfade ohne Punkt -> index.html (Hash-Router braucht das nicht, schadet nicht)
             raise ApiError(404, "not_found", "Nicht gefunden")
+        if rel.endswith("/") or (APP_DIR / rel).is_dir():
+            rel = rel.rstrip("/") + "/index.html"
         f = (APP_DIR / rel).resolve()
         if not str(f).startswith(str(APP_DIR)) or not f.is_file():
             raise ApiError(404, "not_found", "Nicht gefunden")
@@ -643,6 +787,8 @@ class Handler(BaseHTTPRequestHandler):
                 raise ApiError(415 if ctype else 400, "bad_request", "Content-Type muss application/json sein")
             q = {k: v[-1] for k, v in parse_qs(url.query).items()}
             with self.S.lock:
+                if self.command != "GET":
+                    self.S.cache.clear()
                 return fn(self, sess=sess, q=q, body=body if body is not None else ({} if not raw else raw), **m.groupdict())
         # Pfad passt, Methode nicht?
         if any(rx.match(sub) for _, _, rx, *_ in ROUTES):
@@ -826,11 +972,20 @@ def _create_plant(S: State, body) -> dict:
     p = {"id": pid, "name": name, "substrate": body.get("substrate", "erde"),
          "threshold_pct": body.get("threshold_pct", S.settings["default_threshold_pct"]),
          "water_led": body.get("water_led", "inherit"), "notes": body.get("notes", ""),
-         "sensor_id": None, "created": C.iso(now())}
+         "sensor_id": None, "created": C.iso(now()), "species": body.get("species"),
+         "upper_pct": body.get("upper_pct"), "location": body.get("location", ""),
+         "pot": body.get("pot") or {"diameter_cm": None, "material": None, "drainage": True}}
+    _check_range(p)
     S.plants[pid] = p
     if sid:
         _assign(S, p, sid, False)
     return p
+
+
+def _check_range(p):
+    up = p.get("upper_pct")
+    if up is not None and up <= p["threshold_pct"] + 5:
+        raise ApiError(400, "validation", "Obergrenze muss mindestens 5 %-Punkte über der Giessschwelle liegen", "upper_pct")
 
 
 def _assign(S: State, p, sid, move_history):
@@ -877,8 +1032,9 @@ def plant_get(h: Handler, plant_id, **_):
 
 @route("PATCH", "/plants/{plant_id}")
 def plant_patch(h: Handler, plant_id, body, **_):
-    p = _plant(h.S, plant_id)
-    for k in ("name", "substrate", "threshold_pct", "water_led", "notes"):
+    p_real = _plant(h.S, plant_id)
+    p = dict(p_real)  # erst prüfen, dann übernehmen
+    for k in ("name", "substrate", "threshold_pct", "water_led", "notes", "species", "upper_pct", "location", "pot"):
         if k in body:
             v = body[k]
             if k == "name":
@@ -887,7 +1043,12 @@ def plant_patch(h: Handler, plant_id, body, **_):
                     raise ApiError(400, "validation", "Name fehlt", "name")
             if k == "threshold_pct" and not (isinstance(v, int) and 0 <= v <= 100):
                 raise ApiError(400, "validation", "Schwelle 0–100 %", k)
+            if k == "species" and v is not None and v not in SPECIES_KEYS:
+                raise ApiError(400, "validation", "Unbekannte Art", k)
             p[k] = v
+    _check_range(p)
+    p_real.update(p)
+    p = p_real
     if p["sensor_id"] and ({"threshold_pct", "water_led", "substrate"} & set(body)):
         h.S.sensors[p["sensor_id"]]["pending_config"] = True
     out = h.S.plant_out(p)
@@ -944,6 +1105,9 @@ def plant_series(h: Handler, plant_id, q, **_):
         out.update(agg)
     out["events"] = [{"t": int(a["from"]), "type": "sensor_change", "text": f"Sensor {a['sensor']} zugeordnet"}
                      for a in S.assign if a["plant"] == p["id"] and t0 <= a["from"] <= t1]
+    out["events"] += [{"t": e["t"], "type": "watering", "text": f"gegossen, +{e['delta']:.0f} %"}
+                      for e in S.analysis(p["id"])["events_ok"] if t0 <= e["t"] <= t1]
+    out["events"].sort(key=lambda e: e["t"])
     h.send_json(200, out)
 
 
@@ -1211,6 +1375,7 @@ def pairing_accept(h: Handler, device, body, **_):
             temp = S._temp_at(t)
             S.records[device] = [{"t": int(t), "raw": S._raw_from(device, 46.0, temp), "temp": temp,
                                   "flags": 0, "source": "auto"}]
+            S.cache.clear()
             p = S.plants[body["plant_id"]] if body.get("plant_id") else _create_plant(S, body["plant"])
             _assign(S, p, device, False)
             S.pairing.update({"active": False, "until": None, "candidates": []})
@@ -1268,6 +1433,11 @@ def settings_patch(h: Handler, body, **_):
     b = json.loads(json.dumps(body))
     if "mqtt" in b and "password" in b["mqtt"]:
         S.settings["mqtt"]["password_set"] = bool(b["mqtt"].pop("password"))
+    em = (b.get("notifications") or {}).get("email") or {}
+    if "password" in em:
+        S.settings["notifications"]["email"]["password_set"] = bool(em.pop("password"))
+    if ((b.get("notifications") or {}).get("webpush") or {}).get("enabled") and not S.settings["notifications"]["webpush"]["allowed"]:
+        raise ApiError(409, "conflict", "Web Push ist gesperrt: braucht Internet und Hersteller-Server (Entscheid offen, REQ-APP-10)")
     _merge(S.settings, b)
     for s in S.sensors.values():
         s["pending_config"] = True
@@ -1508,6 +1678,361 @@ def restore(h: Handler, body, q, **_):
                       "reboot_in_s": None if dry else 5})
 
 
+
+# ------------------------------------------------------------------------------ Konzept: Profile, Tagebuch,
+# Prognose, Raumplan, Statistik, Hinweise, Dashboard (docs/software/SOFTWARE_CONCEPT.md)
+_STARTWERT = ("Startwert von fluidi (ANNAHME), keine Pflegeempfehlung aus der Literatur: Der Feuchteindex ist "
+              "sensor- und substratspezifisch (0 % = trocken kalibriert, 100 % = nass kalibriert). Bitte an deine "
+              "Pflanze anpassen.")
+_CLASSES = {"dry": (10, 45, "trocken halten"), "medium": (30, 70, "mittel"), "moist": (45, 80, "eher feucht")}
+SPECIES = [
+    # key, Name, botanisch, Wasserklasse (Zuordnung = ANNAHME, vom Nutzer zu prüfen)
+    ("monstera", "Monstera", "Monstera deliciosa", "medium"),
+    ("ficus_lyrata", "Geigenfeige", "Ficus lyrata", "medium"),
+    ("sansevieria", "Bogenhanf", "Dracaena trifasciata (syn. Sansevieria)", "dry"),
+    ("epipremnum", "Efeutute", "Epipremnum aureum", "medium"),
+    ("kaktus", "Kaktus", "Cactaceae", "dry"),
+    ("zitrus", "Zitrus", "Citrus × limon", "medium"),
+    ("calathea", "Calathea", "Goeppertia (syn. Calathea)", "moist"),
+    ("orchidee", "Orchidee", "Phalaenopsis", "dry"),
+    ("zamioculcas", "Glücksfeder", "Zamioculcas zamiifolia", "dry"),
+    ("chlorophytum", "Grünlilie", "Chlorophytum comosum", "medium"),
+    ("generic", "Andere Pflanze", "", "medium"),
+]
+SPECIES_KEYS = {k for k, *_ in SPECIES}
+
+
+def species_out():
+    out = []
+    for key, name, latin, cls in SPECIES:
+        lo, hi, txt = _CLASSES[cls]
+        out.append({"key": key, "name": name, "latin": latin, "water_class": cls, "water_class_text": txt,
+                    "start_range": {"lower_pct": lo, "upper_pct": hi}, "source": "startwert", "note": _STARTWERT,
+                    "illustration": key})
+    return out
+
+
+def default_roomplan():
+    """Büro 6.4 × 4.6 m, Fenster Süd und West, Tür Nord (Beispiel)."""
+    pos = {1: (90, 360), 2: (520, 380), 3: (320, 60), 4: (600, 70), 5: (200, 435), 6: (618, 250),
+           7: (120, 120), 9: (420, 220), 10: (300, 300)}
+    return {"version": 1, "updated": C.iso(now() - 5 * 86400), "rooms": [{
+        "id": "r1", "name": "Büro", "width_cm": 640, "depth_cm": 460, "north_deg": 0, "sun_walls": ["s", "w"],
+        "openings": [{"type": "window", "wall": "s", "offset_cm": 60, "length_cm": 180},
+                     {"type": "window", "wall": "s", "offset_cm": 380, "length_cm": 180},
+                     {"type": "window", "wall": "e", "offset_cm": 140, "length_cm": 160},
+                     {"type": "door", "wall": "n", "offset_cm": 470, "length_cm": 95}],
+        "furniture": [{"kind": "desk", "label": "Pult", "x_cm": 170, "y_cm": 170, "w_cm": 180, "d_cm": 80},
+                      {"kind": "desk", "label": "Pult", "x_cm": 360, "y_cm": 170, "w_cm": 180, "d_cm": 80},
+                      {"kind": "shelf", "label": "Regal", "x_cm": 20, "y_cm": 20, "w_cm": 160, "d_cm": 40},
+                      {"kind": "table", "label": "Besprechung", "x_cm": 60, "y_cm": 280, "w_cm": 120, "d_cm": 80}],
+        "plants": [{"plant_id": k, "x_cm": x, "y_cm": y} for k, (x, y) in pos.items()],
+    }]}
+
+
+@route("GET", "/species", auth="read")
+def species_get(h: Handler, **_):
+    h.send_json(200, species_out())
+
+
+@route("GET", "/plants/{plant_id}/journal", auth="read")
+def journal_get(h: Handler, plant_id, q, **_):
+    p = _plant(h.S, plant_id)
+    limit = _int(q, "limit", 100, 1, 1000)
+    items = h.S.journal_for(p["id"])
+    if q.get("include_rejected") != "true":
+        items = [e for e in items if e["status"] != "rejected"]
+    h.send_json(200, items[:limit])
+
+
+@route("POST", "/plants/{plant_id}/journal")
+def journal_post(h: Handler, plant_id, body, **_):
+    S = h.S
+    p = _plant(S, plant_id)
+    t = now()
+    if body.get("t"):
+        try:
+            t = datetime.fromisoformat(body["t"].replace("Z", "+00:00")).timestamp()
+        except ValueError:
+            raise ApiError(400, "validation", "Zeitpunkt ungültig", "t")
+        if t > now() + 300:
+            raise ApiError(400, "validation", "Zeitpunkt liegt in der Zukunft", "t")
+    typ = body.get("type", "watering")
+    e = S._journal_add(p["id"], t, typ, "button" if typ == "watering" else "manual",
+                       note=body.get("note", ""), amount_ml=body.get("amount_ml"))
+    S.cache.clear()
+    sid = p["sensor_id"]
+    if typ == "watering" and sid and S.reachable(sid) and not body.get("t"):
+        # Mock: Sensor misst kurz darauf den Feuchtesprung (Gateway fordert eine Messung an, Konzept 6.4)
+        def wet():
+            with S.lock:
+                s = S.sensors.get(sid)
+                if not s or p["name"] == "Zitronenbaum":
+                    return
+                temp = S._temp_at(now())
+                rec = {"t": int(now()), "raw": S._raw_from(sid, S.rng.uniform(78, 88), temp), "temp": temp,
+                       "flags": 1, "source": "manual"}
+                S.records[sid].append(rec)
+                s["last_seen"] = now()
+                S.cache.clear()
+                S.emit("measurement", {"plant_id": p["id"], "sensor_id": sid, "reading": S.reading(sid, rec, p)})
+                S.emit("plant", S.plant_out(p))
+                S.emit("journal", {"plant_id": p["id"]})
+        threading.Timer(2.5, wet).start()
+    out = next(x for x in S.journal_for(p["id"]) if x["id"] == e["id"])
+    S.emit("journal", {"plant_id": p["id"]})
+    S.emit("plant", S.plant_out(p))
+    h.send_json(201, out)
+
+
+def _journal_entry(S, entry_id):
+    if entry_id in S.journal:
+        return S.journal[entry_id], False
+    m = re.fullmatch(r"s(\d+)-(\d+)", entry_id)
+    if m and int(m.group(1)) in S.plants:
+        pid, t = int(m.group(1)), int(m.group(2))
+        if any(e["t"] == t for e in S.analysis(pid)["events"]):
+            return {"plant_id": pid, "t": t}, True
+    raise ApiError(404, "not_found", "Eintrag nicht gefunden")
+
+
+@route("PATCH", "/journal/{entry_id}")
+def journal_patch(h: Handler, entry_id, body, **_):
+    S = h.S
+    e, derived = _journal_entry(S, entry_id)
+    if derived:
+        if "status" in body:
+            S.journal_status[(e["plant_id"], e["t"])] = body["status"]
+    else:
+        for k in ("note", "amount_ml", "status"):
+            if k in body:
+                e[k] = body[k]
+    S.cache.clear()
+    out = next((x for x in S.journal_for(e["plant_id"]) if x["id"] == entry_id), None)
+    if out is None:  # verworfen -> nur mit include_rejected sichtbar
+        out = {"id": entry_id, "plant_id": e["plant_id"], "t": C.iso(e["t"]), "type": "watering", "source": "sensor",
+               "status": body.get("status", "rejected"), "note": "", "amount_ml": None, "delta_pct": None,
+               "before_pct": None, "after_pct": None, "sensor_confirmed": True, "uncertain_time": False}
+    S.emit("journal", {"plant_id": e["plant_id"]})
+    h.send_json(200, out)
+
+
+@route("DELETE", "/journal/{entry_id}")
+def journal_delete(h: Handler, entry_id, **_):
+    S = h.S
+    e, derived = _journal_entry(S, entry_id)
+    if derived:
+        raise ApiError(409, "conflict", "Vom Sensor erkannte Giessung: bitte verwerfen statt löschen")
+    S.journal.pop(entry_id)
+    S.cache.clear()
+    S.emit("journal", {"plant_id": e["plant_id"]})
+    h.send_json(204, None)
+
+
+@route("GET", "/plants/{plant_id}/forecast", auth="read")
+def forecast_get(h: Handler, plant_id, **_):
+    S = h.S
+    p = _plant(S, plant_id)
+    a = S.analysis(p["id"])
+    fc = dict(a["forecast"])
+    fc["next_water"] = C.iso(fc["next_water"]) if fc["next_water"] else None
+    fc["plant_id"] = p["id"]
+    fc["threshold_pct"] = p["threshold_pct"]
+    fc["curve"] = None
+    if a["forecast"]["state"] == "ok" and a["points"]:
+        t_last, m_last = a["points"][-1]
+        fc["curve"] = AN.forecast_curve(t_last, m_last, a["forecast"], p["threshold_pct"])
+    hist = []
+    for c in AN.cycles(a["points"], a["events_ok"])[-8:]:
+        f = AN.fit_drying(c["points"])
+        if f:
+            hist.append({"start": C.iso(c["start"]), "k_per_day": round(f["k"], 4), "r2": round(f["r2"], 3),
+                         "current": c["current"]})
+    fc["cycles"] = hist
+    h.send_json(200, fc)
+
+
+def _room_check(S, plan):
+    ids = set()
+    for room in plan["rooms"]:
+        if room["id"] in ids:
+            raise ApiError(400, "validation", "Raum-ID doppelt", "rooms")
+        ids.add(room["id"])
+        seen = set()
+        for pp in room.get("plants", []):
+            if pp["plant_id"] not in S.plants:
+                raise ApiError(400, "validation", f"Pflanze {pp['plant_id']} gibt es nicht", "plants")
+            if pp["plant_id"] in seen:
+                raise ApiError(400, "validation", "Pflanze doppelt platziert", "plants")
+            seen.add(pp["plant_id"])
+            if not (0 <= pp["x_cm"] <= room["width_cm"] and 0 <= pp["y_cm"] <= room["depth_cm"]):
+                raise ApiError(400, "validation", "Pflanze liegt ausserhalb des Raums", "plants")
+        for o in room.get("openings", []):
+            wall_len = room["width_cm"] if o["wall"] in ("n", "s") else room["depth_cm"]
+            if o["offset_cm"] + o["length_cm"] > wall_len:
+                raise ApiError(400, "validation", "Fenster/Tür ragt über die Wand hinaus", "openings")
+
+
+@route("GET", "/roomplan", auth="read")
+def roomplan_get(h: Handler, **_):
+    h.send_json(200, h.S.roomplan)
+
+
+@route("PUT", "/roomplan")
+def roomplan_put(h: Handler, body, **_):
+    S = h.S
+    if body.get("version") != S.roomplan["version"]:
+        raise ApiError(409, "conflict", "Der Raumplan wurde inzwischen geändert – bitte neu laden")
+    _room_check(S, body)
+    plan = json.loads(json.dumps(body))
+    plan["version"] = S.roomplan["version"] + 1
+    plan["updated"] = C.iso(now())
+    S.roomplan = plan
+    h.send_json(200, plan)
+
+
+def _energy(S, s):
+    """Ladungsbilanz je Sensor aus Ereigniszählung (Modell PROTOCOL Kap. 12, Mittelwerte 'real').
+    Mock: Zähler simuliert; Schlafstrom ANNAHME 1.6–2.4 µA (energy_budget.py, REQ-ENE-09 ≤ 8 µA)."""
+    per_day = S.per_day(s["id"]) + 2
+    r = random.Random(s["id"])
+    p = S.plants.get(s["plant_id"]) if s["plant_id"] else None
+    need = bool(p and S.plant_out(p)["status"]["needs_water"])
+    mc = {"sleep": round(r.uniform(1.6, 2.4) * 86.4, 1), "advertising": 51.0,
+          "sessions": round(per_day * 0.299, 2), "measure": round(per_day * 0.03, 2),
+          "led": 11.5 if need and s["led_enabled"] else 0.7}
+    total = sum(mc.values())
+    return {"model": "Ereigniszählung × Ladung je Ereignis (PROTOCOL Kap. 12), Schätzung", "mc_per_day": mc,
+            "total_mc_per_day": round(total, 1), "avg_ua": round(total / 86.4, 2),
+            "mah_per_year": round(total * 365 / 3600, 1), "cell": "CR2032", "capacity_mah": 225}
+
+
+def _battery_hist(S, s):
+    t1 = now()
+    paired = datetime.fromisoformat(s["paired"].replace("Z", "+00:00")).timestamp()
+    ts, mv = [], []
+    t = max(paired, t1 - 365 * 86400)
+    span = max(1.0, t1 - t)
+    while t <= t1:
+        x = (t1 - t) / span
+        ts.append(int(t))
+        mv.append(int(s["battery"]["mv"] + (3020 - s["battery"]["mv"]) * x ** 1.6 + (6 if int(t / 86400) % 3 else -4)))
+        t += 7 * 86400
+    return {"t": ts, "mv": mv}
+
+
+@route("GET", "/stats", auth="read")
+def stats_get(h: Handler, q, **_):
+    S = h.S
+    days = _int(q, "days", 90, 7, 730)
+    t1 = now()
+    t0 = t1 - days * 86400
+    tz = ZoneInfo(S.settings["time"]["timezone"])
+    # Giessungen je Woche (Montag, Ortszeit), letzte 12 Wochen
+    lt = datetime.fromtimestamp(t1, tz)
+    monday = datetime(lt.year, lt.month, lt.day, tzinfo=tz).timestamp() - lt.weekday() * 86400
+    weeks = [monday - i * 7 * 86400 for i in range(11, -1, -1)]
+    counts = [0] * 12
+    plants = []
+    total_w = 0
+    for p in sorted(S.plants.values(), key=lambda x: x["id"]):
+        a = S.analysis(p["id"])
+        ws = sorted(e["t"] for e in a["events_ok"])
+        for w in ws:
+            for i, ws0 in enumerate(weeks):
+                if ws0 <= w < ws0 + 7 * 86400:
+                    counts[i] += 1
+        recent = [w for w in ws if w >= t0]
+        total_w += len(recent)
+        gaps = [(b - a_) / 86400 for a_, b in zip(ws, ws[1:]) if b >= t0]
+        pts = [(t, m) for t, m in a["points"] if t >= t1 - 30 * 86400]
+        plants.append({"plant_id": p["id"], "name": p["name"], "waterings": len(recent),
+                       "avg_interval_days": round(sum(gaps) / len(gaps), 1) if gaps else None,
+                       "time_in_range_pct": AN.time_in_range(pts, p["threshold_pct"], p.get("upper_pct")),
+                       "min_pct": min((m for _, m in pts), default=None), "max_pct": max((m for _, m in pts), default=None)})
+    sensors = []
+    for s in sorted(S.sensors.values(), key=lambda x: x["id"]):
+        sensors.append({"sensor_id": s["id"], "plant_id": s["plant_id"], "battery": S.battery_out(s),
+                        "battery_history": _battery_hist(S, s), "energy": _energy(S, s),
+                        "radio": {"rssi_dbm": s["rssi"], "quality": C.signal_quality(s["rssi"]),
+                                  "sessions_per_day": S.per_day(s["id"]) + 2,
+                                  "missed_pct": round(random.Random(s["id"] + "m").uniform(0.2, 4.0) + (8 if s["rssi"] < -88 else 0), 1)},
+                        "last_seen": C.iso(s["last_seen"]), "fw_version": s["fw_version"]})
+    inr = [p["time_in_range_pct"] for p in plants if p["time_in_range_pct"] is not None]
+    allint = [p["avg_interval_days"] for p in plants if p["avg_interval_days"]]
+    h.send_json(200, {
+        "days": days, "generated": C.iso(t1),
+        "summary": {"waterings": total_w, "avg_interval_days": round(sum(allint) / len(allint), 1) if allint else None,
+                    "time_in_range_pct": round(sum(inr) / len(inr), 1) if inr else None,
+                    "sensors_online": sum(1 for sid in S.sensors if S.reachable(sid)), "sensors": len(S.sensors),
+                    "readings": sum(len(v) for v in S.records.values())},
+        "waterings_per_week": [{"week_start": C.iso(w), "count": c} for w, c in zip(weeks, counts)],
+        "plants": plants, "sensors": sensors,
+        "gateway": {"uptime_s": int(t1 - S.boot), "storage_used_bytes": _used(S), "platform": "mock"},
+    })
+
+
+def _alerts(S):
+    out = []
+    t = now()
+    for p in S.plants.values():
+        po = S.plant_out(p)
+        L, st = po["latest"], po["status"]
+        name = p["name"]
+        if st["sensor_error"]:
+            out.append(("critical", "sensor_error", p, f"{name}: {st['sensor_error']}"))
+        if L and L["moisture_state"] == "air" and not st["stale"]:
+            out.append(("critical", "air", p, f"{name}: Sensor nicht in der Erde?"))
+        if L and L["moisture_state"] == "flooded":
+            out.append(("critical", "flooded", p, f"{name}: zu nass oder überflutet?"))
+        if st["needs_water"] and not st["stale"]:
+            lvl = "critical" if po["mood"] == "parched" else "warn"
+            out.append((lvl, "needs_water", p, f"{name} braucht Wasser ({L['moisture_pct']:.0f} %)"))
+        if st["stale"]:
+            out.append(("warn", "stale", p, f"{name}: seit über {S.settings['notifications']['rules']['offline_h']} h keine neuen Werte"))
+        if po["battery"] and po["battery"]["state"] != "ok":
+            lvl = "critical" if po["battery"]["state"] == "critical" else "warn"
+            out.append((lvl, "battery_low", p, f"{name}: Batterie noch ca. {po['battery']['days_left']} Tage"))
+        if po["signal"] and po["signal"]["quality"] <= 1:
+            out.append(("info", "weak_signal", p, f"{name}: Funksignal schwach ({po['signal']['rssi_dbm']} dBm)"))
+    order = {"critical": 0, "warn": 1, "info": 2}
+    out.sort(key=lambda x: (order[x[0]], x[2]["name"]))
+    return [{"id": f"{kind}-{p['id']}", "level": lvl, "kind": kind, "plant_id": p["id"], "sensor_id": p["sensor_id"],
+             "since": C.iso(t - 3600 * (1 + (p["id"] * 7) % 30)), "text": text} for lvl, kind, p, text in out]
+
+
+@route("GET", "/alerts", auth="read")
+def alerts_get(h: Handler, **_):
+    h.send_json(200, _alerts(h.S))
+
+
+@route("GET", "/dashboard", auth="public")
+def dashboard_get(h: Handler, sess, **_):
+    """Nur-Lese-Zusammenfassung für TV/Kollegen: keine Sensor-IDs, keine Systemdaten."""
+    S = h.S
+    d = S.settings["dashboard"]
+    if not d["enabled"]:
+        raise ApiError(404, "not_found", "Dashboard ist ausgeschaltet")
+    if not d["public"] and not sess and not S.settings["public_read"]:
+        raise ApiError(401, "auth_required", "Bitte anmelden")
+    plants = []
+    for p in sorted(S.plants.values(), key=lambda x: x["name"].lower()):
+        po = S.plant_out(p)
+        L = po["latest"]
+        plants.append({"id": p["id"], "name": p["name"] if d["show_names"] else f"Pflanze {p['id']}",
+                       "species": p.get("species"), "mood": po["mood"],
+                       "state": "stale" if po["status"]["stale"] else (L["moisture_state"] if L else "none"),
+                       "moisture_pct": L["moisture_pct"] if L else None, "threshold_pct": p["threshold_pct"],
+                       "upper_pct": p.get("upper_pct"), "needs_water": po["status"]["needs_water"],
+                       "forecast_days": po["forecast"]["days"], "next_water": po["forecast"]["next_water"]})
+    al = _alerts(S)
+    room = json.loads(json.dumps(S.roomplan))
+    h.send_json(200, {"generated": C.iso(now()), "title": d["title"], "public": d["public"],
+                      "summary": {"plants": len(plants), "needs_water": sum(p["needs_water"] for p in plants),
+                                  "warnings": sum(1 for a in al if a["level"] != "info" and a["kind"] != "needs_water")},
+                      "plants": plants, "roomplan": room})
+
+
 # ------------------------------------------------------------------------------ System
 def _time_out(S):
     return {"now": C.iso(now()), "valid": True, "source": "ntp", "last_sync": C.iso(now() - 1800),
@@ -1605,11 +2130,15 @@ def main():
     ap.add_argument("--fresh", action="store_true", help="Ersteinrichtung (Einrichtungscode) simulieren")
     ap.add_argument("--password", default="fluidi-demo-2026")
     ap.add_argument("--quiet", action="store_true")
+    ap.add_argument("--allow-framing", action="store_true",
+                    help="CSP frame-ancestors * (nur für Screenshots im Geräterahmen)")
     ap.add_argument("--demo-session", action="store_true",
                     help="jede Anfrage gilt als angemeldet (nur für Screenshots, nur mit --host 127.0.0.1)")
     a = ap.parse_args()
     if a.demo_session and a.host != "127.0.0.1":
         ap.error("--demo-session nur mit --host 127.0.0.1")
+    global CSP_FRAME_ANY
+    CSP_FRAME_ANY = a.allow_framing
     srv = make_server(a.host, a.port, a.seed, a.fresh, a.password, a.quiet, a.demo_session)
     S = Handler.S
     print(f"fluidi Mock-Gateway: http://{'localhost' if a.host in ('127.0.0.1', '0.0.0.0') else a.host}:{a.port}/")
@@ -1617,6 +2146,7 @@ def main():
         print(f"  Ersteinrichtung – Einrichtungscode (sonst nur über USB): {S.setup_code}")
     else:
         print(f"  Passwort: {a.password}")
+    print(f"  Entwürfe: http://localhost:{a.port}/concept/?theme=frost | botanik | stele")
     print(f"  Schemaprüfung der Anfragen: {'ein' if Handler.CHECK.ok else 'aus (PyYAML/jsonschema fehlen)'}")
     try:
         srv.serve_forever()

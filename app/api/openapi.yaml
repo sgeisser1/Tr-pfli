@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: fluidi Gateway API
   version: 1.0.0-draft
-  summary: Lokale REST-API des fluidi-Gateways (ESP32-S3) für die PWA „fluidi“.
+  summary: Lokale REST-API des fluidi-Gateways (Raspberry Pi Zero 2 W, D-014) für die PWA „fluidi“.
   description: |
     Normativ zusammen mit `docs/interfaces/GATEWAY_API.md` (Abläufe, Sicherheit, Fehlercodes, SSE).
     Strikt lokal: Basis-URL `https://fluidi.local/api/v1`. Alle Zeitangaben in Objekten als
@@ -30,6 +30,11 @@ tags:
   - name: firmware
   - name: data
   - name: system
+  - name: profiles
+  - name: journal
+  - name: analysis
+  - name: roomplan
+  - name: dashboard
 security:
   - session: []
 paths:
@@ -805,6 +810,163 @@ paths:
             text/event-stream:
               schema: {type: string}
 
+  # ---------------------------------------------------------------- Konzept-Erweiterung (SOFTWARE_CONCEPT.md)
+  /species:
+    get:
+      tags: [profiles]
+      summary: Eingebaute Pflanzenvorlagen (nur Startwerte, keine Pflegeempfehlungen)
+      security: [{}, {session: []}]
+      responses:
+        '200':
+          description: Liste
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: '#/components/schemas/Species'}
+  /plants/{plant_id}/journal:
+    parameters: [{$ref: '#/components/parameters/PlantId'}]
+    get:
+      tags: [journal]
+      summary: Giess-Tagebuch (gespeicherte Einträge + vom Sensor erkannte Giessungen), neueste zuerst
+      security: [{}, {session: []}]
+      parameters:
+        - {name: limit, in: query, schema: {type: integer, minimum: 1, maximum: 1000, default: 100}}
+        - {name: include_rejected, in: query, schema: {type: boolean, default: false}}
+      responses:
+        '200':
+          description: Einträge
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: '#/components/schemas/JournalEntry'}
+        '404': {$ref: '#/components/responses/Error'}
+    post:
+      tags: [journal]
+      summary: Eintrag anlegen, z. B. Knopf „gegossen“ (ohne t = jetzt; Gateway fordert danach eine Messung an)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/JournalCreate'}
+      responses:
+        '201':
+          description: angelegt
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/JournalEntry'}
+        '400': {$ref: '#/components/responses/Error'}
+        '404': {$ref: '#/components/responses/Error'}
+  /journal/{entry_id}:
+    parameters:
+      - {name: entry_id, in: path, required: true, schema: {type: string, maxLength: 40}}
+    patch:
+      tags: [journal]
+      summary: Eintrag ändern; erkannte Giessung bestätigen oder verwerfen
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/JournalPatch'}
+      responses:
+        '200':
+          description: geändert
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/JournalEntry'}
+        '404': {$ref: '#/components/responses/Error'}
+    delete:
+      tags: [journal]
+      summary: Eigenen Eintrag löschen (erkannte Giessungen nur verwerfen, 409)
+      responses:
+        '204': {description: gelöscht}
+        '404': {$ref: '#/components/responses/Error'}
+        '409': {$ref: '#/components/responses/Error'}
+  /plants/{plant_id}/forecast:
+    parameters: [{$ref: '#/components/parameters/PlantId'}]
+    get:
+      tags: [analysis]
+      summary: Prognose „nächstes Giessen“ mit Kurve, Intervall und Zyklen (SOFTWARE_CONCEPT Kap. 7)
+      security: [{}, {session: []}]
+      responses:
+        '200':
+          description: Prognose
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ForecastDetail'}
+        '404': {$ref: '#/components/responses/Error'}
+  /roomplan:
+    get:
+      tags: [roomplan]
+      summary: Raumplan (Räume, Fenster/Türen, Sonnenseite, Möbel, Pflanzenpositionen)
+      security: [{}, {session: []}]
+      responses:
+        '200':
+          description: Plan
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/RoomPlan'}
+    put:
+      tags: [roomplan]
+      summary: Raumplan speichern (optimistische Sperre über version)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/RoomPlan'}
+      responses:
+        '200':
+          description: gespeichert, version + 1
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/RoomPlan'}
+        '400': {$ref: '#/components/responses/Error'}
+        '409': {$ref: '#/components/responses/Error'}
+  /stats:
+    get:
+      tags: [analysis]
+      summary: Statistik (Giessungen, Zeit im Zielbereich, Batterie, Energie, Funk) – serverseitig verdichtet
+      security: [{}, {session: []}]
+      parameters:
+        - {name: days, in: query, schema: {type: integer, minimum: 7, maximum: 730, default: 90}}
+      responses:
+        '200':
+          description: Statistik
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Stats'}
+  /alerts:
+    get:
+      tags: [analysis]
+      summary: Aktuelle Hinweise (In-App-Benachrichtigungen, Badge-Zähler), kritisch zuerst
+      security: [{}, {session: []}]
+      responses:
+        '200':
+          description: Hinweise
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: '#/components/schemas/Alert'}
+  /dashboard:
+    get:
+      tags: [dashboard]
+      summary: Nur-Lese-Zusammenfassung für TV/Kollegen (ohne Sensor-IDs und Systemdaten)
+      description: |
+        Öffentlich ohne Anmeldung nur, wenn `settings.dashboard.public` = true. Auf dem Gateway zusätzlich
+        über einen eigenen Port (`settings.dashboard.port`), der nur diese Route und die statische
+        Dashboard-Seite ausliefert (SOFTWARE_CONCEPT Kap. 10).
+      security: [{}, {session: []}]
+      responses:
+        '200':
+          description: Dashboard
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Dashboard'}
+        '401': {$ref: '#/components/responses/Error'}
+        '404': {$ref: '#/components/responses/Error'}
+
 components:
   securitySchemes:
     session:
@@ -946,6 +1108,288 @@ components:
         signal: {oneOf: [{$ref: '#/components/schemas/Signal'}, {type: 'null'}]}
         calibration: {type: string, enum: [none, default, calibrated]}
         created: {$ref: '#/components/schemas/Timestamp'}
+        species: {type: ['string', 'null'], description: 'Schlüssel aus GET /species'}
+        upper_pct: {type: ['integer', 'null'], minimum: 0, maximum: 100, description: 'Obergrenze des Zielbereichs (zu nass)'}
+        location: {type: string, maxLength: 40}
+        pot: {$ref: '#/components/schemas/Pot'}
+        forecast: {$ref: '#/components/schemas/ForecastSummary'}
+        last_watered: {oneOf: [{$ref: '#/components/schemas/Timestamp'}, {type: 'null'}]}
+        mood: {$ref: '#/components/schemas/Mood'}
+    Pot:
+      type: ['object', 'null']
+      additionalProperties: false
+      properties:
+        diameter_cm: {type: ['integer', 'null'], minimum: 4, maximum: 120}
+        material: {type: ['string', 'null'], enum: [kunststoff, ton, keramik, andere, null]}
+        drainage: {type: boolean}
+    Mood:
+      type: string
+      enum: [happy, ok, thirsty, parched, drowning, confused, sleepy, unknown]
+      description: Stimmung des Tropfen-Charakters (SOFTWARE_CONCEPT Kap. 7.5), immer mit Text angezeigt
+    ForecastSummary:
+      type: object
+      required: [state, next_water, days, confidence]
+      properties:
+        state: {type: string, enum: [ok, due, insufficient_data, not_applicable]}
+        next_water: {oneOf: [{$ref: '#/components/schemas/Timestamp'}, {type: 'null'}]}
+        days: {type: ['number', 'null'], description: 'Tage ab jetzt bis zur Giessschwelle'}
+        days_low: {type: ['number', 'null']}
+        days_high: {type: ['number', 'null']}
+        confidence: {type: ['string', 'null'], enum: [low, medium, high, null]}
+    ForecastDetail:
+      allOf:
+        - {$ref: '#/components/schemas/ForecastSummary'}
+        - type: object
+          required: [plant_id, method, explanation, cycles]
+          properties:
+            plant_id: {type: integer}
+            method: {type: string, enum: [exp]}
+            threshold_pct: {type: integer}
+            k_per_day: {type: ['number', 'null'], description: 'Austrocknungsrate (1/Tag), Median der Zyklen'}
+            cycles_used: {type: integer}
+            r2: {type: ['number', 'null']}
+            explanation: {type: string, description: 'Klartext für die Anzeige'}
+            curve:
+              type: ['object', 'null']
+              properties:
+                t: {type: array, items: {type: integer}}
+                moisture: {type: array, items: {type: number}}
+                threshold_pct: {type: integer}
+            cycles:
+              type: array
+              items:
+                type: object
+                required: [start, k_per_day, r2]
+                properties:
+                  start: {$ref: '#/components/schemas/Timestamp'}
+                  k_per_day: {type: number}
+                  r2: {type: number}
+                  current: {type: boolean}
+    Species:
+      type: object
+      required: [key, name, water_class, start_range, source]
+      properties:
+        key: {type: string}
+        name: {type: string}
+        latin: {type: string}
+        water_class: {type: string, enum: [dry, medium, moist], description: 'Zuordnung ANNAHME, vom Nutzer zu prüfen'}
+        water_class_text: {type: string}
+        start_range:
+          type: object
+          required: [lower_pct, upper_pct]
+          properties:
+            lower_pct: {type: integer}
+            upper_pct: {type: integer}
+        source: {type: string, enum: [startwert, quelle], description: 'startwert = fluidi-Annahme; quelle = mit Literaturangabe'}
+        note: {type: string}
+        illustration: {type: string}
+    JournalEntry:
+      type: object
+      required: [id, plant_id, t, type, source, status]
+      properties:
+        id: {type: string}
+        plant_id: {type: integer}
+        t: {$ref: '#/components/schemas/Timestamp'}
+        type: {type: string, enum: [watering, fertilizing, repotting, note, sensor_change, calibration]}
+        source: {type: string, enum: [button, sensor, manual, system], description: 'button = Knopf gegossen; sensor = am Feuchtesprung erkannt'}
+        status: {type: string, enum: [confirmed, unconfirmed, rejected]}
+        note: {type: string}
+        amount_ml: {type: ['integer', 'null']}
+        delta_pct: {type: ['number', 'null'], description: Feuchtesprung in %-Punkten}
+        before_pct: {type: ['number', 'null']}
+        after_pct: {type: ['number', 'null']}
+        sensor_confirmed: {type: boolean, description: 'Sprung im Verlauf gefunden'}
+        uncertain_time: {type: boolean, description: 'Lücke vor dem Sprung > 26 h'}
+    JournalCreate:
+      type: object
+      additionalProperties: false
+      required: [type]
+      properties:
+        type: {type: string, enum: [watering, fertilizing, repotting, note]}
+        t: {$ref: '#/components/schemas/Timestamp'}
+        note: {type: string, maxLength: 200}
+        amount_ml: {type: ['integer', 'null'], minimum: 0, maximum: 20000}
+    JournalPatch:
+      type: object
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        status: {type: string, enum: [confirmed, rejected]}
+        note: {type: string, maxLength: 200}
+        amount_ml: {type: ['integer', 'null'], minimum: 0, maximum: 20000}
+    RoomPlan:
+      type: object
+      required: [version, rooms]
+      properties:
+        version: {type: integer, description: 'beim PUT die gelesene Version mitsenden'}
+        updated: {$ref: '#/components/schemas/Timestamp'}
+        rooms:
+          type: array
+          maxItems: 20
+          items: {$ref: '#/components/schemas/Room'}
+    Room:
+      type: object
+      required: [id, name, width_cm, depth_cm, openings, plants]
+      properties:
+        id: {type: string, maxLength: 16}
+        name: {type: string, maxLength: 40}
+        width_cm: {type: integer, minimum: 100, maximum: 5000}
+        depth_cm: {type: integer, minimum: 100, maximum: 5000}
+        north_deg: {type: integer, minimum: 0, maximum: 359, description: 'Richtung Norden, 0 = Planoberkante'}
+        sun_walls: {type: array, items: {type: string, enum: [n, e, s, w]}}
+        openings:
+          type: array
+          maxItems: 40
+          items:
+            type: object
+            required: [type, wall, offset_cm, length_cm]
+            properties:
+              type: {type: string, enum: [window, door]}
+              wall: {type: string, enum: [n, e, s, w]}
+              offset_cm: {type: integer, minimum: 0}
+              length_cm: {type: integer, minimum: 20, maximum: 1000}
+        furniture:
+          type: array
+          maxItems: 60
+          items:
+            type: object
+            required: [kind, x_cm, y_cm, w_cm, d_cm]
+            properties:
+              kind: {type: string, enum: [desk, shelf, table, sofa, cabinet, other]}
+              label: {type: string, maxLength: 30}
+              x_cm: {type: integer}
+              y_cm: {type: integer}
+              w_cm: {type: integer, minimum: 10}
+              d_cm: {type: integer, minimum: 10}
+        plants:
+          type: array
+          items:
+            type: object
+            required: [plant_id, x_cm, y_cm]
+            properties:
+              plant_id: {type: integer}
+              x_cm: {type: integer}
+              y_cm: {type: integer}
+    Alert:
+      type: object
+      required: [id, level, kind, text]
+      properties:
+        id: {type: string}
+        level: {type: string, enum: [critical, warn, info]}
+        kind: {type: string, enum: [needs_water, air, flooded, sensor_error, stale, battery_low, weak_signal, cert_expiry, storage]}
+        plant_id: {type: ['integer', 'null']}
+        sensor_id: {oneOf: [{$ref: '#/components/schemas/SensorId'}, {type: 'null'}]}
+        since: {$ref: '#/components/schemas/Timestamp'}
+        text: {type: string}
+    Stats:
+      type: object
+      required: [days, summary, waterings_per_week, plants, sensors]
+      properties:
+        days: {type: integer}
+        generated: {$ref: '#/components/schemas/Timestamp'}
+        summary:
+          type: object
+          properties:
+            waterings: {type: integer}
+            avg_interval_days: {type: ['number', 'null']}
+            time_in_range_pct: {type: ['number', 'null']}
+            sensors_online: {type: integer}
+            sensors: {type: integer}
+            readings: {type: integer}
+        waterings_per_week:
+          type: array
+          items:
+            type: object
+            required: [week_start, count]
+            properties:
+              week_start: {$ref: '#/components/schemas/Timestamp'}
+              count: {type: integer}
+        plants:
+          type: array
+          items:
+            type: object
+            required: [plant_id, name, waterings]
+            properties:
+              plant_id: {type: integer}
+              name: {type: string}
+              waterings: {type: integer}
+              avg_interval_days: {type: ['number', 'null']}
+              time_in_range_pct: {type: ['number', 'null']}
+              min_pct: {type: ['number', 'null']}
+              max_pct: {type: ['number', 'null']}
+        sensors:
+          type: array
+          items:
+            type: object
+            required: [sensor_id, battery, energy]
+            properties:
+              sensor_id: {$ref: '#/components/schemas/SensorId'}
+              plant_id: {type: ['integer', 'null']}
+              battery: {oneOf: [{$ref: '#/components/schemas/Battery'}, {type: 'null'}]}
+              battery_history:
+                type: object
+                properties:
+                  t: {type: array, items: {type: integer}}
+                  mv: {type: array, items: {type: integer}}
+              energy:
+                type: object
+                description: 'Schätzung aus Ereigniszählung (PROTOCOL Kap. 5.5/12), keine Messung'
+                properties:
+                  model: {type: string}
+                  mc_per_day:
+                    type: object
+                    properties:
+                      sleep: {type: number}
+                      advertising: {type: number}
+                      sessions: {type: number}
+                      measure: {type: number}
+                      led: {type: number}
+                  total_mc_per_day: {type: number}
+                  avg_ua: {type: number}
+                  mah_per_year: {type: number}
+                  cell: {type: string}
+                  capacity_mah: {type: number}
+              radio:
+                type: object
+                properties:
+                  rssi_dbm: {type: ['integer', 'null']}
+                  quality: {type: integer}
+                  sessions_per_day: {type: integer}
+                  missed_pct: {type: number}
+              last_seen: {oneOf: [{$ref: '#/components/schemas/Timestamp'}, {type: 'null'}]}
+              fw_version: {type: string}
+        gateway: {type: object}
+    Dashboard:
+      type: object
+      required: [generated, title, summary, plants]
+      properties:
+        generated: {$ref: '#/components/schemas/Timestamp'}
+        title: {type: string}
+        public: {type: boolean}
+        summary:
+          type: object
+          properties:
+            plants: {type: integer}
+            needs_water: {type: integer}
+            warnings: {type: integer}
+        plants:
+          type: array
+          items:
+            type: object
+            required: [id, name, mood, state]
+            properties:
+              id: {type: integer}
+              name: {type: string}
+              species: {type: ['string', 'null']}
+              mood: {$ref: '#/components/schemas/Mood'}
+              state: {type: string, enum: [ok, dry, air, flooded, uncalibrated, invalid, stale, none]}
+              moisture_pct: {type: ['number', 'null']}
+              threshold_pct: {type: integer}
+              upper_pct: {type: ['integer', 'null']}
+              needs_water: {type: boolean}
+              forecast_days: {type: ['number', 'null']}
+              next_water: {oneOf: [{$ref: '#/components/schemas/Timestamp'}, {type: 'null'}]}
+        roomplan: {$ref: '#/components/schemas/RoomPlan'}
     PlantCreate:
       type: object
       required: [name, substrate]
@@ -957,6 +1401,10 @@ components:
         water_led: {type: string, enum: [inherit, 'on', 'off'], default: inherit}
         notes: {type: string, maxLength: 200}
         sensor_id: {$ref: '#/components/schemas/SensorId'}
+        species: {type: ['string', 'null']}
+        upper_pct: {type: ['integer', 'null'], minimum: 0, maximum: 100}
+        location: {type: string, maxLength: 40}
+        pot: {$ref: '#/components/schemas/Pot'}
     PlantPatch:
       type: object
       additionalProperties: false
@@ -967,6 +1415,10 @@ components:
         threshold_pct: {type: integer, minimum: 0, maximum: 100}
         water_led: {type: string, enum: [inherit, 'on', 'off']}
         notes: {type: string, maxLength: 200}
+        species: {type: ['string', 'null']}
+        upper_pct: {type: ['integer', 'null'], minimum: 0, maximum: 100}
+        location: {type: string, maxLength: 40}
+        pot: {$ref: '#/components/schemas/Pot'}
     Sensor:
       type: object
       required: [id, plant_id, fw_version, last_seen, battery, signal, interval_per_day, effective_interval_per_day, pending_config, error]
@@ -1116,6 +1568,8 @@ components:
             timezone: {type: string, description: IANA-Name, z. B. Europe/Zurich}
         public_read: {type: boolean, description: Lesen ohne Anmeldung im LAN}
         mqtt: {$ref: '#/components/schemas/MqttSettings'}
+        notifications: {$ref: '#/components/schemas/NotificationSettings'}
+        dashboard: {$ref: '#/components/schemas/DashboardSettings'}
         storage_forecast_days: {type: ['integer', 'null'], readOnly: true}
     SettingsPatch:
       type: object
@@ -1154,6 +1608,111 @@ components:
             base_topic: {type: string, maxLength: 32}
             discovery: {type: boolean}
             discovery_prefix: {type: string, maxLength: 32}
+        notifications:
+          type: object
+          additionalProperties: false
+          properties:
+            in_app: {type: boolean}
+            badge: {type: boolean}
+            quiet_hours:
+              type: object
+              additionalProperties: false
+              properties:
+                enabled: {type: boolean}
+                start: {type: string, pattern: '^([01][0-9]|2[0-3]):[0-5][0-9]$'}
+                end: {type: string, pattern: '^([01][0-9]|2[0-3]):[0-5][0-9]$'}
+            rules:
+              type: object
+              additionalProperties: false
+              properties:
+                needs_water: {type: boolean}
+                needs_water_delay_h: {type: integer, minimum: 0, maximum: 72}
+                critical: {type: boolean}
+                battery_low: {type: boolean}
+                offline_h: {type: integer, minimum: 2, maximum: 168}
+                daily_summary: {type: ['string', 'null'], pattern: '^([01][0-9]|2[0-3]):[0-5][0-9]$'}
+            email:
+              type: object
+              additionalProperties: false
+              properties:
+                enabled: {type: boolean}
+                host: {type: string, maxLength: 64}
+                port: {type: integer, minimum: 1, maximum: 65535}
+                security: {type: string, enum: [starttls, tls, none]}
+                username: {type: string, maxLength: 64}
+                password: {type: string, maxLength: 128, writeOnly: true}
+                from: {type: string, maxLength: 80}
+                to: {type: string, maxLength: 200}
+            ntfy:
+              type: object
+              additionalProperties: false
+              properties:
+                enabled: {type: boolean}
+                url: {type: string, maxLength: 100}
+                topic: {type: string, maxLength: 64}
+            webpush:
+              type: object
+              additionalProperties: false
+              properties:
+                enabled: {type: boolean, description: 'nur möglich, wenn allowed (Entscheid Auftraggeber, REQ-APP-10)'}
+        dashboard:
+          type: object
+          additionalProperties: false
+          properties:
+            enabled: {type: boolean}
+            public: {type: boolean}
+            port: {type: integer, minimum: 1024, maximum: 65535}
+            title: {type: string, maxLength: 40}
+            show_names: {type: boolean}
+            rotate_s: {type: integer, minimum: 5, maximum: 600}
+    NotificationSettings:
+      type: object
+      required: [in_app, badge, rules, email, ntfy, webpush]
+      properties:
+        in_app: {type: boolean, description: 'Hinweise in der App (strikt lokal)'}
+        badge: {type: boolean, description: 'Zähler am App-Symbol (Badging API, lokal)'}
+        quiet_hours: {type: object, properties: {enabled: {type: boolean}, start: {type: string}, end: {type: string}}}
+        rules:
+          type: object
+          properties:
+            needs_water: {type: boolean}
+            needs_water_delay_h: {type: integer}
+            critical: {type: boolean}
+            battery_low: {type: boolean}
+            offline_h: {type: integer}
+            daily_summary: {type: ['string', 'null']}
+        email:
+          type: object
+          properties:
+            enabled: {type: boolean}
+            host: {type: string}
+            port: {type: integer}
+            security: {type: string, enum: [starttls, tls, none]}
+            username: {type: string}
+            password_set: {type: boolean, readOnly: true}
+            from: {type: string}
+            to: {type: string}
+        ntfy:
+          type: object
+          properties:
+            enabled: {type: boolean}
+            url: {type: string, description: 'ntfy-Server im LAN, z. B. http://ntfy.firma.local'}
+            topic: {type: string}
+        webpush:
+          type: object
+          properties:
+            enabled: {type: boolean}
+            allowed: {type: boolean, readOnly: true, description: 'false bis zum Entscheid (REQ-SYS-01/REQ-APP-10)'}
+    DashboardSettings:
+      type: object
+      required: [enabled, public]
+      properties:
+        enabled: {type: boolean}
+        public: {type: boolean, description: 'ohne Anmeldung lesbar (eigener Port, nur Dashboard)'}
+        port: {type: integer}
+        title: {type: string}
+        show_names: {type: boolean}
+        rotate_s: {type: integer}
     Network:
       type: object
       required: [ssid, connected, hostname]
@@ -1310,5 +1869,5 @@ components:
             required: [t, type]
             properties:
               t: {type: integer}
-              type: {type: string, enum: [calibration, sensor_change, gap]}
+              type: {type: string, enum: [calibration, sensor_change, gap, watering]}
               text: {type: string}

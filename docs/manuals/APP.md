@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | Dokument | `docs/manuals/APP.md` |
-| Version | 0.1 (Prototyp, Phase 4d) |
+| Version | 0.2 (Prototyp Phase 4d + klickbare Stil-Entwürfe) |
 | Datum | 2026-11-07 |
 | Gilt für | `app/` (PWA, Mock-Gateway, Tests) |
 
@@ -24,6 +24,9 @@ app/
   api/openapi.yaml                            API-Spezifikation (OpenAPI 3.1)
   dev/mock_server.py, dev/fluidi_calc.py      Mock-Gateway (Python-Standardbibliothek)
   dev/screenshots.sh                          Screenshots mit Edge headless
+  dev/fluidi_analysis.py                      Giess-Erkennung, Prognose, Stimmung
+  dev/concept_shots.sh, concept_compose.py    Screenshots/Vergleich der Stil-Entwürfe
+  concept/                                    klickbare Stil-Entwürfe (Frost, Botanik, Stele)
   tests/                                      Unit- und Konformitätstests
   docs/screenshots/                           erzeugte Screenshots
 ```
@@ -69,7 +72,8 @@ app/dev/screenshots.sh                                       # 14 Screenshots na
 |---|---|
 | `calc.test.js`, `test_calc.py` | gleiche Vektoren `tests/vectors/calc_vectors.json`: Feuchteindex, Begrenzung, Luft/Überflutung, Temperaturkompensation (Platzhalter), Kalibrierspanne, Rundung, Ausreisser, Signal/Batterie, Auflösung, Tagesmittel über Zeitumstellung |
 | `test_mock_api.py` | jede Route der OpenAPI hat eine Mock-Route und umgekehrt; Antworten gegen die Schemas; Login-Pflicht, CSRF, Origin, elevate, Sperre nach 5 Fehlversuchen; Messjob inkl. Timeout; Kalibrierlauf; Koppeln nur im Fenster; Sensorwechsel mit Historie; CSV; Firmware-Signatur und Batterieschwelle; SSE |
-| `test_pwa.py` | Manifest (Name, Farben, Icons 192/512/maskable mit echten PNG-Grössen), index.html (Viewport, theme-color, apple-touch-icon), Service Worker (alle Shell-Dateien vorhanden, API ausgenommen), keine externen URLs, keine Inline-Skripte/-Styles, kein `innerHTML`, Prüfsummen uPlot |
+| `test_analysis.py` | Giess-Erkennung, Austrocknungsfit, Prognose (Intervall, Sicherheit), Stimmung (`dev/fluidi_analysis.py`) |
+| `test_pwa.py` | Manifest (Name, Farben, Icons 192/512/maskable mit echten PNG-Grössen), index.html (Viewport, theme-color, apple-touch-icon), Service Worker (alle Shell-Dateien vorhanden, API ausgenommen), keine externen URLs, keine Inline-Skripte/-Styles, kein `innerHTML`, Prüfsummen uPlot; Entwürfe `app/concept/` ohne externe Ressourcen, Inline-Skripte und `innerHTML`, Importe vorhanden, je Entwurf Dunkelmodus |
 
 Screenshots: Edge headless legt das Layout mindestens 492 px breit an (gemessen); schmale Aufnahmen daher 500 px.
 Die SSE-Verbindung öffnet die App erst 2 s nach dem Start, weil eine offene Verbindung `--virtual-time-budget`
@@ -101,3 +105,64 @@ Hinweise:
 - Offline (Gateway nicht erreichbar) zeigt die App den zuletzt geladenen Stand mit Hinweisbalken.
 - Passwort vergessen: Gateway per USB → Einrichtungsprogramm → „Passwort zurücksetzen“ (Daten bleiben).
 - Zertifikat läuft nach ≤ 825 Tagen ab; die App warnt 60 Tage vorher (Einstellungen → System).
+
+## 5 Stil-Entwürfe selbst ausprobieren (Software-Konzept)
+
+Die drei klickbaren Entwürfe liegen in `app/concept/` und laufen gegen denselben Mock-Server wie der Prototyp
+(gleiche API, realistische Daten: 10 Pflanzen, 1 Jahr Verlauf, Tagebuch, Prognosen, Raumplan). Konzept:
+`docs/software/SOFTWARE_CONCEPT.md`, Vergleich: `docs/software/UI_ENTWUERFE.md`.
+
+### 5.1 Am PC
+
+```bash
+python3 app/dev/mock_server.py                      # Passwort für Änderungen: fluidi-demo-2026
+```
+
+| Entwurf | Adresse |
+|---|---|
+| A „fluidi Frost“ | http://localhost:8080/concept/?theme=frost |
+| B „fluidi Botanik“ | http://localhost:8080/concept/?theme=botanik |
+| C „fluidi Stele“ | http://localhost:8080/concept/?theme=stele |
+
+- Zusätzlich `&mode=light`, `&mode=dark` oder `&mode=auto` (folgt dem Gerät). Die Wahl bleibt im Browser gespeichert.
+- Oben rechts schaltet ein schwarzer Balken zwischen den Entwürfen und Hell/Dunkel/Automatisch um; dasselbe unter
+  **Einstellungen → Darstellung**. `&shot=1` blendet den Balken aus.
+- Direkt zu Seiten: `#/` Übersicht, `#/pflanze/1` Detail, `#/pflanze/2/profil` Profil, `#/raum` Raumplan
+  (`#/raum?edit=1` Editor), `#/statistik`, `#/einstellungen`, `#/dashboard` (mit `?kiosk=1&theme=…` als Vollbild
+  für einen Bildschirm, z. B. `http://localhost:8080/concept/?theme=stele&mode=dark&kiosk=1#/dashboard`).
+- Zum Ausprobieren: „Gegossen“ (Karte oder runder Knopf) – nach ~3 s bestätigt der simulierte Sensor den
+  Feuchtesprung im Tagebuch; erkannte Giessungen „Stimmt / War nicht gegossen“; Raumplan bearbeiten und sichern;
+  „Jetzt messen“; Schalter bei den Benachrichtigungen (Web Push ist absichtlich gesperrt). Beim ersten Ändern fragt
+  die App nach dem Passwort.
+- Kalibrieren, Koppeln, Firmware und Backup führen auf die Seiten des Funktionsprototyps (`/#/…`).
+
+### 5.2 Vom Handy im WLAN
+
+```bash
+python3 app/dev/mock_server.py --host 0.0.0.0 --port 8080
+ip -4 addr show eth0 | grep inet        # IP des PCs bzw. der WSL-Instanz
+```
+
+Auf dem Handy `http://<IP-des-PCs>:8080/concept/?theme=frost` öffnen (Handy und PC im selben WLAN).
+
+- **WSL2:** Der Dienst läuft in der WSL-VM. Windows leitet nur `localhost` weiter, nicht Anfragen aus dem WLAN.
+  Entweder WSL im Netzwerkmodus „mirrored“ betreiben (`.wslconfig`: `networkingMode=mirrored`, dann gilt die
+  Windows-IP) oder unter Windows eine Portweiterleitung einrichten (als Administrator):
+  `netsh interface portproxy add v4tov4 listenport=8080 listenaddress=0.0.0.0 connectport=8080 connectaddress=<WSL-IP>`
+  und in der Windows-Firewall TCP 8080 für das private Netz erlauben. Danach wieder entfernen
+  (`netsh interface portproxy delete v4tov4 listenport=8080 listenaddress=0.0.0.0`).
+- Über `http://<IP>` ist das **kein sicherer Kontext**: Darstellung und Bedienung funktionieren, „Zum Home-Bildschirm“
+  ergibt aber keine echte PWA (kein Service Worker). Für einen Eindruck in Safari genügt das.
+- Der Mock ist nur für Entwicklung gedacht (kein TLS, Demo-Passwort). Nach dem Ausprobieren beenden (Ctrl+C).
+
+### 5.3 Screenshots neu erzeugen
+
+```bash
+app/dev/concept_shots.sh                 # 84 Bilder nach app/docs/concept/ (3 Entwürfe, Handy im Geräterahmen + Desktop)
+python3 app/dev/concept_compose.py       # Vergleichsbilder nach app/docs/concept/vergleich/
+python3 scripts/md2pdf.py docs/software/UI_ENTWUERFE.md docs/software/UI_ENTWUERFE.pdf
+```
+
+Edge headless legt Seiten mindestens ~500 px breit an. Deshalb lädt eine kleine Rahmenseite die App in einem
+430 px breiten iframe (Handy-Rahmen); der Mock läuft dafür mit `--allow-framing` (nur für Screenshots, setzt
+`frame-ancestors *`) und `--demo-session`.

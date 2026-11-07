@@ -128,5 +128,40 @@ class ServiceWorker(unittest.TestCase):
         self.assertIn("url.pathname.startsWith('/api/')", self.sw)  # API nicht aus dem Shell-Cache
 
 
+class ConceptDrafts(unittest.TestCase):
+    """Klickbare Stil-Entwürfe (app/concept/): gleiche Regeln wie die PWA (REQ-APP-09, CSP)."""
+    C = APP / "concept"
+
+    def test_index_no_inline_and_files_exist(self):
+        html = (self.C / "index.html").read_text(encoding="utf-8")
+        self.assertIsNone(re.search(r"<script(?![^>]*\bsrc=)[^>]*>", html))
+        self.assertNotIn("<style", html)
+        self.assertIsNone(re.search(r"\sstyle=", html))
+        for ref in re.findall(r'(?:src|href)="([^"#:]+)"', html):
+            self.assertTrue((self.C / ref).resolve().is_file(), ref)
+        for t in ("frost", "botanik", "stele"):
+            self.assertIn(f'css/{t}.css', html)
+
+    def test_no_external_and_no_innerhtml(self):
+        rx = re.compile(r"(?:https?:)?//(?!www\.w3\.org/2000/svg)[a-z0-9.-]+\.[a-z]{2,}", re.I)
+        for f in list(self.C.rglob("*.js")) + list(self.C.rglob("*.css")) + list(self.C.rglob("*.html")):
+            txt = f.read_text(encoding="utf-8")
+            if f.suffix == ".js":
+                self.assertIsNone(re.search(r"\.(innerHTML|outerHTML)\s*=|insertAdjacentHTML|document\.write", txt), f.name)
+                txt = re.sub(r"//[^\n]*", "", txt)
+            hits = [m.group(0) for m in rx.finditer(txt) if "w3.org" not in m.group(0)]
+            self.assertEqual(hits, [], f)
+
+    def test_imports_resolve(self):
+        for f in (self.C / "js").glob("*.js"):
+            for imp in re.findall(r"from '(\./[^']+)'", f.read_text(encoding="utf-8")):
+                self.assertTrue((f.parent / imp).is_file(), f"{f.name}: {imp}")
+
+    def test_themes_have_dark_mode(self):
+        for t in ("frost", "botanik", "stele"):
+            css = (self.C / "css" / f"{t}.css").read_text(encoding="utf-8")
+            self.assertIn(f'html[data-theme="{t}"][data-scheme="dark"]', css)
+
+
 if __name__ == "__main__":
     unittest.main()
