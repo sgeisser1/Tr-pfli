@@ -29,11 +29,11 @@ freecadcmd mechanical/gen/fluidi_gateway.py          # mechanical/gateway/print/
 | Betttemperatur | **90 °C** | TDS 80–100 |
 | Bauraum | **Haube geschlossen**, 10 min mit Bett 90 °C vorheizen (Ziel 45 °C, TDS 45–60), Deckel/Oberseite zu | P1S hat keine Kammerheizung |
 | Bauteillüfter | 10 % (ab Schicht 3), max. 30 % für Kleinteile (< 10 s/Schicht), Hilfslüfter **aus** | TDS 0–80 %; ASA verzieht bei starker Kühlung |
-| Schichthöhe | **0.16 mm** Hülse, Kappe, Kragen, Wanne, Deckel; **0.12 mm** Taste, Klemmring, Teller, Stössel, Fenster | Logo-Strich 0.83 mm (Sensor) / 1.14 mm (Gateway) |
+| Schichthöhe | **0.16 mm** Hülse, Kappe, Kragen, Wanne, Deckel; **0.12 mm** Taste, Klemmring, Teller, Stössel, Fenster | Logo-Strich 1.00 mm (Sensor V4) / 1.14 mm (Gateway) |
 | Wände | **4** (≈ 1.7 mm) → Wände 1.6/2.0 mm werden massiv | |
 | Deck-/Bodenschichten | 6 / 5 | |
 | Füllung | **100 %** (Kleinteile), sonst 40 % Gyroid (nur Gateway-Dome) | Sensorwände sind ohnehin massiv |
-| Naht | **hinten** („Back“), Naht verbergen; auf den O-Ring-Gleitflächen (Hülse innen z 2–8 und 30–37) Naht mit 600er-Papier glätten | Leckkanal quer zur Dichtung vermeiden (Mechanikbericht 2.1) |
+| Naht | **hinten** („Back“), Naht verbergen; auf den O-Ring-Gleitflächen (Hülse innen z 2–8 und 30–35, Rev B) Naht mit 600er-Papier glätten | Leckkanal quer zur Dichtung vermeiden (Mechanikbericht 2.1) |
 | Elefantenfuss | 0.15 mm | Hülse, Kragen, Wanne |
 | XY-Lochkompensation | 0.0 (zuerst Passungsprobe drucken, dann ggf. +0.05) | Kap. 4 |
 | Geschwindigkeit | Standard „Optimal“, Aussenwand ≤ 120 mm/s | TDS < 250 mm/s |
@@ -46,8 +46,8 @@ freecadcmd mechanical/gen/fluidi_gateway.py          # mechanical/gateway/print/
 
 | Datei | Teil | Farbe | Ausrichtung (wie exportiert) | Kritische Stellen | g |
 |---|---|---|---|---|---|
-| `huelse_grau` | Hülse | Warmgrau | stehend, Boden auf dem Bett | Logo-Relief 0.25 auf senkrechter Wand; Warnsymbol innen vertieft 0.3; Kerbe oben offen; Furchlippe Ø 1.7 in den ersten 3 Schichten | 5.3 |
-| `kappe_blau` | Kappe mit Zapfen, Schott, Biegezunge | Hellblau | **kopfüber** (Decke auf dem Bett) | Tastentasche im Bett; Schott = Brücke 5.5 mm; O-Ring-Nut-Flanke 1.35 mm Überhang (ohne Stütze druckbar, Probedruck); Zunge 0.8 mm = 2 Bahnen, wächst vom Block | 2.3 |
+| `huelse_grau` | Hülse | Warmgrau | stehend, Boden auf dem Bett | Logo-Relief 0.25 auf senkrechter Wand (19.4 mm); Warnsymbol innen vertieft 0.3; Kerbe oben offen; 4 Ablaufschlitze 3 × 1.2 hinten (Brücke 3 mm); Furchlippe Ø 1.7 in den ersten 3 Schichten; Höhe 44.7 | 7.5 |
+| `kappe_blau` | Kappe mit Zapfen, Schott, Biegezunge | Hellblau | **kopfüber** (Decke auf dem Bett) | Tastentasche im Bett; Schott = Brücke 5.5 mm; O-Ring-Nut-Flanke 1.35 mm Überhang (ohne Stütze druckbar, Probedruck); Zunge 0.8 mm = 2 Bahnen, wächst vom Block; Ablaufstufe am Zapfen = 0.5 mm Überhang (kopfüber ohne Stütze); dünnste Zapfenwand 0.54 mm hinter den hinteren Nutecken | 4.3 |
 | `kragen` | Kragen (Vergussform) | beliebig | stehend | Mutterntasche von vorne = Brücke 4.6 mm; Nutflanke 1.35 mm | 0.8 |
 | `fenster_tropfen` | Lichtfenster Sensor | natur transluzent | Tropfenfläche auf dem Bett, Schaft nach oben | Aussenfläche matt (Bettstruktur Engineering Plate = Diffusor) | 0.1 |
 | `taste_blau` | Taste 9 × 6 | Hellblau | Oberseite auf dem Bett | Hals Ø 3.0 | 0.1 |
@@ -58,7 +58,7 @@ freecadcmd mechanical/gen/fluidi_gateway.py          # mechanical/gateway/print/
 | `distanzlehre_23p5` | Montage-Lehre (2 Stück, wiederverwendbar) | beliebig | stehend | | |
 | `passprobe_huelse_unten/_oben` | Passungsproben (vor der ersten Hülse) | Warmgrau | stehend | Gleitsitz Kragen/Zapfen, O-Ring-Verpressung, Furchlippe | |
 
-ASA pro Sensor ≈ **9 g** (≈ CHF 0.25, **ANNAHME** CHF 25/kg), kein AMS-Farbwechsel (jedes Teil einfarbig). Druckzeit-Schätzung nach Slicen eintragen.
+ASA pro Sensor ≈ **13 g** (Kopf V4, Rev B; Rev A ≈ 9 g) (≈ CHF 0.25, **ANNAHME** CHF 25/kg), kein AMS-Farbwechsel (jedes Teil einfarbig). Druckzeit-Schätzung nach Slicen eintragen.
 
 ### Gateway (`mechanical/gateway/print/`)
 
@@ -97,8 +97,9 @@ Umspritzung des Netzteilsteckers (ANNAHME ≤ 10.6 × 7.0).
 | Fügung | Spiel je Seite | Herkunft |
 |---|---|---|
 | Hülse innen ↔ Zapfen / Kragen (Gleitsitz) | 0.20 | Mechanikbericht 2.6 |
-| O-Ring-Einbauraum radial | 1.35 ± 0.10 → Verpressung 15–33 % (AS568-017, Schnur 1.78 ± 0.08) | `check_sensor.txt` Pkt. 7 |
-| Dachziegelrand Hülse (0.7) im Kappenschlitz (1.0) | 0.10 aussen, 0.20 innen | S3-W3 |
+| O-Ring-Einbauraum radial | 1.35 ± 0.10 → Verpressung 15–33 % (Rev B: AS568-019, Schnur 1.78 ± 0.08, Dehnung 2.1 %) | `check_sensor.txt` Pkt. 7 |
+| Dachziegelrand Hülse (0.7) im Kappenschlitz | 0.10 aussen, 0.70 innen (Rev B: Ablaufspalt) | S3-W3 |
+| Sichtschale ↔ Zapfen oberhalb der Ablaufstufe (Rev B) | 0.70 (kein Kapillarspalt) | PCB_OUTLINE.md Kap. 7 |
 | Sondenschlitz Boden | 0.4 (Sonde inkl. Beschichtung ≤ 2.0 × 20.4) | |
 | Platine im Kragen / Schott | 0.15 / 0.2 (mit Epoxid gefüllt) | |
 | Fenster in Kappe, Lichtschaft in Zapfen | 0.10 Klebespalt | |
@@ -117,7 +118,7 @@ dreht danach frei. Bei Bedarf XY-Lochkompensation anpassen, nicht die Geometrie.
 
 ## 5 Nacharbeit und Montage-Hilfsstoffe
 
-- Hülse: Gleitflächen innen (z 2–8, 30–37) glätten, Kerbe innen entgraten (O-Ring läuft darüber).
+- Hülse: Gleitflächen innen (z 2–8, 30–35) glätten, Ablaufschlitze frei halten, Kerbe innen entgraten (O-Ring läuft darüber).
 - Fenster: Aussenseite matt lassen; Kleben mit transparentem 2K-Epoxid oder UV-Kleber (**ANNAHME** Typ, Welle 2), Klebstoff nicht auf die Sichtfläche.
 - O-Ringe mit Silikonfett (Mechanikbericht 2.1), Werkstoff ohne Russ.
 - Gateway: Gewindeeinsätze M2.5 mit Lötkolben 220 °C einsetzen (**ANNAHME**), FPC innen an die linke Stirnwand kleben.

@@ -1,15 +1,17 @@
-Platzhalter-Kollisionspruefung fluidi Sensor (Schnittstelle Rev A), erzeugt von fluidi_sensor.py
-Echte Pruefung mit KiCad-STEP folgt in Welle 2.
+Kollisionspruefung mit vereinfachtem PCB-Modell, fluidi Sensor (Schnittstelle Rev B), erzeugt von fluidi_sensor.py
+Modell: Kontur Rev B + Bauteilhuellen je Zone + feste Bauteile. Pruefung mit KiCad-STEP folgt nach dem Layout.
 
 XBT1 Keystone 3034 (gedreht)                                           | Keystone_3034_Catalog_M65.pdf S.1: H 4.1, W 23.1, L 16.1
-    Kollision: keine | kleinster Abstand 0.20 mm zu Kappe_blau, 0.20 mm zu Schottkeil
+    Kollision: keine | kleinster Abstand 0.20 mm zu Schottkeil, 0.20 mm zu Verguss_Kragen
 BT1 CR2032                                                             | Panasonic_CR2032_Datasheet_2026-02.pdf S.1: Ø20 x 3.2
-    Kollision: keine | kleinster Abstand 1.75 mm zu Kappe_blau, 1.75 mm zu Schottkeil
+    Kollision: keine | kleinster Abstand 1.06 mm zu Huelse_grau, 1.75 mm zu Schottkeil
 D1 RGB 1615                                                            | Elektronikbericht 1.1 / TUOZHAN DS S.4: 1.6 x 1.5 x 0.6
-    Kollision: keine | kleinster Abstand 2.00 mm zu Fenster_transluzent, 2.80 mm zu Kappe_blau
-SW1 TS-1187A                                                           | XKB DS S.1: 5.1 x 5.1, H 1.5 (Code A), Hub 0.2-0.25
-    Kollision: keine | kleinster Abstand 0.20 mm zu Kappe_blau, 1.05 mm zu Schottkeil
-Band F (CC2340 QFN 4x4, Quarze 3.2x2.5, L 2.0x1.6, C 1206, 0402)       | Huelle 20 x 5.6 x 2.0 (ANNAHME groesste Bauteilhoehe 1206/Quarz <= 2.0)
+    Kollision: keine | kleinster Abstand 1.68 mm zu Kappe_blau, 2.00 mm zu Fenster_transluzent
+SW1 TS-1088-AR02016                                                    | XUNPU DS S.1: 3.9 x 3.0, H 2.0, Hub 0.2
+    Kollision: keine | kleinster Abstand 0.20 mm zu Kappe_blau, 2.62 mm zu Fenster_transluzent
+Band F (CC2340 QFN 4x4, Quarze, L, C 1206, SC70, SOT-23, 0402)         | Huelle 26 x 15.1 x 2.0 (Zonengrenze hmax 2.0)
     Kollision: keine | kleinster Abstand 0.20 mm zu Kappe_blau, 0.60 mm zu Fenster_transluzent
+U3 TMP1075N + C24 im Kragen                                            | Huelle 4.4 x 2.0 x 0.7 (SOT-563 0.6, 0402 0.55 laut FLOORPLAN 2f)
+    Kollision: keine | kleinster Abstand 0.20 mm zu Kragen, 2.60 mm zu Huelse_grau
 AN043-Antenne                                                          | INDEX ANT-AN043: 15.2 x 5.7, Kupfer
     Kollision: keine | kleinster Abstand 0.54 mm zu Kappe_blau, 0.70 mm zu Membran_Silikon

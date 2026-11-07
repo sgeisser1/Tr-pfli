@@ -1,25 +1,37 @@
 {
  "title": "fluidi Sensor P3 - Schnittstelle PCB-Kontur <-> Gehaeuse",
- "revision": "A",
+ "revision": "B",
  "date": "2026-11-07",
- "status": "verbindlich fuer Layout Welle 2 (Aenderung nur ueber neue Revision)",
+ "revision_note": "Rev B ersetzt Rev A: Kopf V4 34 x 13 x 57.5 (D-019), Platine im Kopf 26 mm, Oberkante z 53.5, Band 15.1 mm, Platine 0.8 mm nach vorn (y_F 6.6), LED an der Fuge z 43.9, SW1 TS-1088 bei z 45.1, Clip x -7...9.1, U3 im Kragen (Option f), O-Ring AS568-019, Kupfer Sonde >= 1.25 mm.",
+ "status": "verbindlich fuer Layout Phase 4b Welle 2 (Aenderung nur ueber neue Revision); Z5B erst nach Freigabe Sicherheit",
  "generator": "mechanical/gen/fluidi_params.py",
  "doc": "docs/interfaces/PCB_OUTLINE.md",
  "units": "mm",
  "coordinate_systems": {
   "head": "x Breite (+ rechts von vorne), y Tiefe (0 = Front, + hinten), z Hoehe (0 = Kopfunterkante)",
-  "kicad": "X = x, Y = 44.0 - z (Ursprung Mitte Oberkante, Y nach unten), Top-View = Ansicht von vorne, F.Cu = bestueckte Seite zeigt zum Fenster (-y)"
+  "kicad": "X = x, Y = 53.5 - z (Ursprung Mitte Oberkante, Y nach unten), Top-View = Ansicht von vorne, F.Cu = bestueckte Seite zeigt zum Fenster (-y)",
+  "field": "simulation/field/REPORT.md: z_f = -z (0 an der Kopfunterkante, + zur Spitze); Vergusskante liegt bei z = 2.0 (z_f = -2.0), d. h. 2 mm hoeher als dort angenommen (konservativ fuer Luftanteil)"
+ },
+ "head": {
+  "W": 34.0,
+  "D": 13.0,
+  "H": 57.5,
+  "z_fuge": 43.5,
+  "cap_h": 14.0,
+  "sleeve_top": 43.2
  },
  "board": {
   "thickness": 1.6,
   "layers": 4,
-  "width": 20.0,
-  "length": 149.0,
-  "z_top": 44.0,
+  "width_probe": 20.0,
+  "width_head": 26.0,
+  "length": 158.5,
+  "z_top": 53.5,
   "z_tip": -105.0,
   "tip": "45 Grad, flach 5.0 mm",
-  "y_front_F": 7.4,
-  "y_back_B": 9.0,
+  "shoulder": "45 Grad bis z 11.5 (26 mm), Innenecke R 2.0 (Tangente ab z 7.67, 8 Segmente)",
+  "y_front_F": 6.6,
+  "y_back_B": 8.2,
   "assembly": "einseitig F (JLC Economic)",
   "z_position_tol": 0.2,
   "probe_max_incl_coating": {
@@ -41,11 +53,91 @@
    ],
    [
     10.0,
-    44.0
+    7.6716
+   ],
+   [
+    10.0096,
+    7.8676
+   ],
+   [
+    10.0384,
+    8.0618
+   ],
+   [
+    10.0861,
+    8.2521
+   ],
+   [
+    10.1522,
+    8.4369
+   ],
+   [
+    10.2362,
+    8.6144
+   ],
+   [
+    10.3371,
+    8.7827
+   ],
+   [
+    10.454,
+    8.9404
+   ],
+   [
+    10.5858,
+    9.0858
+   ],
+   [
+    13.0,
+    11.5
+   ],
+   [
+    13.0,
+    53.5
+   ],
+   [
+    -13.0,
+    53.5
+   ],
+   [
+    -13.0,
+    11.5
+   ],
+   [
+    -10.5858,
+    9.0858
+   ],
+   [
+    -10.454,
+    8.9404
+   ],
+   [
+    -10.3371,
+    8.7827
+   ],
+   [
+    -10.2362,
+    8.6144
+   ],
+   [
+    -10.1522,
+    8.4369
+   ],
+   [
+    -10.0861,
+    8.2521
+   ],
+   [
+    -10.0384,
+    8.0618
+   ],
+   [
+    -10.0096,
+    7.8676
    ],
    [
     -10.0,
-    44.0
+    7.6716
    ],
    [
     -10.0,
@@ -55,34 +147,114 @@
   "outline_kicad_XY": [
    [
     -2.5,
-    149.0
+    158.5
    ],
    [
     2.5,
-    149.0
+    158.5
    ],
    [
     10.0,
-    141.5
+    151.0
    ],
    [
     10.0,
+    45.8284
+   ],
+   [
+    10.0096,
+    45.6324
+   ],
+   [
+    10.0384,
+    45.4382
+   ],
+   [
+    10.0861,
+    45.2479
+   ],
+   [
+    10.1522,
+    45.0631
+   ],
+   [
+    10.2362,
+    44.8856
+   ],
+   [
+    10.3371,
+    44.7173
+   ],
+   [
+    10.454,
+    44.5596
+   ],
+   [
+    10.5858,
+    44.4142
+   ],
+   [
+    13.0,
+    42.0
+   ],
+   [
+    13.0,
     0.0
    ],
    [
-    -10.0,
+    -13.0,
     0.0
    ],
    [
+    -13.0,
+    42.0
+   ],
+   [
+    -10.5858,
+    44.4142
+   ],
+   [
+    -10.454,
+    44.5596
+   ],
+   [
+    -10.3371,
+    44.7173
+   ],
+   [
+    -10.2362,
+    44.8856
+   ],
+   [
+    -10.1522,
+    45.0631
+   ],
+   [
+    -10.0861,
+    45.2479
+   ],
+   [
+    -10.0384,
+    45.4382
+   ],
+   [
+    -10.0096,
+    45.6324
+   ],
+   [
     -10.0,
-    141.5
+    45.8284
+   ],
+   [
+    -10.0,
+    151.0
    ]
   ]
  },
  "markings": {
   "max_insertion": {
    "z": -5.0,
-   "kicad_Y": 49.0,
+   "kicad_Y": 58.5,
    "sides": "F+B",
    "silkscreen": "Linie 0.2 mm, x -9...9, Text \"max\" + Pfeil"
   },
@@ -110,7 +282,7 @@
     -4.4,
     -0.8
    ],
-   "text": "fluidi rev A"
+   "text": "fluidi rev B"
   },
   "warning_silkscreen": {
    "side": "B",
@@ -119,7 +291,7 @@
     8.0
    ],
    "z": [
-    9.0,
+    11.0,
     28.0
    ],
    "text": "Dreieck ! + CR2032 + Verschluckgefahr"
@@ -130,15 +302,15 @@
    "id": "Z1_ANTENNE",
    "side": "FB",
    "x": [
-    -10.0,
-    10.0
+    -13.0,
+    13.0
    ],
    "z": [
-    38.3,
-    44.0
+    47.8,
+    53.5
    ],
    "hmax": 0.0,
-   "rule": "AN043-IFA (15.2 x 5.7) inkl. Masse-Keepout nach AN043; keine Bauteile, kein Metall des Gehaeuses. Kunststoff vor der F-Seite: Stoesselrohr, Finger, Biegezunge (siehe Kap. 5) -> Elektronik bestaetigt.",
+   "rule": "AN043-IFA 15.2 x 5.7 (Footprint Texas_SWRA117D_2.4GHz_Left) an der Oberkante; Lage in x durch Elektronik, offenes Ende (Arm mit hoechstem E-Feld) rechts, nicht hinter Stoessel (x -4.2...-0.2) oder Zunge (x -7.6...-4.4). Ganze Zone ohne Bauteile, neben und ueber der Antenne kein Kupfer (AN043). Kein Metall des Gehaeuses.",
    "kicad_Y": [
     0.0,
     5.7
@@ -148,94 +320,112 @@
    "id": "Z2_BAND_F",
    "side": "F",
    "x": [
-    -10.0,
-    10.0
+    -13.0,
+    13.0
    ],
    "z": [
     32.7,
-    38.3
+    47.8
    ],
    "hmax": 2.0,
-   "rule": "Elektronikband. Bauteilhoehe <= 2.0 mm (Durchfuehrung durch das Schott beim Einschieben von unten). In Spalte x -7.8...-4.2 (Biegezunge) <= 1.5 mm. LED D1 und Taster SW1 fest (Kap. 4).",
+   "rule": "Elektronikband 26 x 15.1 = 392.6 mm2 (Bedarf 382.3 mm2 = 254.9 Courtyard x 1.5, Kap. 4). Bauteilhoehe <= 2.0 mm ueberall (Einschieben von unten durch das Schott; Zunge 0.2 vor SW1). Courtyards >= 0.3 mm zur Kontur. D1 und SW1 fest (Kap. 5). Lichtschaft vor D1: Ø3.0, endet 2.0 mm vor der LED-Oberseite.",
    "kicad_Y": [
     5.7,
-    11.3
+    20.8
    ]
   },
   {
    "id": "Z2_BAND_B",
    "side": "B",
    "x": [
-    -10.0,
-    10.0
+    -13.0,
+    13.0
    ],
    "z": [
     30.3,
-    44.0
+    47.8
    ],
    "hmax": 0.0,
-   "rule": "B-Seite unbestueckt (Economic PCBA einseitig). Freiraum 2.4 mm bis Kappe innen.",
+   "rule": "Unbestueckt (Economic PCBA einseitig). Kupfer und Testpads erlaubt (TP PROBE_SENSE, TP4 OSZ_OUT, GND), Zugang nur vor dem Einschieben (Pogo). Freiraum hinter B: 0.2 mm (Zapfen), 3.2 mm (Kappe, z > 44.9).",
    "kicad_Y": [
-    0.0,
-    13.7
+    5.7,
+    23.2
    ]
   },
   {
    "id": "Z3_SCHOTT",
    "side": "FB",
    "x": [
-    -10.0,
-    10.0
+    -13.0,
+    13.0
    ],
    "z": [
     30.3,
     32.7
    ],
    "hmax": 0.0,
-   "rule": "Schott-Verguss: keine Bauteile, keine Vias, kein Kupfer auf Aussenlagen, Loetstopplack geschlossen. Signale nur Innenlagen (M-03, S3-K1).",
+   "rule": "Schott-Verguss z 30.8...32.0: keine Bauteile, keine Vias, kein Kupfer auf Aussenlagen, Loetstopplack geschlossen. Signale nur Innenlagen (M-03, S3-K1).",
    "kicad_Y": [
-    11.3,
-    13.7
+    20.8,
+    23.2
    ]
   },
   {
    "id": "Z4_FACH_F",
    "side": "F",
    "x": [
-    -10.0,
-    10.0
+    -13.0,
+    13.0
    ],
    "z": [
     7.5,
     30.3
    ],
    "hmax": 4.1,
-   "rule": "Zellfach: nur Keystone 3034 (gedreht, Ausschub +x), Minuspad, UART-/Testpads (Streifen x 6.6...9.5). Unter der Zelle nur Loetstopplack ausser Minuspad (R2-W01 Nr. 2). Keine Vias im Fach (S2-W03). 2 x 100 kOhm im Elektronikraum (R2-A3).",
+   "rule": "Zellfach: nur Keystone 3034 (gedreht, Ausschub +x, Clip x -7.0...9.1) und Minuspad; UART-/Testpads nur im Streifen x -12.7...-7.5, z 12...30 (ausserhalb des Ausschubwegs). Unter der Zelle nur Loetstopplack ausser Minuspad (R2-W01 Nr. 2). Keine Vias im Fach (S2-W03). Leitungen zum Kragen (SENS_PWR, SDA, SCL, GND) und zur Sonde nur Innenlagen; GND als schmale Bahn (Thermik U3). 2 x 100 kOhm im Elektronikraum (R2-A3). Schulter z 7.7...11.5 (45 Grad, Innenecke R 2) ohne Kupfer aussen.",
    "kicad_Y": [
-    13.7,
-    36.5
+    23.2,
+    46.0
    ]
   },
   {
    "id": "Z4_FACH_B",
    "side": "B",
    "x": [
-    -10.0,
-    10.0
+    -13.0,
+    13.0
    ],
    "z": [
     7.5,
     30.3
    ],
    "hmax": 0.0,
-   "rule": "Silkscreen Warnsymbol Dreieck >= 7 x 9 mm + \"CR2032\" (S3-W4, zweiter Ort zusaetzlich zur Huelse).",
+   "rule": "Silkscreen Warnsymbol Dreieck >= 7 x 9 mm + \"CR2032 Verschluckgefahr\" (S3-W4, zweiter Ort). Keine Testpads (Fach wird geflutet, REQ-SAF-05).",
    "kicad_Y": [
-    13.7,
-    36.5
+    23.2,
+    46.0
    ]
   },
   {
-   "id": "Z5_KRAGEN",
+   "id": "Z5B_KRAGEN_BAUTEILE",
+   "side": "FB",
+   "x": [
+    -10.0,
+    10.0
+   ],
+   "z": [
+    4.2,
+    7.5
+   ],
+   "hmax": 0.0,
+   "rule": "Im Kragen-Verguss. F: nur U3 TMP1075N + C24 im Feld x -9.4...-4.6, z 4.4...6.8, Hoehe <= 0.7 (Tasche 1.2 tief, >= 0.5 mm Epoxid darueber); Vias nur in diesem Feld. Sonst keine Bauteile, keine Vias, kein Aussenkupfer. B: frei. Abstand zur Mutter |x| >= 2.6. ERST NACH FREIGABE SICHERHEIT (S3-K2).",
+   "kicad_Y": [
+    46.0,
+    49.3
+   ]
+  },
+  {
+   "id": "Z5A_KRAGEN_DICHTSTREIFEN",
    "side": "FB",
    "x": [
     -10.0,
@@ -243,13 +433,13 @@
    ],
    "z": [
     1.5,
-    7.5
+    4.2
    ],
    "hmax": 0.0,
-   "rule": "Kragen-Verguss = Sondendichtung (S3-K2, REQ-MECH-08/15): keine Bauteile, keine Vias, kein Kupfer auf Aussenlagen. Mutter M2 liegt 0.2 mm vor der F-Seite (eingegossen).",
+   "rule": "Sondendichtung (S3-K2, REQ-MECH-08/15), Vergusskante z 2.0: keine Bauteile, keine Vias, kein Kupfer auf Aussenlagen, Loetstopp geschlossen. Innenlagen nur Sondennetze (S, Guard/G) und die 4 Netze zu U3.",
    "kicad_Y": [
-    36.5,
-    42.5
+    49.3,
+    52.0
    ]
   },
   {
@@ -264,10 +454,10 @@
     1.5
    ],
    "hmax": 0.0,
-   "rule": "Zwischen Erde und Kragen: keine Elektroden (Luftanteil), Silkscreen Logo (F) und \"max\"/Revision (B).",
+   "rule": "Zwischen Erde und Kragen: keine Elektroden (Luftanteil), Guard auf L2/L3 erlaubt (Feld Kap. 8), keine Vias (Feld: z 0...2 und nasser Bereich). Silkscreen Logo (F) und \"max\"/Revision (B).",
    "kicad_Y": [
-    42.5,
-    49.0
+    52.0,
+    58.5
    ]
   },
   {
@@ -282,10 +472,10 @@
     -5.0
    ],
    "hmax": 0.0,
-   "rule": "Sonde: Elektroden nur Innenlagen, Aussenlagen ohne Kupfer (REQ-MECH-04), Kupfer >= 1.0 mm zur Kontur (REQ-MECH-06), keine Vias (REQ-MECH-05). Spitze 45 Grad.",
+   "rule": "Sonde: Elektroden nur Innenlagen L2/L3, Aussenlagen ohne Kupfer (REQ-MECH-04), Kupfer >= 1.25 mm zur Kontur inkl. Spitze (Feld Kap. 8; REQ-MECH-06 >= 1.0), keine Vias (REQ-MECH-05). Spitze 45 Grad.",
    "kicad_Y": [
-    49.0,
-    149.0
+    58.5,
+    158.5
    ]
   }
  ],
@@ -295,63 +485,113 @@
    "side": "F",
    "center_xz": [
     0.0,
-    37.4
+    43.9
    ],
    "kicad_XY": [
     0.0,
-    6.6
+    9.6
    ],
    "height": 0.6,
    "tol": 0.3,
-   "window_inner_face_y": 4.800000000000001,
+   "window_inner_face_y": 4.0,
    "d_led_to_window": 2.0,
-   "note": "Leuchtflaeche zum Fenster (-y). Lichtschaft Ø3.0 des Fensters endet 2.0 mm vor der LED."
+   "note": "Leuchtflaeche zum Fenster (-y), Mitte 0.4 mm ueber der Sichtfuge z 43.5. Lichtschaft Ø3.0 des Fensters endet 2.0 mm vor der LED. Kein Bauteil > 0.6 mm im Kreis r 1.8 um D1."
   },
   "SW1_TASTER": {
-   "part": "XKB TS-1187A-B-A-B (C318884)",
+   "part": "XUNPU TS-1088-AR02016 (C720477)",
    "side": "F",
    "center_xz": [
     -6.0,
-    35.6
+    45.1
    ],
    "kicad_XY": [
     -6.0,
     8.4
    ],
-   "height": 1.5,
+   "height": 2.0,
    "tol": 0.2,
-   "pads": "laut Datenblatt S.1 (7.0 x 4.5 Rastermass), Anschluesse in x-Richtung",
-   "actuation": "Biegezunge der Kappe drueckt senkrecht (+y) auf den Betaetiger Ø2.0; Taste oben -> Membran -> Stoessel -> 30-Grad-Keil -> Zunge"
+   "body_xz": [
+    3.9,
+    3.0
+   ],
+   "pads": "2 x (1.05 in x x 2.0 in z), Mittenabstand 4.45 in x, aussen 5.50; Footprint Button_Switch_SMD:SW_SPST_TS-1088-xR020 unrotiert",
+   "actuator": "Ø1.8, Hub 0.2, 1.57 N (XUNPU_TS-1088-AR02016_Datasheet_LCSC-2022-06.pdf S.1)",
+   "actuation": "Taste oben -> Silikonmembran -> Stoessel -> 30-Grad-Keil -> Biegezunge der Kappe (Hebel 2.5) -> senkrecht (+y) auf den Betaetiger"
   },
   "XBT1_CLIP": {
    "part": "Keystone 3034TR (C5213768)",
    "side": "F",
    "rotation": "90 Grad: Einschub in x, offenes Ende +x",
    "cell_center_xz": [
-    0.0,
+    3.0,
     19.05
    ],
    "kicad_XY": [
-    0.0,
-    24.95
+    3.0,
+    34.45
    ],
    "clip_x": [
-    -10.0,
-    6.100000000000001
+    -7.0,
+    9.100000000000001
    ],
    "clip_z": [
     7.5,
     30.6
    ],
    "height": 4.1,
-   "note": "Minuspad innerhalb der Minuskappe (R2-W01 Nr. 1); Zelle Ø20 schliesst buendig mit den Platinenkanten ab; Ausschub +x frei bei abgezogener Huelse"
+   "note": "Minuspad innerhalb der Minuskappe (R2-W01 Nr. 1); Zelle Ø20 schliesst buendig mit der rechten Platinenkante x = 13 ab; Ausschub +x frei bei abgezogener Huelse, in der Huelse 2.4 mm bis zur Wand (Clip haelt)"
+  },
+  "U3_TMP_KRAGEN": {
+   "part": "TI TMP1075NDRLR SOT-563 (C3663690) + C24 100 nF 0402",
+   "side": "F",
+   "x": [
+    -9.2,
+    -4.8
+   ],
+   "z": [
+    4.6,
+    6.6
+   ],
+   "height_max": 0.7,
+   "kicad_Y": [
+    46.9,
+    48.9
+   ],
+   "pocket": {
+    "x": [
+     -9.6,
+     -4.4
+    ],
+    "y": [
+     5.4,
+     6.6
+    ],
+    "z": [
+     2.0,
+     6.8
+    ],
+    "note": "unten offen (Verguss kopfueber, entlueftet)"
+   },
+   "note": "Option (f), FLOORPLAN_OPTIONS.md Kap. 2f; Freigabe Sicherheit (S3-K2) offen"
+  },
+  "TESTPAD_STRIP_FACH": {
+   "side": "F",
+   "x": [
+    -12.7,
+    -7.5
+   ],
+   "z": [
+    12.0,
+    30.0
+   ],
+   "note": "UART TX/RX, GND, VBAT-Messpunkt als Pads (keine Bauteile), ausserhalb des Ausschubwegs"
   },
   "ANTENNA": {
    "part": "AN043 IFA",
    "zone": "Z1_ANTENNE",
    "z": [
-    38.3,
-    44.0
+    47.8,
+    53.5
    ]
   },
   "SCREW_NUT": {
@@ -359,19 +599,19 @@
    "nut": "ISO 4032 M2 A2 SW4 x 1.6, im Kragen eingegossen",
    "axis_xy": [
     0.0,
-    5.0
+    4.199999999999999
    ],
    "nut_z": [
     2.3,
     3.9
    ],
    "dist_to_pcb_F": 0.4,
-   "dist_to_antenna_z": 34.4
+   "dist_to_antenna_z": 43.9
   }
  },
  "seals": {
   "oring": {
-   "type": "AS568-017",
+   "type": "AS568-019",
    "material": "Silikon oder EPDM ohne Russ (rot/transluzent), Silikonfett",
    "qty": 2,
    "places": {
@@ -385,7 +625,8 @@
     ]
    },
    "gland": 1.35,
-   "squeeze_nom": 0.242
+   "squeeze_nom": 0.242,
+   "stretch_pct": 2.06
   },
   "potting": {
    "schott_z": [
@@ -396,19 +637,32 @@
     2.0,
     7.3
    ],
-   "material": "Epoxid 2K, thixotrop am Schott (ANNAHME Typ, Phase 4b Welle 2)"
+   "material": "Epoxid 2K mineralisch gefuellt, Tg >= 80 C (FLOORPLAN_OPTIONS 2f; Typ ANNAHME, offen)"
   },
-  "window_glue_to_oring_groove": 1.2
+  "window_glue_to_oring_groove": 7.7,
+  "visible_joint": "Sichtfuge z 43.5 ist NICHT dicht (Huelse dort Sichtschale). Ablauf: Spalt 0.7 mm, Stufe z 36.2 (vorn) -> 34.7 (hinten), 4 Schlitze 3 x 1.2 in der Huelsenrueckwand."
  },
  "height_limits_summary": {
   "F_band": 2.0,
-  "F_band_under_tongue": 1.5,
+  "F_kragen_feld": 0.7,
   "F_fach": "nur 3034 (4.1)",
-  "B": "0 (unbestueckt)"
+  "B": "0 (unbestueckt, Pads erlaubt im Band)"
  },
  "open_points": [
-  "KRITISCH Elektronik/Orchestrator: Band F 20 x 5.6 = 112 mm2, Bauteilflaeche laut BOM Rev A ca. 251 mm2 (Abschaetzung, Huellen inkl. Pads + 0.25 mm) -> passt nicht. Optionen: beidseitig bestuecken (Band B +112 mm2, Standard-PCBA), kleinere Bauteile (0201, kleinerer Taster), Kopf hoeher (+1 mm = +20 mm2 je Seite, Auftraggeber), Bauteile im Fach nur mit Freigabe Sicherheit (REQ-SAF-05). Entscheid vor Layout -> Rev B",
-  "Elektronik: Kunststoffteile vor der Antenne (Stoesselrohr, Finger, Zunge, 0.6...2.5 mm vor F) bestaetigen",
-  "Elektronik: Lage SW1/LED gegen Layout bestaetigen (Pads SW1 x -9.5...-2.5)"
- ]
+  "Sicherheit: Freigabe Z5B (Bauteile im Kragen-Verguss, S3-K2)",
+  "Elektronik: Lage der Antenne in x (offenes Ende rechts), Kunststoff vor der Antenne (Stoessel 1.3 mm, Zunge 2.2 mm) bestaetigen; S11/RSSI im Gehaeuse (PROTOTYP-PRUEFUNG)",
+  "Elektronik: Blockplan Kap. 4 ist ein Machbarkeitsnachweis (Faktor 1.5 ANNAHME), Layout darf umordnen, D1/SW1/Zonen nicht",
+  "Mechanik: Verguss Kragen mit Tasche (Volumen, Entlueftung) am Muster pruefen (PROTOTYP-PRUEFUNG)"
+ ],
+ "area_balance": {
+  "courtyard_f_without_U3": 211.6,
+  "courtyard_D3": 43.3,
+  "courtyard_band": 254.9,
+  "factor": 1.5,
+  "required": 382.3,
+  "band_gross": 392.6,
+  "effective_factor": 1.54,
+  "block_plan_check": "OK",
+  "note": "Blockplan (Layer Plan_* in der DXF, PNG pcb_rev_b_floorplan.png) ist Machbarkeitsnachweis, keine Platzierungsvorgabe ausser D1/SW1"
+ }
 }

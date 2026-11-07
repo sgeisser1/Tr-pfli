@@ -54,7 +54,13 @@ r1b = runs.get(('LC1b_ohne_Kragenstuetze', 0.5))
 if r1b:
     out['LC1b'] = dict(sigma_hot=r1b['sigma_zz_at_1.5'], sigma_max_pcb=r1b['sigma_1_max_pcb'], u_tip=r1b['u_tip'])
 # Fall 1 m: obere Schranke, gesamte kinetische Energie geht in Biegung der Sonde (Spitze trifft seitlich auf)
-m_total = 0.022          # kg, CAD-Abschaetzung (check_sensor.txt Pkt. 8)
+import re
+try:                     # kg, CAD-Abschaetzung aus mechanical/sensor/check_sensor.txt Pkt. 8 (Rev A: 22.1 g, Rev B: ~28 g)
+    _t = open(os.path.join(D, '..', '..', 'mechanical', 'sensor', 'check_sensor.txt')).read()
+    m_total = float(re.search(r'Sensor gesamt ca\. ([0-9.]+) g', _t).group(1)) / 1000.0
+except Exception:
+    m_total = 0.022
+out['m_total_kg'] = m_total
 m_probe = 20 * 1.6 * 107 * 1.85e-6    # kg, Sonde unterhalb des Kragens
 k = 10.0 / fine['u_tip']               # N/mm aus FEM
 s_per_N = s_hot / 10.0

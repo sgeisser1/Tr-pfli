@@ -6,7 +6,7 @@ Lauf:  freecadcmd simulation/fem/fem_probe.py            (ca. 15 min)
 Ausgabe: simulation/fem/results.json, summary.json, fem_log.txt, work/<fall>/ (ccx-Dateien),
          fem_probe_LC1_seitlich_y.FCStd (feinstes Netz inkl. Ergebnis)
 
-Modell (Masse aus mechanical/gen/fluidi_params.py, Schnittstelle Rev A):
+Modell (Masse aus mechanical/gen/fluidi_params.py, Schnittstelle Rev B; Rev A: Lauf vom 2026-11-07 in REPORT.md Kap. 2):
   Leiterplatte FR4 20 x 1.6 mm, Spitze 45 Grad, von z = -105 (Spitze) bis z = 32.0 (Schott, eingespannt).
   Kragen (Verguss + ASA) als ein Koerper z 2.0 ... 7.3 um die Platine (bis Nutgrund 22.1 x 7.1), mit der Platine
   verbunden (gemeinsames Netz = Verguss haftet), Aussenflaechen fest (Huelse liegt nach 0.2 mm Spiel an und stuetzt

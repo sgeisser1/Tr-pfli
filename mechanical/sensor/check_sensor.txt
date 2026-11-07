@@ -1,25 +1,26 @@
-Logo: Massstab 0.4134 mm/u -> Strich 0.83 mm (2.0 u)
-=== fluidi Sensor P3, Schnittstelle Rev A (2026-11-07) ===
+Logo: Massstab 0.5021 mm/u -> Strich 1.00 mm (2.0 u)
+=== fluidi Sensor P3, Schnittstelle Rev B (2026-11-07) ===
 1 Kollisionen montiert (Ruhe):
   -> keine
 2 Taste gedrueckt (Hub 0.6): Ueberdeckungen keine
-   Keil 30 Grad: seitlicher Netto-Weg an der Zunge 0.20 mm -> am Betaetiger x2.50 = 0.49 mm; noetig 0.45 (Spalt 0.20 + Hub 0.25)
+   Keil 30 Grad: seitlicher Netto-Weg an der Zunge 0.20 mm -> am Betaetiger x2.50 = 0.49 mm; noetig 0.40 (Spalt 0.20 + Hub 0.20)
    Zunge-Taster Spalt in Ruhe: 0.20 mm; Keil-Vorspalt 0.15 mm
 3 Huelse 160 mm nach unten ueber die Sonde abziehen: frei
 4 Zelle seitlich 25 mm (+x) herausschieben (ohne Huelse): frei
    Zelle in montierter Huelse: Weg bis Seitenwand 2.40 mm (Clip haelt Zelle, Ausschub begrenzt)
 5 Platine (mit Bauteilhuelle) 60 mm von unten durch das Schott einschieben: frei
 6 LED-Oberseite bis Fenster-Lichtschaft: 2.00 mm (Ziel 1.5-2.5)
-   Klebefuge Fenster (Tropfen-Unterkante z 34.90) bis O-Ring-Nut oben z 33.70: 1.20 mm (>= 1.0); Lichtschaft-Unterkante 2.20 mm
-   Abstand Mutter_M2      - Antenne: 34.4 mm
-   Abstand Schraube_M2x4  - Antenne: 34.3 mm
-   Abstand CR2032         - Antenne: 9.3 mm
-   Abstand Keystone3034   - Antenne: 7.7 mm
-   Abstand Kunststoff Stoessel             - Antennenkupfer: 1.27 mm
+   Klebefuge Fenster (Tropfen-Unterkante z 41.40) bis O-Ring-Nut oben z 33.70: 7.70 mm (>= 1.0); Lichtschaft-Unterkante 8.70 mm
+   U3 (Kragen) - Kragen-ASA: 0.20 mm, Epoxid ueber U3: 0.50 mm (>= 0.5), U3 - Mutter: 3.09 mm
+   Abstand Mutter_M2      - Antenne: 43.9 mm
+   Abstand Schraube_M2x4  - Antenne: 43.8 mm
+   Abstand CR2032         - Antenne: 18.8 mm
+   Abstand Keystone3034   - Antenne: 17.2 mm
+   Abstand Kunststoff Stoessel             - Antennenkupfer: 1.26 mm
    Abstand Kunststoff Kappe_blau           - Antennenkupfer: 0.54 mm
-   Abstand Kunststoff Fenster_transluzent  - Antennenkupfer: 2.56 mm
+   Abstand Kunststoff Fenster_transluzent  - Antennenkupfer: 3.51 mm
    Abstand Mutter - Platine F: 0.40 mm; Mutter - O-Ring Kragen: 0.65 mm (Kragenwerkstoff dazwischen)
-7 O-Ring AS568-017: Nutgrundumfang 54.97 -> Dehnung 1.9 %
+7 O-Ring AS568-019: Nutgrundumfang 65.25 -> Dehnung 2.1 %
    Einbauraum 1.25 (FDM -0.1) Schnur 1.70 -> Verpressung 26 %
    Einbauraum 1.25 (FDM -0.1) Schnur 1.86 -> Verpressung 33 %
    Einbauraum 1.35 (FDM +0.0) Schnur 1.70 -> Verpressung 21 %
@@ -27,37 +28,51 @@ Logo: Massstab 0.4134 mm/u -> Strich 0.83 mm (2.0 u)
    Einbauraum 1.45 (FDM +0.1) Schnur 1.70 -> Verpressung 15 %
    Einbauraum 1.45 (FDM +0.1) Schnur 1.86 -> Verpressung 22 %
    Nutfuellung 77 % (< 85 %)
+9 Zapfen z 32.5: Wand min 0.54 mm
+9 Zapfen z 33.0: Wand min 0.54 mm
+9 Zapfen z 34.0: Wand min 1.69 mm
+9 Zapfen z 35.5: Wand min 1.29 mm
+9 Zapfen z 40.0: Wand min 1.19 mm
+9 Zapfen z 43.0: Wand min 1.00 mm
+9 Zapfen z 44.0: Wand min 1.00 mm
+   Sichtschale (Huelse oberhalb Zapfen-O-Ring): Wand 1.6 mm, Spalt zum Kern 0.7 mm (Gleitspalt 0.2 + Ruecksprung 0.5)
+   Ablaufstufe: z 36.2 vorn -> 34.7 hinten, Gefaelle 6.6 Grad; Schlitze 4 x (3.0 x 1.2) Rueckwand ab z 34.7; Steg ueber Nut hinten 1.0 mm
+   kleinster Abstand Huelse - Kern zwischen Stufe und Fuge: 0.70 mm
+10 Tropfen: Mitte z 43.9 (Fuge 43.5), Kerbe in der Sichtschale z 41.1 ... Rand 44.7; Fenster-Unterkante bis Stufe vorn 5.2 mm
 8 Volumen / Masse (ASA 1.07, FR4 1.85, Epoxid 1.15, Stahl 7.9, Silikon 1.2 g/cm3; ANNAHME Dichten):
-   Kappe_blau           ASA       2108.1 mm3   2.26 g
-   Huelse_grau          ASA       4944.2 mm3   5.29 g
-   Kragen               ASA        756.1 mm3   0.81 g
-   Fenster_transluzent  ASA         62.0 mm3   0.07 g
+   U3_TMP_Kragen        Epoxid       6.2 mm3   0.01 g
+   Kappe_blau           ASA       4123.0 mm3   4.41 g
+   Huelse_grau          ASA       6968.6 mm3   7.46 g
+   Kragen               ASA        974.5 mm3   1.04 g
+   Fenster_transluzent  ASA         56.3 mm3   0.06 g
    Taste_blau           ASA         68.6 mm3   0.07 g
    Tastenteller         ASA          5.0 mm3   0.01 g
    Klemmring            ASA         24.2 mm3   0.03 g
    Stoessel             ASA         22.2 mm3   0.02 g
-   Schottkeil           ASA         45.8 mm3   0.05 g
-   PCB                  FR4       4678.0 mm3   8.65 g
-   Verguss_Kragen       Epoxid      43.1 mm3   0.05 g
-   Verguss_Schott       Epoxid      13.7 mm3   0.02 g
+   Schottkeil           ASA         59.5 mm3   0.06 g
+   PCB                  FR4       5399.9 mm3   9.99 g
+   Verguss_Kragen       Epoxid      62.2 mm3   0.07 g
+   Verguss_Schott       Epoxid      17.3 mm3   0.02 g
    Mutter_M2            Stahl       19.0 mm3   0.15 g
    Schraube_M2x4        Stahl       27.3 mm3   0.22 g
-   ORing_Kragen         Silikon    151.9 mm3   0.18 g
-   ORing_Zapfen         Silikon    151.9 mm3   0.18 g
+   ORing_Kragen         Silikon    178.2 mm3   0.21 g
+   ORing_Zapfen         Silikon    178.2 mm3   0.21 g
    Membran_Silikon      Silikon     15.9 mm3   0.02 g
-   + CR2032 2.9 g (ANNAHME), Clip 0.6 g, Bestueckung 0.5 g -> Sensor gesamt ca. 22.1 g
-Platzhalter-Kollisionspruefung fluidi Sensor (Schnittstelle Rev A), erzeugt von fluidi_sensor.py
-Echte Pruefung mit KiCad-STEP folgt in Welle 2.
+   + CR2032 2.9 g (ANNAHME), Clip 0.6 g, Bestueckung 0.5 g -> Sensor gesamt ca. 28.1 g
+Kollisionspruefung mit vereinfachtem PCB-Modell, fluidi Sensor (Schnittstelle Rev B), erzeugt von fluidi_sensor.py
+Modell: Kontur Rev B + Bauteilhuellen je Zone + feste Bauteile. Pruefung mit KiCad-STEP folgt nach dem Layout.
 
 XBT1 Keystone 3034 (gedreht)                                           | Keystone_3034_Catalog_M65.pdf S.1: H 4.1, W 23.1, L 16.1
-    Kollision: keine | kleinster Abstand 0.20 mm zu Kappe_blau, 0.20 mm zu Schottkeil
+    Kollision: keine | kleinster Abstand 0.20 mm zu Schottkeil, 0.20 mm zu Verguss_Kragen
 BT1 CR2032                                                             | Panasonic_CR2032_Datasheet_2026-02.pdf S.1: Ø20 x 3.2
-    Kollision: keine | kleinster Abstand 1.75 mm zu Kappe_blau, 1.75 mm zu Schottkeil
+    Kollision: keine | kleinster Abstand 1.06 mm zu Huelse_grau, 1.75 mm zu Schottkeil
 D1 RGB 1615                                                            | Elektronikbericht 1.1 / TUOZHAN DS S.4: 1.6 x 1.5 x 0.6
-    Kollision: keine | kleinster Abstand 2.00 mm zu Fenster_transluzent, 2.80 mm zu Kappe_blau
-SW1 TS-1187A                                                           | XKB DS S.1: 5.1 x 5.1, H 1.5 (Code A), Hub 0.2-0.25
-    Kollision: keine | kleinster Abstand 0.20 mm zu Kappe_blau, 1.05 mm zu Schottkeil
-Band F (CC2340 QFN 4x4, Quarze 3.2x2.5, L 2.0x1.6, C 1206, 0402)       | Huelle 20 x 5.6 x 2.0 (ANNAHME groesste Bauteilhoehe 1206/Quarz <= 2.0)
+    Kollision: keine | kleinster Abstand 1.68 mm zu Kappe_blau, 2.00 mm zu Fenster_transluzent
+SW1 TS-1088-AR02016                                                    | XUNPU DS S.1: 3.9 x 3.0, H 2.0, Hub 0.2
+    Kollision: keine | kleinster Abstand 0.20 mm zu Kappe_blau, 2.62 mm zu Fenster_transluzent
+Band F (CC2340 QFN 4x4, Quarze, L, C 1206, SC70, SOT-23, 0402)         | Huelle 26 x 15.1 x 2.0 (Zonengrenze hmax 2.0)
     Kollision: keine | kleinster Abstand 0.20 mm zu Kappe_blau, 0.60 mm zu Fenster_transluzent
+U3 TMP1075N + C24 im Kragen                                            | Huelle 4.4 x 2.0 x 0.7 (SOT-563 0.6, 0402 0.55 laut FLOORPLAN 2f)
+    Kollision: keine | kleinster Abstand 0.20 mm zu Kragen, 2.60 mm zu Huelse_grau
 AN043-Antenne                                                          | INDEX ANT-AN043: 15.2 x 5.7, Kupfer
     Kollision: keine | kleinster Abstand 0.54 mm zu Kappe_blau, 0.70 mm zu Membran_Silikon

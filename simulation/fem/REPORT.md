@@ -43,3 +43,33 @@ Kerbwirkung an der Vergusskante.
   Bedienungsanleitung verlangt, in fester oder verdichteter Erde vorzustechen (z. B. mit einem Holzstäbchen). Keine
   konstruktive Änderung.
 - Offen (PROTOTYP-PRÜFUNG): tatsächliche Einsteckkräfte in Erde und Granulat, Faserrichtung/Laminat bei JLC, Fallversuch.
+
+## 4 Nachtrag Rev B (2026-11-07, Schnittstelle PCB-Kontur Rev B, Kopf V4)
+
+**Was sich an der Sonde ändert:** Länge (Spitze z −105 bis Vergusskante z 2.0 = 107 mm), Querschnitt 20 × 1.6, Kragen
+z 2.0 … 7.3 und Schott z 30.8 … 32.0 bleiben. Neu sind die Platine 0.8 mm weiter vorn im Kragen (y_F 6.6), der breitere
+Kragen (O-Ring-Nutgrund 28.1 × 7.1 statt 22.1 × 7.1), die Schulter 20 → 26 mm über dem Kragen und die höhere Masse
+(28.1 g statt 22.1 g, `mechanical/sensor/check_sensor.txt`). Deshalb wurde `fem_probe.py` unverändert neu gerechnet
+(Geometrie aus `fluidi_params.py` Rev B). `fem_eval.py` liest die Masse jetzt aus `check_sensor.txt`.
+
+| Lastfall | Rev A | **Rev B** | Handrechnung | SF Rev B | Bewertung |
+|---|---|---|---|---|---|
+| LC1 seitlich 10 N (z 1.5 / max. an der Kante) | 152 / 171 MPa | **151 / 168 MPa** (Kt 1.21, 254 k Knoten, konvergiert: 1.0/0.5/0.25 mm → 147/154/151) | 125 MPa; u 29.9 mm (FEM 30.7) | 2.29 (2.06) | ✅ unverändert |
+| LC1b ohne Kragenstütze | 147 / 174 MPa | **150 / 191 MPa** | Schulter: 10 N × 112.7 mm / 8.53 mm³ = 132 MPa × Kt ≈ 1.45 | 1.81 | ⚠ Grenzfall (siehe unten) |
+| LC2 in der Ebene | 30 MPa | 13 MPa | 10 MPa | 25.8 | ✅ |
+| LC3 Druck 50 N / LC4 Zug 30 N | 2.5 / 1.5 | 2.3 / 1.4 MPa | 1.6 / 0.9 | 147 / 241 | ✅ |
+| LC5 Knicken frei | 29.0 N | **29.0 N** | 29.4 N | 0.58 | ❌ wie Rev A, D-016 gilt |
+| LC6 Knicken geführt | 236 N | **236 N** | 241 N | 4.72 | ✅ |
+| Fall 1 m, obere Schranke ganzer Sensor | 181 MPa (22.1 g) | **202 MPa (28.1 g)** | σ ∝ √m: 181 × √(28.1/22.1) = 204 | 1.71 (2.79 typ.) | ⚠ unter 2 |
+| Fall 1 m, nur Sondenmasse | 97 MPa | 96 MPa | – | 3.59 | ✅ |
+
+- **Schulter:** Ein erster Rev-B-Lauf mit scharfer 135°-Innenecke bei z 7.5 ergab in LC1b eine Spitze von **284 MPa**
+  (SF 1.21) an der Ecke direkt über dem Kragen. Die Kontur hat jetzt eine **Innenecke R 2.0** (Tangente ab z 7.67);
+  damit 191 MPa. Mit Kragenstütze (Regelfall, LC1) ist die Schulter unkritisch, das Maximum liegt wie in Rev A an der
+  Vergusskante.
+- **LC1b** (Hülse stützt den Kragen nicht) bleibt Grenzfall wie in Rev A; SF 1.81 gegen den Mindestwert quer, 2.95 gegen
+  typisch längs.
+- **Fall 1 m:** Die obere Schranke (gesamte kinetische Energie geht in Biegung der Sonde) sinkt wegen der höheren Masse
+  unter 2 (1.71, typisch 2.79). Die Schranke ist sehr konservativ (Kopf trifft in der Praxis zuerst oder Energie geht
+  in Rotation/Gehäuse). **PROTOTYP-PRÜFUNG** Fallversuch 1 m (seitlich auf die Spitze, auf den Kopf) an 3 Mustern.
+- Rohdaten: `results.json`, `summary.json`, `fem_log.txt` (Rev B). Rev-A-Werte oben in Kap. 2 bleiben als Referenz.

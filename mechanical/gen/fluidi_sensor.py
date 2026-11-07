@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
-"""fluidi Sensor P3 "Stele" - parametrisches Fertigungs-CAD (Phase 4b, Welle 1), FreeCAD 0.21.2 headless.
+"""fluidi Sensor P3 "Stele" - parametrisches Fertigungs-CAD (Phase 4b, Welle 2: Kopf V4, Schnittstelle Rev B),
+FreeCAD 0.21.2 headless.
+
+Rev B (D-019): Kopf 34 x 13 x 57.5, Kappe 14 mm, Sichtfuge z 43.5. Die graue Huelse ist oberhalb des Zapfen-O-Rings nur
+Sichtschale ueber dem dichten Kern (Kappe + Zapfen + Schott). Wasser, das an der Sichtfuge/Tropfenkerbe eindringt,
+laeuft im Spalt 0.7 mm auf eine nach hinten geneigte Stufe und durch 4 Schlitze in der Huelsenrueckwand ab.
+Kragen mit Tasche fuer U3 TMP1075N (Option f), Platine 26 mm im Kopf, 20 mm in der Sonde.
 
 Konstruktion A1 (Kern + Huelse, M2 von unten) nach docs/reviews/phase3_sleeve_mechanik.md, ueberarbeitet:
   - beide Dichtungen radial, gleicher O-Ring AS568-017 (S3-W3), Dachziegel-Fuge (Kappe ueberlappt Huelse 1.4 mm)
@@ -39,6 +45,14 @@ def P(off=0.0):
     return plan(H['W'], H['D'], H['CF'], H['CB'], off)
 
 
+def above_step():
+    """Halbraum oberhalb der Ablaufebene: z = STEP_FRONT bei y = 0, STEP_BACK bei y = D (nach hinten fallend)."""
+    zf, zb, d = Z['STEP_FRONT'], Z['STEP_BACK'], H['D']
+    k = (zb - zf) / d
+    pts = [V(-30, -5, zf - 5 * k), V(-30, d + 5, zb + 5 * k), V(-30, d + 5, 80), V(-30, -5, 80), V(-30, -5, zf - 5 * k)]
+    return Part.Face(Part.makePolygon(pts)).extrude(V(60, 0, 0))
+
+
 def build():
     S = {}
     # ------------------------------------------------------------------ Leiterplatte (Platzhalter-Volumenmodell)
@@ -50,18 +64,19 @@ def build():
     # Bauteil-Huelle Elektronikband F: <= 2.0 mm, unter der Biegezunge <= 1.5 mm (Schnittstelle Z2_BAND_F)
     T = FP.TONGUE
     yb = PCB['Y_F']
-    env = box(-10.0, T['COL_X0'], yb - 2.0, yb, Z['BAND0'], Z['BAND1'])
-    env = env.fuse(box(T['COL_X1'], 10.0, yb - 2.0, yb, Z['BAND0'], Z['BAND1']))
-    env = env.fuse(box(T['COL_X0'], T['COL_X1'], yb - 1.5, yb, Z['BAND0'], Z['BAND1'])).removeSplitter()
-    S['Band_Huelle_F'] = env
+    h2 = PCB['W_HEAD'] / 2
+    h2 -= PCB['EDGE_CLR']                                              # Courtyards >= 0.3 von der Kontur
+    S['Band_Huelle_F'] = box(-h2, h2, yb - 2.0, yb, Z['BAND0'], Z['BAND1'])     # Rev B: ueberall <= 2.0
     S['D1_LED'] = box(FP.LED['X'] - FP.LED['LX'] / 2, FP.LED['X'] + FP.LED['LX'] / 2, yb - FP.LED['H'], yb,
                       FP.LED['Z'] - FP.LED['LZ'] / 2, FP.LED['Z'] + FP.LED['LZ'] / 2)
     sw = FP.SW
-    S['SW1_Taster'] = box(sw['X'] - sw['BODY'] / 2, sw['X'] + sw['BODY'] / 2, yb - sw['H'], yb,
-                          sw['Z'] - sw['BODY'] / 2, sw['Z'] + sw['BODY'] / 2)
+    S['SW1_Taster'] = box(sw['X'] - sw['BODY_X'] / 2, sw['X'] + sw['BODY_X'] / 2, yb - sw['H'], yb,
+                          sw['Z'] - sw['BODY_Z'] / 2, sw['Z'] + sw['BODY_Z'] / 2)
+    tm = FP.TMP
+    S['U3_TMP_Kragen'] = box(tm['X0'], tm['X1'], yb - tm['H'], yb, tm['Z0'], tm['Z1'])
     # Clip + Zelle (F-Seite, gedreht: geschlossenes Ende -x, Ausschub +x)
     c = FP.CLIP
-    cell = cyl_y(FP.CELL['D'] / 2, yb - 0.1 - FP.CELL['T'], yb - 0.1, 0.0, Z['CELL_C'])
+    cell = cyl_y(FP.CELL['D'] / 2, yb - 0.1 - FP.CELL['T'], yb - 0.1, FP.CELL['XC'], Z['CELL_C'])
     clip = box(c['X0'], c['X1'], yb - c['H'], yb, Z['CLIP0'], Z['CLIP1']).cut(cell)
     S['CR2032'] = cell
     S['Keystone3034'] = clip
@@ -70,7 +85,12 @@ def build():
     L, G = FP.LAND, FP.GROOVE_BOT
     col = rrect(L, Z['COL0'], Z['COL1'])
     col = col.cut(rrect(L, Z['COL_G0'], Z['COL_G1'], grow=0.5).cut(rrect(G, Z['COL_G0'] - 1, Z['COL_G1'] + 1)))
-    col = col.cut(box(-PCB['W'] / 2 - 0.15, PCB['W'] / 2 + 0.15, PCB['Y_F'] - 0.15, PCB['Y_B'] + 0.15, Z['COL0'] - 1, Z['COL1'] + 1))
+    xs, ys0, ys1 = PCB['W'] / 2 + 0.15, PCB['Y_F'] - 0.15, PCB['Y_B'] + 0.15
+    col = col.cut(box(-xs, xs, ys0, ys1, Z['COL0'] - 1, Z['COL1'] + 1))
+    # Tasche fuer U3 + C24 vor F (Option f), unten offen -> Verguss kopfueber entlueftet
+    kp = FP.KPOCKET
+    pocket = box(kp['X0'], kp['X1'], PCB['Y_F'] - kp['DEPTH'], ys0 + 0.01, kp['Z0'] - 1, kp['Z1'])
+    col = col.cut(pocket)
     sc = FP.SCREW
     # Mutter seitlich von vorne eingeschoben (Tasche unterhalb der O-Ring-Nut, offen zur nassen Seite, vergossen)
     rc = (sc['NUT_S'] + 0.1) / 2 / math.cos(math.pi / 6)
@@ -80,18 +100,19 @@ def build():
     col = col.cut(cyl(sc['D'] / 2 + 0.2, Z['COL_NUT1'], sc['L'] + 0.3, sc['X'], sc['Y']))   # Freiraum Schraubenspitze
     # Hohlkehle fuer den Verguss an der Unterkante (Kerbwirkung, FEM): 0.8 x 45 Grad um den Schlitz
     ch = 0.6
-    w0 = Part.makePolygon([V(-10.15 - ch, 7.25 - ch, Z['COL0']), V(10.15 + ch, 7.25 - ch, Z['COL0']), V(10.15 + ch, 9.15 + ch, Z['COL0']),
-                           V(-10.15 - ch, 9.15 + ch, Z['COL0']), V(-10.15 - ch, 7.25 - ch, Z['COL0'])])
-    w1 = Part.makePolygon([V(-10.15, 7.25, Z['COL0'] + ch), V(10.15, 7.25, Z['COL0'] + ch), V(10.15, 9.15, Z['COL0'] + ch),
-                           V(-10.15, 9.15, Z['COL0'] + ch), V(-10.15, 7.25, Z['COL0'] + ch)])
+    w0 = Part.makePolygon([V(-xs - ch, ys0 - ch, Z['COL0']), V(xs + ch, ys0 - ch, Z['COL0']), V(xs + ch, ys1 + ch, Z['COL0']),
+                           V(-xs - ch, ys1 + ch, Z['COL0']), V(-xs - ch, ys0 - ch, Z['COL0'])])
+    w1 = Part.makePolygon([V(-xs, ys0, Z['COL0'] + ch), V(xs, ys0, Z['COL0'] + ch), V(xs, ys1, Z['COL0'] + ch),
+                           V(-xs, ys1, Z['COL0'] + ch), V(-xs, ys0, Z['COL0'] + ch)])
     col = col.cut(Part.makeLoft([w0, w1], True))
     S['Kragen'] = col
     nut = prism(hexagon(sc['NUT_S'], sc['X'], sc['Y']), Z['COL_NUT0'], Z['COL_NUT1']).cut(
         cyl(sc['D'] / 2 * 0.8, Z['COL_NUT0'] - 1, Z['COL_NUT1'] + 1, sc['X'], sc['Y']))
     S['Mutter_M2'] = nut
     # Verguss Kragen (Epoxid): Spalt + Hohlkehle, ohne Platine
-    vk = box(-PCB['W'] / 2 - 0.15, PCB['W'] / 2 + 0.15, PCB['Y_F'] - 0.15, PCB['Y_B'] + 0.15, Z['COL0'], Z['COL1'])
-    vk = vk.fuse(Part.makeLoft([w0, w1], True)).cut(pcb)
+    vk = box(-xs, xs, ys0, ys1, Z['COL0'], Z['COL1'])
+    vk = vk.fuse(Part.makeLoft([w0, w1], True)).fuse(pocket.common(box(-20, 20, -5, 20, Z['COL0'], Z['COL1'])))
+    vk = vk.cut(pcb).cut(S['U3_TMP_Kragen'])
     S['Verguss_Kragen'] = vk.removeSplitter()
 
     # ------------------------------------------------------------------ Schraube M2x4 (unverlierbar)
@@ -111,13 +132,17 @@ def build():
     top_edges = [e for e in cap.Edges if all(abs(v.Point.z - H['H']) < 1e-6 for v in e.Vertexes)]
     cap = cap.makeChamfer(H['TOP_CH'], top_edges)
     cap = cap.fuse(rrect(L, Z['BULK0'], H['SLOT_TOP'] + 0.01)).removeSplitter()
+    # Ablaufstufe: Zapfen oberhalb einer nach hinten geneigten Ebene um RECESS zurueckgesetzt (Spalt 0.7 zur Huelse)
+    rec = rrect(L, Z['STEP_BACK'] - 0.5, H['SLOT_TOP']).cut(rrect(L, Z['STEP_BACK'] - 1, H['SLOT_TOP'] + 1, grow=-CAP['RECESS']))
+    cap = cap.cut(rec.common(above_step()))
     # Dachziegel-Schlitz fuer den Huelsenrand (aussen Schuerze 0.8, innen Zapfen)
     cap = cap.cut(prism(P(H['SKIRT_T']), H['Z_FUGE'] - 0.5, H['SLOT_TOP']).cut(rrect(L, H['Z_FUGE'] - 1, H['SLOT_TOP'] + 1)))
     # O-Ring-Nut im Zapfen
     cap = cap.cut(rrect(L, Z['SP_G0'], Z['SP_G1'], grow=0.5).cut(rrect(G, Z['SP_G0'] - 1, Z['SP_G1'] + 1)))
     # Innenraum (Elektronikraum)
-    cap = cap.cut(prism(P(CAP['SP_IN_OFF_LOW']), Z['BULK1'], Z['SP_THIN']))
-    cap = cap.cut(prism(P(CAP['SP_IN_OFF_HIGH']), Z['SP_THIN'], H['SLOT_TOP']))
+    cap = cap.cut(rrect(FP.SP_IN, Z['BULK1'], H['SLOT_TOP'] + 0.01))
+    T_ = FP.TONGUE                                                    # Tasche fuer die Zungenspitze im Zapfen
+    cap = cap.cut(box(T_['COL_X0'], T_['COL_X1'], T_['Y0'] - 0.3, FP.SP_IN['Y0'] + 0.1, T_['Z_TIP'] - 1.0, H['SLOT_TOP'] + 0.01))
     cap = cap.cut(prism(P(CAP['CAV_OFF']), H['SLOT_TOP'], H['H'] - H['CEIL']))
     bs = CAP['BULK_SLOT']
     cap = cap.cut(box(-bs['X'], bs['X'], bs['Y0'], bs['Y1'], Z['BULK0'] - 1, Z['BULK1'] + 0.01))
@@ -129,7 +154,7 @@ def build():
     # Tastenblock, Fuehrungsrohr, Biegezunge (alles einteilig mit der Kappe; Druck kopfueber)
     ax, ay = BTN['AX_X'], BTN['AX_Y']
     blk = box(-8.0, 0.8, CAP['CAV_OFF'], PCB['Y_F'] - 0.4, BTN['BLOCK_Z0'], H['H'] - H['CEIL'] + 0.01)
-    blk = blk.fuse(box(-8.0, 0.8, CAP['CAV_OFF'], 9.6, BTN['BLOCK_Z0'] + 0.3, H['H'] - H['CEIL'] + 0.01))  # 0.7 ueber Oberkante
+    blk = blk.fuse(box(-8.0, 0.8, CAP['CAV_OFF'], PCB['Y_B'] + 0.6, BTN['BLOCK_Z0'] + 0.3, H['H'] - H['CEIL'] + 0.01))  # 0.7 ueber Oberkante
     blk = blk.fuse(cyl(BTN['TUBE_OD'] / 2, BTN['TUBE_Z0'], BTN['BLOCK_Z0'] + 0.01, ax, ay))
     tg = box(FP.TONGUE['X0'], FP.TONGUE['X1'], FP.TONGUE['Y0'], FP.TONGUE['Y1'], FP.TONGUE['Z_TIP'], BTN['BLOCK_Z0'] + 0.01)
     cap = cap.fuse(blk).fuse(tg).removeSplitter()
@@ -138,9 +163,9 @@ def build():
     btn_poly = [(x, y - BTN['D'] / 2) for x, y in btn_poly]
     pocket = [(x + BTN['X'], y + BTN['Y'] - (BTN['D'] + 2 * BTN['POCKET_GAP']) / 2)
               for x, y in plan(BTN['W'] + 2 * BTN['POCKET_GAP'], BTN['D'] + 2 * BTN['POCKET_GAP'], BTN['CH'], BTN['CH'], 0.0)]
-    z_pf = H['H'] - BTN['POCKET_D']                                  # Taschenboden 47.0
+    z_pf = H['H'] - BTN['POCKET_D']                                  # Taschenboden 56.5
     cap = cap.cut(prism(pocket, z_pf, H['H'] + 1))
-    z_cb = z_pf - 2.3                                                # Senkungsgrund 44.7
+    z_cb = z_pf - 2.3                                                # Senkungsgrund 54.2
     cap = cap.cut(cyl(BTN['CB_D'] / 2, z_cb, z_pf + 0.01, ax, ay))
     cap = cap.cut(cyl(BTN['BORE_D'] / 2, BTN['TUBE_Z0'] - 1, z_cb + 0.01, ax, ay))
     S['Kappe_blau'] = cap
@@ -150,22 +175,23 @@ def build():
     S['Verguss_Schott'] = box(-bs['X'], bs['X'], bs['Y0'], bs['Y1'], Z['BULK0'], Z['BULK1']).cut(pcb).cut(S['Schottkeil'])
 
     # ------------------------------------------------------------------ Taste, Membran, Klemmring, Stoessel
-    z_m0, z_m1 = z_cb, z_cb + BTN['MEMB_T']                          # 44.7 ... 45.2
+    z_m0, z_m1 = z_cb, z_cb + BTN['MEMB_T']
     S['Membran_Silikon'] = cyl(BTN['CB_D'] / 2 - 0.02, z_m0, z_m1, ax, ay)
     ring = cyl(BTN['CB_D'] / 2 - 0.05, z_m1 + 1.0, z_pf, ax, ay).cut(cyl(BTN['RING_ID'] / 2, z_m1, z_pf + 1, ax, ay))
     ring = ring.fuse(cyl(BTN['CB_D'] / 2 - 0.05, z_m1, z_m1 + 1.0, ax, ay).cut(cyl(BTN['SKIRT_ID'] / 2, z_m1 - 1, z_m1 + 2, ax, ay)))
     S['Klemmring'] = ring.removeSplitter()
-    z_bt0 = z_pf + BTN['STROKE']                                     # Taste unten in Ruhe 47.6
+    z_bt0 = z_pf + BTN['STROKE']                                     # Taste unten in Ruhe
     taste = prism(btn_poly, z_bt0, H['H'] + BTN['PROUD'])
     taste = taste.fuse(cyl(BTN['NECK_D'] / 2, z_m1 + 0.05, z_bt0 + 0.01, ax, ay)).removeSplitter()
     S['Taste_blau'] = taste
     z_w1 = z_m1 + 1.0                                                # Teller liegt in Ruhe am Ring an
     S['Tastenteller'] = cyl(BTN['WASHER_D'] / 2, z_w1 - BTN['WASHER_T'], z_w1, ax, ay).cut(
         cyl(BTN['NECK_D'] / 2, z_w1 - 1, z_w1 + 1, ax, ay))
-    st = cyl(BTN['STEM_D'] / 2, BTN['TUBE_Z0'], z_m0 - 0.05, ax, ay).common(box(-20, 20, 3.6, 20, 0, 60))  # D-Profil
-    fy0, fy1 = 3.6, FP.TONGUE['Y0'] - FP.TONGUE['WEDGE_GAP']
+    st = cyl(BTN['STEM_D'] / 2, BTN['TUBE_Z0'], z_m0 - 0.05, ax, ay).common(box(-20, 20, ay - 1.0, 20, 0, 80))  # D-Profil
+    fy1 = FP.TONGUE['Y0'] - FP.TONGUE['WEDGE_GAP']
+    fy0 = fy1 - 1.15
     st = st.fuse(box(-5.8, ax, fy0, fy1, BTN['TUBE_Z0'] - 0.8, BTN['TUBE_Z0']))       # Arm
-    st = st.fuse(box(-5.8, -4.6, fy0, fy1, 39.6, BTN['TUBE_Z0'] - 0.8 + 0.01))           # Finger mit Keil (30 Grad)
+    st = st.fuse(box(-5.8, -4.6, fy0, fy1, FP.TONGUE['Z_CONTACT'] - 0.4, BTN['TUBE_Z0'] - 0.8 + 0.01))  # Finger mit Keil (30 Grad)
     S['Stoessel'] = st.removeSplitter()
 
     # ------------------------------------------------------------------ Tropfenfenster transluzent
@@ -184,6 +210,10 @@ def build():
     notch = prism_xz(drop2(D['X'], D['ZC'], D['R'] + g, (D['K'] * D['R'] + g) / (D['R'] + g)), -1, SI['Y0'] + 0.3)
     notch = notch.fuse(box(D['X'] - D['R'] - g, D['X'] + D['R'] + g, -1, SI['Y0'] + 0.3, D['ZC'], H['RIM_TOP'] + 1))
     sl = sl.cut(notch)
+    # Ablaufschlitze in der Rueckwand, Unterkante = tiefster Punkt der Ablaufstufe
+    dr = FP.DRAIN
+    for xc in dr['XC']:
+        sl = sl.cut(box(xc - dr['W'] / 2, xc + dr['W'] / 2, SI['Y1'] - 0.5, H['D'] + 1, Z['STEP_BACK'], Z['STEP_BACK'] + dr['H']))
     sl_plain = sl.copy()
     # Logo-Relief Ton in Ton (Wortmarke v3a mono), 16 mm, 0.25 mm erhaben
     lg, s_logo = logo_solid(os.path.join(FP.REPO, FP.LOGO['SVG']), FP.LOGO['W'], 0.0, FP.LOGO['ZC'], 0.0, FP.LOGO['RELIEF'])
@@ -210,7 +240,8 @@ def checks(S, sl_plain):
                ('Keystone3034', 'CR2032'),
                ('Mutter_M2', 'Schraube_M2x4'),       # Gewindeeingriff (Nennmass-Zylinder)
                ('Schraube_M2x4', 'Huelse_grau'),
-               ('Mutter_M2', 'Verguss_Kragen')}       # Mutter eingegossen     # Furchlippe Ø1.7 im Boden (unverlierbar)
+               ('Mutter_M2', 'Verguss_Kragen'),
+               ('Band_Huelle_F', 'U3_TMP_Kragen')}       # Mutter eingegossen     # Furchlippe Ø1.7 im Boden (unverlierbar)
     log('1 Kollisionen montiert (Ruhe):')
     hits = collide(S, allowed)
     log('  -> %s' % ('keine' if not hits else '%d Kollisionen' % len(hits)))
@@ -241,7 +272,7 @@ def checks(S, sl_plain):
     log('   Zunge-Taster Spalt in Ruhe: %.2f mm; Keil-Vorspalt %.2f mm' % (zg, T['WEDGE_GAP']))
     # 3 Huelse abziehen (vereinfacht ohne Logo/Text), O-Ringe gleiten (nicht geprueft)
     kern = ['PCB', 'Kragen', 'CR2032', 'Keystone3034', 'Kappe_blau', 'Mutter_M2', 'Fenster_transluzent',
-            'Verguss_Kragen', 'Band_Huelle_F']
+            'Verguss_Kragen', 'Band_Huelle_F', 'U3_TMP_Kragen']
     first = None
     for d in range(1, 161):
         m = sl_plain.copy(); m.translate(V(0, 0, -d))
@@ -263,14 +294,16 @@ def checks(S, sl_plain):
     log('4 Zelle seitlich 25 mm (+x) herausschieben (ohne Huelse): %s' % ('frei' if not blk else 'blockiert bei %d mm (%s)' % blk))
     c = S['CR2032'].copy(); c.translate(V(3.0, 0, 0))
     log('   Zelle in montierter Huelse: Weg bis Seitenwand %.2f mm (Clip haelt Zelle, Ausschub begrenzt)'
-        % (FP.SLEEVE_IN['X'] - FP.CELL['D'] / 2))
+        % (FP.SLEEVE_IN['X'] - FP.CELL['XC'] - FP.CELL['D'] / 2))
     # 5 PCB von unten durch das Schott einschieben (Kappe mit Fenster, Zunge, Stoessel montiert)
-    mov = ['PCB', 'Band_Huelle_F', 'D1_LED', 'SW1_Taster', 'Antenne_AN043', 'Keystone3034', 'CR2032']
+    mov = ['PCB', 'Band_Huelle_F', 'D1_LED', 'SW1_Taster', 'Antenne_AN043', 'Keystone3034', 'CR2032', 'U3_TMP_Kragen']
     hitp = None
     for d in range(60, -1, -1):
         for a_ in mov:
             m = S[a_].copy(); m.translate(V(0, 0, -d))
-            for b in ('Kappe_blau', 'Fenster_transluzent', 'Stoessel'):
+            for b in ('Kappe_blau', 'Fenster_transluzent', 'Stoessel', 'Schottkeil'):
+                if b == 'Schottkeil':
+                    continue                                          # Keil wird erst nach dem Einschieben gesetzt
                 if m.BoundBox.intersect(S[b].BoundBox) and m.common(S[b]).Volume > 1e-3:
                     hitp = (d, a_, b); break
             if hitp: break
@@ -283,6 +316,9 @@ def checks(S, sl_plain):
     log('   Klebefuge Fenster (Tropfen-Unterkante z %.2f) bis O-Ring-Nut oben z %.2f: %.2f mm (>= 1.0); '
         'Lichtschaft-Unterkante %.2f mm' % (FP.DROP['ZC'] - FP.DROP['R'], Z['SP_G1'], FP.DROP['ZC'] - FP.DROP['R'] - Z['SP_G1'],
                                             FP.DROP['ZC'] - FP.DROP['BOSS_D'] / 2 - Z['SP_G1']))
+    log('   U3 (Kragen) - Kragen-ASA: %.2f mm, Epoxid ueber U3: %.2f mm (>= 0.5), U3 - Mutter: %.2f mm'
+        % (S['U3_TMP_Kragen'].distToShape(S['Kragen'])[0], FP.KPOCKET['DEPTH'] - FP.TMP['H'],
+           S['U3_TMP_Kragen'].distToShape(S['Mutter_M2'])[0]))
     for k in ('Mutter_M2', 'Schraube_M2x4', 'CR2032', 'Keystone3034'):
         log('   Abstand %-14s - Antenne: %.1f mm' % (k, S[k].distToShape(S['Antenne_AN043'])[0]))
     for k in ('Stoessel', 'Kappe_blau', 'Fenster_transluzent'):
@@ -299,9 +335,38 @@ def checks(S, sl_plain):
             log('   Einbauraum %.2f (FDM %+.1f) Schnur %.2f -> Verpressung %.0f %%' % (gl, tg / 2, cs, (cs - gl) / cs * 100))
     fill = math.pi / 4 * O['CS'] ** 2 / (O['GLAND'] * O['GROOVE_W'])
     log('   Nutfuellung %.0f %% (< 85 %%)' % (fill * 100))
+    # 9 Wandstaerken Kern (Zapfen) und Sichtschale, Ablauf
+    cap = S['Kappe_blau']
+    T_ = FP.TONGUE
+    for z in (32.5, 33.0, 34.0, 35.5, 40.0, 43.0, 44.0):
+        slab = box(-30, 30, -5, 20, z - 0.05, z + 0.05)
+        inner = rrect(FP.SP_IN, z - 0.05, z + 0.05)
+        if z >= T_['Z_TIP'] - 1.0:
+            inner = inner.fuse(box(T_['COL_X0'], T_['COL_X1'], T_['Y0'] - 0.3, FP.SP_IN['Y0'] + 0.1, z - 0.05, z + 0.05))
+        outside = slab.cut(cap).cut(inner)
+        if z > FP.DROP['ZC'] - 2.5:                                   # Fensterbohrung (geklebt) nicht als Wand werten
+            outside = outside.cut(box(FP.DROP['X'] - 2.0, FP.DROP['X'] + 2.0, -5, 20, z - 1, z + 1))
+        # Bereiche, die mit dem Innenraum verbunden sind (Fensterbohrung), nicht als Aussenraum zaehlen
+        outside = Part.makeCompound([so for so in outside.Solids if so.distToShape(inner)[0] > 1e-4 or
+                                     so.BoundBox.XLength > 20])
+        log('9 Zapfen z %.1f: Wand min %.2f mm' % (z, inner.distToShape(outside)[0]))
+    log('   Sichtschale (Huelse oberhalb Zapfen-O-Ring): Wand %.1f mm, Spalt zum Kern %.1f mm (Gleitspalt %.1f + Ruecksprung %.1f)'
+        % (H['WALL'], H['CLR_SLIDE'] + CAP['RECESS'], H['CLR_SLIDE'], CAP['RECESS']))
+    k = (Z['STEP_FRONT'] - Z['STEP_BACK']) / H['D']
+    log('   Ablaufstufe: z %.1f vorn -> %.1f hinten, Gefaelle %.1f Grad; Schlitze %d x (%.1f x %.1f) Rueckwand ab z %.1f; '
+        'Steg ueber Nut hinten %.1f mm'
+        % (Z['STEP_FRONT'], Z['STEP_BACK'], math.degrees(math.atan(k)), len(FP.DRAIN['XC']), FP.DRAIN['W'], FP.DRAIN['H'],
+           Z['STEP_BACK'], Z['STEP_BACK'] - Z['SP_G1']))
+    # Ablaufpruefung: Huelse und Kern im Bereich der Stufe duerfen sich nicht beruehren; Schlitz-Unterkante <= Stufe hinten
+    gap = S['Huelse_grau'].distToShape(S['Kappe_blau'].common(box(-30, 30, -5, 20, Z['STEP_FRONT'] + 0.3, H['Z_FUGE'] - 0.6)))[0]
+    log('   kleinster Abstand Huelse - Kern zwischen Stufe und Fuge: %.2f mm' % gap)
+    # 10 Tropfenfenster/Kerbe
+    log('10 Tropfen: Mitte z %.1f (Fuge %.1f), Kerbe in der Sichtschale z %.1f ... Rand %.1f; Fenster-Unterkante bis Stufe vorn %.1f mm'
+        % (FP.DROP['ZC'], H['Z_FUGE'], FP.DROP['ZC'] - FP.DROP['R'] - FP.DROP['NOTCH_GAP'], H['RIM_TOP'],
+           FP.DROP['ZC'] - FP.DROP['R'] - Z['STEP_FRONT']))
     # 8 Volumen/Masse
     rho = {'ASA': 1.07e-3, 'FR4': 1.85e-3, 'Epoxid': 1.15e-3, 'Stahl': 7.9e-3, 'Silikon': 1.2e-3}
-    mat = {'Kappe_blau': 'ASA', 'Huelse_grau': 'ASA', 'Kragen': 'ASA', 'Fenster_transluzent': 'ASA', 'Taste_blau': 'ASA',
+    mat = {'U3_TMP_Kragen': 'Epoxid', 'Kappe_blau': 'ASA', 'Huelse_grau': 'ASA', 'Kragen': 'ASA', 'Fenster_transluzent': 'ASA', 'Taste_blau': 'ASA',
            'Tastenteller': 'ASA', 'Klemmring': 'ASA', 'Stoessel': 'ASA', 'Schottkeil': 'ASA', 'PCB': 'FR4',
            'Verguss_Kragen': 'Epoxid', 'Verguss_Schott': 'Epoxid', 'Mutter_M2': 'Stahl', 'Schraube_M2x4': 'Stahl',
            'ORing_Kragen': 'Silikon', 'ORing_Zapfen': 'Silikon', 'Membran_Silikon': 'Silikon'}
@@ -321,13 +386,14 @@ def placeholder_collision(S):
         ('XBT1 Keystone 3034 (gedreht)', 'Keystone_3034_Catalog_M65.pdf S.1: H 4.1, W 23.1, L 16.1', 'Keystone3034'),
         ('BT1 CR2032', 'Panasonic_CR2032_Datasheet_2026-02.pdf S.1: Ø20 x 3.2', 'CR2032'),
         ('D1 RGB 1615', 'Elektronikbericht 1.1 / TUOZHAN DS S.4: 1.6 x 1.5 x 0.6', 'D1_LED'),
-        ('SW1 TS-1187A', 'XKB DS S.1: 5.1 x 5.1, H 1.5 (Code A), Hub 0.2-0.25', 'SW1_Taster'),
-        ('Band F (CC2340 QFN 4x4, Quarze 3.2x2.5, L 2.0x1.6, C 1206, 0402)',
-         'Huelle 20 x 5.6 x 2.0 (ANNAHME groesste Bauteilhoehe 1206/Quarz <= 2.0)', 'Band_Huelle_F'),
+        ('SW1 TS-1088-AR02016', 'XUNPU DS S.1: 3.9 x 3.0, H 2.0, Hub 0.2', 'SW1_Taster'),
+        ('Band F (CC2340 QFN 4x4, Quarze, L, C 1206, SC70, SOT-23, 0402)',
+         'Huelle 26 x 15.1 x 2.0 (Zonengrenze hmax 2.0)', 'Band_Huelle_F'),
+        ('U3 TMP1075N + C24 im Kragen', 'Huelle 4.4 x 2.0 x 0.7 (SOT-563 0.6, 0402 0.55 laut FLOORPLAN 2f)', 'U3_TMP_Kragen'),
         ('AN043-Antenne', 'INDEX ANT-AN043: 15.2 x 5.7, Kupfer', 'Antenne_AN043')]
-    lines = ['Platzhalter-Kollisionspruefung fluidi Sensor (Schnittstelle Rev %s), erzeugt von fluidi_sensor.py' % FP.REV,
-             'Echte Pruefung mit KiCad-STEP folgt in Welle 2.', '']
-    housing = ['Kappe_blau', 'Huelse_grau', 'Kragen', 'Stoessel', 'Fenster_transluzent', 'Schottkeil', 'Mutter_M2',
+    lines = ['Kollisionspruefung mit vereinfachtem PCB-Modell, fluidi Sensor (Schnittstelle Rev %s), erzeugt von fluidi_sensor.py' % FP.REV,
+             'Modell: Kontur Rev B + Bauteilhuellen je Zone + feste Bauteile. Pruefung mit KiCad-STEP folgt nach dem Layout.', '']
+    housing = ['Kappe_blau', 'Huelse_grau', 'Kragen', 'Verguss_Kragen', 'Stoessel', 'Fenster_transluzent', 'Schottkeil', 'Mutter_M2',
                'Schraube_M2x4', 'ORing_Kragen', 'ORing_Zapfen', 'Taste_blau', 'Klemmring', 'Membran_Silikon', 'Tastenteller']
     for name, src, key in rows:
         mins = []
@@ -335,7 +401,9 @@ def placeholder_collision(S):
             d = S[key].distToShape(S[h])[0]
             mins.append((d, h))
         mins.sort()
-        coll = [h for h in housing if S[key].BoundBox.intersect(S[h].BoundBox) and S[key].common(S[h]).Volume > 1e-3]
+        hs = [h for h in housing if not (key == 'U3_TMP_Kragen' and h == 'Verguss_Kragen')]
+        mins = [m for m in mins if m[1] in hs]
+        coll = [h for h in hs if S[key].BoundBox.intersect(S[h].BoundBox) and S[key].common(S[h]).Volume > 1e-3]
         lines.append('%-70s | %s' % (name, src))
         lines.append('    Kollision: %s | kleinster Abstand %.2f mm zu %s, %.2f mm zu %s'
                      % (', '.join(coll) or 'keine', mins[0][0], mins[0][1], mins[1][0], mins[1][1]))
@@ -379,7 +447,7 @@ def main():
     # und O-Ring Gleitsitz, Verpressung und Schraube pruefen, bevor die ganze Huelse gedruckt wird
     probe = sl_plain.common(box(-20, 20, -5, 20, -1, 9.0))
     export_part(probe, os.path.join(OUT, 'print', 'passprobe_huelse_unten'), [])
-    top = sl_plain.common(box(-20, 20, -5, 20, 29.0, 40))
+    top = sl_plain.common(box(-20, 20, -5, 20, Z['BULK0'] - 2.0, H['RIM_TOP'] + 1))
     export_part(top, os.path.join(OUT, 'print', 'passprobe_huelse_oben'), [])
     App.closeDocument(doc.Name)
     for f in os.listdir(OUT):
