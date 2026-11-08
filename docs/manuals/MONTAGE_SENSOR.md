@@ -34,7 +34,7 @@ Teile: Pos. 1–17 laut Stückliste FL-S-00 (gedruckt nach `PRINT_SETTINGS.md`, 
 | Messschieber 0.01 mm | Distanzlehre, Passungen, Dicke Dummy-Zelle |
 | Lupe ≥ 10× | Sichtprüfungen (VIP-Pads, Verguss, Lötstellen; ST-E1) |
 | 2 × Distanzlehre 24.2 (FL-S-10) | Abstand Kragen ↔ Schott beim Kragenverguss |
-| Isopropanol, fusselfreie Tücher | Flussmittelreste im Kragenbereich entfernen (K-5) |
+| Isopropanol (**leicht entzündlich**: keine offene Flamme, Lötkolben aus, lüften), fusselfreie Tücher | Flussmittelreste im Kragenbereich entfernen (K-5) |
 | 600er Schleifpapier | FDM-Naht auf den O-Ring-Gleitflächen der Hülse glätten (PRINT_SETTINGS Kap. 5) |
 | Silikonfett | O-Ringe (Pos. 11) |
 | Kapton-Punkt (Ø ≈ 3 mm) | Gewinde der Mutter vor Epoxid schützen (PCB_OUTLINE Kap. 7) |
@@ -118,6 +118,10 @@ Der Kragenverguss ist die **Sondendichtung** (S3-K2, REQ-MECH-08). Er wird nie w
 
 Nach Kap. `docs/manuals/PROGRAMMIEREN_SENSOR.md`, **Weg A** (Programmieradapter, Hülse abgezogen, Zugang zu TP1/TP2 im
 Zellfach). Keine Zelle im Clip. Danach Dummy-Zelle entnehmen.
+
+**Solange Weg A nicht freigegeben ist** (Test ST-P1, Sicherheitsauflagen PS-W1/A1–A5): Muster **vor dem Verguss**
+nach Weg B (Kap. 5 der Programmieranleitung, nur mit Dummy-Scheibe) programmieren, d. h. diesen Schritt vor Kap. 5
+dieser Anleitung ausführen (R3-K4).
 
 ## 7 Zelle einsetzen, O-Ringe, Hülse schliessen (Pos. 2, 11, 12, 17)
 

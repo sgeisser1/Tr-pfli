@@ -8,7 +8,8 @@ Für alle, die den Sensor benutzen. Dauer etwa 5 Minuten. Bild: `renders/final/f
 > **Warnung – Knopfzelle verschlucken ist lebensgefährlich.**
 > Eine verschluckte Lithium-Knopfzelle kann in kurzer Zeit schwere innere Verätzungen verursachen.
 > - Neue und alte Zellen **ausser Reichweite von Kindern und Haustieren** aufbewahren.
-> - **Besteht der Verdacht, dass eine Zelle verschluckt oder in den Körper eingeführt wurde: sofort ärztliche Hilfe holen.**
+> - **Besteht der Verdacht, dass eine Zelle verschluckt oder in den Körper eingeführt wurde: sofort ärztliche Hilfe holen**
+>   (Notruf **144**, Tox Info Suisse **145**, https://www.toxinfo.ch). Nicht abwarten, bis Beschwerden auftreten.
 > - Das Batteriefach muss nach dem Wechsel **immer vollständig geschlossen und verschraubt** sein. Lässt es sich nicht
 >   schliessen: Zelle herausnehmen und den Sensor nicht mehr benutzen.
 >
@@ -24,6 +25,9 @@ Für alle, die den Sensor benutzen. Dauer etwa 5 Minuten. Bild: `renders/final/f
 - Den Sensor nicht in Reichweite von Kleinkindern und Haustieren aufstellen (FMEA F-25).
 - Nur **CR2032 der Marke laut Stückliste** verwenden (Panasonic CR2032, REQ-ENE-08), nur neue Zellen.
 - Die Sondenspitze ist spitz: beim Herausziehen und Reinigen nicht gegen die Hand führen.
+- **Beschädigte, verformte oder ausgelaufene Zellen** nicht einsetzen; ausgelaufene Zelle nur mit Handschuhen anfassen,
+  abgeklebt entsorgen, Fach trocken auswischen.
+- Sensor **nicht auf oder neben den Heizkörper** und nicht in die pralle Mittagssonne hinter Glas stellen (Zellentemperatur).
 
 ## Was Sie brauchen
 
@@ -37,7 +41,8 @@ Für alle, die den Sensor benutzen. Dauer etwa 5 Minuten. Bild: `renders/final/f
 1. **Sensor herausziehen** am Kopf, gerade nach oben. **Sonde reinigen** und trocknen (Erde würde beim Abziehen der
    Hülse an der Dichtung schleifen).
 2. Über der Schale arbeiten. Sensor mit der Spitze nach oben halten. **Schraube unten am Kopf lösen** (PH1, gegen den
-   Uhrzeigersinn), bis sie frei dreht. Sie bleibt in der Hülse und fällt nicht heraus.
+   Uhrzeigersinn), **etwa 4 Umdrehungen, bis sich die Hülse abziehen lässt – nicht weiter drehen**, sonst fällt die
+   Schraube heraus (R3-W1). Eine Ersatzschraube M2×3 bereithalten.
 3. **Graue Hülse nach unten über die Sonde abziehen** (wie im Bild). Nicht an der blauen Kappe drücken.
    Innen an der Rückwand sehen Sie das Warnsymbol „CR2032 Verschluckgefahr“.
 4. **Alte Zelle herausschieben:** Sensor wieder normal halten (Kopf oben, Tropfenfenster zu Ihnen). Von vorne gesehen sitzt die Zelle rechts offen im Halter. Mit dem Fingernagel oder
@@ -47,7 +52,7 @@ Für alle, die den Sensor benutzen. Dauer etwa 5 Minuten. Bild: `renders/final/f
 6. **Neue Zelle einsetzen:** Pluspol (beschriftete Seite) **nach vorne**, von rechts flach einschieben, bis sie am
    linken Anschlag anliegt. Sie sitzt gerade und bündig, nicht schräg. **Dabei die Taste nicht berühren.**
 7. **LED beobachten:** Kurz nach dem Einsetzen blinkt die LED einmal grün (Selbsttest ok). Rot bedeutet Fehler, siehe
-   Fehlersuche. Kommt **gar kein Signal**: Zelle 10 Sekunden herausnehmen und ohne die Taste zu berühren wieder einsetzen
+   Fehlersuche. Kommt **gar kein Signal**: zuerst die **Polung** prüfen (Pluspol nach vorne, Schritt 6). Dann Zelle 10 Sekunden herausnehmen und ohne die Taste zu berühren wieder einsetzen
    (`docs/manuals/PROGRAMMIEREN_SENSOR.md` Kap. 6).
 8. **Dichtringe prüfen:** Die zwei roten bzw. durchsichtigen Gummiringe (oben und unten) sitzen in ihren Nuten, sind
    nicht verdreht und nicht beschädigt. Trocken wirkende Ringe dünn mit Silikonfett einreiben.
