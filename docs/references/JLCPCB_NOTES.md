@@ -267,3 +267,21 @@ Abgerufen 2026-11-07 per WebFetch (HTML, Auszüge sinngemäss bzw. wörtlich in 
   JLC fertigt ohne Rückfrage; passende „vias covering option“ selbst wählen.
 - EasyEDA/LCSC-Footprintdaten (Nullorientierung der JLC-Bibliothek) sind aus WSL nicht abrufbar
   (easyeda.com/api: HTTP 403, 2026-11-07) → Rotationen nur über die JLC-Vorschau prüfbar.
+
+## 9 Nachtrag 2026-11-08 (Red Team K-2, W-2): Verzollung DHL, Economic + ENIG + POFV
+- [OFFIZIELL] DHL Express CH, Zoll-Services („Aktualisiert: Dezember 1, 2025 / Gültig: Januar 1, 2026“),
+  https://mydhl.express.dhl/ch/de/ship/customs-services.html, abgerufen 2026-11-08, lokal
+  `docs/references/DHL-Express-CH_Customs-Services_Gebuehren_Auszug_2026-11-08.txt`:
+  „Abwicklung der Zollabfertigung … 19.00 CHF (Vereinfachte Verzollung)“, „Kontoabwicklungsgebühr … 19.00 CHF“,
+  „Vorlagegebühr … Nur für Importeure ohne ZAZ-Konto … 3.00 CHF oder 2% der verauslagten Einfuhrabgaben (der höhere
+  Betrag ist maßgeblich)“, Vollverzollung 39.50 CHF. **Korrektur zu Kap. 6:** Die 19 CHF fallen nicht nur „bei
+  behördlichen Auflagen“ an, sondern laut Privatkunden-FAQ bei jeder DHL-Express-Worldwide-Sendung ohne ZAZ-Konto.
+- [OFFIZIELL] DHL Express CH, Zollinformationen für Privatkunden (ohne Datum), abgerufen 2026-11-08, lokal
+  `docs/references/DHL-Express-CH_Zollinformationen-Privatkunden_Auszug_2026-11-08.txt`: „Es fallen CHF 19.00
+  Kontoabwicklungsgebühren an, sofern bei DHL Express Schweiz kein ZAZ-Konto hinterlegt ist“; „Die Vorlageprovision
+  beträgt 2% mindestens CHF 3.00“; im Rechenbeispiel ist die „Vorweisungstaxe … 19.00“ Teil des steuerbaren Warenwerts.
+  → `scripts/cost_model.py`: 19 CHF + max(3 CHF; 2 %), MWST auch auf die 19 CHF. **ANNAHME:** kein eigenes ZAZ-Konto.
+- [JLC] https://jlcpcb.com/capabilities/pcb-assembly-capabilities, abgerufen 2026-11-08 (ohne Datum): Economic PCBA
+  „Surface finish: Limited by specific options“ (Tabelle wie Kap. 2, 1.6 mm grün mit ENIG), „Standard stack-up only“.
+  Zu Via-Abdeckung/POFV steht dort **nichts**. Eine Websuche (2026-11-08) fand keine JLC-Aussage zur Kombination
+  Economic PCBA + POFV bei 4 Lagen → bleibt **BESTELL-PRÜFUNG** im Formular (`hardware/sensor/out/ORDER_JLC_REV_C.md`).

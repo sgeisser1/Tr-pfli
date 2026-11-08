@@ -1,0 +1,189 @@
+Quelle: DHL Express Schweiz - Zoll-Services / Gebuehren (HTML, kein PDF verfuegbar)
+URL: https://mydhl.express.dhl/ch/de/ship/customs-services.html
+Seitenangabe: "Aktualisiert: Dezember 1, 2025 / Gueltig: Januar 1, 2026"
+Abgerufen: 2026-11-08T10:49:22+01:00 mit curl (User-Agent Mozilla/5.0), HTTP 200
+sha256 Roh-HTML: 820914f8feac10c73f43b5d5a72067ca7e1721403a69ae06272ce22821a85acf
+Inhalt: Textauszug (Skripte/Stile entfernt, Tags entfernt), Abschnitt Gebuehren vollstaendig, unveraendert.
+Verwendung: scripts/cost_model.py (DHL_CLEARANCE_CHF, DHL_FEE_MIN_CHF, DHL_FEE_PCT), Befund K-2 phase4_redteam_gesamt.md
+======================================================================
+ Zollservices
+ Aktualisiert: Dezember 1, 2025
+Gültig: Januar 1, 2026 
+ DHL Express verfügt über umfassende weltweite Zollkenntnisse und Erfahrungen. Wir wissen, dass ein reibungsloser und effizienter Zollabfertigungsprozess dazu beiträgt, dass Ihre Sendungen so schnell wie möglich ankommen. Wir bieten standardisierte Services, die den Zollabfertigungsprozess effektiv unterstützen.
+ Zollservices
+ Inhaltsbeschreibung
+ Wie wir kalkulieren
+ Kosten
+ Zoll-Vorbereitung 
+ Export Validierung 
+ Wenn das Exportieren von Waren zusätzlichen Kontrollen unterliegt
+ Mehr anzeigen 
+ Weniger anzeigen 
+ Temporärer Import Export
+ Eine Ausfuhranmeldung ist für Sendungen erforderlich, die einen bestimmten Wert überschreiten. Dies kann auch für Sendungen gelten, die regulierte Waren enthalten oder eine bestimmte Gewichtsgrenze überschreiten.
+ Pro Sendung
+ 11.00 CHF
+ Nationales Transitverfahren 
+ Versand unter Zollverschluss
+ Mehr anzeigen 
+ Weniger anzeigen 
+ Export Validierung
+ Überweisung und Auslieferung der Sendung im Transitstatus mittels elektronischem, nationalem Transitverfahren
+ Pro Sendung
+ 45.00 CF
+ Zusatzpositionen 
+ Wenn Sendungen mit unterschiedlichen Produkten importiert werden
+ Mehr anzeigen 
+ Weniger anzeigen 
+ Nationales Transitverfahren
+ Gebühren fallen an, wenn mehr als 5 Zolltarifnummern für die Verzollung erfasst werden (zB unterschiedliche Produkte oder Herstellungsländer)
+ Per Line
+ 12.00 CHF
+ Temporärer Import Export 
+ Vorbereitung für den vorübergehenden Export/Import
+ Mehr anzeigen 
+ Weniger anzeigen 
+ Temporärer Import Export
+ Auf Kundenwunsch ermöglicht DHL die vorübergehende Ausfuhr und anschließende Wiedereinfuhr von Waren aus dem Ursprungsland oder die vorübergehende Einfuhr und spätere Wiederausfuhr von Waren am Bestimmungsort. Diese Dienstleistungen werden typischerweise zu Zwecken wie Reparaturen, Tests, Ausstellungen oder ähnlichen Aktivitäten erbracht und erfolgen unter Einhaltung der Zollbestimmungen durch Einreichung aller erforderlichen Unterlagen und Einhaltung der entsprechenden Zollabfertigungsverfahren.
+ Pro Sendung
+ 80.00 CHF
+ Bevorzugte Herkunft 
+ Profitieren Sie von Vorzugszöllen
+ Mehr anzeigen 
+ Weniger anzeigen 
+ Avisierung
+ Auf Verlangen des Versenders erfolgt die Erstellung oder Bereitstellung eines Ursprungszeugnisses/Präferenznachweises oder anderer ähnlicher Formulare durch DHL. Damit wird bescheinigt, dass die Waren einer bestimmten Exportsendung in einem bestimmten Land produziert, hergestellt oder verarbeitet wurden, so dass am Bestimmungsort Präferenzzölle erhoben werden können und/oder Handelsbeschränkungen eingehalten werden. Gängige Beispiele sind EUR1, ATR.
+ Pro Sendung
+ €10.00
+ Zollverfahren 
+ Nicht-routinemäßige Verzollung 
+ Von der Standardzollabfertigung ausgeschlossene Waren
+ Mehr anzeigen 
+ Weniger anzeigen 
+ Nicht-routinemäßige Verzollung
+ Gilt, wenn Waren von der routinemäßigen Zollabfertigung ausgeschlossen sind, weil ihr Wert oder Gewicht den von den Zollbehörden des Bestimmungsorts festgelegten offiziellen Einfuhrgrenzwert überschreitet oder weil andere gesetzliche Anforderungen wie Zolltarifnummern vorliegen. Gilt auch für die formelle Zollabfertigung durch von DHL beauftragte Drittmakler in Ländern, in denen DHL derartige Zollabfertigungsdienste nicht anbieten oder nicht als lizenzierter Makler tätig sein kann.
+ Pro Sendung
+ 39.50 CHF (Vollverzollung)
+ Lagerung unter Zollverschluss 
+ Wenn die Sendung vom Zoll keine Freigabe erhält
+ Mehr anzeigen 
+ Weniger anzeigen 
+ Lagerung unter Zollverschluss
+ Lagergebühren fallen an, wenn die Sendung nicht vom Zoll freigegeben werden kann.
+ Die Gebühren werden drei Kalendertage nach dem Ankunftsdatum der Fracht fällig. Die Gebühr fällt für den Zoll- und Steuerzahler an.
+ Pro Sendung
+Pro Tag
+Nach 3 Kalendertagen
+ 11.00 CHF pro Tag plus 0.45 CHF pro kg
+ Lizenzen und Genehmigungen 
+ Wir erleichtern den Prozess der Lizenzanmeldung.
+ Mehr anzeigen 
+ Weniger anzeigen 
+ Lizenzen und Genehmigungen
+ Zur Beschleunigung der Einfuhr ausgewählter kontrollierter Waren, wie Edelmetalle und Veterinärprodukte, medizinische Geräte, Arzneimittel, Computermonitore, Laser-CD-Player, Kosmetika, Brillen, Lebensmittel und Lebensmittelprodukte, muss DHL bestimmte Informationen einreichen, um die erforderlichen Einfuhrgenehmigungen oder Lizenzen zu erhalten. Die Gebühr gilt für den Zoll- und Steuerzahler.
+ Pro Sendung
+ 29.00 CHF
+ Abwicklung der Zollabfertigung 
+ Eine Gebühr für die Zollabfertigung von Sendungen
+ Mehr anzeigen 
+ Weniger anzeigen 
+ Abwicklung der Zollabfertigung
+ Gilt, wenn durch die Einfuhr von Sendungen aufgrund behördlicher Auflagen zusätzliche Kosten entstehen.
+ Pro Sendung
+ 19.00 CHF (Vereinfachte Verzollung)
+ 13.00 CHF (Weltpaket)
+ Physische Intervention des Zolls 
+ Sendungen, die der Zollkontrolle unterliegen 
+ Mehr anzeigen 
+ Weniger anzeigen 
+ Physische Intervention des Zolls
+ Die Durchführung einer nicht routinemäßigen physischen Zollkontrolle einer Sendung, die entweder eine vollständige oder teilweise Entladung beinhaltet. Dazu gehört auch die Markierung oder Beschädigung von Proben.
+ Pro Sendung
+ 50.00 CHF zzgl. Kosten der Edelmetallkontrolle/des Veterinäramtes)
+ Avisierung 
+ Sendungen, die der Zollkontrolle unterliegen 
+ Mehr anzeigen 
+ Weniger anzeigen 
+ Avisierung
+ Gilt, wenn der benannte Importeur ausdrücklich darum gebeten hat, vor Beginn der Zollabfertigung von DHL kontaktiert zu werden.
+ Hierzu ist eine vertragliche Vereinbarung erforderlich.
+ Pro Sendung 
+ 20.00 CHF
+ Unterstützung bei der Verzollung 
+ Zoll- und Steuerabwicklung 
+ Vertragskunden mit einer DHL Kundennummer können die Zollabfertigung beschleunigen
+ Mehr anzeigen 
+ Weniger anzeigen 
+ Zoll- und Steuerabwicklung
+ DHL beschleunigt die Zollabfertigung und leitet den Zahlungsprozess für die mit einer Sendung verbundenen Zölle und Steuern ein. Der Zoll- und Steuerbetrag wird dem Empfänger in Rechnung gestellt, sodass die Zahlung bis zu einem gemeinsam vereinbarten Termin aufgeschoben werden kann.
+ Pro Sendung
+ 19.00 CHF
+ Zoll- und Steuerabwicklung 
+ Einfuhrzölle und Steuern für Empfänger ohne DHL Kundennummer
+ Mehr anzeigen 
+ Weniger anzeigen 
+ Zoll- und Steuerabwicklung
+ Eine Verwaltungsgebühr fällt an, wenn DHL Einfuhrzölle, Steuern oder andere behördliche Gebühren im Namen von Kunden abwickelt, die kein ZAZ-Konto besitzen.
+ Pro Sendung
+ International - 3.00 CHF oder 2% der verauslagten Einfuhrabgaben (der höhere Betrag ist maßgeblich)
+ Weltpaket - 3 % des steuerbaren Betrags (Warenwert, Transport, alle Zölle und Steuern), jedoch max. 100.00 CHF
+ Broker Benachrichtigung 
+ Bestimmen Sie Ihren bevorzugten Zollmakler
+ Mehr anzeigen 
+ Weniger anzeigen 
+ Broker Benachrichtigung
+ Auf Wunsch des Kunden stellt DHL dem vom Kunden benannten Broker die erforderlichen Unterlagen zur Verfügung, um die Importabfertigung durchzuführen und die Lieferung an den endgültigen Bestimmungsort zu ermöglichen, sobald die Freigabe abgeschlossen ist.
+ Pro Sendung
+ 30.00 CHF
+ Freigabe an Makler 
+ Ihre Sendung wird vom Zollmakler Ihrer Wahl verzollt und zugestellt
+ Mehr anzeigen 
+ Weniger anzeigen 
+ Freigabe an Makler
+ Auf Antrag des Versenders oder Importeurs, die Freigabe einer DHL Express-Sendung an den vom Kunden benannten Zollbroker seiner Wahl. DHL überträgt die Verantwortung für eine Sendung und die damit verbundenen Zollunterlagen an den vom Kunden benannten Makler für die Abfertigung und die Zustellung auf der letzten Meile.
+ Gebühren für den Transit unter Zollverschluss können anfallen, wenn der benannte Makler sich außerhalb des Einfuhrortes befindet.
+ Pro Sendung
+ 45.00 CHF
+ Other Government Agency 
+ Wenn das Importieren von Waren zusätzlichen Kontrollen unterliegt
+ Mehr anzeigen 
+ Weniger anzeigen 
+ Other Government Agency
+ Auf Wunsch kümmert sich DHL um die Durchführung von Gesundheits-, Veterinär-, CITES- oder Pflanzenschutzkontrollen beim ersten Grenzeintritt in ein Land oder eine Zollunion. Typischerweise ist das beim Importieren von Pflanzen, Samen, pharmazeutitschen oder tierischen Produkten der Fall.
+ Pro Sendung
+ 50.00 CHF
+ Post Clearance Modification 
+ Auf Wunsch können Sendungsdaten (Wert, Klassifizierung usw.) nach der Anmeldung geändert werden
+ Mehr anzeigen 
+ Weniger anzeigen 
+ Post Clearance Modification
+ Auf Anfrage der Zollbehörden oder des Importeurs/Exporteurs kann DHL die den Zollbehörden zu Zollabfertigungszwecken gemeldeten Daten ergänzen oder ändern. Dazu gehören Daten wie der deklarierte Wert, die Klassifizierung der Waren und Angaben zum Importeur auf der Grundlage von vom Importeur oder Exporteur eingeholten oder bestätigten Belegen.
+ Pro Sendung
+ 77.00 CHF
+ Kontoabwicklungsgebühr 
+ Verzollung über das DHL Zollkonto
+ Mehr anzeigen 
+ Weniger anzeigen 
+ Kontoabwicklungsgebühr
+ Verzollung über das DHL ZAZ-Konto. Einmalig pro Rechnung anfallende Abwicklungsgebühr. Nur für Import TDI Sendungen.
+ Pro Sendung
+ 19.00 CHF
+ Vorlagegebühr 
+ Vorkasse durch Verzollung auf DHL Zollkonto
+ Mehr anzeigen 
+ Weniger anzeigen 
+ Vorlagegebühr
+ Nur für Importeure ohne ZAZ-Konto in der Schweiz. Erhebung einer Gebühr im Zusammenhang mit der Verauslagung von Einfuhrabgaben. (Dies gilt für TDI/DDI Sendungen sowie für Weltpaket Prio Sendungen).
+ Pro Sendung
+ 3.00 CHF oder 2% der verauslagten Einfuhrabgaben (der höhere Betrag ist maßgeblich)
+ Mehr über Zollservices 
+ Mehr über Zollservices 
+ DHL übernimmt die Vorauszahlung und Rückerstattung der staatlich vorgeschriebenen Zertifikatsgebühren.
+ Für Sendungen, die mit dem DTP-Service (Duty Tax Paid) gebucht werden, können zusätzliche Abfertigungsgebühren anfallen. Diese werden dem DTP-Versender in Rechnung gestellt. Diese Gebühren können Folgendes umfassen, sind aber nicht darauf beschränkt:
+ Lagerung unter Zollverschluss
+ Abwicklung der Zollabfertigung
+ Physische Intervention durch den Zoll
+ Zusatzpositionen
+ Nicht-routinemäßige Verzollung
+ Lizenzen und Genehmigungen
+ Post Clearance Modification

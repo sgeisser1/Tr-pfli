@@ -169,8 +169,24 @@ CH_TAX_MIN_CHF = 5.0
 # https://www.bazg.admin.ch/de/aufhebung-industriezolle-januar-2024 -> Zoll 0.
 CH_DUTY = 0.0
 # Verzollungsgebuehren Kurier, nur wenn Abgaben erhoben werden:
-# [OFFIZIELL] DHL Express CH, ab 1.1.2026, https://mydhl.express.dhl/ch/de/ship/customs-services.html
-#   ohne ZAZ-Konto: max(3.00 CHF, 2 % der verauslagten Einfuhrabgaben)
+# [OFFIZIELL] DHL Express CH, "Aktualisiert: Dezember 1, 2025 / Gueltig: Januar 1, 2026",
+#   https://mydhl.express.dhl/ch/de/ship/customs-services.html, abgerufen 2026-11-08, lokal:
+#   docs/references/DHL-Express-CH_Customs-Services_Gebuehren_Auszug_2026-11-08.txt
+#   - "Vorlagegebuehr ... Nur fuer Importeure ohne ZAZ-Konto ... 3.00 CHF oder 2% der verauslagten Einfuhrabgaben
+#     (der hoehere Betrag ist massgeblich)"                                    -> DHL_FEE_MIN_CHF / DHL_FEE_PCT
+#   - "Abwicklung der Zollabfertigung ... Pro Sendung 19.00 CHF (Vereinfachte Verzollung)" bzw.
+#     "Kontoabwicklungsgebuehr ... 19.00 CHF"                                  -> DHL_CLEARANCE_CHF
+# [OFFIZIELL] DHL Express CH, Zollinformationen fuer Privatkunden (ohne Datum), abgerufen 2026-11-08, lokal:
+#   docs/references/DHL-Express-CH_Zollinformationen-Privatkunden_Auszug_2026-11-08.txt
+#   - "Bei DHL EXPRESS WORLDWIDE Sendungen ... Es fallen CHF 19.00 Kontoabwicklungsgebuehren an, sofern bei DHL
+#     Express Schweiz kein ZAZ-Konto hinterlegt ist"; "vereinfachte Verzollung zu CHF 19.00 (Mehrwertsteuerwert
+#     < 1'000 CHF ...)"; "Die Vorlageprovision betraegt 2% mindestens CHF 3.00."
+#   - Beispiel steuerbarer Warenwert: "+ Vorweisungstaxe (Vereinfachte Verzollung/Vollverzollung) + 19.00 / 39.50 CHF"
+#     -> die 19 CHF sind Teil der MWST-Bemessung                           -> DHL_CLEARANCE_IN_VAT_BASE
+# Befund K-2 (phase4_redteam_gesamt.md): bis 2026-11-07 nur 3.00 CHF gerechnet (zu tief).
+# [ANNAHME] Empfaenger ohne eigenes ZAZ-Konto; Vollverzollung (39.50 CHF) erst ab MWST-Wert > 1000 CHF, hier nicht.
+DHL_CLEARANCE_CHF = 19.0
+DHL_CLEARANCE_IN_VAT_BASE = True
 DHL_FEE_MIN_CHF = 3.0
 DHL_FEE_PCT = 0.02
 # [OFFIZIELL] Post CH, https://www.post.ch/de/empfangen/importverzollung (2026-11-06):
@@ -410,18 +426,21 @@ def compute(bom: list[BomLine], layers: int, thickness: float, pcb_qty: int, pcb
     vat = base_chf * CH_VAT
     duty = base_chf * CH_DUTY
     abgaben = vat + duty
+    vat_fee = 0.0  # MWST auf die Verzollungsgebuehr (DHL: Teil des steuerbaren Warenwerts) -> nur einmalig
     if abgaben <= CH_TAX_MIN_CHF:
         abgaben = 0.0
         vat = 0.0
         carrier_fee = 0.0
     elif ship == "DHL":
-        carrier_fee = max(DHL_FEE_MIN_CHF, DHL_FEE_PCT * abgaben)
+        vat_fee = DHL_CLEARANCE_CHF * CH_VAT if DHL_CLEARANCE_IN_VAT_BASE else 0.0
+        carrier_fee = DHL_CLEARANCE_CHF + max(DHL_FEE_MIN_CHF, DHL_FEE_PCT * (abgaben + vat_fee))
     else:
         carrier_fee = min(POST_FEE_MAX_CHF, POST_FEE_BASE_CHF + POST_FEE_PCT * base_chf)
     # MWST anteilig: Stueckanteil -> Stueckkosten, Rest -> Einmalkosten
     share_unit = (unit_usd * pcba_qty) / goods_usd if goods_usd else 0.0
     vat_unit_chf = abgaben * share_unit / pcba_qty
-    vat_once_chf = abgaben * (1 - share_unit)
+    vat_once_chf = abgaben * (1 - share_unit) + vat_fee
+    vat += vat_fee
 
     board_chf = unit_usd * fx + vat_unit_chf                 # JLC-Anteil pro bestuecktem Board
     lokal_sensor_chf = lokal_unit_chf * (1 + local_scrap)    # lokale Teile inkl. Ausschuss

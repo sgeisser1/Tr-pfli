@@ -1,0 +1,174 @@
+Quelle: DHL Express Schweiz - Zollinformationen fuer Privatkunden (FAQ, HTML, kein PDF verfuegbar)
+URL: https://mydhl.express.dhl/ch/de/help-and-support/customs-clearance-advice/duties-and-taxes/customs-information-for-private-customers.html
+Seitenangabe: kein Aktualisierungsdatum auf der Seite
+Abgerufen: 2026-11-08T10:49:22+01:00 mit curl (User-Agent Mozilla/5.0), HTTP 200
+sha256 Roh-HTML: adf64055c1ec8664a558e0f77712218eb12694b4bd6ad8696c536dfc21ef1419
+Inhalt: Textauszug (Skripte/Stile entfernt, Tags entfernt), FAQ-Teil vollstaendig, unveraendert.
+Verwendung: scripts/cost_model.py (DHL_CLEARANCE_CHF, DHL_CLEARANCE_IN_VAT_BASE), Befund K-2
+======================================================================
+ Leitfaden für Verlader und Empfänger zu Zöllen und Steuern
+ Nachricht gesendet</div>
+">
+ Zollinformationen für Privatkunden
+ Antworten auf häufige Fragen zur Verzollung von Importsendungen.
+ Das Dokument liefert Ihnen Antworten auf häufig gestellte Fragen rund um Verzollung und Mehrwertsteuerabgaben.
+ Wieso muss ich bei der Zustellung einer Sendung aus dem Ausland Abgaben zahlen (Mehrwertsteuer, Zollabgaben)? 
+ Ob Geschenk oder nicht – jede Sendung muss eine Einfuhrabfertigung durchlaufen, die sich nach den Zollgesetzen des Ziellandes richtet. Jede Sendung aus dem Ausland ist grundsätzlich Zoll- und MWST-pflichtig. Sie, als Empfänger solch einer Sendung, zahlen Mehrwertsteuer (MWST) auf den Warenwert (inkl.Fracht-/ und Zollkosten) und Zollabgaben auf das Bruttogewicht. Diese Kosten sind nicht zu verwechseln mit den Transportkosten, die bei der Aufgabe der Sendung bezahlt werden.
+Weiterführende detaillierte Angaben finden Sie auf den Internetseiten vom Bundesamt für Zoll und Grenzsicherheit BAZG 
+ Ab wann bezahle ich Zoll und/oder Mehrwertsteuer (MWST) für Importsendungen? 
+ Jede Sendung aus dem Ausland ist grundsätzlich Zoll- und MWST-pflichtig.
+Die Wertfreigrenze von CHF 150.00 gilt ausschliesslich im Reiseverkehr. Beim Importieren von Waren aus dem Ausland gilt das Warenverkehr-Gesetz. Es werden keine Zoll- und Mehrwertsteuerabgaben erhoben, sofern der errechnete Betrag weniger als CHF 5.00 je Zolldeklaration ausmacht, wobei Zoll- und Mehrwertsteuerabgaben separat zu betrachten sind.
+Im Weiteren sind insbesondere Geschenksendungen von im Ausland wohnhaften Privatpersonen an Privatpersonen in der Schweiz bis zu einem Warenwert von CHF 100.00 abgabefrei.
+Im Internet erworbene Waren erfüllen diese Bedingungen nicht. Sie sind nach den allgemeinen Vorschriften abgabepflichtig.
+Die Warenwertobergrenze (Warenwert, inkl. Transportkosten und allfälliger Zollabgaben) für eine mehrwertsteuerbefreite Einfuhr liegt bei:
+ 8.1% MWST (Grossteil der Sendungen) => CHF 61.00
+ 2.6% MWST (z.B. Bücher) => CHF 192.00
+ Wie setzt sich der steuerbare Warenwert (Einfuhrwert) zusammen, auf dem die MWST berechnet wird? 
+ Der steuerbare Warenwert wird aus mehreren Positionen berechnet: 
+ Beispiel für eine Sendung aus Deutschland: (Ausgenommen Deutsches Postpaket Intl) 
+ Rechnungsbetrag (Warenkosten) 
+ 119.00 CHF* 
+ - ausländische MWST 
+ - 19.00 CHF 
+ + Transportkosten
+ + evt. Zollabgaben 
+ + 15.00 CHF 
+ + Vorweisungstaxer** (Vereinfachte Verzollung/Vollverzollung) 
+ + 19.00 / 39.50 CHF 
+ =Total steuerbarer Warenwert*** 
+ = 134.00 / 154.50 CHF 
+ Der steuerbare Warenwert wird aus mehreren Positionen berechnet: 
+ Beispiel für ein Deutsches Postpaket International (Eco) 
+ Rechnungsbetrag (Warenkosten) 
+ 119.00 CHF* 
+ - ausländische MWST 
+ - 19.00 CHF 
+ + Transportkosten
+ + evt. Zollabgaben 
+ + 15.00 CHF 
+ + Verzollungskosten 
+ + 13.00 CHF 
+ + Aufwandsentschädigung 3% vom steuerbaren Betrag 
+ + 3.80 CHF 
+ =Total steuerbarer Warenwert*** 
+ = 131.80 CHF 
+ *** von diesem Betrag (ohne Rappen) berechnet sich die MWST
+ *Die Umrechnung des Rechnungsbetrags von einer Fremdwährung in Schweizer Franken erfolgt anhand vom Zoll vorgegebener und täglich aktualisierter Wechselkurse immer auf Grundlage der Devisenkurse des Vortages.
+**vereinfachte Verzollung zu CHF 19.00 (Mehrwertsteuerwert < 1‘000 CHF / Gewicht < 1‘000kg / keine Nebengesetze/ die Einfuhrabgaben(ohne Mwst) betragen nicht mehr als 5 CHF) oder Vollverzollung zu CHF 39.50 (Mehrwertsteuerwert > 1‘000 CHF / Gewicht >1‘000kg / Nebengesetze)
+ Woher kennt der Zolldeklarant die Transportkosten, die Teil des MWST-Werts sind? 
+ Der Zolldeklarant hat mehrere Möglichkeiten, um die Transportkosten zu bestimmen:
+ Wenn die Transportkosten auf den Begleitpapieren erkennbar sind, werden diese in die Berechnung des Warenwerts einbezogen.
+ Sind auf den Begleitpapieren keine Transportkosten erkennbar, werden die Transportkosten anhand der mit dem Zoll vereinbarten Frachttabelle bestimmt.
+ Bei Geschenksendungen von Privatpersonen an Privatpersonen bis zu einem Wert von 100 CHF werden die Transportkosten nicht in den MWST-Wert einbezogen.
+ Sind die Transportkosten auf den Begleitpapieren als Bestandteil des Warenwerts ausgewiesen, werden keine zusätzlichen Transportkosten in den MWST-Wert eingerechnet.
+ Welche Mehrwertsteuersätze gelten in der Schweiz? 
+ Seit dem 1. Januar 2024 gelten folgende Mehrwertsteuersätze:
+ Art 
+ Mwst-Satz 
+ Normalsatz auf steuerbare Lieferungen und Dienstleistungen 
+ 8.1% 
+ Reduzierter Satz auf steuerbare Lieferungen und Dienstleistungen (Bsp. Bücher) 
+ 2.6% 
+ MWST-Erhebung; Warum muss ich auf sonstige Verzollungskosten 8.1% MWST bezahlen? 
+ Sämtliche Dienstleistungen, die vor und während der effektiven Verzollung erbracht werden, sind gemäss Zollbestimmungen im MWST-Wert mit einzuberechnen und demnach zu versteuern. Dienstleistungen, die während der Verzollung anfallen und nicht vorhersehbar sind, werden auf der Rechnung von DHL Express mit 8.1% versteuert.
+Siehe auch: Mehrwertsteuergesetz, Art. 52 
+ Muss eine Geschenksendung verzollt werden? 
+ Ob Geschenk oder nicht – jede Sendung muss eine Einfuhrabfertigung durchlaufen, die sich nach den Zollgesetzen des Ziellandes richtet.
+Geschenksendungen sind unter folgenden Voraussetzungen abgabenfrei:
+ Sendung von Privatperson an Privatperson
+ Warenwert < CHF 100.–
+ Der Begriff «Geschenk» muss auf allen Zolldokumenten klar ersichtlich sein.
+Eine Verzollung ist in folgenden Ausnahmefällen in jedem Fall nötig:
+ Tabakfabrikate
+ Alkoholische Getränke
+ Weitere Waren, die einem nichtzollrechtlichen Erlass unterliegen
+ Ersatzlieferung - es handelt sich bei der Lieferung um einen Ersatz eines bereits einmal verzollten Gegenstandes. Muss ich die MWST doppelt bezahlen? 
+ Es sind zwei Fälle zu unterscheiden:Ist der Empfänger ein Unternehmen, welches vom Vorsteuerabzug Gebrauch machen kann, ist eine Rückerstattung der doppelt bezahlten MWST nicht möglich. Diese kann im Rahmen der Vorsteuerabrechnung geltend gemacht werden (Artikel 80 Absatz 2 des BG über die MWSTG: https://www.admin.ch/opc/de/classified-compilation/20081110/index.html ). Dieses Recht steht dem Empfänger zu, wenn er die eingeführten Gegenstände für einen geschäftlich begründeten Zweck verwendet (Art 38 Absatz. 1c + Absatz. 2 + Abs 7c MWSTG: https://www.admin.ch/opc/de/classified-compilation/20081110/index.html ).
+ Da die Verzollungsdienstleistung zweimal erfolgte, ist diese auch zweimal geschuldet. Beide Rechnungen sind demzufolge vollumfänglich zu bezahlen.
+ Ist der Empfänger eine Privatperson, muss gegenüber der Zollbehörde nachgewiesen werden, dass eine Einfuhr, eine nachfolgende Ausfuhr und eine wieder erfolgte Einfuhr vorliegt. Der Beweis besteht aus entsprechenden Import-Zollausweisen sowie dem Beleg der Ausfuhr (Ausfuhrzollausweis, Frachtbrief mit konkreten Inhaltsangaben oder ähnliches). Mit diesen Beweisen ist die MWST-Rückforderung möglich. Bitte senden Sie alle Unterlagen (d.h. Einfuhrbelege, Ausfuhrbelege und die Belege des Re-Importes) mit einem entsprechenden Vermerk zu.
+ Reparatur - das Paket beinhaltet eine Reparatur. Worauf muss ich genau MWST bezahlen? 
+ Aktiver Reparatur-Verkehr: Ware, die in die Schweiz eingeführt wird, um hier repariert zu werden.
+ - Waren ausländischen Ursprungs zur Reparatur sind normal zu verzollen oder mit Freipass abzufertigen.
+ - Die MWST kann nach der Wiederausfuhr ausschliesslich im Vorsteuerabzug geltend gemacht werden. Es ist keine Rückerstattung möglich.
+ Passiver Reparatur-Verkehr: Ware wurde im Ausland repariert und kommt in die Schweiz zurück. MWST fällt nur auf das Neumaterial und die Lohnkosten an. Die Handelsrechnung muss dies aber klar ausweisen.
+ Weshalb wurde meine Importsendung von DHL Express Schweiz blockiert? 
+ Falsch oder ungenügend dokumentierte Importsendungen können von DHL Express Schweiz nicht verzollt werden und werden somit blockiert. Der Empfänger wird mit einem Benachrichtigungsschreiben aufgefordert, die fehlenden Angaben nachzuliefern. Bei der Zustellung können Sie anschliessend zwischen den zwei folgenden Möglichkeiten wählen.
+ Sie liefern DHL Express Schweiz die benötigten Angaben, lösen somit die Sendung aus und bezahlen die zusätzlichen Bearbeitungsgebühren direkt bei der Zustellung der Sendung an Ihrem Domizil.
+ Sie wollen für den Fehler des Absenders nicht bezahlen und verweigern die Zustellung. Somit wird die Sendung wieder zurück zum Absender geschickt.
+ Was passiert mit Postsendungen aus Deutschland bestehend aus mehreren Paketen? 
+ Die Deutsche Post verschickt keine Sammelsendungen. Jedes Paket wird einzeln verzollt. Der Absender ist angewiesen, dass er pro Paket eine korrekte Handelsrechnung beifügt, in welcher der exakte Wert des Paketes angegeben wird.
+ Was passiert, wenn der Absender mehrere Postpakete aus Deutschland mit der gleichen Rechnung verschickt? 
+ Bei Postpaket aus Deutschland handelt es sich um ein Einzelpaket-Produkt. Da es aus informationstechnischen Gründen nicht möglich ist, dies zu erkennen, wird die Ware oft mehrfach verzollt. Die Korrektur der Mehrfach-Verzollung kann nur durch ein Gesuch bei der eidg. Zollverwaltung eingereicht werden. Da dies kostenpflichtig ist, werden Gesuche erst ab einem Rückerstattungsbetrag über CHF 100.00 eingereicht. Die Kosten müssen vom Warenempfänger getragen werden.
+ Wie wird der Verzollungspreis berechnet? 
+ DHL Express bietet drei Produkte an: DHL EXPRESS WORLDWIDE, DHL ECONOMY SELECT und Weltpaket (Postpaket-Import aus Deutschland)
+Bei DHL EXPRESS WORLDWIDE Sendungen ist die Verzollung im Transportpreis inbegriffen. Es fallen CHF 19.00 Kontoabwicklungsgebühren an, sofern bei DHL Express Schweiz kein ZAZ-Konto hinterlegt ist (Weiterführende Informationen zum Thema „Zollkonto im zentralisierten Abrechnungsverfahren der Zollverwaltung“ finden Sie hier: Merkblatt zentralisierte Abrechnungsverfahren des BAZG (ZAZ) .
+Bei DHL ECONOMY SELECT Sendungen wird der Verzollungspreis wie folgt berechnet:
+Eine vereinfachte Verzollung kostet CHF 19.00 (Mehrwertsteuerwert < 1‘000 CHF / Gewicht < 1‘000kg / keine Nebengesetze / keine Zölle, keine Tabaksteuer, keine Alkoholsteuer, keine Einfuhrlizenz oder -genehmigung / die Einfuhrabgaben (ohne Mwst) betragen nicht mehr als CHF 5.00)
+Eine Vollverzollung kostet CHF 39.50 (Mehrwertsteuerwert > 1‘000 CHF / Gewicht >1‘000kg / Nebengesetze).
+Bei Sendungen „Deutsches Postpaket International PREMIUM“ (Weltpaket Prio) werden die Verzollungskosten vom Absender übernommen.
+Bei Sendungen „Deutsches Postpaket International ECONOMY“ (Weltpaket Eco) fallen für den Empfänger folgende Gebühren an:
+ Aufwandsentschädigung: 3% des Warenwerts (max. CHF 100)
+ Verzollungsgebühr CHF 13.00
+ Über 5 Zolltarifnummern: weitere CHF 12/Nummer
+ Welche zusätzliche Kosten werden von DHL Express zzgl. Verzollungskosten noch erhoben? 
+ Avisierung 
+ CHF 20.00 
+ Geleitschein 
+ CHF 45.00 
+ Übergabe an Spediteur 
+ CHF 45.00 
+ ATA / Freipass / Temporärer Import / Export 
+ CHF 80.00 
+ Edelmetallkontrolle 
+ CHF 50.00 
+ Veterinärkontrolle 
+ CHF 50.00 
+ Nachträgliche Aenderung der Verzollung* 
+ CHF 77.00 
+ Zusatzpositionen ab der 5. Tarifposition 
+ CHF 12.00 
+*auf Kundenwunsch
+ Wann wird der Zuschlag „Zusatzpositionen“ erhoben? 
+ Der Zuschlag für Zusatzpositionen wird erhoben, wenn eine Sendung mehr als 5 Zolltarifnummern umfasst. Die Verzollung von einer bis fünf Zolltarifnummern ist im Verzollungspreis inbegriffen. Ab der sechsten Zolltarifnummer wird ein Zuschlag von CHF 12.00 je zusätzliche Zolltarifnummer erhoben.
+Beispiel:
+Verzollung einer Sendung mit 8 Zolltarifnummern: Zuschlag CHF 36.00
+ Was sind nichtzollrechtliche Erlasse (NZE) bzw. Nebengesetze? 
+ Die Zollverwaltung wirkt beim Vollzug nichtzollrechtlicher Erlasse des Bundes mit. Diese so genannten NZE finden sich heute in zahlreichen Rechtsgebieten wieder. Dazu zählen:
+ Einfuhrzollabgaben
+ Sicherheit
+ Kriegsmaterial, Waffen, Sprengmittel, Kernenergie, zivil und militärisch verwendbare Güter, staatsgefährdendes Propagandamaterial,...
+ Geistiges Eigentum
+ Edelmetalle, Marken und Herkunftsangaben, Designrecht, Urheberrecht, Lotterien und Wetten,...
+ Wirtschaftliche und finanzielle Massnahmen
+ Beschränkung und Überwachung der Einfuhr und Ausfuhr
+ Gesundheit
+ Lebensmittel, Doping, Betäubungsmittel, Leichen, Heilmittel
+ Regale und Monopole
+ Alkohol, Tabak, Post, Münzen, Banknoten, Salz
+ Umwelt
+ Tierseuchen, Tierschutz, Fischerei, Pflanzenschutz, Abfälle.
+ Kulturgut/Antiquitäten, mehr als 100 Jahre alt
+ Briefmarken, Postkarten, Münzen, Bilder, Skulpturen, kartografische Erzeugnisse, antike Bücher und andere Gegenstände, die offensichtlich älter als 100 Jahre sind, müssen aufgrund der Vorgaben des Bundesgesetzes (KGTG/KGTV) der Zollverwaltung bzw. dem Bundesamt für Kultur (BAK) bei der Einfuhr angemeldet werden. Dies ist mit zusätzlichen aufwandsbezogenen Verzollungsgebühren verbunden. www.bak.admin.ch/kulturerbe 
+ Wohin wende ich mich, wenn ich Fragen zur Verzollung habe? 
+ Fragen zu bereits verzollten Sendungen: vatquery.ch@dhl.com 
+Fragen für unverzollte Importsendungen: cccg@dhl.com 
+ Meine Zoll-/MWST-Rechnung ist mit der falschen Adresse ausgestellt - was kann ich tun? 
+ Wenn die Zoll-/Mwst-Rechnung gemäss Angaben der Handelsrechnung ausgestellt wurde, ist eine Änderung kostenpflichtig und wird obligatorisch mit CHF 15.00 auf der neuen Rechnung dem Empfänger belastet. Eine schriftliche Anfrage an Vatquery.ch@dhl.com ist erforderlich.
+ Warum muss ich Vorlageprovision bezahlen? 
+ Die Vorlageprovision beträgt 2% mindestens CHF 3.00.
+Diese Gebühr wird für die Benutzung des ZAZ Kontos (Zahlungsaufschubskonto) von DHL Express Schweiz und das dafür bestehende Risiko der Vorauszahlung von Zoll- und MWST erhoben.
+Diese Kosten werden nur Kunden ohne ZAZ Konto belastet. Ein Antrag für ein ZAZ Konto kann bei der Oberzolldirektion Bern angefordert werden. Merkblatt zentralisierte Abrechnungsverfahren des BAZG (ZAZ) 
+ Warum muss ich Importkosten bezahlen, wenn der Absender sagt, er hat alles übernommen? 
+ In den meisten Fällen werden nur die Transportkosten vom Absender übernommen. Die Zollabgaben sowie die Verzollungskosten werden automatisch dem Empfänger belastet, sofern der Absender nicht deutlich auf dem Frachtbrief andere entsprechende / Handelskonditionen vermerkt hat. Die Angaben auf der Rechnung sind hier nicht relevant und können nicht berücksichtigt werden. Eine nachträgliche Kostenübernahme durch den Absender kann innerhalb von 2 Monaten erfolgen, sofern Sie uns die Kostengutsprache zukommen lassen. Kontaktieren Sie uns hierzu per email unter Vatquery.ch@dhl.com . Dies gilt für alle Dienstleistungen von DHL Express ausser Postpaketen aus Deutschland. 
+ Ist die Ware, welche ich importiere, zollpflichtig? 
+ Sie können auf der Internetseite der eidgenössischen Zollverwaltung (EZV) prüfen, ob die Ware zollpflichtig ist: http://xtares.admin.ch/tares/login/loginFormFiller.do?l=de 
+ Was mache ich, wenn ich die Ware wieder exportiert habe? 
+ Die Import Rechnung von DHL Express Schweiz für Zoll-/ MWST muss bezahlt werden. Wenn Sie die Ware wieder exportieren, werden die Importabgaben (Zollkosten + MWST) nicht automatisch annulliert.
+Bitte wenden Sie sich an den Spediteur, mit dem die Ware zurückgesandt wurde. Das genaue Vorgehen kann unter folgendem Link nachgelesen werden: Rücksendung, Reparatur, Veredelung 
+ Zurück nach oben 
+ Bitte aktivieren Sie Javascript und aktualisieren Sie die Seite, um fortzufahren.
+ KONTAKT UND SUPPORT
+ Hilfe und Support 
+ FAQs 
+ Kontaktieren Sie uns 
+ Einen DHL Standort finden 
