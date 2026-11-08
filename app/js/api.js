@@ -76,16 +76,24 @@ export const patch = (p, b) => req('PATCH', p, b);
 export const put = (p, b) => req('PUT', p, b);
 export const del = (p, query) => req('DELETE', p, undefined, { query });
 
+/** Browserzeit anbieten (GATEWAY_API 5.7, REQ-GW-09): Das Gateway übernimmt sie nur ohne gültige Zeit
+ *  (kein NTP, keine RTC, z. B. nach Stromausfall ohne Internet). Ohne Anmeldung/CSRF nichts tun, Fehler still. */
+export async function offerTime() {
+  if (!csrf) return null;
+  try { return await req('POST', '/system/time', { t: new Date().toISOString() }, { noHooks: true }); } catch { return null; }
+}
 export async function login(password, remember = true) {
   const s = await req('POST', '/auth/login', { password, remember }, { noHooks: true });
   csrf = s.csrf;
   await refreshAuth();
+  offerTime();
   return s;
 }
 export async function setup(setup_code, password) {
   const s = await req('POST', '/auth/setup', { setup_code, password }, { noHooks: true });
   csrf = s.csrf;
   await refreshAuth();
+  offerTime();
   return s;
 }
 export async function logout() {

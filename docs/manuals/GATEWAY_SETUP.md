@@ -180,7 +180,7 @@ Farben (rot/grün/gelb), die App dieselbe Folge. Stimmt sie: **kurz die Sensorta
 | Passwort vergessen | SSH einschalten (Kap. 4.4), `cd /opt/fluidi/current/gateway && sudo -u fluidi /opt/fluidi/venv/bin/python -m fluidi_gw reset-password -c /etc/fluidi/gateway.toml` → neuer Einrichtungscode; Daten bleiben (UC-16) |
 | Dashboard für Kollegen | App → Einstellungen → Dashboard → „Ohne Anmeldung im Firmennetz“ → Bildschirm öffnet `http://fluidi.local:8080/` (HTTP, nur lesen, keine Sensor-IDs; D-020) |
 | WLAN wechseln | App → System → WLAN wechseln (Rückfall nach 2 min ohne Erfolg) |
-| Zeit | NTP (einzige Verbindung nach aussen, abschaltbar). Ohne Internet: App → System → „Zeit vom Handy übernehmen“ |
+| Zeit | NTP (einzige Verbindung nach aussen, abschaltbar; Firmen-NTP unter Einstellungen → Zeit). Ohne NTP (z. B. nach Stromausfall ohne Internet) übernimmt das Gateway beim Öffnen der App durch den angemeldeten Admin automatisch die Uhrzeit des Handys (nur wenn plausibel); sonst App → System → „Zeit vom Handy übernehmen“. Bis dahin: Werte „Zeit unsicher“, sie werden danach anhand der Sensor-Laufzeit zurückgerechnet (docs/reviews/phase5_gateway_zeit.md) |
 | Sensor-Firmware | App → Sensoren & Firmware → signiertes Abbild hochladen → Verteilen |
 | Gateway-Update | neue Repository-Version auf den Pi kopieren, `sudo ./install_gateway.sh` (Daten bleiben); signiertes Online-Update über die App ist vorbereitet (REQ-GW-11, Schlüssel `/etc/fluidi/keys/gateway-update.pem`) |
 | Simulation am PC | `cd firmware/gateway && python3 -m fluidi_gw sim --port 8080` (Sensoren simuliert, gleiches Funkprotokoll) |

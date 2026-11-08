@@ -157,3 +157,27 @@ des Produktionsschlüssels getrennt vom Schlüssel festhalten (Testplan ST-S3).
 **VETO PS-K1** gegen Weg B in der heutigen Fassung. Aufhebung durch die drei Textänderungen oben. Weg A ist unter
 PS-W1 freigebbar. Sicherheitstests ST-P1…ST-P6 gehen in den Testplan
 (`phase5_testplan_beitrag_sicherheit.md`).
+
+## Runde 2 (2026-11-08, Sicherheits-Agent)
+
+Geprüft: `docs/manuals/PROGRAMMIEREN_SENSOR.md` v1.1 und `.gitignore` aus Commit `8ee1e34`, `hardware/programmer/README.md` (unverändert).
+Selbst ausgeführt: `git check-ignore -v` mit `firmware/gateway/x.key`, `app/ca.key` und `secrets.pem` → werden ignoriert.
+`firmware/sensor/keys/DEV_ONLY_fluidi_signing_ec-p256.pem` bleibt versioniert, wie es sein soll.
+
+| Befund | Ergebnis | Beleg / Rest |
+|---|---|---|
+| **PS-K1** | **umgesetzt → VETO aufgehoben** | Bed. 1: Regel 1, Kap. 2 (Scheibe „Pflicht“), Kap. 5 Tabelle und Schritt 2 („Ohne Scheibe kein Weg B“, keine Prüfklemme, kein Draht am Minuspad). Bed. 2: Schritt 8 legt die Reihenfolge fest (Netzteil aus und ab → Scheibe heraus → Drähte weg); Zelle erst nach Schritt 9. Bed. 3: Schritt 9 „Zellen unter 2.6 V nicht wiederverwenden“. Damit ist Programmieren mit Zelle in Weg B konstruktiv ausgeschlossen (Clip belegt). |
+| PS-W1 | offen | Einteiligkeit des Adapters (PA-1) ist noch nicht gebaut; Freigabe Weg A erst nach ST-P1 |
+| PS-W2 | **teilweise** | Verbot, auf Minuspad und Via-in-Pad-Flächen im Fach zu löten, steht in Schritt 2. **Widerspruch:** Schritt 4 erlaubt weiter „Draht an TP2 (Ø 1.5 mm, leicht zu löten)“. TP2 ist ein Via-in-Pad im Fach. Vorschlag: Schritt 4 nur noch mit „Prüfspitze oder Federstift an TP2“, Schritt 8 (c) entsprechend. Ausserdem steht in `hardware/programmer/README.md` Kap. 4 weiter „Krone oder Spitze“: dort auf flachen bzw. gerundeten Kopf ändern |
+| PS-W3 | teilweise | Dicke 3.0–3.2 mm steht als Vorgabe in der Anleitung (Kap. 2, Kap. 5 Schritt 2). In `hardware/programmer/README.md` Kap. 4 und Kap. 7 Schritt 3 fehlt sie noch (Bauvorgabe 2 × 1.6 mm unverändert) |
+| PS-W4 | umgesetzt | Schritt 9: Foto, Hinweis, dass die Messung einen vergessenen Draht nicht erkennt |
+| PS-W5 | offen | PROTOTYP-PRÜFUNG ST-P6; Option Trigger-Pin (Firmware) |
+| PS-L1 | offen | ST-P3 |
+| PS-L2 | offen | kodierter Stecker; Prüfschritt VIO deckt den Fehler ab |
+| PS-L3 | umgesetzt | Schritt 5: 10 mA, höchstens 20 mA, einstellen vor dem Anschliessen |
+| PS-L4 | – | nur Hinweis |
+| CK-L1 | umgesetzt | Wurzel-`.gitignore` Z. 21–27 |
+
+**Ergebnis Runde 2:** Das **VETO PS-K1 ist aufgehoben.** Weg B darf für die Muster angewendet werden. Offene Punkte
+ohne Veto: Der Widerspruch zum Löten an TP2 (PS-W2) und die Dicke in der README (PS-W3) sind vor dem ersten Einsatz
+zu bereinigen. PS-W1 bleibt Bedingung für die Freigabe von Weg A.

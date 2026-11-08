@@ -14,7 +14,7 @@
 | C-02 | Verpolschutz Q1 richtig verdrahtet (G = GND, S = VDD, D = VBAT) | ✓ / T | `phase4_layout_revb_sicherheit.md` Kap. 4; `AOS_AO3401A_Datasheet_Rev3.1.pdf` S. 1; Verpoltest 24 h (ST-Z1) |
 | C-03 | Q1 richtig bestückt (Rotation) | T | B-3, ST-E2 |
 | C-04 | Zwei Rückstrombarrieren je externer Quelle (TP1/TP2: 2 × 100 kΩ im Band) | ✓ / T | CONCEPTS 2.7, R2-A3; ST-Z5 (R2-A4) |
-| C-05 | Programmieren nur ohne Zelle, **konstruktiv** | ✗ / O | Weg B ohne Scheibe verletzt das → **VETO PS-K1**; Weg A hängt an PS-W1 (`phase5_programmer_sicherheit.md`) |
+| C-05 | Programmieren nur ohne Zelle, **konstruktiv** | ✓ Weg B / O Weg A | Runde 2: PS-K1 umgesetzt, Veto aufgehoben (`PROGRAMMIEREN_SENSOR.md` v1.1). Ursprünglich: Weg B ohne Scheibe verletzt das → **VETO PS-K1**; Weg A hängt an PS-W1 (`phase5_programmer_sicherheit.md`) |
 | C-06 | Ladegrenze belegt (≤ 10 mA Fehlerfall, ≤ 1 % C) | ✓ | `docs/references/Maxell_CR_Warnings_12e_2012.pdf` S. 2; Renata/Panasonic offen (OP-K7) |
 | C-07 | Kein GND-Ziel neben dem Zellrand im Fach (TP3 entfällt) | ✓ | A-1, `ORDER_JLC_REV_C.md` (4 VIP im Fach) |
 | C-08 | Vias im Fach nur als POFV-Via-in-Pad | ✓ / T | D-023 A-2 (Bestellung), A-3 (Querschliff) |
@@ -93,7 +93,7 @@
 
 | Nr | Stufe | Befund | Vorschlag |
 |---|---|---|---|
-| CK-K1 | **kritisch (VETO)** | = PS-K1: Weg B ohne Dummy-Scheibe erlaubt eine Zelle bei angeschlossenem Netzteil | siehe `phase5_programmer_sicherheit.md` |
+| CK-K1 | kritisch, **VETO aufgehoben (Runde 2)** | = PS-K1: Weg B ohne Dummy-Scheibe erlaubte eine Zelle bei angeschlossenem Netzteil | umgesetzt in `PROGRAMMIEREN_SENSOR.md` v1.1, siehe `phase5_programmer_sicherheit.md` Runde 2 |
 | CK-W1 | wichtig | Sicherheits-, Batteriewechsel- und Montageanleitung fehlen (K-05, M-07; REQ-SAF-DOC-01, REQ-DOC-02) | vor der Nutzung der Muster ausserhalb des Labors erstellen; Prüfung durch Sicherheit |
 | CK-W2 | wichtig | Vergussmasse und Kantenversiegelung offen (M-03, M-04) | Auswahl mit Datenblatt, dann Sicherheitsprüfung K-4/K-5 |
 | CK-W3 | wichtig | Gateway-Netzteil nicht in einer Einkaufsliste festgelegt (FMEA F-44; REQ-SAF-DOC-02). RTC: Kandidat Adafruit 4282 ohne Ladepfad (von Sicherheit geprüft, FMEA F-45), Typ noch festzuschreiben | Gateway-Stückliste mit geprüftem Netzteil und RTC-Typ; ST-G1 |

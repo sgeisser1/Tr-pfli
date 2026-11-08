@@ -83,7 +83,7 @@ class Gateway:
             if s.addr in M.by_addr:
                 continue
             s.press_button_long()
-            M.pairing.update(active=True, until=time.time() + 60, candidates={})
+            M.pairing.update(active=True, until=timesvc.wall() + 60, candidates={})
             j = M.new_job("pair", s.name, None, 60)
             name, sp = SIM_PLANTS[i % len(SIM_PLANTS)]
             spec = next((x for x in M.species() if x["key"] == sp), None)

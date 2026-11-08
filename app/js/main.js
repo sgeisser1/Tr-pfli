@@ -147,6 +147,7 @@ async function boot() {
   document.getElementById('app').prepend(nav());
   let st = null;
   try { st = await api.refreshAuth(); } catch (e) { toast(e.message, 'err'); }
+  if (st && st.logged_in) api.offerTime();   // Gateway ohne gültige Zeit übernimmt die Browserzeit (REQ-GW-09)
   api.setHooks({ onAuthRequired: () => ctx.go('/anmelden?zurueck=' + encodeURIComponent(location.hash.slice(1) || '/')) });
   if (st && st.setup_required && !location.hash.startsWith('#/einrichten')) location.hash = '#/einrichten';
   else if (st && !st.logged_in && !st.public_read && !location.hash.startsWith('#/anmelden') && !location.hash.startsWith('#/dashboard')) {

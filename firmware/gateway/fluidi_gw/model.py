@@ -22,7 +22,7 @@ from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
 from . import protocol as P
-from . import timesync
+from . import timesync, timesvc
 from .shared import AN, C
 
 SPECIES_FALLBACK_NOTE = ("Startwert von fluidi (ANNAHME), keine Pflegeempfehlung aus der Literatur: Der Feuchteindex ist "
@@ -63,7 +63,7 @@ VOLATILE_FLUSH_S = 900
 
 
 def now() -> float:
-    return time.time()
+    return timesvc.wall()   # Gateway-Zeit inkl. Browserzeit (phase5_gateway_zeit.md)
 
 
 def iso(t):

@@ -18,7 +18,7 @@ import threading
 import time
 from collections import defaultdict, deque
 
-from . import crypto
+from . import crypto, timesvc
 from . import protocol as P
 from .shared import C
 from .transport import LinkClosed
@@ -283,7 +283,7 @@ class Session:
             # ERROR-Frames sind nicht authentisiert: NICHT den Schlüssel löschen, nur melden (Befund W-8)
             s = m.sensor_by_addr(self.addr)
             if s:
-                s["error"] = {"code": f"0x{code:02X}", "text": P.ERRORS.get(code, f"Fehler 0x{code:02X}"), "t": C.iso(time.time())}
+                s["error"] = {"code": f"0x{code:02X}", "text": P.ERRORS.get(code, f"Fehler 0x{code:02X}"), "t": C.iso(timesvc.wall())}
             m.log("warn", "sensor_refused", f"{self.addr}: {P.ERRORS.get(code, code)}", s["id"] if s else None)
             raise SessionError(P.ERRORS.get(code, str(code)))
         if ft != P.FT_HELLO_RSP:

@@ -22,7 +22,7 @@ import tempfile
 import time
 from pathlib import Path
 
-from . import crypto
+from . import crypto, timesvc
 
 MAGIC = b"FLUIDIBK"
 FORMAT = 1
@@ -51,7 +51,7 @@ def create(model, passphrase: str) -> bytes:
         n = db.execute("SELECT COUNT(*) FROM reading").fetchone()[0]
         db.execute("VACUUM")
         db.close()
-        manifest = {"format": "fluidi-backup", "version": FORMAT, "gateway_id": model.gw_name, "created": time.time(),
+        manifest = {"format": "fluidi-backup", "version": FORMAT, "gateway_id": model.gw_name, "created": timesvc.wall(),
                     "records": n, "plants": len(model.plants), "sensors": len(model.sensors), "schema": 1}
         raw = io.BytesIO()
         with tarfile.open(fileobj=raw, mode="w:gz") as tar:

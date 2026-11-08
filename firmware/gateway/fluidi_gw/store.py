@@ -16,8 +16,9 @@ from __future__ import annotations
 import json
 import sqlite3
 import threading
-import time
 from pathlib import Path
+
+from . import timesvc
 
 SCHEMA_VERSION = 1
 
@@ -151,7 +152,7 @@ class Store:
             c.execute("INSERT OR REPLACE INTO calibration(sensor, substrate, doc) VALUES (?, ?, ?)", (addr, substrate, json.dumps(doc)))
             if history:
                 c.execute("INSERT INTO calibration_hist(sensor, substrate, t, doc) VALUES (?, ?, ?, ?)",
-                          (addr, substrate, time.time(), json.dumps(doc)))
+                          (addr, substrate, timesvc.wall(), json.dumps(doc)))
         self.tx(f)
 
     def calibrations(self):
@@ -177,7 +178,7 @@ class Store:
     def insert_readings(self, addr, rows):
         """rows: dicts mit seq, t, raw, c_diag, temp, vbat, cause, sflags, flags, boot_id, uptime.
         -> Anzahl neu gespeicherter (Duplikate verworfen). Eine Transaktion, COMMIT mit synchronous=FULL."""
-        now = time.time()
+        now = timesvc.wall()
 
         def f(c):
             n = 0
@@ -254,7 +255,7 @@ class Store:
     def log(self, level, code, text, sensor=None):
         def f(c):
             c.execute("INSERT INTO event_log(t, level, code, text, sensor) VALUES (?, ?, ?, ?, ?)",
-                      (time.time(), level, code, text, sensor))
+                      (timesvc.wall(), level, code, text, sensor))
             c.execute("DELETE FROM event_log WHERE id <= (SELECT MAX(id) FROM event_log) - ?", (EVENT_LOG_MAX,))
         self.tx(f)
 

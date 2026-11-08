@@ -214,8 +214,10 @@ Erreichbarkeit bleibt über `fluidi.local`; Sensoren sind nicht betroffen.
 
 ### 5.7 Zeit (REQ-GW-09)
 `GET /system` liefert `time.valid` und `time.source` (`ntp|rtc|browser|none`). Hat das Gateway keine gültige Zeit,
-sendet die angemeldete PWA die Browserzeit (`POST /system/time`); mit gültiger Zeit wird sie nur mit
-`force=true` + elevate übernommen. Ohne gültige Zeit verteilt das Gateway keine Zeit an Sensoren; empfangene
+sendet die angemeldete PWA die Browserzeit (`POST /system/time`, `t` ISO 8601 oder `epoch_ms`; die PWA bietet sie nach
+Anmeldung und beim Start automatisch an); mit gültiger Zeit wird sie nur mit
+`force=true` + elevate übernommen. Zeiten vor 2026-01-01 oder ab 2100 → 400. Die Browserzeit wird an die monotone
+Uhr gebunden (Sprünge der Systemuhr wirken nicht) und gilt bis NTP synchronisiert oder bis zum Neustart. Ohne gültige Zeit verteilt das Gateway keine Zeit an Sensoren; empfangene
 Werte bekommen Flag 2.
 
 ### 5.8 Raumklima (D-017) – neu

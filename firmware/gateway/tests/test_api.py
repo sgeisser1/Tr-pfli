@@ -105,6 +105,32 @@ class GatewayApi(unittest.TestCase):
         st, _ = self.c.json("POST", "/api/v1/auth/elevate", {"password": PASSWORD})
         self.assertEqual(st, 200)
 
+    def test_system_time_browser(self):
+        """REQ-GW-09: Browserzeit nur ohne gültige Zeit, unplausible Zeit -> 400 (phase5_gateway_zeit.md)."""
+        from fluidi_gw import timesvc
+        st, e = self.c.json("POST", "/api/v1/system/time", {"t": "1999-12-31T23:00:00Z"})
+        self.assertEqual((st, e["error"]["code"]), (400, "validation"))
+        st, r = self.c.json("POST", "/api/v1/system/time", {"epoch_ms": int(time.time() * 1000) + 7200_000})
+        self.assertEqual(st, 200)
+        self.check("/system/time", "post", 200, r)
+        self.assertEqual(r["source"], "ntp")                      # Sim-Zeit gilt als gültig: nicht übernommen
+        M, prev, prev_active = self.gw.model, self.gw.model.time, timesvc._ACTIVE
+        M.time = timesvc.TimeService("invalid")
+        try:
+            target = time.time() + 2 * 86400        # Systemuhr lag 2 Tage zurück (Stromausfall ohne NTP)
+            st, r = self.c.json("POST", "/api/v1/system/time", {"epoch_ms": int(target * 1000)})
+            self.assertEqual((st, r["valid"], r["source"]), (200, True, "browser"))
+            self.assertAlmostEqual(timesvc.wall(), target, delta=5)
+            st, a = self.c.json("GET", "/api/v1/auth/status")
+            self.assertTrue(a["logged_in"])                       # Sitzungsfrist mitgezogen
+        finally:
+            d = M.time.now() - prev.now()
+            M.time, timesvc._ACTIVE = prev, prev_active
+            for se in M.sessions.values():          # Fristen für die übrigen Tests zurückschieben
+                se["expires"] -= d
+                if se.get("elevated_until"):
+                    se["elevated_until"] -= d
+
     def test_measure_job_via_radio(self):
         st, j = self.c.json("POST", "/api/v1/plants/1/measure")
         self.assertEqual(st, 202)

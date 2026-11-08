@@ -21,6 +21,8 @@ import random
 import threading
 import time
 
+from . import timesvc
+
 I2C_SLAVE = 0x0703  # linux/i2c-dev.h
 CMD_MEASURE_HIGH = 0xFD
 FLUSH_S = 1800
@@ -92,7 +94,7 @@ class Climate:
             self.dev = SimClimate()
         self.source = self.dev.source if self.dev else "off"
         self._stop = threading.Event()
-        self.last_flush = time.time()
+        self.last_flush = timesvc.wall()
 
     def sample(self):
         if not self.dev:
@@ -102,7 +104,7 @@ class Climate:
         except Exception as e:  # noqa: BLE001
             self.err = str(e)
             return None
-        now = int(time.time())
+        now = int(timesvc.wall())
         self.last = {"t": now, "temp_c": t, "rh_pct": rh}
         self.buf.append((now, t, rh))
         if now - self.last_flush >= FLUSH_S:
@@ -112,7 +114,7 @@ class Climate:
     def flush(self):
         rows, self.buf = self.buf, []
         self.store.insert_climate(rows)
-        self.last_flush = time.time()
+        self.last_flush = timesvc.wall()
 
     def latest(self):
         from datetime import datetime, timezone

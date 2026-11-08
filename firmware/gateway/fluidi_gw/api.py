@@ -18,7 +18,7 @@ from zoneinfo import ZoneInfo
 from . import backup as BK
 from . import mcuboot
 from . import protocol as P
-from . import sysinfo
+from . import sysinfo, timesvc
 from .model import ApiError, iso, now
 from .shared import AN, C
 
@@ -1260,12 +1260,28 @@ def system_time(h, body, sess, **_):
     if force and (sess.get("elevated_until") or 0) < now():
         raise ApiError(403, "elevation_required", "Bitte Passwort erneut bestätigen")
     t = body.get("t") or body.get("now")
-    if t:
+    ts = None
+    if body.get("epoch_ms") is not None:      # openapi.yaml
+        if not isinstance(body["epoch_ms"], (int, float)) or isinstance(body["epoch_ms"], bool):
+            raise ApiError(400, "validation", "Zeit ungültig", "epoch_ms")
+        ts = body["epoch_ms"] / 1000
+    elif t:
         try:
             ts = datetime.fromisoformat(str(t).replace("Z", "+00:00")).timestamp()
         except ValueError:
             raise ApiError(400, "validation", "Zeit ungültig", "t")
-        if not M.time.set_browser_time(ts, force=force) and force:
+    if ts is not None:
+        if not timesvc.plausible(ts):
+            raise ApiError(400, "validation", "Uhrzeit des Geräts unplausibel (vor 2026 oder nach 2099)", "t")
+        before = M.time.now()
+        if M.time.set_browser_time(ts, force=force):
+            d = M.time.now() - before        # Zeitsprung: Sitzungsfristen mitziehen (sonst sofort abgemeldet)
+            if abs(d) > 60:
+                for s in list(M.sessions.values()):
+                    s["expires"] += d
+                    if s.get("elevated_until"):
+                        s["elevated_until"] += d
+        elif force:
             raise ApiError(409, "conflict", "Zeit nicht übernommen")
     h.send_json(200, M.time.status(M.settings["time"]["timezone"]))
 

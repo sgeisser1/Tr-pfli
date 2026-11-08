@@ -766,10 +766,11 @@ paths:
           application/json:
             schema:
               type: object
-              required: [epoch_ms]
+              description: 'Genau eines von epoch_ms oder t. Zeiten vor 2026-01-01 oder ab 2100 werden mit 400 abgelehnt (phase5_gateway_zeit.md).'
               additionalProperties: false
               properties:
-                epoch_ms: {type: integer}
+                epoch_ms: {type: integer, description: 'Unix-Zeit in ms'}
+                t: {type: string, format: date-time, description: 'ISO 8601 (so sendet es die PWA)'}
                 force: {type: boolean, default: false, description: 'true = auch bei gültiger Zeit übernehmen (nur mit elevate)'}
       responses:
         '200':
@@ -777,7 +778,9 @@ paths:
           content:
             application/json:
               schema: {$ref: '#/components/schemas/TimeStatus'}
+        '400': {$ref: '#/components/responses/Error'}
         '403': {$ref: '#/components/responses/Error'}
+        '409': {$ref: '#/components/responses/Error'}
   /system/reboot:
     post:
       tags: [system]
