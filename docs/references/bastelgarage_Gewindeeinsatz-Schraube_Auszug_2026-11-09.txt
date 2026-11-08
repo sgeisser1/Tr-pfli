@@ -1,0 +1,85 @@
+Quelle: bastelgarage.ch Produktseiten (Hersteller purecrea), abgerufen 2026-11-09 mit curl (User-Agent Browser), Textauszug (Tags entfernt), gekuerzt
+Verwendung: mechanical/gen/fluidi_gateway_pi.py (TUBE, Gewindeeinsatz), mechanical/gen/fluidi_params.py (SCREW, Kopfhoehe), mechanical/PRINT_SETTINGS.md
+Ergaenzt docs/references/Haendler_Einkauf_Auszug_2026-11-09.txt (dort Text nach 2000 Zeichen abgeschnitten: Bohrdurchmesser fehlte)
+======================================================================
+
+### URL: https://www.bastelgarage.ch/m2-5-4mm-gewindeeinsatze-messing-heat-insert-100stk
+HTTP 200, sha256 Roh-HTML: cba8c3ded0957e689aaa0b555e2492596f0296f2dd44e3a9ed7ffece2ac69f99
+Beschreibung
+Bewertungen (0)
+M2.5×4mm Gewindeeinsätze Messing Heat Insert 100Stk
+Die Messing Gewindeeinsätze M2.5 × 4 × 4.6 mm sind präzisionsgefertigte Einschmelzmuttern für den Einsatz in 3D-gedruckten Bauteilen aus PLA, PETG, ABS, ASA und anderen Thermoplasten. Der Aussendurchmesser von 4.6 mm und die Höhe von 4 mm machen diese Einsätze zur Standardwahl für M2.5-Gewindeanwendungen – besonders verbreitet in Raspberry Pi-Projekten und SBC-Halterungen. Die gerändelte Aussenfläche verankert sich beim Einschmelzen im plastifizierten Kunststoff und widersteht sowohl Auszugkräften als auch Drehmomenten zuverlässig.
+Empfohlenes Zubehör:
+C245 Lötkolben Einschmelzhilfe Gewindeeinsätze Insert M2-M8
+Lötkolben Einschmelzhilfe Gewindeeinsätze Insert M2-M8
+Gewindeeinsatz Presse Kit mit Lötkolben und Zubehör
+Gewindeeinsatz Presse Kit Pro mit Lötkolben und Zubehör
+Eigenschaften:
+Messing-Material mit hoher Wärmeleitfähigkeit ermöglicht schnelles, gleichmässiges Einschmelzen in alle gängigen FDM-Thermoplaste
+Gerändelte Aussenfläche verankert sich formschlüssig im erstarrenden Kunststoff und widersteht zuverlässig Auszug- und Drehmomentbelastungen
+Standardgrösse M2.5 × 4 × 4.6 mm (Innengewinde × Höhe × Aussendurchmesser) – Standardmass für Raspberry Pi und SBC-Montageprojekte
+Montage mit handelsüblicher Lötstation oder Einschmelzpresse – kein Gewindeschneiden oder Nachbearbeiten erforderlich
+Kompatibel mit M2.5-Schrauben (ISO-Metrisch), geeignet für PLA, PETG, ABS, ASA, PC und weitere Thermoplaste
+100 Stück pro Packung für Serienanwendungen, Prototypenbau und Reparaturarbeiten
+Anwendungsbeispiele:
+Raspberry Pi-Gehäuse und SBC-Halterungen mit M2.5-Befestigungspunkten für dauerhafte, belastbare Schraubenverbindungen
+3D-gedruckte Elektronikgehäuse und Projektboxen mit M2.5-Schrauben für Platinen und Abdeckungen
+Voron- und CoreXY-Druckerprojekte mit M2.5-Befestigungspunkten
+Reparatur von Kunststoffteilen mit beschädigten M2.5-Gewinden durch nachträgliches Einschmelzen
+Technische Daten:
+Hersteller SKU: M2.5x4x4.6 - 100 pcs
+Gewindegrösse: M2.5
+Höhe: 4.0 mm
+Aussendurchmesser: 4.6 mm
+Material: Messing (vernickelt)
+Einbaumethode: Einschmelzen (Lötkolben / Presse) oder Ultraschall
+Empfohlene Einschmelztemperatur: Drucktemperatur + 10–20 °C
+Empfohlener Bohrdurchmesser: 3.9 mm
+Empfohlene Bohrtiefe: Min. 4.5 mm
+Kompatible Schrauben: M2.5 ISO-Metrisch
+Kompatible Materialien: PLA, PETG, ABS, ASA, PC und weitere Thermoplaste
+Inhalt: 100 Stück
+Verpackungsabmessungen: 133 × 110 × 23 mm
+Bruttogewicht: 30 g
+Lieferumfang:
+100× M2.5 × 4 mm Gewindeeinsätze Messing Heat Insert
+Hersteller
+purecrea
+Artikelnr. 425681
+Verfügbarkeit Lagernd
+CHF15,90
+Netto CHF14,71
+Menge
++ Warenkorb
+0 Bewertungen
+/
++ Bewertung
+
+### URL: https://www.bastelgarage.ch/10-stuck-m2x3mm-linsenkopfschrauben-set-rostfrei
+HTTP 200, sha256 Roh-HTML: 1ac635cd1ad5b3cd8d2fe04286cfd74bff49bb22517c0e0552ad5364aa01c572
+Beschreibung
+Bewertungen (0)
+10 Stück M2x3mm Linsenkopfschrauben Set rostfrei
+Diese rostfreien M2x3mm Torx Linsenkopfschrauben eignen sich perfekt für jeden Maker und Bastler zum Verschrauben und Befestigen von Leiterplatten, Sensoren und mechanischen Bauteilen. Wir setzen diese Schrauben selbst oft bei 3D gedruckten Teilen ein und können dir dieses Produkt weiterempfehlen.
+Empfohlenes Zubehör:
+PB 515 Schraubenzieher Set
+Technische Details:
+Gewinde: M2
+Länge: 3mm
+Material: A2 rostfreier Stahl
+Kopf: Linsenkopf mit Torx TX6
+Kopfhöhe: 1.6mm
+Gewicht: 2g
+Lieferumfang:
+10x M2x3mm Linsenkopfschrauben Set rostfrei
+Hersteller
+purecrea
+Artikelnr. 422191
+Verfügbarkeit Lagernd
+CHF3,90
+Netto CHF3,61
+Menge
++ Warenkorb
+0 Bewertungen
+/
++ Bewertung

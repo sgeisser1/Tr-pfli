@@ -17,7 +17,8 @@ Logo: Massstab 0.5021 mm/u -> Strich 1.00 mm (2.0 u)
 5 Platine (mit Bauteilhuelle) 60 mm von unten durch das Schott einschieben: frei
 5b Platine in Endlage: freier Weg nach oben bis Anschlag 0.00 mm (Rev B: 0.70 bis Tastenblock)
    Clip-Pads (Spanne W 23.10): z 7.15 ... 30.25 -> Luft zum Kragen-Verguss (z 6.60) 0.55 mm, zum Schott-Verguss (z 30.80) 0.55 mm; Lagetoleranz Platine +-0.20
-5c Schraube ISO 7045 M2x3: Schaft z 0 ... 3.0, Mutter z 1.6 ... 3.2 -> Einschraubtiefe 1.40 mm (3.5 Gaenge P 0.4), Ueberstand ueber Mutter -0.20; Freibohrung bis z 3.3, O-Ring-Nut ab z 3.6 (Abstand 0.30)
+5c Schraube M2x3 Linsenkopf TX6: Schaft z 0 ... 3.0, Mutter z 1.6 ... 3.2 -> Einschraubtiefe 1.40 mm (3.5 Gaenge P 0.4), Ueberstand ueber Mutter -0.20; Freibohrung bis z 3.3, O-Ring-Nut ab z 3.6 (Abstand 0.30)
+   Kopf Ø3.8 (ANNAHME, am Kaufteil messen) x 1.6 (Haendler): z -1.60 ... 0 (Auflage auf dem Huelsenboden, keine Senkung); Abstand Kopf - Sonde (Platine F) 0.50 mm, - Sonde inkl. Beschichtung max. (0.20 je Seite) 0.30 mm; zulaessiger Kopf-Ø bis 4.2 (Abstand >= 0.1); Kopfunterseite bis Markierung max. Stecktiefe (z -5.0) 3.40 mm
 6 LED-Oberseite bis Fenster-Lichtschaft: 2.00 mm (Ziel 1.5-2.5)
    Klebefuge Fenster (Tropfen-Unterkante z 41.40) bis O-Ring-Nut oben z 33.70: 7.70 mm (>= 1.0); Lichtschaft-Unterkante 8.70 mm
    U3 (Kragen) - Kragen-ASA: 0.20 mm, Epoxid ueber U3: 0.50 mm (>= 0.5), U3 - Mutter: 2.92 mm
@@ -63,7 +64,7 @@ Logo: Massstab 0.5021 mm/u -> Strich 1.00 mm (2.0 u)
    Verguss_Kragen       Epoxid      62.2 mm3   0.07 g
    Verguss_Schott       Epoxid      12.3 mm3   0.01 g
    Mutter_M2            Stahl       19.0 mm3   0.15 g
-   Schraube_M2          Stahl       24.2 mm3   0.19 g
+   Schraube_M2          Stahl       27.6 mm3   0.22 g
    ORing_Kragen         Silikon    178.2 mm3   0.21 g
    ORing_Zapfen         Silikon    178.2 mm3   0.21 g
    Membran_Silikon      Silikon     15.9 mm3   0.02 g

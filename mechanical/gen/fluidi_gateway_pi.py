@@ -5,7 +5,9 @@ Formsprache wie freigegebenes G1 v3 (D-011, docs/design/P3_FLUIDI.md Kap. V2.1, 
 Wanne Warmgrau hell #B9B5AC z 0 ... 13.85, Deckel Hellblau z 14.15 ... 20, 45-Grad-Frontfacette (9 mm), 3-mm-Fasen
 an den Stirnseiten, LED-Tropfen an der Fuge auf der Facette, Logo-Relief Ton in Ton auf der Front, keine Antenne aussen.
 Gegenueber v3 nur groesser (84 x 42 x 20 statt 62 x 40 x 20), alle Profile/Fasen/Fuge/Tropfen identisch.
-Rechts eine thermisch getrennte Klimakammer (Luft-T/rF-Breakout, Auftrag 2026-11-07).
+Rechts eine thermisch getrennte Klimakammer (Luft-T/rF-Breakout, Auftrag 2026-11-07; Modul DFRobot SEN0428, D-029).
+Phase 6 (Einkaufsliste 2026-11-09): RTC gestrichen (D-028) -> Rahmen/Platzhalter entfernt; Klimamodul SEN0428 14 x 17 mm
+in Bodenschiene + Deckelnut; Gewindeeinsatz = Kaufteil bastelgarage 425681 (Ø4.6 x 4, Bohrung 3.9 laut Haendler).
 
 Lauf:  freecadcmd -c "exec(open('mechanical/gen/fluidi_gateway_pi.py').read())"   (oder: freecadcmd <datei>)
 Ausgabe: mechanical/gateway_pi/fluidi_gateway_pi.FCStd, fluidi_gateway_pi_assembly.step, print/*.{step,stl,3mf},
@@ -28,8 +30,16 @@ ANNAHMEN (Zeichnung enthaelt KEINE Hoehen, keine Lage von ACT-LED und Antenne ->
   PCB 1.0 mm; Bauteilhoehen ueber PCB: HDMI 3.5, Micro-USB 3.0 (Mitte 1.5), microSD-Halter 2.0, SiP 1.4, Haube 1.8,
   Kamerabuchse 2.0, uebrige Bauteile <= 1.2 (Huelle); Unterseite <= 1.2; Karte steht 2.5 ueber die Kante;
   Micro-USB-Steckerumspritzung <= 10.6 x 7.0; GPIO-Header NICHT bestueckt (bestueckt: Stifte 8.5 hoch, Option pruefen);
-  LED-Platine 8 x 8.2 x 1.0 (eigene Mini-Platine, RGB wie Sensor, an GPIO-Pads geloetet, auf Lichtschacht geklebt); RTC-Modul Adafruit 4282 21.3 x 20.0 (ohne Buchsenleiste, Hoehe am Modul messen);
-  Gewindeeinsatz M2.5 Ø 3.5 x 4 (Bohrung 3.2), Schraube M2.5 x 8 Linsenkopf ISO 7380 (dk 4.7, k 1.4).
+  LED-Platine 8 x 8.2 x 1.0 (eigene Mini-Platine, RGB wie Sensor, an GPIO-Pads geloetet, auf Lichtschacht geklebt);
+  Schraube M2.5 x 8 Linsenkopf ISO 7380 (dk 4.7, k 1.4, Quelle offen G8b).
+  Klimamodul SEN0428: Platinendicke und Bauteilhoehen NICHT angegeben -> MT 1.6, Bauteile vorn <= 2.5 (SOT-23/DFN/0402
+  laut Bestueckbild, ca. 1.5 + 1.0 Reserve), Rueckseite nur Loetstellen <= 1.0 -> am Muster messen.
+GEWINDEEINSATZ (Kaufteil, bastelgarage.ch Art. 425681, purecrea "M2.5x4x4.6"; docs/references/
+  bastelgarage_Gewindeeinsatz-Schraube_Auszug_2026-11-09.txt): M2.5, Hoehe 4.0, Aussen-Ø 4.6, empfohlener Bohrdurchmesser
+  3.9, Bohrtiefe min. 4.5, Einschmelztemperatur Drucktemperatur + 10-20 C.
+SEN0428 (docs/datasheets/DFRobot_SEN0428_Dimensions_V0.1.png, Massstab 35.9 px/mm aus 14/17 mm, abgegriffen +-0.1):
+  Bohrungen Ø2.0 je 2.0 von Seiten- und Stirnkante (Abstand 10.0); 4 Loetaugen Ø~1.45 im Raster 2.54, Mitte 1.27 von der
+  anderen 14-mm-Kante, 3.14 ... 10.76 von der Seitenkante; Bestueckung nur Sensorseite, >= 1.45 von den 17-mm-Kanten.
 """
 import math
 import os
@@ -50,8 +60,16 @@ OUT = os.path.join(FP.REPO, 'mechanical', 'gateway_pi')
 G = dict(W=84.0, D=42.0, H=20.0, FACET=9.0, CH_END=3.0, Z_FUGE=14.0, GAP=0.3, WALL=2.0,
          LIP_CLR=0.15, LIP_T=1.2, LIP_Z0=11.5, LED_X=24.0)
 # Klimakammer (Lufttemperatur/-feuchte, I2C-Breakout, Modul folgt Welle 2): rechte Stirnseite, eigene Kammer
-CLIMA = dict(WI=8.0, WALL=2.0, MW=24.0, MH=14.0, MT=1.6, PART_F=2.5, PART_B=1.0, YC=2.0, Z0=3.0, X_PCB=36.0,
-             HOLE_D=3.0, HOLE_Y=-3.5, HOLE_Z=10.5, BOSS_R=2.5, BOSS_L=2.5, BUNDLE_D=2.6)
+# D-029: DFRobot SEN0428 hochkant, 17 (y) x 14 (z); Loetaugen-Kante (14 mm) bei y = ym0 zum Kabelkanal, Bohrungs-Kante bei ym1.
+# Halter (Phase 6): Bodenschiene mit Nut ueber die ganze 17-mm-Unterkante (Eingriff RAIL_E) + Endanschlaege, Deckelrippe mit
+# Nut ueber die Oberkante (Eingriff LID_E). Die 14-mm-Kanten bleiben frei (Loetaugen 0.5 ... 2.0 von der Kante, Bauteile
+# 1.0 ... 1.6 neben den Bohrungen) - die frueheren Nutpfosten an den Stirnkanten haetten die Loetaugen verdeckt.
+CLIMA = dict(WI=8.0, WALL=2.0, MW=17.0, MH=14.0, MT=1.6, PART_F=2.5, PART_B=1.0, YC=2.0, Z0=3.0, X_PCB=36.0,
+             HOLE_D=3.0, HOLE_Y=-2.5, HOLE_Z=10.5,   # Phase 6: Kanal y -3.5 -> -2.5 (Litzen 0.6 neben Rohr Ø7.0)
+             BOSS_R=2.5, BOSS_L=2.5, BUNDLE_D=2.6,
+             GR_CLR=0.15, RAIL_W=0.8, RAIL_E=1.0, LID_E=0.8, LID_TOP=0.3, END_CLR=0.3, END_L=1.2,
+             COMP_EDGE=1.45, PAD_EDGE=1.27, PAD_Z=(3.14, 5.68, 8.22, 10.76), PAD_D=1.45, MOD_HOLE_D=2.0, MOD_HOLE_E=2.0,
+             VENT_BOT=(-6.0, 10.0), VENT_FRONT=(-8.0, 12.0), VENT_LID=(-6.0, 12.0))   # Lueftung wie bisher (absolut)
 # GPIO-Loetaugen fuer die Klimasensor-Leitungen (keine Stiftleiste, Leitungen direkt eingeloetet).
 # Lage aus RP-008358-DS-1 abgegriffen: Quadratpad (= Pin 1) Mitte X 8.39 / Y 25.25, Raster 2.54 (X) x 2.54 (Y),
 # ungerade Pins in der Reihe Y 25.25, gerade in Y 27.79. Belegung 3V3 = 1, SDA/GPIO2 = 3, SCL/GPIO3 = 5, GND = 6 oder 9
@@ -75,16 +93,14 @@ PARTS = {   # Name: (X0, X1, Y0, Y1, Hoehe ueber PCB)   Lage abgegriffen, Hoehe 
 }
 USB = dict(PWR_X=54.0, OTG_X=41.4, ZC_DZ=1.5, WIN=(11.4, 7.8), PLUG=(10.6, 7.0), RELIEF=1.2)
 HEADER = dict(X0=7.0, X1=58.9, Y0=24.0, Y1=29.0, H=8.5)
-TUBE = dict(R=2.8, INS_D=3.2, INS_L=4.6, HOLE_D=2.8, CB_D=5.4, CB_H=1.6, SCREW_L=8.0, HEAD_D=4.7, HEAD_K=1.4)
-# Phase 5 (Befund Fertigung): RTC Adafruit 4282 PiRTC 21.3 x 20.0 x 13.6 mm inkl. Buchsenleiste
-# (docs/references/Adafruit_4282_PiRTC-DS3231_Produktseite_Auszug_2026-11-08.txt, Z. 130). Mit Leiste passt es nicht (Pi ohne
-# Stiftleiste, Bauraum ueber dem Pi < 13.6). Variante mit RTC: Modul OHNE Buchsenleiste, Litzen in die Loetaugen (wie Klima),
-# flach unter die Deckeldecke geklebt. H = Grenzhoehe des Bauraums (0.5 Luft ueber Haube/SiP), KEIN Modulmass -> am Modul
-# messen. Variante ohne RTC: Rahmen bleibt leer. Lage: zwischen Haube/SiP und HDMI, vor dem Steg, neben den Klima-Litzen.
-# G-R2 (Sicherheit R3): Modul mit der Platinenrueckseite an die Decke kleben, nur auf zwei Randstreifen der Platine; CR1220-Halter
-# zeigt zum Gehaeuseinneren (zum Pi), ist nach Abnehmen des Deckels ohne Loesen der Klebung zugaenglich und wird nicht gegen den
-# Deckel gepresst (Luft zur Haube >= 0.5, Pruefung 13).
-RTC = dict(LX=21.3, LY=20.0, H=9.7, H_SRC=13.6, X=29.0, Y=15.4)   # Lage (Mitte) in Pi-Koordinaten
+# Niederhalterrohr (Deckel) mit Gewindeeinsatz. Phase 6: Einsatz Ø4.6 x 4 (statt ANNAHME Ø3.5) -> Bohrung 3.9 (Haendler),
+# Bohrtiefe INS_L ab Rohrende >= Einsatzlage + 4.5 (Haendler: min. 4.5). Wand um die Bohrung >= 1.5 im Rohr Ø7.0; der Fuss
+# (die untersten FOOT_H ueber der Platine) bleibt Ø5.6 innerhalb des Freihaltekreises Ø6 der Pi-Zeichnung (Bauteilhuelle 1.2
+# + 0.3 Luft darunter). Das Rohr wird an hohen Pi-Bauteilen (HDMI, Micro-USB, microSD-Halter) mit 0.3 Luft abgeflacht.
+# Einsatz 0.5 versenkt (INS_REC), damit er nicht auf der Platine aufsteht (Wulst beim Einschmelzen).
+TUBE = dict(R=3.5, FOOT_R=2.8, FOOT_H=1.5, INS_D=3.9, INS_L=5.2, INS_OD=4.6, INS_H=4.0, INS_REC=0.5, CUT_CLR=0.3,
+            HOLE_D=2.8, CB_D=5.4, CB_H=1.6, SCREW_L=8.0, HEAD_D=4.7, HEAD_K=1.4)
+# D-028 (2026-11-08): Gateway ohne RTC -> RTC-Platzhalter und Deckelrahmen (Phase 5, G-R2) entfernt.
 LEDB = dict(S=8.0, V0=-5.0, V1=3.2, T=1.0, DIST=1.6)   # Platine 8 breit, entlang Facette V0..V1 um Fensterachse
 LOG = []
 
@@ -217,11 +233,17 @@ def build():
     T = TUBE
     # Freiraum 0.3 der Rohre zur Wannenwand (vorne laufen die Rohre unter der Facette bis unter die Fuge)
     wclear = outer.cut(shell_solid(G['WALL'] + 0.3)).common(box(-big, big, -big, big, -1, zf - g2 + 0.25))
+    cc = T['CUT_CLR']
+    parts_clear = None
+    for k_, (X0, X1, Y0, Y1, h) in PARTS.items():
+        b_ = pbox(X0 - cc, X1 + cc, Y0 - cc, Y1 + cc, ZP - 1.0, ZP + h + cc)
+        parts_clear = b_ if parts_clear is None else parts_clear.fuse(b_)
     for X, Y in PI['HOLES']:
         x, y = px(X), py(Y)
-        wanne = wanne.fuse(cyl(T['R'], G['WALL'] - 0.01, PI['Z0'], x, y))
+        wanne = wanne.fuse(cyl(T['FOOT_R'], G['WALL'] - 0.01, PI['Z0'], x, y))   # Abstandshalter Ø5.6 (Freihaltekreis Ø6)
         wanne = wanne.cut(cyl(T['HOLE_D'] / 2, -1, PI['Z0'] + 1, x, y)).cut(cyl(T['CB_D'] / 2, -1, T['CB_H'], x, y))
-        tube = cyl(T['R'], ZP, G['H'], x, y).common(cavity).cut(wclear)
+        tube = cyl(T['R'], ZP + T['FOOT_H'], G['H'], x, y).fuse(cyl(T['FOOT_R'], ZP, ZP + T['FOOT_H'] + 0.01, x, y))
+        tube = tube.common(cavity).cut(wclear).cut(parts_clear)
         deckel = deckel.fuse(tube).cut(cyl(T['INS_D'] / 2, ZP - 0.1, ZP + T['INS_L'], x, y))
         deckel = deckel.cut(cyl(1.4, ZP + T['INS_L'] - 0.1, ZP + T['INS_L'] + 2.0, x, y))   # Spanraum Schraubenspitze
     # ---- Rueckwand: Ausschnitte Micro-USB (Steckerumspritzung) + innere Freistiche (Pi senkrecht einlegen)
@@ -244,16 +266,8 @@ def build():
     for k in range(4):
         x = sx0 + 1.0 + k * 4.0
         deckel = deckel.cut(box(x, x + 1.2, G['D'] / 2 - G['WALL'] - 1, G['D'] / 2 + 1, zf + 1.6, G['H'] - 1.8))
-    # ---- Option RTC-Modul: Rahmen 1.5 hoch an der Deckelinnenseite (Modul geklebt)
-    R = RTC
-    rx0, rx1 = px(R['X']) - R['LX'] / 2, px(R['X']) + R['LX'] / 2
-    ry0, ry1 = py(R['Y']) - R['LY'] / 2, py(R['Y']) + R['LY'] / 2
-    ztop = G['H'] - G['WALL']
-    fr = box(rx0 - 1.2, rx1 + 1.2, ry0 - 1.2, ry1 + 1.2, ztop - 1.5, ztop + 0.01)
-    fr = fr.cut(box(rx0 - 0.2, rx1 + 0.2, ry0 - 0.2, ry1 + 0.2, 0, 30))
-    deckel = deckel.fuse(fr)
     # ---- Klimakammer rechts: Trennwand (Wanne) + Gegenrippe (Deckel, Spalt 0.3 = Fuge), Kabeldurchfuehrung,
-    #      Halter (2 Nutpfosten, Modul steht in der y-z-Ebene, Sensorseite +x zur Stirnwand), Schlitze Boden/Stirn
+    #      Halter (Bodenschiene + Deckelnut, Modul steht in der y-z-Ebene, Sensorseite +x zur Stirnwand), Schlitze Boden/Stirn
     C = CLIMA
     xp0, xp1 = X_PART, X_PART + C['WALL']
     wanne = wanne.fuse(box(xp0, xp1, -big, big, 0, zf - g2).common(cavity))
@@ -266,20 +280,31 @@ def build():
     wanne = wanne.cut(Part.makeCylinder(C['HOLE_D'] / 2, 10, V(xp0 - 5, C['HOLE_Y'], C['HOLE_Z']), V(1, 0, 0)))
     xm0, xm1 = C['X_PCB'] - C['MT'] / 2, C['X_PCB'] + C['MT'] / 2
     ym0, ym1 = C['YC'] - C['MW'] / 2, C['YC'] + C['MW'] / 2
-    for sgn, ye in ((-1, ym0), (1, ym1)):
-        post = box(xm0 - 1.2, xm1 + 1.2, min(ye - sgn * 1.2, ye + sgn * 2.3), max(ye - sgn * 1.2, ye + sgn * 2.3),
-                   G['WALL'] - 0.01, C['Z0'] + 9.0)
-        groove = box(xm0 - 0.15, xm1 + 0.15, min(ye - sgn * 1.5, ye + sgn * 0.3), max(ye - sgn * 1.5, ye + sgn * 0.3),
-                     C['Z0'], 30)
-        wanne = wanne.fuse(post.cut(groove))
-    for xs in (xp1 + 1.0, G['W'] / 2 - G['WALL'] - 2.2):
-        wanne = wanne.cut(box(xs, xs + 1.2, ym0 + 4.0, ym1 - 4.0, -1, G['WALL'] + 0.5))
+    gc, rw = C['GR_CLR'], C['RAIL_W']
+    gx0, gx1 = xm0 - gc, xm1 + gc                       # Nut (Platine + 2 x 0.15)
+    rx0_, rx1_ = gx0 - rw, gx1 + rw                     # Schiene / Rippe
+    ye0, ye1 = ym0 - C['END_CLR'], ym1 + C['END_CLR']   # Endanschlaege (Luft 0.3 je Ende)
+    z_top = G['H'] - G['WALL']
+    # Bodenschiene: Nutgrund = Modulunterkante Z0, Eingriff RAIL_E; Endanschlaege so hoch wie die Schiene (unter den Loetaugen)
+    rail = box(rx0_, rx1_, ye0 - C['END_L'], ye1 + C['END_L'], G['WALL'] - 0.01, C['Z0'] + C['RAIL_E'])
+    rail = rail.cut(box(gx0, gx1, ye0, ye1, C['Z0'], 30))
+    wanne = wanne.fuse(rail)
+    # Deckelrippe mit Nut ueber der Oberkante (Luft LID_TOP ueber dem Modul, Eingriff LID_E), nur im Kammerbereich
+    zmt = C['Z0'] + C['MH']
+    lrib = box(rx0_, rx1_, ye0 - C['END_L'], ye1 + C['END_L'], zmt - C['LID_E'], z_top + 0.01)
+    lrib = lrib.cut(box(gx0, gx1, ye0, ye1, zmt - C['LID_E'] - 1, zmt + C['LID_TOP']))
+    deckel = deckel.fuse(lrib.common(cavity))
+    # Lueftung (Lage unabhaengig von der Modulgroesse wie bisher; Bodenschlitze neben der Schiene)
+    vb, vf, vl = C['VENT_BOT'], C['VENT_FRONT'], C['VENT_LID']
+    for xs in (xp1 + 0.6, G['W'] / 2 - G['WALL'] - 1.8):
+        wanne = wanne.cut(box(xs, xs + 1.2, vb[0], vb[1], -1, G['WALL'] + 0.5))
     for zs in (4.0, 7.0, 10.0):
-        wanne = wanne.cut(box(G['W'] / 2 - G['WALL'] - 1, G['W'] / 2 + 1, ym0 + 2.0, ym1 - 2.0, zs, zs + 1.2))
-    deckel = deckel.cut(box(G['W'] / 2 - G['WALL'] - 1, G['W'] / 2 + 1, ym0 + 4.0, ym1 - 2.0, zf + 1.1, zf + 2.3))
+        wanne = wanne.cut(box(G['W'] / 2 - G['WALL'] - 1, G['W'] / 2 + 1, vf[0], vf[1], zs, zs + 1.2))
+    deckel = deckel.cut(box(G['W'] / 2 - G['WALL'] - 1, G['W'] / 2 + 1, vl[0], vl[1], zf + 1.1, zf + 2.3))
+    ce = C['COMP_EDGE']
     S['Klima_Modul_Option'] = box(xm0, xm1, ym0, ym1, C['Z0'], C['Z0'] + C['MH']).fuse(
-        box(xm1, xm1 + C['PART_F'], ym0 + 1.5, ym1 - 1.5, C['Z0'] + 1.5, C['Z0'] + C['MH'] - 1.5)).fuse(
-        box(xm0 - C['PART_B'], xm0, ym0 + 1.5, ym1 - 1.5, C['Z0'] + 1.5, C['Z0'] + C['MH'] - 1.5))
+        box(xm1, xm1 + C['PART_F'], ym0 + ce, ym1 - ce, C['Z0'] + ce, C['Z0'] + C['MH'] - ce)).fuse(
+        box(xm0 - C['PART_B'], xm0, ym0 + 0.5, ym1 - ce, C['Z0'] + ce, C['Z0'] + C['MH'] - ce))
     # ---- Montierbarkeit: Deckel senkrecht aufsetzbar -> nichts vom Deckel unter der ueberhaengenden Wannen-Facette
     #      (+3 mm: Steg vorne ganz weg, sonst streift er beim Aufsetzen Lichtschacht und Facetten-Stirnfasen)
     S['_Y_SHADOW'] = (zf - g2) - (G['H'] - G['FACET']) + G['WALL'] * math.sqrt(2) - G['D'] / 2 + 0.3 + 3.0
@@ -294,7 +319,6 @@ def build():
             sum(so.Volume for so in deckel.Solids if so.Volume <= 1.0)))
         deckel = sl[0] if len(sl) == 1 else Part.makeCompound(sl)
     S['Deckel_blau'] = deckel          # removeSplitter() macht diesen Koerper ungueltig (OCC 7.6) -> weglassen
-    S['RTC_Modul_Option'] = box(rx0, rx1, ry0, ry1, ztop - R['H'], ztop)
     # ---- Pi + Schrauben + Einsaetze
     S.update(pi_model())
     for i, (X, Y) in enumerate(PI['HOLES']):
@@ -302,7 +326,8 @@ def build():
         z_head = T['CB_H']
         S['Schraube_M2p5_%d' % i] = cyl(T['HEAD_D'] / 2, z_head - T['HEAD_K'], z_head, x, y).fuse(
             cyl(1.25, z_head, z_head + T['SCREW_L'], x, y))
-        S['Einsatz_%d' % i] = cyl(1.75, ZP + 0.2, ZP + 4.2, x, y).cut(cyl(1.25, 0, 30, x, y))
+        zi = ZP + T['INS_REC']
+        S['Einsatz_%d' % i] = cyl(T['INS_OD'] / 2, zi, zi + T['INS_H'], x, y).cut(cyl(1.25, 0, 30, x, y))
     for i, (fx, fy) in enumerate([(-16, -8), (16, -8), (-16, 8), (16, 8)]):
         S['Fuss_%d' % i] = cyl(4.0, -1.5, 0.0, fx, fy)
     # Leitungsbuendel (Platzhalter, 4 x Litze AWG28, ANNAHME Ø 2.6): Pin 5 senkrecht hoch, nach hinten, durch den Kanal
@@ -323,6 +348,50 @@ def build():
 ASSY_SKIP = ('Wanne_grau_OTG',)
 
 
+def clima_checks(S):
+    """14: Klimamodul DFRobot SEN0428 (D-029) - Halterung, Spiel, Loetaugen/Litzenausgang, Bauteilfreiheit."""
+    C = CLIMA
+    xm0, xm1 = C['X_PCB'] - C['MT'] / 2, C['X_PCB'] + C['MT'] / 2
+    ym0, ym1 = C['YC'] - C['MW'] / 2, C['YC'] + C['MW'] / 2
+    xin0, xin1 = X_PART + C['WALL'], G['W'] / 2 - G['WALL']
+    ci = (xin1 - xin0, G['D'] - 2 * G['WALL'], G['H'] - 2 * G['WALL'])
+    km = S['Klima_Modul_Option']
+    log('14 Klimamodul DFRobot SEN0428 (D-029, docs/datasheets/DFRobot_SEN0428_Dimensions_V0.1.png): %.1f (y) x %.1f (z) x '
+        'Platine %.1f (ANNAHME) + Bauteile vorn %.1f / hinten %.1f (ANNAHME); Kammer innen %.1f x %.1f x %.1f (x, y, z)'
+        % (C['MW'], C['MH'], C['MT'], C['PART_F'], C['PART_B'], ci[0], ci[1], ci[2]))
+    log('   Lage: x %.2f ... %.2f (Platine), y %.2f ... %.2f, z %.2f ... %.2f; Sensorseite +x, Bauteile bis x %.2f -> Stirnwand %.2f mm'
+        % (xm0, xm1, ym0, ym1, C['Z0'], C['Z0'] + C['MH'], xm1 + C['PART_F'], xin1 - (xm1 + C['PART_F'])))
+    log('   Halter: Bodenschiene Nut %.2f breit (Platine %.2f + 2 x %.2f), Eingriff %.2f; Deckelnut Eingriff %.2f, Luft ueber der '
+        'Oberkante %.2f; Endanschlaege y-Luft je %.2f, Hoehe %.2f ueber Modulunterkante'
+        % (C['MT'] + 2 * C['GR_CLR'], C['MT'], C['GR_CLR'], C['RAIL_E'], C['LID_E'], C['LID_TOP'], C['END_CLR'], C['RAIL_E']))
+    log('   Bauteilfreiheit an den Nuten: Bauteile ab %.2f von der 17-mm-Kante (abgegriffen) -> Luft zur Schiene %.2f, zur '
+        'Deckelrippe %.2f mm (Soll >= 0.3)' % (C['COMP_EDGE'], C['COMP_EDGE'] - C['RAIL_E'], C['COMP_EDGE'] - C['LID_E']))
+    log('   Spiel Modul - Wanne %.2f (Auflage im Nutgrund gewollt), - Deckel %.2f mm'
+        % (km.distToShape(S['Wanne_grau'])[0], km.distToShape(S['Deckel_blau'])[0]))
+    # Loetaugen an der 14-mm-Kante bei y = ym0 (zum Kabelkanal), Litzen von der Rueckseite (-x)
+    yp = ym0 + C['PAD_EDGE']
+    zps = [C['Z0'] + z for z in C['PAD_Z']]
+    lab = ('VCC', 'GND', 'SCL', 'SDA')
+    log('   Loetaugen (Litzenausgang Rueckseite -x): y %.2f, z %s (%s; Reihenfolge je nach Einbaulage gespiegelt)'
+        % (yp, ', '.join('%.2f' % z for z in zps), '/'.join(lab)))
+    zlow = min(zps) - C['PAD_D'] / 2
+    log('   Loetauge unterste Kante z %.2f ueber Endanschlag/Schiene z %.2f -> %.2f mm frei'
+        % (zlow, C['Z0'] + C['RAIL_E'], zlow - (C['Z0'] + C['RAIL_E'])))
+    xch = X_PART + C['WALL']
+    gap = (xm0 - C['PART_B']) - xch
+    dy = abs(yp - C['HOLE_Y'])
+    dz = max(abs(z - C['HOLE_Z']) for z in zps)
+    log('   Kabelkanal-Austritt x %.2f y %.2f z %.2f -> Loetaugenreihe: x %.2f, y %.2f, z bis %.2f; freier Raum fuer die '
+        'Litzenboegen zwischen Trennwand und Loetstellen %.2f mm (Soll >= 2: Litze AWG28 + Biegeradius, ANNAHME)'
+        % (xch, C['HOLE_Y'], C['HOLE_Z'], xm0 - xch, dy, dz, gap))
+    ok_in = C['MW'] + 2 * (C['END_CLR'] + C['END_L']) <= ci[1]
+    log('   Schiene inkl. Endanschlaege %.1f mm in Kammer %.1f mm: %s; Modulbohrungen Ø%.1f (Option M2) bei y %.2f, z %.2f / %.2f'
+        % (C['MW'] + 2 * (C['END_CLR'] + C['END_L']), ci[1], 'ja' if ok_in else 'NEIN', C['MOD_HOLE_D'],
+           ym1 - C['MOD_HOLE_E'], C['Z0'] + C['MOD_HOLE_E'], C['Z0'] + C['MH'] - C['MOD_HOLE_E']))
+    log('   PROTOTYP-PRUEFUNG: Platinendicke messen (Nut = Dicke + 0.3; bei < 1.4 mm MT anpassen), Bauteilhoehe <= %.1f, '
+        'Modul sitzt ohne Klemmen und klappert bei geschlossenem Deckel nicht' % C['PART_F'])
+
+
 def checks(S):
     log('=== fluidi Gateway G1 v4 (Raspberry Pi Zero 2 W) ===')
     log('Aussenmasse %.0f x %.0f x %.0f mm (B x T x H), Wand %.1f, Fuge z %.2f ... %.2f'
@@ -333,46 +402,21 @@ def checks(S):
     for i in range(4):
         allowed |= {('Deckel_blau', 'Einsatz_%d' % i), ('Einsatz_%d' % i, 'Schraube_M2p5_%d' % i)}
     allowed |= {('LED_Platine', 'LED_RGB'), ('Pi_PCB', 'Pi_Bauteile_oben'), ('Pi_PCB', 'Pi_Bauteile_unten'),
-                ('Pi_Bauteile_oben', 'microSD_Karte'), ('Deckel_blau', 'RTC_Modul_Option'),
+                ('Pi_Bauteile_oben', 'microSD_Karte'),
                 ('Pi_PCB', 'Leitungen_Klima'), ('Pi_Bauteile_oben', 'Leitungen_Klima')}   # Leitungen in die Loetaugen
     hits = collide(A, allowed)
     for a, b, vol in hits:
         bb = A[a].common(A[b]).BoundBox
         log('   Lage %s/%s: x %.1f..%.1f y %.1f..%.1f z %.1f..%.1f' % (a, b, bb.XMin, bb.XMax, bb.YMin, bb.YMax, bb.ZMin, bb.ZMax))
     log('1 Kollisionen montiert: %s' % ('keine' if not hits else ', '.join('%s/%s %.3f' % h for h in hits)))
-    # RTC-Modul sitzt im Rahmen (Rahmen-Innenmass 0.2 groesser) -> Volumenueberschneidung muss 0 sein
-    v = S['Deckel_blau'].common(S['RTC_Modul_Option']).Volume
-    log('   RTC-Modul im Rahmen: Ueberschneidung %.3f mm3' % v)
-    # Phase 5: Modulmasse aus den Quellen gegen den Bauraum
-    R = RTC
-    ztop = G['H'] - G['WALL']
-    rb = S['RTC_Modul_Option'].BoundBox
-    below = S['Pi_Bauteile_oben'].common(box(rb.XMin, rb.XMax, rb.YMin, rb.YMax, 0, 30))
-    zpi = below.BoundBox.ZMax if below.Volume > 1e-6 else ZP
-    log('13 RTC Adafruit 4282 (21.3 x 20.0 x 13.6 inkl. Buchsenleiste, Produktseite Z. 130): Grundriss im Rahmen %.1f x %.1f '
-        'unter der Decke z %.1f; hoechstes Pi-Bauteil darunter z %.1f -> Bauraum %.1f mm. Mit Buchsenleiste (13.6) passt es NICHT '
-        '(und der Pi hat keine Stiftleiste); ohne Leiste zulaessig bis %.1f mm Modulhoehe (am Modul messen, ANNAHME bis dahin). '
-        'Abstand zu Klima-Litzen %.1f, HDMI %.1f mm. G-R2: Modul mit der Rueckseite an die Decke geklebt (Randstreifen), Zelle zum Pi, '
-        'wechselbar ohne Loesen der Klebung, nicht gegen den Deckel gepresst'
-        % (R['LX'] + 0.4, R['LY'] + 0.4, ztop, zpi, ztop - zpi, R['H'], S['RTC_Modul_Option'].distToShape(S['Leitungen_Klima'])[0],
-           S['RTC_Modul_Option'].distToShape(pbox(*PARTS['HDMI'][:4], ZP, ZP + PARTS['HDMI'][4]))[0]))
-    C = CLIMA
-    ci = (G['W'] / 2 - G['WALL'] - (X_PART + C['WALL']), G['D'] - 2 * G['WALL'], G['H'] - 2 * G['WALL'])
-    fits = []
-    for o in ((20.0, 40.0), (40.0, 20.0)):
-        for ax_ in ('xy', 'yz', 'xz'):
-            dims = {'xy': (o[0], o[1], 1.6), 'yz': (1.6, o[0], o[1]), 'xz': (o[0], 1.6, o[1])}[ax_]
-            if all(d + 0.4 <= c for d, c in zip(dims, ci)):
-                fits.append(ax_)
-    log('14 Grove SHT41 (20 x 40 mm, docs/references/Seeed_Grove-SHT4x_Wiki_Auszug_2026-11-08.txt; Hoehe nicht angegeben, '
-        'hier nur Platine 1.6): Klimakammer innen %.1f x %.1f x %.1f (x, y, z) -> %s'
-        % (ci[0], ci[1], ci[2], ('passt (%s)' % ', '.join(fits)) if fits else 'passt in KEINER Lage (40 > %.1f innen)' % max(ci)))
+    log('13 RTC: gestrichen (D-028), kein Platzhalter, kein Deckelrahmen mehr')
+    clima_checks(S)
     # Mindestabstaende
     def d(a, b):
         return S[a].distToShape(S[b])[0]
     log('2 Mindestabstaende (Spiel, Ziel >= 0.3 FDM bzw. >= 1.0 zu Waenden):')
     inner_wall = shell_solid(0).cut(shell_solid(G['WALL']))
-    for k in ('Pi_PCB', 'Pi_Bauteile_oben', 'Pi_Bauteile_unten', 'microSD_Karte', 'LED_Platine', 'RTC_Modul_Option',
+    for k in ('Pi_PCB', 'Pi_Bauteile_oben', 'Pi_Bauteile_unten', 'microSD_Karte', 'LED_Platine',
               'Klima_Modul_Option', 'Leitungen_Klima'):
         log('   %-18s - Wanne %.2f   - Deckel %.2f' % (k, d(k, 'Wanne_grau'), d(k, 'Deckel_blau')))
     log('   (Pi_PCB 0.00 = Auflage auf Abstandshaltern / Niederhalterrohren, gewollt; Bauteilhuelle 0.20 nur innerhalb')
@@ -381,17 +425,40 @@ def checks(S):
     for k in ('LED_Platine', 'LED_RGB'):
         log('   %-18s - Pi_Bauteile_oben %.2f  - Pi_PCB %.2f' % (k, d(k, 'Pi_Bauteile_oben'), d(k, 'Pi_PCB')))
     # Rohre/Abstandshalter zu den Aussenwaenden (gleichmaessige Wand, kein Masseanhaeufung)
+    T = TUBE
     dmin = 99
     for X, Y in PI['HOLES']:
-        t = cyl(TUBE['R'], G['WALL'], G['Z_FUGE'] + 0.5, px(X), py(Y)).common(S['Deckel_blau'])
+        t = cyl(T['R'], G['WALL'], G['Z_FUGE'] + 0.5, px(X), py(Y)).common(S['Deckel_blau'])
         dmin = min(dmin, t.distToShape(S['Wanne_grau'])[0])
-    log('3 Niederhalterrohre (R %.1f, Deckel) zur Wanne min. %.2f mm (keine Anbindung an die Wand) -> Wand ueberall %.1f mm' % (TUBE['R'], dmin, G['WALL']))
-    log('   Rohr Ø %.1f innerhalb Freihaltekreis Ø %.1f der Zeichnung: %s' % (2 * TUBE['R'], PI['KEEP_D'],
-        'ja' if 2 * TUBE['R'] <= PI['KEEP_D'] else 'NEIN'))
-    eng = ZP + TUBE['INS_L'] - 0.4
-    tip = TUBE['CB_H'] + TUBE['SCREW_L']
-    log('   Schraube M2.5 x %.0f: Spitze z %.1f, Einsatz z %.1f ... %.1f -> Einschraubtiefe %.1f mm' %
-        (TUBE['SCREW_L'], tip, ZP + 0.2, ZP + 4.2, min(tip, ZP + 4.2) - (ZP + 0.2)))
+    log('3 Niederhalterrohre (Ø %.1f, Fuss Ø %.1f x %.1f, Deckel) zur Wanne min. %.2f mm (keine Anbindung an die Wand, Soll >= 0.3)'
+        % (2 * T['R'], 2 * T['FOOT_R'], T['FOOT_H'], dmin))
+    log('   Fuss Ø %.1f (Auflage auf dem Pi) innerhalb Freihaltekreis Ø %.1f der Zeichnung: %s; Rohr Ø %.1f erst ab z %.1f '
+        '(Bauteilhuelle bis z %.1f)' % (2 * T['FOOT_R'], PI['KEEP_D'], 'ja' if 2 * T['FOOT_R'] <= PI['KEEP_D'] else 'NEIN',
+                                        2 * T['R'], ZP + T['FOOT_H'], ZP + PI['ENV_TOP']))
+    zi = ZP + T['INS_REC']
+    tip = T['CB_H'] + T['SCREW_L']
+    log('   Gewindeeinsatz (bastelgarage 425681): Ø %.1f x %.1f, Bohrung Ø %.1f (Haendler 3.9), Bohrtiefe %.1f ab Rohrende '
+        '(Haendler min. 4.5; Einsatz %.1f versenkt -> %.1f unter dem Einsatz)' % (T['INS_OD'], T['INS_H'], T['INS_D'], T['INS_L'],
+                                                                             T['INS_REC'], T['INS_L'] - T['INS_REC'] - T['INS_H']))
+    walls = []
+    for X, Y in PI['HOLES']:
+        x, y = px(X), py(Y)
+        lid = S['Deckel_blau']
+        for zz in (ZP + 0.3, ZP + T['FOOT_H'] + 0.5, ZP + 3.5):
+            sl = lid.common(cyl(T['R'] + 0.6, zz - 0.05, zz + 0.05, x, y))
+            ang = [a * 10 for a in range(36)]
+            wmin = 99
+            for a in ang:
+                ca, sa = math.cos(math.radians(a)), math.sin(math.radians(a))
+                ln = Part.makeLine(V(x + ca * T['INS_D'] / 2, y + sa * T['INS_D'] / 2, zz), V(x + ca * (T['R'] + 0.6), y + sa * (T['R'] + 0.6), zz))
+                cm = ln.common(sl)
+                wmin = min(wmin, cm.Length if cm.Edges else 0.0)
+            walls.append((X, Y, zz - ZP, wmin))
+    for X, Y, dz, wm in walls:
+        log('   Rohr Pi-Loch (%.1f, %.1f), z PCB+%.1f: Wand um Bohrung min. %.2f mm (ueber Raendel Ø4.6: %.2f)'
+            % (X, Y, dz, wm, wm - (T['INS_OD'] - T['INS_D']) / 2))
+    log('   Schraube M2.5 x %.0f: Spitze z %.1f, Einsatz z %.1f ... %.1f -> Einschraubtiefe %.1f mm (%.1f Gaenge P 0.45)' %
+        (T['SCREW_L'], tip, zi, zi + T['INS_H'], min(tip, zi + T['INS_H']) - zi, (min(tip, zi + T['INS_H']) - zi) / 0.45))
     # Stecker
     zc = ZP + USB['ZC_DZ']
     pw, ph = USB['PLUG']
@@ -447,11 +514,15 @@ def checks(S):
     km = S['Klima_Modul_Option']
     log('11 Klimakammer rechts: Innenraum x %.1f ... %.1f (%.1f mm), Trennwand %.1f mm + %.1f mm Luftspalt (SD-Raum) zum Pi;'
         % (X_PART + C['WALL'], G['W'] / 2 - G['WALL'], C['WI'], C['WALL'], PI['SD_SPACE']))
-    log('   Modul (ANNAHME max. %.0f x %.0f mm, steht in Nuten, Sensorseite zur Stirnwand): Abstand zu SiP %.1f mm, zu '
+    log('   Modul (SEN0428 %.0f x %.0f mm, Bodenschiene + Deckelnut, Sensorseite zur Stirnwand): Abstand zu SiP %.1f mm, zu '
         'Micro-USB-PWR (Einspeisung, Regler vermutl. nahe) %.1f mm, zur Pi-Platine %.1f mm'
         % (C['MW'], C['MH'], km.distToShape(sip)[0], km.distToShape(pwr)[0], km.distToShape(S['Pi_PCB'])[0]))
     log('   Zuluft 2 Bodenschlitze + 3 Stirnschlitze (Wanne), Abluft 1 Stirnschlitz (Deckel); Kabelkanal Ø %.1f x %.1f mm '
         'bei y %.1f z %.1f, vergossen' % (C['HOLE_D'], C['BOSS_L'] + C['WALL'], C['HOLE_Y'], C['HOLE_Z']))
+    vb, vf = C['VENT_BOT'], C['VENT_FRONT']
+    log('   Lueftungsquerschnitt: Boden 2 x 1.2 x %.1f = %.1f mm2, Stirn 3 x 1.2 x %.1f = %.1f mm2, Deckel 1.2 x %.1f = %.1f mm2'
+        % (vb[1] - vb[0], 2 * 1.2 * (vb[1] - vb[0]), vf[1] - vf[0], 3 * 1.2 * (vf[1] - vf[0]),
+           C['VENT_LID'][1] - C['VENT_LID'][0], 1.2 * (C['VENT_LID'][1] - C['VENT_LID'][0])))
     log('12 Druckteile, Anzahl Koerper (Soll je 1): %s' % ', '.join('%s %d' % (k, len(S[k].Solids)) for k in PRINT))
     nslots = 5
     log('9 Lueftung: %d Bodenschlitze 1.2 mm unter dem SiP, 4 Kaminschlitze 1.2 x %.1f mm in der Deckel-Rueckwand'
@@ -465,7 +536,7 @@ PRINT = {'Wanne_grau': ('wanne_grau', [], 'ASA Warmgrau hell'),
 
 COLORS = {'Wanne_grau': '#B9B5AC', 'Deckel_blau': '#59ADDD', 'Fenster_transluzent': '#7CFC9A',
           'Pi_PCB': '#1F6B3A', 'Pi_Bauteile_oben': '#8A8F94', 'Pi_Bauteile_unten': '#5E6A60', 'microSD_Karte': '#202020',
-          'LED_Platine': '#2E5E2E', 'LED_RGB': '#F0F0F0', 'RTC_Modul_Option': '#3060A0',
+          'LED_Platine': '#2E5E2E', 'LED_RGB': '#F0F0F0',
           'Klima_Modul_Option': '#7A3FA0', 'Leitungen_Klima': '#D04020'}
 
 
@@ -545,9 +616,8 @@ def preview(S, path):
               'Klima_Modul_Option', 'Leitungen_Klima']
     view(axs[1, 0], [(T[k], COLORS[k]) for k in inside], 25, 50, 'Wanne: Pi Zero 2 W (Huellmodell), rechts Klimakammer mit Modul, Leitungen rot')
     lid = tris(S['Deckel_blau'].copy().rotate(V(0, 0, 0), V(1, 0, 0), 180))
-    rtc = tris(S['RTC_Modul_Option'].copy().rotate(V(0, 0, 0), V(1, 0, 0), 180))
-    view(axs[1, 1], [(lid, COLORS['Deckel_blau']), (rtc, COLORS['RTC_Modul_Option'])], 25, 55,
-         'Deckel innen (Niederhalterrohre mit Einsatz M2.5, Steg, Lichtschacht, RTC-Rahmen)')
+    view(axs[1, 1], [(lid, COLORS['Deckel_blau'])], 25, 55,
+         'Deckel innen (Niederhalterrohre mit Einsatz M2.5 Ø4.6, Steg, Gegenrippe + Nutrippe Klimamodul)')
     fig.suptitle('fluidi Gateway G1 v4 - %.0f x %.0f x %.0f mm - Raspberry Pi Zero 2 W (Kontrollansicht, kein Rendering)'
                  % (G['W'], G['D'], G['H']), fontsize=11)
     fig.tight_layout()

@@ -22,7 +22,7 @@ sondern die Projektleitung fragen.
 | O-3 | Klebstoff Lichtfenster | **ANNAHME** transparentes 2K-Epoxid oder UV-Kleber (PRINT_SETTINGS Kap. 5) |
 | O-4 | Klemmring (Pos. 6): **Presssitz** 0.05 je Seite in der Senkung Ø 6.4, Schürze verpresst die Membran um 0.1 mm (20 %) – Phase 5 R3-W2 (`check_sensor.txt` 2e) | Auszugskraft und Dichtheit am Muster: PROTOTYP-PRÜFUNG ST-W6 (a), M-W3; Klebung nur, wenn ein Kleber mit Datenblatt gewählt ist |
 | O-5 | Tastermechanik (P5-M2, Runde 2): 60°-Keil am Finger auf einer Nase der Zunge in Höhe SW1, Führungsrippe und D-Bohrung gegen Verdrehen. SW1 schaltet im CAD nominal bei 0.3 mm Tastenhub, worst bei 0.65 mm (Reserve +0.17); Tastenkraft nominal ≈ 8 N, worst ≈ 12 N (+ Membran, μ 0.3 ANNAHME) (`check_sensor.txt` 2a–2e) | **Überlast:** nach dem Schalten trägt SW1 die Tastenkraft; bei 20 N und μ ≥ 0.3 Zunge SF ≥ 1.15, bei kleinerer Reibung < 1 → PROTOTYP-PRÜFUNG M-T2; Taste nicht mit Kraft drücken |
-| O-6 | Anzugsmoment Schraube M2 × 3 in ASA/Mutter | nicht festgelegt; „handfest mit PH1“ (**ANNAHME**), am Muster prüfen (ST-K1) |
+| O-6 | Anzugsmoment Schraube M2 × 3 in ASA/Mutter | nicht festgelegt; „handfest mit TX6“ (**ANNAHME**), am Muster prüfen (ST-K1) |
 
 ## 1 Teile, Werkzeuge, Hilfsstoffe
 
@@ -30,7 +30,7 @@ Teile: Pos. 1–17 laut Stückliste FL-S-00 (gedruckt nach `PRINT_SETTINGS.md`, 
 
 | Werkzeug / Hilfsstoff | Zweck |
 |---|---|
-| Kreuzschlitz-Schraubenzieher **PH1** | Schraube ISO 7045 M2 × 3 PH1 (Pos. 12) |
+| Torx-Schraubenzieher **TX6** | Schraube M2 × 3 Torx TX6, A2 (Pos. 12, bastelgarage 422191, D-032) |
 | Messschieber 0.01 mm | Distanzlehre, Passungen, Dicke Dummy-Zelle |
 | Lupe ≥ 10× | Sichtprüfungen (VIP-Pads, Verguss, Lötstellen; ST-E1) |
 | 2 × Distanzlehre 24.2 (FL-S-10) | Abstand Kragen ↔ Schott beim Kragenverguss |
@@ -350,7 +350,7 @@ Kap. 7 wieder eingesetzt werden, Zellen < 2.6 V entsorgen (PROGRAMMIEREN Kap. 6)
 
 Ablauf für Nutzer: `docs/manuals/BATTERIEWECHSEL.md` (mit Sicherheitshinweisen). Zusätzlich für die Werkstatt:
 
-1. Sonde reinigen, über einer Schale arbeiten (FMEA F-22). Schraube lösen (PH1), Hülse nach unten über die Sonde
+1. Sonde reinigen, über einer Schale arbeiten (FMEA F-22). Schraube lösen (TX6), Hülse nach unten über die Sonde
    abziehen (`renders/final/fluidi_04_batteriewechsel.png`).
    Dabei Kantenversiegelung (Kap. 5a) und Hohlkehle des Kragens unter der Lupe ansehen: abgeplatzte Stellen oder
    sichtbare Glasfasern in der Musterliste notieren und melden.

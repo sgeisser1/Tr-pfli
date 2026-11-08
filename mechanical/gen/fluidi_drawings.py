@@ -47,12 +47,12 @@ STAND = 'Rev %s, V-K/M-4, P5-M1..M3 R2; Generator-SHA256 %s (git-Basis %s)' % (
 DATE = datetime.date.today().isoformat()
 ALL_CHECKS = []
 
-ASA = 'Bambu ASA (BambuLab_ASA_TechnicalDataSheet_V2.0.pdf), HDT 92 °C'
+ASA = 'Bambu ASA (TDS V2.0, HDT 92 °C) oder eSun ASA+ (TDS V1.0, HDT 95.5 °C/0.45 MPa), PRINT_SETTINGS Kap. 1'
 NOTE_COMMON = [
     '1  Masse in mm, Dezimalpunkt. Nennmasse = CAD-Modell; alle Masszahlen werden aus Modellpunkten berechnet (drawings_check.txt).',
     '2  Allgemeintoleranz Druckteil ±0.1 mm (ANNAHME FDM P1S 0.4-mm-Düse, wie Toleranzkette check_sensor.txt 2b); ISO 2768 gilt nicht.',
     '3  Passungen nicht durch Geometrieänderung, sondern über Passprobe und XY-Lochkompensation einstellen (PRINT_SETTINGS.md Kap. 4).',
-    '4  Profil PRINT_SETTINGS.md Kap. 2 (ASA 260/90 °C, 4 Wände, 100 % Füllung), stützenfrei; Naht hinten, nicht auf Dichtflächen.',
+    '4  Profil PRINT_SETTINGS Kap. 2 (4 Wände; ASA 260/90, eSun ASA+ 270/100 °C), stützenfrei; Naht hinten, nicht auf Dichtflächen.',
     '5  (Masszahl im Rundrahmen) = Prüfmass (Funktionsmass, am Muster messen). ——·—— breit = Dichtfläche / Funktionsfläche.',
 ]
 
@@ -87,7 +87,7 @@ def finish(sh, fname):
 def d_huelse(S):
     sl = S['Huelse_grau']
     sh = sheet('A3', 'FL-S-01', 'Hülse grau (Sichtschale + Zellfach)', 'Batteriefach, Dichtflächen der 2 O-Ringe AS568-019, Sondenschlitz, Furchlippe M2',
-               'ASA (Bambu, TDS V2.0), Warmgrau hell #B9B5AC', '2:1, Z 10:1',
+               'ASA (PRINT_SETTINGS Kap. 1), Warmgrau hell #B9B5AC', '2:1, Z 10:1',
                'stehend, Boden auf dem Bett, Mausohren 3 mm; Höhe 44.7; Logo-Relief auf senkrechter Wand',
                notes=['6  Logo-Relief 0.25 erhaben (Front), Warnsymbol innen Rückwand 0.3 vertieft (S3-W4): Form nach CAD, nicht bemasst.'])
     s = 2.0
@@ -178,7 +178,7 @@ def d_kappe(S):
     XC = -5.0                      # Schnitt C-C durch Zunge, Nase, Platinenanschlag (Rippe x -5.8...-5.2 nicht geschnitten)
     k = S['Kappe_blau']
     sh = sheet('A3', 'FL-S-02', 'Kappe blau mit Zapfen, Schott, Biegezunge', 'Elektronikraum (dicht), O-Ring-Nut Zapfen, Ablaufstufe, Tastenführung, Platinenanschlag',
-               'ASA (Bambu, TDS V2.0), Hellblau, ohne Russ/Metallpigment', '2:1',
+               'ASA (PRINT_SETTINGS Kap. 1), Hellblau, ohne Russ/Metallpigment', '2:1',
                'kopfüber (Decke auf dem Bett), stützenfrei; Trichter 45° (P5-M1); O-Ring-Nutflanke 1.15 Überhang',
                notes=['6  Tropfenausschnitt r %s, Spitze %s über Mitte (drop2, k %s), Mitte x 0 / z %s; Fenster FL-S-04 eingeklebt (Spalt 0.1).'
                       % (fmt(FP.DROP['R']), fmt(FP.DROP['K'] * FP.DROP['R']), fmt(FP.DROP['K']), fmt(FP.DROP['ZC'])),
@@ -272,7 +272,7 @@ def d_kappe(S):
 def d_kragen(S):
     k = S['Kragen']
     sh = sheet('A3', 'FL-S-03', 'Kragen (Vergussform Sondenübergang)', 'O-Ring-Nut Kragen, Platinenschlitz, Tasche U3/C24, Muttertasche M2, Hohlkehle',
-               'ASA (Bambu, TDS V2.0), Farbe beliebig (Restmaterial)', '5:1',
+               'ASA (PRINT_SETTINGS Kap. 1), Farbe beliebig (Restmaterial)', '5:1',
                'stehend (Unterseite mit Hohlkehle auf dem Bett); Muttertasche = Brücke 4.7',
                notes=['6  Wird auf der Platine vergossen (Epoxid, Kap. Montage), Mutter ISO 4032 M2 von vorne eingeschoben und eingegossen.'],
                )
@@ -384,7 +384,7 @@ def d_taste(S):
         f.dim((ax_ - BTN['NECK_D'] / 2, ay_, 56.0), (ax_ + BTN['NECK_D'] / 2, ay_, 56.0), 'h', f.bottom(1), 'Hals', k, pre='Ø', frame=True)
         f.note((ax_, ay_, zn), 'Teller FL-S-07 auf den Hals pressen', 12, -8)
     small(S, 'Taste_blau', 'FL-S-05', 'FL-S-05_taste_blau', 'Taste blau', 'Tastenplatte mit Hals (Hub 0.8, M-4)',
-          'ASA (Bambu, TDS V2.0), Hellblau', 5, 'Oberseite auf dem Bett, 0.12 mm',
+          'ASA (PRINT_SETTINGS Kap. 1), Hellblau', 5, 'Oberseite auf dem Bett, 0.12 mm',
           [('f', 'front', None, (80, 170), 'Vorderansicht'), ('t', 'top', None, (80, 122), 'Draufsicht')], dims)
 
 
@@ -403,7 +403,7 @@ def d_klemmring(S):
         a.dim((ax_, ay_ + 2.0, zm1 + 1.0 + BTN['MEMB_SQ']), (ax_, ay_ + 2.0, zpf), 'v', a.left(1), 'Platte', k, tside=-1)
         a.centerline((ax_, ay_, zm1 - 0.5), (ax_, ay_, zpf + 0.5))
     small(S, 'Klemmring', 'FL-S-06', 'FL-S-06_klemmring', 'Klemmring Membran', 'klemmt Silikonmembran Ø6.4 × 0.5 in der Senkung der Kappe',
-          'ASA (Bambu, TDS V2.0), Hellblau', 10, 'Platte auf dem Bett, 0.12 mm',
+          'ASA (PRINT_SETTINGS Kap. 1), Hellblau', 10, 'Platte auf dem Bett, 0.12 mm',
           [('a', 'left', (ax_, 0, 0), (110, 150), 'A–A (durch Achse)')], dims,
           notes=['6  Presssitz in Senkung Ø6.4 (Übermass 0.05 je Seite), Schürze verpresst die Membran 0.1 mm (R3-W2); Schürzen-Unterseite = Dichtfläche.'])
 
@@ -418,7 +418,7 @@ def d_teller(S):
         a.dim((ax_, ay_ - BTN['NECK_D'] / 2, zw1), (ax_, ay_ + BTN['NECK_D'] / 2, zw1), 'h', a.bottom(1), 'Bohrung (Presssitz Hals)', k, pre='Ø', frame=True)
         a.dim((ax_, ay_ + 2.0, zw1 - BTN['WASHER_T']), (ax_, ay_ + 2.0, zw1), 'v', a.right(1), 'Dicke', k)
     small(S, 'Tastenteller', 'FL-S-07', 'FL-S-07_tastenteller', 'Tastenteller', 'Anschlag der Taste am Klemmring (unverlierbar)',
-          'ASA (Bambu, TDS V2.0), Hellblau', 10, 'flach, 0.12 mm (3 Schichten)',
+          'ASA (PRINT_SETTINGS Kap. 1), Hellblau', 10, 'flach, 0.12 mm (3 Schichten)',
           [('a', 'left', (ax_, 0, 0), (110, 150), 'A–A (durch Achse)')], dims,
           notes=['6  Presssitz Ø3.0 auf Hals Ø3.0 (Nennmass gleich): Übermass über FDM-Toleranz, am Muster prüfen (PROTOTYP-PRÜFUNG).'])
 
@@ -447,7 +447,7 @@ def d_stoessel(S):
         a.note((xm, 3.0, zf0 + (3.0 - F_['Y0']) / tA), 'Keil 60° zur Senkrechten\n(scharfkantig, nicht verrunden)', 14, -10, shape=k,
                what='Keilflaeche auf Geometrie')
     small(S, 'Stoessel', 'FL-S-08', 'FL-S-08_stoessel', 'Stössel mit Finger', 'überträgt den Tastenhub über einen 60°-Keil auf die Nase der Biegezunge',
-          'ASA (Bambu, TDS V2.0), Farbe beliebig', 5, 'flach auf der D-Fläche (Arm/Finger bündig, stützenfrei), 0.12 mm',
+          'ASA (PRINT_SETTINGS Kap. 1), Farbe beliebig', 5, 'flach auf der D-Fläche (Arm/Finger bündig, stützenfrei), 0.12 mm',
           [('f', 'front', None, (80, 160), 'Vorderansicht'), ('t', 'bottom', None, (80, 112), 'Ansicht von unten'),
            ('a', 'left', (xm, 0, 0), (170, 160), 'A–A (Finger)')], dims,
           notes=['6  Finger läuft vorn an der Führungsrippe der Kappe (Spiel 0.1), Schaft in D-Bohrung (Spiel 0.1): Verdrehsicherung (C-1).'])
@@ -462,7 +462,7 @@ def d_schottkeil(S):
         f.dim((10, 5.0, Z['BULK0']), (10, 5.0, Z['BULK1']), 'v', f.right(1), 'Hoehe', k)
         l.dim((0, bs['Y0'] + kc, 31.4), (0, PCB['Y_F'], 31.4), 'h', l.bottom(1), 'Dicke (Rueckseite = F-Referenz)', k, frame=True)
     small(S, 'Schottkeil', 'FL-S-09', 'FL-S-09_schottkeil', 'Schottkeil', 'füllt den vorderen Durchführungsspalt im Schott, drückt F nach hinten an',
-          'ASA (Bambu, TDS V2.0), Farbe beliebig', 5, 'flach, 0.16 mm',
+          'ASA (PRINT_SETTINGS Kap. 1), Farbe beliebig', 5, 'flach, 0.16 mm',
           [('f', 'front', None, (110, 130), 'Vorderansicht'), ('l', 'left', (0, 0, 0), (215, 130), 'A–A')], dims)
 
 
@@ -496,7 +496,7 @@ ASM = [  # (Pos, Schluessel FCStd oder STEP-Gruppe, Menge, Benennung, Sachnummer
     (9, 'Schottkeil', '1', 'Schottkeil', 'FL-S-09', 'ASA', (135, 0.5), 'A'),
     (10, 'Membran_Silikon', '1', 'Tastenmembran Ø6.4 × 0.5', 'INDEX MECH-MEM1', 'Silikon, Shore A 40–60 (ANNAHME, Typ offen)', (0, 0.3), 'B'),
     (11, 'ORing_Kragen', '2', 'O-Ring AS568-019 (20.35 × 1.78)', 'INDEX MECH-OR1 (Rev B)', 'Silikon/EPDM ohne Russ, Silikonfett', (0, 0.35), 'A'),
-    (12, 'Schraube_M2', '1', 'Linsenschraube M2 × 3 PH1', 'ISO 7045, A2', 'unverlierbar (Furchlippe), V-K D-023', (90, 0.35), 'A'),
+    (12, 'Schraube_M2', '1', 'Linsenschraube M2 × 3 Torx TX6, k 1.6', 'Kaufteil bastelgarage 422191', 'A2, unverlierbar (Furchlippe), V-K D-023', (90, 0.35), 'A'),
     (13, 'Mutter_M2', '1', 'Sechskantmutter M2', 'ISO 4032, A2', 'im Kragen eingegossen', (0, 0.35), 'A'),
     (14, 'Verguss_Kragen', '-', 'Verguss Kragen', 'INDEX EP-K', 'Epoxid 2K mineral. gefüllt, Tg ≥ 80 °C (Typ offen)', (90, 0.3), 'A'),
     (15, 'Verguss_Schott', '-', 'Verguss Schott', 'INDEX EP-K', 'wie Pos. 14', (90, 0.3), 'A'),
@@ -592,8 +592,8 @@ def d_wanne(GN, GS):
     w = GS['Wanne_grau']
     G, PI, T, USB = GN['G'], GN['PI'], GN['TUBE'], GN['USB']
     px, py, ZP = GN['px'], GN['py'], GN['ZP']
-    sh = Sheet('A3', 'FL-G-01', 'Gateway G1 v4 – Wanne grau', 'Pi-Abstandshalter, Lichtschacht, Klimakammer, Micro-USB-Fenster (Variante _otg: + OTG-Fenster)',
-               'ASA (Bambu, TDS V2.0), Warmgrau hell #B9B5AC', '2:1', 'Boden auf dem Bett, Brim 3 mm; Brücken: USB-Fenster 11.4, Senkungen Ø5.4',
+    sh = Sheet('A3', 'FL-G-01', 'Gateway G1 v4 – Wanne grau', 'Pi-Abstandshalter, Lichtschacht, Klimakammer mit Schiene SEN0428, Micro-USB-Fenster (_otg: + OTG)',
+               'ASA (PRINT_SETTINGS Kap. 1), Warmgrau hell #B9B5AC', '2:1', 'Boden auf dem Bett, Brim 3 mm; Brücken: USB-Fenster 11.4, Senkungen Ø5.4',
                STAND, GW_SRC, NOTE_COMMON + GW_NOTES, date=DATE)
     s = 2.0
     fr = View(sh, w, 'front', s).place(125, 252).draw('Vorderansicht', 12)
@@ -624,6 +624,14 @@ def d_wanne(GN, GS):
     xp0 = GN['X_PART']
     tp.dim((xp0, 0, 8), (xp0 + GN['CLIMA']['WALL'], 0, 8), 'h', tp.top(2, 6), 'Trennwand Klimakammer', w, tside=1)
     tp.dim((xp0 + GN['CLIMA']['WALL'], 0, 8), (W2, -10, 6), 'h', tp.bottom(2), 'Klimakammer bis Stirnseite', w)
+    C = GN['CLIMA']
+    gx0 = C['X_PCB'] - C['MT'] / 2 - C['GR_CLR']
+    gx1 = C['X_PCB'] + C['MT'] / 2 + C['GR_CLR']
+    ye0 = C['YC'] - C['MW'] / 2 - C['END_CLR']
+    ye1 = C['YC'] + C['MW'] / 2 + C['END_CLR']
+    zr = C['Z0'] + C['RAIL_E'] - 0.5
+    tp.dim((gx0, C['YC'], zr), (gx1, C['YC'], zr), 'h', tp.top(3, 6), 'Nut Klimamodul Breite', w, frame=True)
+    tp.dim((gx1, ye0, zr), (gx1, ye1, zr), 'v', tp.right(1), 'Nut Klimamodul Laenge (Endanschlaege)', w, frame=True)
     # A-A
     aa.dim((0, D2 - G['WALL'], 8), (0, D2, 8), 'h', aa.top(1, 5), 'Wand', w, tside=-1)
     aa.dim((0, -D2, 0), (0, -D2, G['H'] - G['FACET']), 'v', aa.right(1), 'Facette Beginn', w)
@@ -634,7 +642,7 @@ def d_wanne(GN, GS):
     bb.dim((x1 - T['CB_D'] / 2, hy, 0.8), (x1 + T['CB_D'] / 2, hy, 0.8), 'h', bb.bottom(1), 'Senkung Schraubenkopf', w, pre='Ø')
     bb.dim((x1 + T['CB_D'] / 2, hy, 0), (x1 + 2.0, hy, T['CB_H']), 'v', bb.right(1), 'Senkung Tiefe', w, tside=1)
     bb.dim((x1 + 4.5, hy, G['WALL']), (x1 + 2.1, hy, PI['Z0']), 'v', bb.right(2), 'Auflage Pi (Abstandshalter)', w, frame=True)
-    bb.dim((x1 - T['R'], hy, 4.0), (x1 + T['R'], hy, 4.0), 'h', bb.top(2, 5), 'Abstandshalter', w, pre='Ø')
+    bb.dim((x1 - T['FOOT_R'], hy, 4.0), (x1 + T['FOOT_R'], hy, 4.0), 'h', bb.top(2, 5), 'Abstandshalter', w, pre='Ø')
     # Ansicht C: Micro-USB
     xu, zc = px(USB['PWR_X']), ZP + USB['ZC_DZ']
     ww, wh = USB['WIN']
@@ -651,9 +659,9 @@ def d_deckel(GN, GS):
     k = GS['Deckel_blau']
     G, PI, T = GN['G'], GN['PI'], GN['TUBE']
     px, py, ZP = GN['px'], GN['py'], GN['ZP']
-    sh = Sheet('A3', 'FL-G-02', 'Gateway G1 v4 – Deckel blau', 'Facette mit Tropfenfenster, 4 Niederhalterrohre (Einsatz M2.5), Steg, Kaminschlitze, RTC-Rahmen',
-               'ASA (Bambu, TDS V2.0), Hellblau, ohne Russ/Metallpigment', '2:1', 'kopfüber (Decke auf dem Bett); Facette 45°; vordere Rohre stehen auf der Innenfacette',
-               STAND, GW_SRC, NOTE_COMMON + GW_NOTES + ['7  Gewindeeinsätze M2.5 Ø3.5 × 4 mit Lötkolben 220 °C einsetzen (ANNAHME, PRINT_SETTINGS Kap. 5).'], date=DATE)
+    sh = Sheet('A3', 'FL-G-02', 'Gateway G1 v4 – Deckel blau', 'Facette mit Tropfenfenster, 4 Rohre (Einsatz M2.5 Ø4.6), Steg, Kaminschlitze, Nut Klimamodul',
+               'ASA (PRINT_SETTINGS Kap. 1), Hellblau, ohne Russ/Metallpigment', '2:1', 'kopfüber (Decke auf dem Bett); Facette 45°; vordere Rohre stehen auf der Innenfacette',
+               STAND, GW_SRC, NOTE_COMMON + GW_NOTES + ['7  Einsatz M2.5 × 4 × Ø4.6 (bastelgarage 425681): Bohrung 3.9 (Händler), 0.5 versenkt, einschmelzen nach PRINT_SETTINGS Kap. 5.'], date=DATE)
     s = 2.0
     fr = View(sh, k, 'front', s).place(125, 262).draw('Vorderansicht', 4)
     tp = View(sh, k, 'top', s).place(125, 190).draw('Draufsicht', 5)
@@ -674,6 +682,10 @@ def d_deckel(GN, GS):
     rr = T['INS_D'] / 2
     bb.dim((hx, hy - rr, 8), (hx, hy + rr, 8), 'h', bb.top(1, 5), 'Bohrung Einsatz M2.5', k, pre='Ø', frame=True)
     bb.dim((hx, hy - T['R'], 8), (hx, hy + T['R'], 8), 'h', bb.bottom(1), 'Rohr', k, pre='Ø')
+    bb.dim((hx, hy - T['FOOT_R'], ZP + 0.5), (hx, hy + T['FOOT_R'], ZP + 0.5), 'h', bb.bottom(2), 'Rohrfuss (Freihaltekreis Pi Ø6)', k, pre='Ø',
+           frame=True)
+    bb.dim((hx, hy + T['FOOT_R'], ZP), (hx, hy + T['FOOT_R'] + 0.3, ZP + T['FOOT_H']), 'v', bb.left(2), 'Fusshoehe', k,
+           chk=[(hx, hy + T['FOOT_R'], ZP + 0.5), (hx, hy + T['FOOT_R'] + 0.3, ZP + T['FOOT_H'])])
     bb.dim((hx, hy + 2.2, ZP), (hx, hy + 1.5, ZP + T['INS_L']), 'v', bb.left(1), 'Bohrtiefe Einsatz', k, frame=True)
     bb.dim((hx, hy + 2.2, ZP), (hx, D2, G['H']), 'v', bb.right(1), 'Rohrunterkante bis Oberseite', k,
            chk=[(hx, hy + 2.2, ZP), (hx + 0.5, D2 - 1, G['H'])])

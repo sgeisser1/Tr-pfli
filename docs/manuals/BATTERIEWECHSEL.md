@@ -32,7 +32,7 @@ Für alle, die den Sensor benutzen. Dauer etwa 5 Minuten. Bild: `renders/final/f
 ## Was Sie brauchen
 
 - 1 neue Knopfzelle **CR2032** (Panasonic, Originalverpackung)
-- **Kreuzschlitz-Schraubenzieher PH1** (für die Schraube an der Kopfunterseite, neben der Sonde)
+- **Torx-Schraubenzieher TX6** (T6; für die Schraube an der Kopfunterseite, neben der Sonde)
 - Weiches Tuch, Wasser; eine **Schale** als Unterlage (falls die Zelle herausfällt, rollt sie nicht weg)
 - Zahnstocher oder Kunststoffspatel (kein Metall)
 
@@ -41,7 +41,7 @@ Für alle, die den Sensor benutzen. Dauer etwa 5 Minuten. Bild: `renders/final/f
 1. **Sensor herausziehen** am Kopf, gerade nach oben. **Sonde reinigen** und trocknen (Erde würde beim Abziehen der
    Hülse an der Dichtung schleifen).
 2. Über der Schale arbeiten. Sensor mit der **Sondenspitze nach oben** halten. Die Schraube sitzt an der Kopfunterseite
-   **neben der Sonde** (zeigt jetzt nach oben). **Schraube lösen** (PH1, gegen den Uhrzeigersinn), **etwa 4 Umdrehungen,
+   **neben der Sonde** (zeigt jetzt nach oben). **Schraube lösen** (TX6, gegen den Uhrzeigersinn), **etwa 4 Umdrehungen,
    bis sich die Hülse abziehen lässt – nicht weiter drehen**, sonst fällt die Schraube heraus (R3-W1). Eine
    Ersatzschraube M2×3 bereithalten.
 3. **Graue Hülse Richtung Sondenspitze von der Kappe wegziehen und über die Sonde abziehen** (wie im Bild). Nicht an der

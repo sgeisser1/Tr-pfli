@@ -162,8 +162,11 @@ BTN['BORE_FLAT'] = round(FINGER['Y0'] - 0.1, 3)            # D-Bohrung im Rohr, 
 BTN['RING_OVER'] = 0.05                                    # Klemmring Presssitz je Seite (R3-W2, O-4)
 BTN['MEMB_SQ'] = 0.10                                      # Membranverpressung durch den Klemmring (20 %)
 SCREW = dict(X=0.0, D=2.0, L=3.0,                  # V-K: M2x3 (M2x4 stuende 0.8 ueber der Mutter, 0.05 neben der O-Ring-Nut)
-             HEAD_D=3.8, HEAD_H=1.3, HOLE_D=2.4, LIP_D=1.7, LIP_H=0.5,
-             NUT_S=4.0, NUT_M=1.6)                 # ISO 7045 M2x3 A2 PH1, ISO 4032 M2 A2 (Nennmasse, ANNAHME bis Bestellung)
+             HEAD_D=3.8, HEAD_H=1.6, HOLE_D=2.4, LIP_D=1.7, LIP_H=0.5,
+             NUT_S=4.0, NUT_M=1.6)                 # ISO 4032 M2 A2 (Nennmasse, ANNAHME bis Bestellung)
+# Phase 6 (Einkauf 2026-11-09): Schraube = Kaufteil bastelgarage.ch Art. 422191 (purecrea) M2x3 A2 Linsenkopf Torx TX6,
+# Kopfhoehe 1.6 laut Haendler (statt ISO 7045 PH1 k 1.3, keine CH-Quelle). Kopf-Ø NICHT angegeben -> HEAD_D 3.8 ANNAHME
+# (wie bisher), am Kaufteil messen. docs/references/bastelgarage_Gewindeeinsatz-Schraube_Auszug_2026-11-09.txt
 SCREW['Y'] = PCB['Y_F'] - 0.4 - SCREW['NUT_S'] / 2  # Mutter 0.4 mm vor F (4.2)
 SLOT = dict(X=PCB['W_COAT_MAX'] / 2 + 0.2, Y0=PCB['Y_F'] - 0.4, Y1=PCB['Y_B'] + 0.4)  # Sondenschlitz Boden
 # Logo waechst mit der Breite (16 mm bei 28 mm) und sitzt bei 39 % der Huelsenhoehe (PROPORTIONEN.md)
@@ -347,7 +350,7 @@ def interface_dict(area=None):
             ANTENNA=dict(part='AN043 IFA', footprint=ANT['FP'], zone='Z1_ANTENNE', z=(Z['ANT0'], Z['ANT1']),
                          copper_x=(ANT['X0'], ANT['X1']), copper_z=(ANT['Z0'], ANT['Z1']), feed_x=ANT['FEED_X'],
                          keepout_x=(-2.7, 12.5)),
-            SCREW_NUT=dict(screw='ISO 7045 M2x3 A2 PH1 (unverlierbar, Gewindefurch-Lippe Ø1.7 im Huelsenboden)',
+            SCREW_NUT=dict(screw='M2x3 A2 Linsenkopf Torx TX6, Kopfhoehe 1.6 (bastelgarage 422191; unverlierbar, Gewindefurch-Lippe Ø1.7 im Huelsenboden)',
                            nut='ISO 4032 M2 A2 SW4 x 1.6, im Kragen eingegossen',
                            axis_xy=(SCREW['X'], SCREW['Y']), nut_z=(Z['COL_NUT0'], Z['COL_NUT1']),
                            dist_to_pcb_F=round(PCB['Y_F'] - (SCREW['Y'] + SCREW['NUT_S'] / 2), 2),

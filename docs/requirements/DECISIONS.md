@@ -294,3 +294,13 @@ Format: Nr. · Datum · Entscheid · Alternativen · Begründung · Quelle · St
 - **Alternativen:** Waveshare CH343 (kein CH-Händler, Auslandsversand); Adapter mit festem 3.3-V-Pegel (ungeeignet).
 - **Quelle:** `simulation/spice/programmer/prog_uart_pl2303_report.txt`, `docs/datasheets/Prolific_PL2303GS_Datasheet_Rev1.0.4.pdf` S. 39.
 - **Status:** gültig; Sicherheitsprüfung der Anleitung PROGRAMMIEREN_SENSOR v1.2 folgt in der Phase-6-Prüfrunde.
+
+### D-032 · 2026-11-09 · Kaufteile Mechanik Phase 6 (Orchestrator)
+- **Batteriefachschraube:** M2 × 3 Torx **TX6** A2 (bastelgarage 422191) statt ISO 7045 PH1 (keine CH-Quelle in
+  Kleinmengen); Kopfhöhe 1.6 mm, CAD angepasst, Werkzeug in BATTERIEWECHSEL/MONTAGE TX6. TX6 ist handelsüblich (REQ-MECH-15).
+- **Gewindeeinsätze Gateway:** bastelgarage 425681, Bohrung 3.9 mm (Herstellerangabe), Rohr Ø 7.0 mit Fuss Ø 5.6.
+- **Filament:** Bambu ASA bleibt Vorgabe; **eSun ASA+** als bedingte Alternative (HDT 95.5 °C laut TDS, Händlerseite
+  78 °C → erst nach PROTOTYP-PRÜFUNG 7 Tage 65 °C). Farbe Grau derzeit nicht lieferbar (D-010 betroffen, Auftraggeber).
+- **Gateway-Klimakammer:** Bodenschiene + Deckelrippe für SEN0428 (D-029), RTC-Platzhalter entfernt (D-028).
+- **Quelle:** `mechanical/gateway_pi/check_gateway_pi.txt`, `mechanical/drawings/drawings_check.txt` (182 Masse, 0 Fehler).
+- **Status:** gültig, Prüfung in der Phase-6-Prüfrunde.

@@ -509,10 +509,20 @@ def checks(S, sl_plain):
         'Lagetoleranz Platine +-%.2f' % (FP.CLIP['W'], pz0, pz1, Z['COL1'], pz0 - Z['COL1'], Z['BULK0'], Z['BULK0'] - pz1, PCB['TOL_Z']))
     sc = FP.SCREW
     eng = min(sc['L'], Z['COL_NUT1']) - Z['COL_NUT0']
-    log('5c Schraube ISO 7045 M2x%g: Schaft z 0 ... %.1f, Mutter z %.1f ... %.1f -> Einschraubtiefe %.2f mm (%.1f Gaenge P 0.4), '
+    log('5c Schraube M2x%g Linsenkopf TX6: Schaft z 0 ... %.1f, Mutter z %.1f ... %.1f -> Einschraubtiefe %.2f mm (%.1f Gaenge P 0.4), '
         'Ueberstand ueber Mutter %.2f; Freibohrung bis z %.1f, O-Ring-Nut ab z %.1f (Abstand %.2f)'
         % (sc['L'], sc['L'], Z['COL_NUT0'], Z['COL_NUT1'], eng, eng / 0.4, sc['L'] - Z['COL_NUT1'], sc['L'] + 0.3,
            Z['COL_G0'], Z['COL_G0'] - (sc['L'] + 0.3)))
+    # Phase 6: Kopf TX6 1.6 hoch (bisher PH1 1.3) - Kopf steht unter dem Huelsenboden neben der Sonde
+    hd = S['Schraube_M2'].common(cyl(sc['HEAD_D'] / 2 + 0.01, -sc['HEAD_H'] - 1, 0.0, sc['X'], sc['Y']))
+    sonde = S['PCB'].common(box(-30, 30, -30, 30, -60, 0.0))
+    dk = hd.distToShape(sonde)[0]
+    tc = (PCB['T_COAT_MAX'] - PCB['T']) / 2
+    log('   Kopf Ø%.1f (ANNAHME, am Kaufteil messen) x %.1f (Haendler): z %.2f ... 0 (Auflage auf dem Huelsenboden, keine Senkung); '
+        'Abstand Kopf - Sonde (Platine F) %.2f mm, - Sonde inkl. Beschichtung max. (%.2f je Seite) %.2f mm; zulaessiger Kopf-Ø '
+        'bis %.1f (Abstand >= 0.1); Kopfunterseite bis Markierung max. Stecktiefe (z %.1f) %.2f mm'
+        % (sc['HEAD_D'], sc['HEAD_H'], -sc['HEAD_H'], dk, tc, dk - tc, sc['HEAD_D'] + 2 * (dk - tc - 0.1), -H['GAP_SOIL'],
+           H['GAP_SOIL'] - sc['HEAD_H']))
     # 6 Abstaende
     d_led = PCB['Y_F'] - FP.LED['H'] - FP.DROP['BOSS_Y1']
     log('6 LED-Oberseite bis Fenster-Lichtschaft: %.2f mm (Ziel 1.5-2.5)' % d_led)

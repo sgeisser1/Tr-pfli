@@ -4,26 +4,46 @@ Deckel_blau: 1 Splitter < 1 mm3 entfernt (0.071 mm3)
 Aussenmasse 84 x 42 x 20 mm (B x T x H), Wand 2.0, Fuge z 13.85 ... 14.15
 Pi: X=0 bei x 26.0, Y=0 bei y 18.6, PCB z 5.0 ... 6.0 (ANNAHME T 1.0)
 1 Kollisionen montiert: keine
-   RTC-Modul im Rahmen: Ueberschneidung 0.000 mm3
-13 RTC Adafruit 4282 (21.3 x 20.0 x 13.6 inkl. Buchsenleiste, Produktseite Z. 130): Grundriss im Rahmen 21.7 x 20.4 unter der Decke z 18.0; hoechstes Pi-Bauteil darunter z 7.8 -> Bauraum 10.2 mm. Mit Buchsenleiste (13.6) passt es NICHT (und der Pi hat keine Stiftleiste); ohne Leiste zulaessig bis 9.7 mm Modulhoehe (am Modul messen, ANNAHME bis dahin). Abstand zu Klima-Litzen 3.6, HDMI 0.5 mm. G-R2: Modul mit der Rueckseite an die Decke geklebt (Randstreifen), Zelle zum Pi, wechselbar ohne Loesen der Klebung, nicht gegen den Deckel gepresst
-14 Grove SHT41 (20 x 40 mm, docs/references/Seeed_Grove-SHT4x_Wiki_Auszug_2026-11-08.txt; Hoehe nicht angegeben, hier nur Platine 1.6): Klimakammer innen 8.0 x 38.0 x 16.0 (x, y, z) -> passt in KEINER Lage (40 > 38.0 innen)
+13 RTC: gestrichen (D-028), kein Platzhalter, kein Deckelrahmen mehr
+14 Klimamodul DFRobot SEN0428 (D-029, docs/datasheets/DFRobot_SEN0428_Dimensions_V0.1.png): 17.0 (y) x 14.0 (z) x Platine 1.6 (ANNAHME) + Bauteile vorn 2.5 / hinten 1.0 (ANNAHME); Kammer innen 8.0 x 38.0 x 16.0 (x, y, z)
+   Lage: x 35.20 ... 36.80 (Platine), y -6.50 ... 10.50, z 3.00 ... 17.00; Sensorseite +x, Bauteile bis x 39.30 -> Stirnwand 0.70 mm
+   Halter: Bodenschiene Nut 1.90 breit (Platine 1.60 + 2 x 0.15), Eingriff 1.00; Deckelnut Eingriff 0.80, Luft ueber der Oberkante 0.30; Endanschlaege y-Luft je 0.30, Hoehe 1.00 ueber Modulunterkante
+   Bauteilfreiheit an den Nuten: Bauteile ab 1.45 von der 17-mm-Kante (abgegriffen) -> Luft zur Schiene 0.45, zur Deckelrippe 0.65 mm (Soll >= 0.3)
+   Spiel Modul - Wanne 0.00 (Auflage im Nutgrund gewollt), - Deckel 0.15 mm
+   Loetaugen (Litzenausgang Rueckseite -x): y -5.23, z 6.14, 8.68, 11.22, 13.76 (VCC/GND/SCL/SDA; Reihenfolge je nach Einbaulage gespiegelt)
+   Loetauge unterste Kante z 5.42 ueber Endanschlag/Schiene z 4.00 -> 1.42 mm frei
+   Kabelkanal-Austritt x 32.00 y -2.50 z 10.50 -> Loetaugenreihe: x 3.20, y 2.73, z bis 4.36; freier Raum fuer die Litzenboegen zwischen Trennwand und Loetstellen 2.20 mm (Soll >= 2: Litze AWG28 + Biegeradius, ANNAHME)
+   Schiene inkl. Endanschlaege 20.0 mm in Kammer 38.0 mm: ja; Modulbohrungen Ø2.0 (Option M2) bei y 8.50, z 5.00 / 15.00
+   PROTOTYP-PRUEFUNG: Platinendicke messen (Nut = Dicke + 0.3; bei < 1.4 mm MT anpassen), Bauteilhoehe <= 2.5, Modul sitzt ohne Klemmen und klappert bei geschlossenem Deckel nicht
 2 Mindestabstaende (Spiel, Ziel >= 0.3 FDM bzw. >= 1.0 zu Waenden):
    Pi_PCB             - Wanne 0.00   - Deckel 0.00
    Pi_Bauteile_oben   - Wanne 0.30   - Deckel 0.20
    Pi_Bauteile_unten  - Wanne 0.20   - Deckel 1.02
-   microSD_Karte      - Wanne 0.50   - Deckel 1.30
+   microSD_Karte      - Wanne 0.50   - Deckel 0.80
    LED_Platine        - Wanne 0.00   - Deckel 0.25
-   RTC_Modul_Option   - Wanne 5.80   - Deckel 0.00
-   Klima_Modul_Option - Wanne 0.00   - Deckel 0.70
-   Leitungen_Klima    - Wanne 0.20   - Deckel 0.30
+   Klima_Modul_Option - Wanne 0.00   - Deckel 0.15
+   Leitungen_Klima    - Wanne 0.20   - Deckel 0.60
    (Pi_PCB 0.00 = Auflage auf Abstandshaltern / Niederhalterrohren, gewollt; Bauteilhuelle 0.20 nur innerhalb
     des Freihaltekreises Ø 6 der Zeichnung, dort keine Bauteile)
    Pi_PCB - Wand (ohne Freistiche) 0.40
    LED_Platine        - Pi_Bauteile_oben 4.88  - Pi_PCB 5.72
    LED_RGB            - Pi_Bauteile_oben 5.88  - Pi_PCB 6.77
-3 Niederhalterrohre (R 2.8, Deckel) zur Wanne min. 1.00 mm (keine Anbindung an die Wand) -> Wand ueberall 2.0 mm
-   Rohr Ø 5.6 innerhalb Freihaltekreis Ø 6.0 der Zeichnung: ja
-   Schraube M2.5 x 8: Spitze z 9.6, Einsatz z 6.2 ... 10.2 -> Einschraubtiefe 3.4 mm
+3 Niederhalterrohre (Ø 7.0, Fuss Ø 5.6 x 1.5, Deckel) zur Wanne min. 0.40 mm (keine Anbindung an die Wand, Soll >= 0.3)
+   Fuss Ø 5.6 (Auflage auf dem Pi) innerhalb Freihaltekreis Ø 6.0 der Zeichnung: ja; Rohr Ø 7.0 erst ab z 7.5 (Bauteilhuelle bis z 7.2)
+   Gewindeeinsatz (bastelgarage 425681): Ø 4.6 x 4.0, Bohrung Ø 3.9 (Haendler 3.9), Bohrtiefe 5.2 ab Rohrende (Haendler min. 4.5; Einsatz 0.5 versenkt -> 0.7 unter dem Einsatz)
+   Rohr Pi-Loch (3.5, 3.5), z PCB+0.3: Wand um Bohrung min. 0.85 mm (ueber Raendel Ø4.6: 0.50)
+   Rohr Pi-Loch (3.5, 3.5), z PCB+2.0: Wand um Bohrung min. 1.15 mm (ueber Raendel Ø4.6: 0.80)
+   Rohr Pi-Loch (3.5, 3.5), z PCB+3.5: Wand um Bohrung min. 1.15 mm (ueber Raendel Ø4.6: 0.80)
+   Rohr Pi-Loch (61.5, 3.5), z PCB+0.3: Wand um Bohrung min. 0.85 mm (ueber Raendel Ø4.6: 0.50)
+   Rohr Pi-Loch (61.5, 3.5), z PCB+2.0: Wand um Bohrung min. 1.15 mm (ueber Raendel Ø4.6: 0.80)
+   Rohr Pi-Loch (61.5, 3.5), z PCB+3.5: Wand um Bohrung min. 1.55 mm (ueber Raendel Ø4.6: 1.20)
+   Rohr Pi-Loch (3.5, 26.5), z PCB+0.3: Wand um Bohrung min. 0.85 mm (ueber Raendel Ø4.6: 0.50)
+   Rohr Pi-Loch (3.5, 26.5), z PCB+2.0: Wand um Bohrung min. 1.35 mm (ueber Raendel Ø4.6: 1.00)
+   Rohr Pi-Loch (3.5, 26.5), z PCB+3.5: Wand um Bohrung min. 1.55 mm (ueber Raendel Ø4.6: 1.20)
+   Rohr Pi-Loch (61.5, 26.5), z PCB+0.3: Wand um Bohrung min. 0.85 mm (ueber Raendel Ø4.6: 0.50)
+   Rohr Pi-Loch (61.5, 26.5), z PCB+2.0: Wand um Bohrung min. 1.55 mm (ueber Raendel Ø4.6: 1.20)
+   Rohr Pi-Loch (61.5, 26.5), z PCB+3.5: Wand um Bohrung min. 1.55 mm (ueber Raendel Ø4.6: 1.20)
+   Schraube M2.5 x 8: Spitze z 9.6, Einsatz z 6.5 ... 10.5 -> Einschraubtiefe 3.1 mm (6.9 Gaenge P 0.45)
 4 Micro-USB-PWR: Buchsenfront 1.5 mm hinter Aussenflaeche, Umspritzung 10.6 x 7.0 -> Spiel zur Wanne_grau 0.40 mm
 4 Micro-USB-OTG: Buchsenfront 1.5 mm hinter Aussenflaeche, Umspritzung 10.6 x 7.0 -> Spiel zur Wanne_grau_OTG 0.40 mm
 5 GPIO: Auftraggeber-Pi ohne Stiftleiste, Leitungen direkt in die Loetaugen (Lage aus Zeichnung, Pin 1 = Quadratpad):
@@ -38,16 +58,17 @@ Pi: X=0 bei x 26.0, Y=0 bei y 18.6, PCB z 5.0 ... 6.0 (ANNAHME T 1.0)
 6 Metall im Gehaeuse: 4 Schrauben/Einsaetze nur in den 4 Befestigungsbohrungen des Pi (Herstellerbohrungen),
    LED-Platine (Kupfer) Abstand zur Pi-Platine 5.7 mm; keine weiteren Metallteile. Lage der Onboard-Antenne
    ist in den offiziellen Unterlagen nicht angegeben -> RSSI offen/geschlossen messen (PROTOTYP-PRUEFUNG).
-7 Wanne_grau           13.0 cm3 -> 14.0 g ASA
-7 Wanne_grau_OTG       12.9 cm3 -> 13.8 g ASA
-7 Deckel_blau          9.1 cm3 -> 9.7 g ASA
+7 Wanne_grau           12.9 cm3 -> 13.8 g ASA
+7 Wanne_grau_OTG       12.8 cm3 -> 13.7 g ASA
+7 Deckel_blau          9.5 cm3 -> 10.2 g ASA
 7 Fenster_transluzent  0.0 cm3 -> 0.1 g ASA
 8 Verlustleistung 1.0 W: dT Gehaeuse ~ 11 K (h = 8 W/m2K, A = 0.0111 m2, ANNAHME; Leistung Pi nicht im Product Brief)
 8 Verlustleistung 2.0 W: dT Gehaeuse ~ 22 K (h = 8 W/m2K, A = 0.0111 m2, ANNAHME; Leistung Pi nicht im Product Brief)
 8 Verlustleistung 3.0 W: dT Gehaeuse ~ 34 K (h = 8 W/m2K, A = 0.0111 m2, ANNAHME; Leistung Pi nicht im Product Brief)
 10 Montage senkrecht: Pi in Wanne (mit Lichtschacht/LED-Platine) und Deckel auf Wanne, Ueberschneidung beim Anheben um t: t 0.3: Pi 0.00 / Deckel 0.00 mm3, t 1.0: Pi 0.00 / Deckel 0.00 mm3, t 2.0: Pi 0.00 / Deckel 0.00 mm3, t 4.0: Pi 0.00 / Deckel 0.00 mm3, t 8.0: Pi 0.00 / Deckel 0.00 mm3, t 15.0: Pi 0.00 / Deckel 0.00 mm3
 11 Klimakammer rechts: Innenraum x 32.0 ... 40.0 (8.0 mm), Trennwand 2.0 mm + 4.0 mm Luftspalt (SD-Raum) zum Pi;
-   Modul (ANNAHME max. 24 x 14 mm, steht in Nuten, Sensorseite zur Stirnwand): Abstand zu SiP 28.0 mm, zu Micro-USB-PWR (Einspeisung, Regler vermutl. nahe) 58.1 mm, zur Pi-Platine 8.2 mm
-   Zuluft 2 Bodenschlitze + 3 Stirnschlitze (Wanne), Abluft 1 Stirnschlitz (Deckel); Kabelkanal Ø 3.0 x 4.5 mm bei y -3.5 z 10.5, vergossen
+   Modul (SEN0428 17 x 14 mm, Bodenschiene + Deckelnut, Sensorseite zur Stirnwand): Abstand zu SiP 28.0 mm, zu Micro-USB-PWR (Einspeisung, Regler vermutl. nahe) 58.3 mm, zur Pi-Platine 8.2 mm
+   Zuluft 2 Bodenschlitze + 3 Stirnschlitze (Wanne), Abluft 1 Stirnschlitz (Deckel); Kabelkanal Ø 3.0 x 4.5 mm bei y -2.5 z 10.5, vergossen
+   Lueftungsquerschnitt: Boden 2 x 1.2 x 16.0 = 38.4 mm2, Stirn 3 x 1.2 x 20.0 = 72.0 mm2, Deckel 1.2 x 18.0 = 21.6 mm2
 12 Druckteile, Anzahl Koerper (Soll je 1): Wanne_grau 1, Wanne_grau_OTG 1, Deckel_blau 1, Fenster_transluzent 1
 9 Lueftung: 5 Bodenschlitze 1.2 mm unter dem SiP, 4 Kaminschlitze 1.2 x 2.6 mm in der Deckel-Rueckwand
