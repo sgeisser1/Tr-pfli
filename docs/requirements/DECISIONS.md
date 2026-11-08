@@ -218,3 +218,13 @@ Format: Nr. · Datum · Entscheid · Alternativen · Begründung · Quelle · St
 - **M-4 Taster:** Tastenhub 0.6 → 0.8 mm und Quetschrippe an der Gabel umsetzen (Toleranzkette Spalt 0.05…0.61 mm).
 - **EP-2 LED:** Pulse ≤ 5 ms (FW-4); lange Leuchtphasen dadurch halb so hell (wahrgenommen ≈ 70–80 %, ANNAHME) –
   akzeptiert für den Prototyp, PROTOTYP-PRÜFUNG E6 (Sichtbarkeit), ggf. Vorwiderstände anpassen.
+
+### D-024 · 2026-11-08 · Erstprogrammierung der Sensoren (Projektleiter, Red-Team B-4/W-4)
+- **Entscheid:** Programmieradapter Rev 1: Waveshare CH343 USB-UART-Board (VIO extern), Speisung 2.0 V über die
+  Dummy-Zelle (XC6206P332 → 2 × XC6206P202, getrennter Regler für VIO), Schmitt-Puffer SN74AUP1G17 ≤ 3 cm am TP1-Stift.
+  Muster vor dem Verguss: **Behelf** mit Labornetzteil 2.0–2.2 V und CH343-RXD an **R9 Pad 1** (DIO6), Draht vor dem
+  Einsetzen der Zelle entfernen. Ablauf: `docs/manuals/PROGRAMMIEREN_SENSOR.md`.
+- **Alternativen:** 1.8 V (nur 40–70 mV Reserve zu VDDS min), ohne Puffer (Low ≥ 0.64 V, vom CH343 nicht lesbar),
+  SN74LVC1G17 (Leckstrom ±5 µA über 200 kΩ → bis 1 V).
+- **Quelle:** `hardware/programmer/README.md`, `simulation/spice/programmer/prog_uart_report.txt` (Kapazitäten ANNAHME).
+- Offen: Sicherheitsprüfung des Adapters und Mechanik des Federstiftkopfs (Phase 5); Bootloader-Strom (W-10) PROTOTYP-PRÜFUNG.

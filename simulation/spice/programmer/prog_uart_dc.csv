@@ -1,0 +1,41 @@
+fall,bedingung,knoten,pegel,v,grenze,ok,reserve_huelle,reserve_interp
+A0 ohne Puffer (Ist),"VIO 1.8 V, Pull-up min 3 uA, Board-LED MAX",CH343-RXD (TP1),low,0.64210366,<= 0.50 (CH343 VIL),False,,
+A0 ohne Puffer (Ist),"VIO 1.8 V, Pull-up min 3 uA, Board-LED MIN",CH343-RXD (TP1),low,0.64218353,<= 0.50 (CH343 VIL),False,,
+A0 ohne Puffer (Ist),"VIO 1.8 V, Pull-up typ 14 uA, Board-LED MAX",CH343-RXD (TP1),low,1.7691898,<= 0.50 (CH343 VIL),False,,
+A0 ohne Puffer (Ist),"VIO 1.8 V, Pull-up typ 14 uA, Board-LED MIN",CH343-RXD (TP1),low,1.7691898,<= 0.50 (CH343 VIL),False,,
+A0 ohne Puffer (Ist),"VIO 1.8 V, Pull-up max 21 uA, Board-LED MAX",CH343-RXD (TP1),low,1.7793392,<= 0.50 (CH343 VIL),False,,
+A0 ohne Puffer (Ist),"VIO 1.8 V, Pull-up max 21 uA, Board-LED MIN",CH343-RXD (TP1),low,1.7793392,<= 0.50 (CH343 VIL),False,,
+A0 ohne Puffer (Ist),"VIO 2.0 V, Pull-up min 3 uA, Board-LED MAX",CH343-RXD (TP1),low,0.7256129,<= 0.50 (CH343 VIL),False,,
+A0 ohne Puffer (Ist),"VIO 2.0 V, Pull-up min 3 uA, Board-LED MIN",CH343-RXD (TP1),low,0.72936515,<= 0.50 (CH343 VIL),False,,
+A0 ohne Puffer (Ist),"VIO 2.0 V, Pull-up typ 14 uA, Board-LED MAX",CH343-RXD (TP1),low,1.9671449,<= 0.50 (CH343 VIL),False,,
+A0 ohne Puffer (Ist),"VIO 2.0 V, Pull-up typ 14 uA, Board-LED MIN",CH343-RXD (TP1),low,1.9671449,<= 0.50 (CH343 VIL),False,,
+A0 ohne Puffer (Ist),"VIO 2.0 V, Pull-up max 30 uA, Board-LED MAX",CH343-RXD (TP1),low,1.9846247,<= 0.50 (CH343 VIL),False,,
+A0 ohne Puffer (Ist),"VIO 2.0 V, Pull-up max 30 uA, Board-LED MIN",CH343-RXD (TP1),low,1.9846247,<= 0.50 (CH343 VIL),False,,
+A1 Puffer-Eingang,"VDD 1.96 V, VIO 1.96 V, Leck +0.5 uA, R1 10Meg",AUP1G17 A (TP1),low,0.33069421,<= 0.47 (VT- min Huelle) / 0.57 (interp.),True,0.13930578999999998,0.24422886692307688
+A1 Puffer-Eingang,"VDD 1.96 V, VIO 1.96 V, Leck -0.5 uA, R1 10Meg",AUP1G17 A (TP1),high,1.8617301,>= 1.77 (VT+ max Huelle) / 1.52 (interp.),True,0.09173009999999993,0.3428070230769229
+A1 Puffer-Eingang,"VDD 1.96 V, VIO 2.04 V, Leck +0.5 uA, R1 10Meg",AUP1G17 A (TP1),low,0.33226481,<= 0.47 (VT- min Huelle) / 0.60 (interp.),True,0.13773518999999995,0.26973518999999996
+A1 Puffer-Eingang,"VDD 1.96 V, VIO 2.04 V, Leck -0.5 uA, R1 10Meg",AUP1G17 A (TP1),high,1.8633024,>= 1.77 (VT+ max Huelle) / 1.58 (interp.),True,0.09330240000000001,0.28530239999999973
+A1 Puffer-Eingang,"VDD 2.04 V, VIO 1.96 V, Leck +0.5 uA, R1 10Meg",AUP1G17 A (TP1),low,0.36735961,<= 0.47 (VT- min Huelle) / 0.57 (interp.),True,0.10264038999999997,0.20756346692307687
+A1 Puffer-Eingang,"VDD 2.04 V, VIO 1.96 V, Leck -0.5 uA, R1 10Meg",AUP1G17 A (TP1),high,1.9401578,>= 1.77 (VT+ max Huelle) / 1.52 (interp.),True,0.17015779999999991,0.4212347230769229
+A1 Puffer-Eingang,"VDD 2.04 V, VIO 2.04 V, Leck +0.5 uA, R1 10Meg",AUP1G17 A (TP1),low,0.36893019,<= 0.47 (VT- min Huelle) / 0.60 (interp.),True,0.10106980999999998,0.23306981
+A1 Puffer-Eingang,"VDD 2.04 V, VIO 2.04 V, Leck -0.5 uA, R1 10Meg",AUP1G17 A (TP1),high,1.9417301,>= 1.77 (VT+ max Huelle) / 1.58 (interp.),True,0.1717301,0.3637300999999997
+"A1z Ruhepegel, DIO6 hochohmig","VDD = VIO = 1.96 V, Leck -0.1 uA (25 degC), R1 10Meg",AUP1G17 A (TP1),high (Ruhe),0.96001955,">= 1.04 (VT- max Huelle, haelt high) / 1.77 (VT+ max)",False,-0.07998044999999998,-0.558903526923077
+"A1z Ruhepegel, DIO6 hochohmig","VDD = VIO = 1.96 V, Leck -0.5 uA (-40..85 degC), R1 10Meg",AUP1G17 A (TP1),high (Ruhe),0.53147224,">= 1.04 (VT- max Huelle, haelt high) / 1.77 (VT+ max)",False,-0.50852776,-0.987450836923077
+"A1z Ruhepegel, DIO6 hochohmig","VDD = VIO = 2.04 V, Leck -0.1 uA (25 degC), R1 10Meg",AUP1G17 A (TP1),high (Ruhe),1.0400187,">= 1.04 (VT- max Huelle, haelt high) / 1.77 (VT+ max)",True,1.870000000003813e-05,-0.5379813000000002
+"A1z Ruhepegel, DIO6 hochohmig","VDD = VIO = 2.04 V, Leck -0.5 uA (-40..85 degC), R1 10Meg",AUP1G17 A (TP1),high (Ruhe),0.61147223,">= 1.04 (VT- max Huelle, haelt high) / 1.77 (VT+ max)",False,-0.4285277700000001,-0.9665277700000003
+A1o Puffer-Ausgang,"VIO 1.96 V, Pull-up max, Board-LED min",CH343-RXD,low,0.039932349,<= 0.50 (CH343 VIL),True,,
+A1o Puffer-Ausgang,"VIO 2.04 V, Pull-up max, Board-LED min",CH343-RXD,low,0.046851079,<= 0.50 (CH343 VIL),True,,
+A2 Behelf R9-Pad,"VDD = VIO = 2.0 V, Pull-up max, beide LED min",DIO6 = CH343-RXD,low,0.25271778,<= 0.50 (CH343 VIL),True,,
+A2 Behelf R9-Pad,"VDD = VIO = 2.2 V, Pull-up max, beide LED min",DIO6 = CH343-RXD,low,0.35941443,<= 0.50 (CH343 VIL),True,,
+A3 Behelf falsches Pad (R9-Pad 2),"VDD = VIO = 2.0 V, Pull-up min 3 uA",UART_TX_MID = CH343-RXD,low,0.42568295,<= 0.50 (CH343 VIL),True,,
+A3 Behelf falsches Pad (R9-Pad 2),"VDD = VIO = 2.0 V, Pull-up max 30 uA",UART_TX_MID = CH343-RXD,low,1.9695392,<= 0.50 (CH343 VIL),False,,
+B Sensor-RX,"VDD 1.96 V (Adapter min), LED blau MIN",DIO20,low,0.13574425,<= 0.39 (VIL 0.2 VDDS) / 1->0 min 0.64,True,0.25625575,0.5067001944444444
+B Sensor-RX,"VDD 1.96 V (Adapter min), LED blau MID",DIO20,low,0.035683869,<= 0.39 (VIL 0.2 VDDS) / 1->0 min 0.64,True,0.35631613100000004,0.6067605754444444
+B Sensor-RX,"VDD 2.0 V (Adapter nom), LED blau MIN",DIO20,low,0.16234875,<= 0.40 (VIL 0.2 VDDS) / 1->0 min 0.66,True,0.23765125000000004,0.49320680555555557
+B Sensor-RX,"VDD 2.0 V (Adapter nom), LED blau MID",DIO20,low,0.050183835,<= 0.40 (VIL 0.2 VDDS) / 1->0 min 0.66,True,0.349816165,0.6053717205555555
+B Sensor-RX,"VDD 2.04 V (Adapter max), LED blau MIN",DIO20,low,0.19041232,<= 0.41 (VIL 0.2 VDDS) / 1->0 min 0.67,True,0.21758768000000003,0.47825434666666666
+B Sensor-RX,"VDD 2.04 V (Adapter max), LED blau MID",DIO20,low,0.067743675,<= 0.41 (VIL 0.2 VDDS) / 1->0 min 0.67,True,0.340256325,0.6009229916666666
+B Sensor-RX,"VDD 2.2 V (Behelf), LED blau MIN",DIO20,low,0.31314799,<= 0.44 (VIL 0.2 VDDS) / 1->0 min 0.72,True,0.12685201000000007,0.40796312111111116
+B Sensor-RX,"VDD 2.2 V (Behelf), LED blau MID",DIO20,low,0.16234875,<= 0.44 (VIL 0.2 VDDS) / 1->0 min 0.72,True,0.27765125000000007,0.5587623611111112
+B Sensor-RX,"VDD 1.8 V (1.8 V (alt)), LED blau MIN",DIO20,low,0.050183835,<= 0.36 (VIL 0.2 VDDS) / 1->0 min 0.59,True,0.30981616500000003,0.539816165
+B Sensor-RX,"VDD 1.8 V (1.8 V (alt)), LED blau MID",DIO20,low,0.0062258958,<= 0.36 (VIL 0.2 VDDS) / 1->0 min 0.59,True,0.35377410420000005,0.5837741042

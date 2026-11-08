@@ -338,12 +338,18 @@ def main():
     for x, y, t in NOTES:
         sh.text(t, parts.g(x), parts.g(y))
     sh.write(os.path.join(PRJ, NAME + ".kicad_sch"))
-    # Projektdateien
+    # Projektdateien. Die Abschnitte "board" und "net_settings" schreibt der Layout-Generator
+    # (pcb_build.write_project); sie bleiben erhalten (Befund K-1 2026-11-08: run_all.sh hat sie geloescht).
+    pro_path = os.path.join(PRJ, NAME + ".kicad_pro")
+    old = json.load(open(pro_path)) if os.path.exists(pro_path) else {}
     pro = {"meta": {"filename": NAME + ".kicad_pro", "version": 3},
            "erc": {"erc_exclusions": [], "meta": {"version": 0}, "pin_map": [], "rule_severities": {}},
            "schematic": {"meta": {"version": 1}},
            "text_variables": {"REV": REV}}
-    with open(os.path.join(PRJ, NAME + ".kicad_pro"), "w") as fh:
+    for key in ("board", "net_settings"):
+        if key in old:
+            pro[key] = old[key]
+    with open(pro_path, "w") as fh:
         json.dump(pro, fh, indent=2)
     # Projekt-Bibliothekstabellen: Projektbibliothek + benutzte KiCad-Standardbibliotheken ueber
     # ${KICAD10_SYMBOL_DIR}/${KICAD10_FOOTPRINT_DIR} (gleich unter WSL und Windows, unabhaengig von der Benutzerkonfiguration)

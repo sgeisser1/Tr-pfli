@@ -1,0 +1,22 @@
+{
+  "meta": {
+    "filename": "fluidi_programmer.kicad_pro",
+    "version": 3
+  },
+  "erc": {
+    "erc_exclusions": [],
+    "meta": {
+      "version": 0
+    },
+    "pin_map": [],
+    "rule_severities": {}
+  },
+  "schematic": {
+    "meta": {
+      "version": 1
+    }
+  },
+  "text_variables": {
+    "REV": "1"
+  }
+}

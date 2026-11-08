@@ -1,0 +1,112 @@
+fluidi - prog_uart.py (ngspice -b), Erstprogrammierung: Pegel und Zeitverhalten
+
+(1) DC-Pegel [V]
+| Fall | Bedingung | Knoten | Pegel | V | Grenze | ok | Reserve Huelle / interp. |
+|---|---|---|---|---|---|---|---|
+| A0 ohne Puffer (Ist) | VIO 1.8 V, Pull-up min 3 uA, Board-LED MAX | CH343-RXD (TP1) | low | 0.642 | <= 0.50 (CH343 VIL) | NEIN |  |
+| A0 ohne Puffer (Ist) | VIO 1.8 V, Pull-up min 3 uA, Board-LED MIN | CH343-RXD (TP1) | low | 0.642 | <= 0.50 (CH343 VIL) | NEIN |  |
+| A0 ohne Puffer (Ist) | VIO 1.8 V, Pull-up typ 14 uA, Board-LED MAX | CH343-RXD (TP1) | low | 1.769 | <= 0.50 (CH343 VIL) | NEIN |  |
+| A0 ohne Puffer (Ist) | VIO 1.8 V, Pull-up typ 14 uA, Board-LED MIN | CH343-RXD (TP1) | low | 1.769 | <= 0.50 (CH343 VIL) | NEIN |  |
+| A0 ohne Puffer (Ist) | VIO 1.8 V, Pull-up max 21 uA, Board-LED MAX | CH343-RXD (TP1) | low | 1.779 | <= 0.50 (CH343 VIL) | NEIN |  |
+| A0 ohne Puffer (Ist) | VIO 1.8 V, Pull-up max 21 uA, Board-LED MIN | CH343-RXD (TP1) | low | 1.779 | <= 0.50 (CH343 VIL) | NEIN |  |
+| A0 ohne Puffer (Ist) | VIO 2.0 V, Pull-up min 3 uA, Board-LED MAX | CH343-RXD (TP1) | low | 0.726 | <= 0.50 (CH343 VIL) | NEIN |  |
+| A0 ohne Puffer (Ist) | VIO 2.0 V, Pull-up min 3 uA, Board-LED MIN | CH343-RXD (TP1) | low | 0.729 | <= 0.50 (CH343 VIL) | NEIN |  |
+| A0 ohne Puffer (Ist) | VIO 2.0 V, Pull-up typ 14 uA, Board-LED MAX | CH343-RXD (TP1) | low | 1.967 | <= 0.50 (CH343 VIL) | NEIN |  |
+| A0 ohne Puffer (Ist) | VIO 2.0 V, Pull-up typ 14 uA, Board-LED MIN | CH343-RXD (TP1) | low | 1.967 | <= 0.50 (CH343 VIL) | NEIN |  |
+| A0 ohne Puffer (Ist) | VIO 2.0 V, Pull-up max 30 uA, Board-LED MAX | CH343-RXD (TP1) | low | 1.985 | <= 0.50 (CH343 VIL) | NEIN |  |
+| A0 ohne Puffer (Ist) | VIO 2.0 V, Pull-up max 30 uA, Board-LED MIN | CH343-RXD (TP1) | low | 1.985 | <= 0.50 (CH343 VIL) | NEIN |  |
+| A1 Puffer-Eingang | VDD 1.96 V, VIO 1.96 V, Leck +0.5 uA, R1 10Meg | AUP1G17 A (TP1) | low | 0.331 | <= 0.47 (VT- min Huelle) / 0.57 (interp.) | ja | +139 / +244 mV |
+| A1 Puffer-Eingang | VDD 1.96 V, VIO 1.96 V, Leck -0.5 uA, R1 10Meg | AUP1G17 A (TP1) | high | 1.862 | >= 1.77 (VT+ max Huelle) / 1.52 (interp.) | ja | +92 / +343 mV |
+| A1 Puffer-Eingang | VDD 1.96 V, VIO 2.04 V, Leck +0.5 uA, R1 10Meg | AUP1G17 A (TP1) | low | 0.332 | <= 0.47 (VT- min Huelle) / 0.60 (interp.) | ja | +138 / +270 mV |
+| A1 Puffer-Eingang | VDD 1.96 V, VIO 2.04 V, Leck -0.5 uA, R1 10Meg | AUP1G17 A (TP1) | high | 1.863 | >= 1.77 (VT+ max Huelle) / 1.58 (interp.) | ja | +93 / +285 mV |
+| A1 Puffer-Eingang | VDD 2.04 V, VIO 1.96 V, Leck +0.5 uA, R1 10Meg | AUP1G17 A (TP1) | low | 0.367 | <= 0.47 (VT- min Huelle) / 0.57 (interp.) | ja | +103 / +208 mV |
+| A1 Puffer-Eingang | VDD 2.04 V, VIO 1.96 V, Leck -0.5 uA, R1 10Meg | AUP1G17 A (TP1) | high | 1.940 | >= 1.77 (VT+ max Huelle) / 1.52 (interp.) | ja | +170 / +421 mV |
+| A1 Puffer-Eingang | VDD 2.04 V, VIO 2.04 V, Leck +0.5 uA, R1 10Meg | AUP1G17 A (TP1) | low | 0.369 | <= 0.47 (VT- min Huelle) / 0.60 (interp.) | ja | +101 / +233 mV |
+| A1 Puffer-Eingang | VDD 2.04 V, VIO 2.04 V, Leck -0.5 uA, R1 10Meg | AUP1G17 A (TP1) | high | 1.942 | >= 1.77 (VT+ max Huelle) / 1.58 (interp.) | ja | +172 / +364 mV |
+| A1z Ruhepegel, DIO6 hochohmig | VDD = VIO = 1.96 V, Leck -0.1 uA (25 degC), R1 10Meg | AUP1G17 A (TP1) | high (Ruhe) | 0.960 | >= 1.04 (VT- max Huelle, haelt high) / 1.77 (VT+ max) | NEIN | -80 / -559 mV |
+| A1z Ruhepegel, DIO6 hochohmig | VDD = VIO = 1.96 V, Leck -0.5 uA (-40..85 degC), R1 10Meg | AUP1G17 A (TP1) | high (Ruhe) | 0.531 | >= 1.04 (VT- max Huelle, haelt high) / 1.77 (VT+ max) | NEIN | -509 / -987 mV |
+| A1z Ruhepegel, DIO6 hochohmig | VDD = VIO = 2.04 V, Leck -0.1 uA (25 degC), R1 10Meg | AUP1G17 A (TP1) | high (Ruhe) | 1.040 | >= 1.04 (VT- max Huelle, haelt high) / 1.77 (VT+ max) | ja | +0 / -538 mV |
+| A1z Ruhepegel, DIO6 hochohmig | VDD = VIO = 2.04 V, Leck -0.5 uA (-40..85 degC), R1 10Meg | AUP1G17 A (TP1) | high (Ruhe) | 0.611 | >= 1.04 (VT- max Huelle, haelt high) / 1.77 (VT+ max) | NEIN | -429 / -967 mV |
+| A1o Puffer-Ausgang | VIO 1.96 V, Pull-up max, Board-LED min | CH343-RXD | low | 0.040 | <= 0.50 (CH343 VIL) | ja |  |
+| A1o Puffer-Ausgang | VIO 2.04 V, Pull-up max, Board-LED min | CH343-RXD | low | 0.047 | <= 0.50 (CH343 VIL) | ja |  |
+| A2 Behelf R9-Pad | VDD = VIO = 2.0 V, Pull-up max, beide LED min | DIO6 = CH343-RXD | low | 0.253 | <= 0.50 (CH343 VIL) | ja |  |
+| A2 Behelf R9-Pad | VDD = VIO = 2.2 V, Pull-up max, beide LED min | DIO6 = CH343-RXD | low | 0.359 | <= 0.50 (CH343 VIL) | ja |  |
+| A3 Behelf falsches Pad (R9-Pad 2) | VDD = VIO = 2.0 V, Pull-up min 3 uA | UART_TX_MID = CH343-RXD | low | 0.426 | <= 0.50 (CH343 VIL) | ja |  |
+| A3 Behelf falsches Pad (R9-Pad 2) | VDD = VIO = 2.0 V, Pull-up max 30 uA | UART_TX_MID = CH343-RXD | low | 1.970 | <= 0.50 (CH343 VIL) | NEIN |  |
+| B Sensor-RX | VDD 1.96 V (Adapter min), LED blau MIN | DIO20 | low | 0.136 | <= 0.39 (VIL 0.2 VDDS) / 1->0 min 0.64 | ja | +256 / +507 mV |
+| B Sensor-RX | VDD 1.96 V (Adapter min), LED blau MID | DIO20 | low | 0.036 | <= 0.39 (VIL 0.2 VDDS) / 1->0 min 0.64 | ja | +356 / +607 mV |
+| B Sensor-RX | VDD 2.0 V (Adapter nom), LED blau MIN | DIO20 | low | 0.162 | <= 0.40 (VIL 0.2 VDDS) / 1->0 min 0.66 | ja | +238 / +493 mV |
+| B Sensor-RX | VDD 2.0 V (Adapter nom), LED blau MID | DIO20 | low | 0.050 | <= 0.40 (VIL 0.2 VDDS) / 1->0 min 0.66 | ja | +350 / +605 mV |
+| B Sensor-RX | VDD 2.04 V (Adapter max), LED blau MIN | DIO20 | low | 0.190 | <= 0.41 (VIL 0.2 VDDS) / 1->0 min 0.67 | ja | +218 / +478 mV |
+| B Sensor-RX | VDD 2.04 V (Adapter max), LED blau MID | DIO20 | low | 0.068 | <= 0.41 (VIL 0.2 VDDS) / 1->0 min 0.67 | ja | +340 / +601 mV |
+| B Sensor-RX | VDD 2.2 V (Behelf), LED blau MIN | DIO20 | low | 0.313 | <= 0.44 (VIL 0.2 VDDS) / 1->0 min 0.72 | ja | +127 / +408 mV |
+| B Sensor-RX | VDD 2.2 V (Behelf), LED blau MID | DIO20 | low | 0.162 | <= 0.44 (VIL 0.2 VDDS) / 1->0 min 0.72 | ja | +278 / +559 mV |
+| B Sensor-RX | VDD 1.8 V (1.8 V (alt)), LED blau MIN | DIO20 | low | 0.050 | <= 0.36 (VIL 0.2 VDDS) / 1->0 min 0.59 | ja | +310 / +540 mV |
+| B Sensor-RX | VDD 1.8 V (1.8 V (alt)), LED blau MID | DIO20 | low | 0.006 | <= 0.36 (VIL 0.2 VDDS) / 1->0 min 0.59 | ja | +354 / +584 mV |
+
+(2) Transient: Bytes 55 55 00 FF 01 80 CC 33, Taktfehler +-1.5 %, Kriterium Reserve >= 0.2 Bit
+| Richtung | Baud | Kapazitaeten | Schwellen | V low / high eingeschw. | t10-90 steigend [us] | fallend [us] | Bytes ok | Reserve [Bit] | ok |
+|---|---|---|---|---|---|---|---|---|---|
+| Sensor->Host (TP1, Puffer) | 19200 | nominal (1/2/5 pF) | interp. VT+max/VT-min | 0.350 / 2.098 | 3.13 | 3.13 | ja | 0.350 | ja |
+| Sensor->Host (TP1, Puffer) | 19200 | nominal (1/2/5 pF) | interp. VT+min/VT-max | 0.350 / 2.098 | 3.13 | 3.13 | ja | 0.357 | ja |
+| Sensor->Host (TP1, Puffer) | 19200 | nominal (1/2/5 pF) | Huelle VT+1.77/VT-0.47 | 0.350 / 2.098 | 3.13 | 3.13 | ja | 0.345 | ja |
+| Sensor->Host (TP1, Puffer) | 19200 | schlecht (3/3/10 pF) | interp. VT+max/VT-min | 0.350 / 2.098 | 5.96 | 5.95 | ja | 0.329 | ja |
+| Sensor->Host (TP1, Puffer) | 19200 | schlecht (3/3/10 pF) | interp. VT+min/VT-max | 0.350 / 2.098 | 5.96 | 5.95 | ja | 0.349 | ja |
+| Sensor->Host (TP1, Puffer) | 19200 | schlecht (3/3/10 pF) | Huelle VT+1.77/VT-0.47 | 0.350 / 2.098 | 5.96 | 5.95 | ja | 0.320 | ja |
+| Sensor->Host (TP1, Puffer) | 19200 | Puffer am Kabelende (1/2/40 pF) | interp. VT+max/VT-min | 0.350 / 2.098 | 18.25 | 18.22 | ja | 0.240 | ja |
+| Sensor->Host (TP1, Puffer) | 19200 | Puffer am Kabelende (1/2/40 pF) | interp. VT+min/VT-max | 0.350 / 2.098 | 18.25 | 18.22 | ja | 0.300 | ja |
+| Sensor->Host (TP1, Puffer) | 19200 | Puffer am Kabelende (1/2/40 pF) | Huelle VT+1.77/VT-0.47 | 0.350 / 2.098 | 18.25 | 18.22 | ja | 0.213 | ja |
+| Sensor->Host (TP1, Puffer) | 38400 | nominal (1/2/5 pF) | interp. VT+max/VT-min | 0.350 / 2.098 | 3.13 | 3.13 | ja | 0.327 | ja |
+| Sensor->Host (TP1, Puffer) | 38400 | nominal (1/2/5 pF) | interp. VT+min/VT-max | 0.350 / 2.098 | 3.13 | 3.13 | ja | 0.348 | ja |
+| Sensor->Host (TP1, Puffer) | 38400 | nominal (1/2/5 pF) | Huelle VT+1.77/VT-0.47 | 0.350 / 2.098 | 3.13 | 3.13 | ja | 0.318 | ja |
+| Sensor->Host (TP1, Puffer) | 38400 | schlecht (3/3/10 pF) | interp. VT+max/VT-min | 0.350 / 2.098 | 5.97 | 5.96 | ja | 0.286 | ja |
+| Sensor->Host (TP1, Puffer) | 38400 | schlecht (3/3/10 pF) | interp. VT+min/VT-max | 0.350 / 2.098 | 5.97 | 5.96 | ja | 0.325 | ja |
+| Sensor->Host (TP1, Puffer) | 38400 | schlecht (3/3/10 pF) | Huelle VT+1.77/VT-0.47 | 0.350 / 2.098 | 5.97 | 5.96 | ja | 0.268 | ja |
+| Sensor->Host (TP1, Puffer) | 38400 | Puffer am Kabelende (1/2/40 pF) | interp. VT+max/VT-min | 0.350 / 2.098 | 18.25 | 18.23 | ja | 0.094 | NEIN |
+| Sensor->Host (TP1, Puffer) | 38400 | Puffer am Kabelende (1/2/40 pF) | interp. VT+min/VT-max | 0.350 / 2.098 | 18.25 | 18.23 | ja | 0.215 | ja |
+| Sensor->Host (TP1, Puffer) | 38400 | Puffer am Kabelende (1/2/40 pF) | Huelle VT+1.77/VT-0.47 | 0.350 / 2.098 | 18.25 | 18.23 | ja | 0.040 | NEIN |
+| Sensor->Host (TP1, Puffer) | 57600 | nominal (1/2/5 pF) | interp. VT+max/VT-min | 0.350 / 2.098 | 3.14 | 3.13 | ja | 0.304 | ja |
+| Sensor->Host (TP1, Puffer) | 57600 | nominal (1/2/5 pF) | interp. VT+min/VT-max | 0.350 / 2.098 | 3.14 | 3.13 | ja | 0.335 | ja |
+| Sensor->Host (TP1, Puffer) | 57600 | nominal (1/2/5 pF) | Huelle VT+1.77/VT-0.47 | 0.350 / 2.098 | 3.14 | 3.13 | ja | 0.290 | ja |
+| Sensor->Host (TP1, Puffer) | 57600 | schlecht (3/3/10 pF) | interp. VT+max/VT-min | 0.350 / 2.098 | 5.97 | 5.96 | ja | 0.242 | ja |
+| Sensor->Host (TP1, Puffer) | 57600 | schlecht (3/3/10 pF) | interp. VT+min/VT-max | 0.350 / 2.098 | 5.97 | 5.96 | ja | 0.302 | ja |
+| Sensor->Host (TP1, Puffer) | 57600 | schlecht (3/3/10 pF) | Huelle VT+1.77/VT-0.47 | 0.350 / 2.098 | 5.97 | 5.96 | ja | 0.216 | ja |
+| Sensor->Host (TP1, Puffer) | 57600 | Puffer am Kabelende (1/2/40 pF) | interp. VT+max/VT-min | 0.350 / 2.098 | 18.24 | 18.23 | NEIN | 0.005 | NEIN |
+| Sensor->Host (TP1, Puffer) | 57600 | Puffer am Kabelende (1/2/40 pF) | interp. VT+min/VT-max | 0.350 / 2.098 | 18.24 | 18.23 | ja | 0.101 | NEIN |
+| Sensor->Host (TP1, Puffer) | 57600 | Puffer am Kabelende (1/2/40 pF) | Huelle VT+1.77/VT-0.47 | 0.350 / 2.098 | 18.24 | 18.23 | NEIN | 0.002 | NEIN |
+| Host->Sensor (DIO20), VDD 2.0 V | 19200 | nominal, LED 0 pF | 0->1 max / 1->0 min | 0.162 / 2.000 | 3.19 | 2.42 | ja | 0.357 | ja |
+| Host->Sensor (DIO20), VDD 2.0 V | 19200 | nominal, LED 0 pF | 0->1 min / 1->0 max | 0.162 / 2.000 | 3.19 | 2.42 | ja | 0.357 | ja |
+| Host->Sensor (DIO20), VDD 2.0 V | 19200 | schlecht, LED 15 pF | 0->1 max / 1->0 min | 0.162 / 2.000 | 10.90 | 8.26 | ja | 0.356 | ja |
+| Host->Sensor (DIO20), VDD 2.0 V | 19200 | schlecht, LED 15 pF | 0->1 min / 1->0 max | 0.162 / 2.000 | 10.90 | 8.26 | ja | 0.357 | ja |
+| Host->Sensor (DIO20), VDD 2.0 V | 19200 | schlecht, LED 30 pF | 0->1 max / 1->0 min | 0.162 / 2.000 | 17.49 | 13.25 | ja | 0.354 | ja |
+| Host->Sensor (DIO20), VDD 2.0 V | 19200 | schlecht, LED 30 pF | 0->1 min / 1->0 max | 0.162 / 2.000 | 17.49 | 13.25 | ja | 0.357 | ja |
+| Host->Sensor (DIO20), VDD 2.0 V | 38400 | nominal, LED 0 pF | 0->1 max / 1->0 min | 0.162 / 2.000 | 3.19 | 2.42 | ja | 0.356 | ja |
+| Host->Sensor (DIO20), VDD 2.0 V | 38400 | nominal, LED 0 pF | 0->1 min / 1->0 max | 0.162 / 2.000 | 3.19 | 2.42 | ja | 0.357 | ja |
+| Host->Sensor (DIO20), VDD 2.0 V | 38400 | schlecht, LED 15 pF | 0->1 max / 1->0 min | 0.162 / 2.000 | 10.90 | 8.26 | ja | 0.353 | ja |
+| Host->Sensor (DIO20), VDD 2.0 V | 38400 | schlecht, LED 15 pF | 0->1 min / 1->0 max | 0.162 / 2.000 | 10.90 | 8.26 | ja | 0.357 | ja |
+| Host->Sensor (DIO20), VDD 2.0 V | 38400 | schlecht, LED 30 pF | 0->1 max / 1->0 min | 0.162 / 2.000 | 17.49 | 13.25 | ja | 0.341 | ja |
+| Host->Sensor (DIO20), VDD 2.0 V | 38400 | schlecht, LED 30 pF | 0->1 min / 1->0 max | 0.162 / 2.000 | 17.49 | 13.25 | ja | 0.347 | ja |
+| Host->Sensor (DIO20), VDD 2.0 V | 57600 | nominal, LED 0 pF | 0->1 max / 1->0 min | 0.162 / 2.000 | 3.19 | 2.42 | ja | 0.356 | ja |
+| Host->Sensor (DIO20), VDD 2.0 V | 57600 | nominal, LED 0 pF | 0->1 min / 1->0 max | 0.162 / 2.000 | 3.19 | 2.42 | ja | 0.357 | ja |
+| Host->Sensor (DIO20), VDD 2.0 V | 57600 | schlecht, LED 15 pF | 0->1 max / 1->0 min | 0.162 / 2.000 | 10.90 | 8.26 | ja | 0.344 | ja |
+| Host->Sensor (DIO20), VDD 2.0 V | 57600 | schlecht, LED 15 pF | 0->1 min / 1->0 max | 0.162 / 2.000 | 10.90 | 8.26 | ja | 0.349 | ja |
+| Host->Sensor (DIO20), VDD 2.0 V | 57600 | schlecht, LED 30 pF | 0->1 max / 1->0 min | 0.162 / 2.000 | 17.49 | 13.25 | ja | 0.300 | ja |
+| Host->Sensor (DIO20), VDD 2.0 V | 57600 | schlecht, LED 30 pF | 0->1 min / 1->0 max | 0.162 / 2.000 | 17.49 | 13.25 | ja | 0.307 | ja |
+| Host->Sensor (DIO20), VDD 2.2 V | 19200 | nominal, LED 0 pF | 0->1 max / 1->0 min | 0.313 / 2.200 | 3.19 | 2.03 | ja | 0.357 | ja |
+| Host->Sensor (DIO20), VDD 2.2 V | 19200 | nominal, LED 0 pF | 0->1 min / 1->0 max | 0.313 / 2.200 | 3.19 | 2.03 | ja | 0.357 | ja |
+| Host->Sensor (DIO20), VDD 2.2 V | 19200 | schlecht, LED 15 pF | 0->1 max / 1->0 min | 0.313 / 2.200 | 10.89 | 6.92 | ja | 0.357 | ja |
+| Host->Sensor (DIO20), VDD 2.2 V | 19200 | schlecht, LED 15 pF | 0->1 min / 1->0 max | 0.313 / 2.200 | 10.89 | 6.92 | ja | 0.357 | ja |
+| Host->Sensor (DIO20), VDD 2.2 V | 19200 | schlecht, LED 30 pF | 0->1 max / 1->0 min | 0.313 / 2.200 | 17.49 | 11.10 | ja | 0.357 | ja |
+| Host->Sensor (DIO20), VDD 2.2 V | 19200 | schlecht, LED 30 pF | 0->1 min / 1->0 max | 0.313 / 2.200 | 17.49 | 11.10 | ja | 0.351 | ja |
+| Host->Sensor (DIO20), VDD 2.2 V | 38400 | nominal, LED 0 pF | 0->1 max / 1->0 min | 0.313 / 2.200 | 3.19 | 2.03 | ja | 0.357 | ja |
+| Host->Sensor (DIO20), VDD 2.2 V | 38400 | nominal, LED 0 pF | 0->1 min / 1->0 max | 0.313 / 2.200 | 3.19 | 2.03 | ja | 0.357 | ja |
+| Host->Sensor (DIO20), VDD 2.2 V | 38400 | schlecht, LED 15 pF | 0->1 max / 1->0 min | 0.313 / 2.200 | 10.90 | 6.92 | ja | 0.357 | ja |
+| Host->Sensor (DIO20), VDD 2.2 V | 38400 | schlecht, LED 15 pF | 0->1 min / 1->0 max | 0.313 / 2.200 | 10.90 | 6.92 | ja | 0.346 | ja |
+| Host->Sensor (DIO20), VDD 2.2 V | 38400 | schlecht, LED 30 pF | 0->1 max / 1->0 min | 0.313 / 2.200 | 17.49 | 11.10 | ja | 0.347 | ja |
+| Host->Sensor (DIO20), VDD 2.2 V | 38400 | schlecht, LED 30 pF | 0->1 min / 1->0 max | 0.313 / 2.200 | 17.49 | 11.10 | ja | 0.330 | ja |
+| Host->Sensor (DIO20), VDD 2.2 V | 57600 | nominal, LED 0 pF | 0->1 max / 1->0 min | 0.313 / 2.200 | 3.19 | 2.03 | ja | 0.357 | ja |
+| Host->Sensor (DIO20), VDD 2.2 V | 57600 | nominal, LED 0 pF | 0->1 min / 1->0 max | 0.313 / 2.200 | 3.19 | 2.03 | ja | 0.357 | ja |
+| Host->Sensor (DIO20), VDD 2.2 V | 57600 | schlecht, LED 15 pF | 0->1 max / 1->0 min | 0.313 / 2.200 | 10.90 | 6.92 | ja | 0.350 | ja |
+| Host->Sensor (DIO20), VDD 2.2 V | 57600 | schlecht, LED 15 pF | 0->1 min / 1->0 max | 0.313 / 2.200 | 10.90 | 6.92 | ja | 0.333 | ja |
+| Host->Sensor (DIO20), VDD 2.2 V | 57600 | schlecht, LED 30 pF | 0->1 max / 1->0 min | 0.313 / 2.200 | 17.49 | 11.10 | ja | 0.311 | ja |
+| Host->Sensor (DIO20), VDD 2.2 V | 57600 | schlecht, LED 30 pF | 0->1 min / 1->0 max | 0.313 / 2.200 | 17.49 | 11.10 | ja | 0.308 | ja |

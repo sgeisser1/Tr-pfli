@@ -7,6 +7,7 @@ Q2 an DIO11, TMP1075N im Kragen, 4 × 100 µF im Prototyp). Alle Läufe per Skri
 .venv/bin/python simulation/spice/supply/supply_burst.py > simulation/spice/supply/supply_report.txt   # (a) ca. 2 min
 .venv/bin/python simulation/spice/osc/osc_sim.py                  # (b) ca. 8 min, schreibt osc/osc_report.txt
 .venv/bin/python simulation/spice/uart_backfeed/uart_backfeed.py  # (c) < 10 s
+.venv/bin/python simulation/spice/programmer/prog_uart.py          # (d) ca. 15 s, Erstprogrammierung (2026-11-08)
 ```
 
 Jedes Skript schreibt die Netzliste (`*.cir`, letzter Fall), eine CSV mit allen Fällen und PNG-Plots in seinen Ordner.
@@ -115,6 +116,24 @@ ESD-Struktur ist gleich gross wie der Padstrom (≤ 46 µA je Pin). Das Datenbla
 das eine PROTOTYP-PRÜFUNG nach R2-A4.
 
 Plot: `uart_backfeed/uart_backfeed.png`.
+
+## (d) Erstprogrammierung: UART-Pegel und Flanken mit Programmieradapter Rev 1 (Red-Team W-4, B-4)
+
+Modell und Quellen im Kopf von `programmer/prog_uart.py`; Adapter `hardware/programmer/README.md`, Ablauf
+`docs/manuals/PROGRAMMIEREN_SENSOR.md`. CH343-Pull-up als abregelnde Stromquelle nach VIO, Waveshare-RXD-LED (2 kΩ),
+LED-Modelle aus `led_rgb/led_models.inc`. Kapazitäten (**ANNAHME**): R9/R10-Knoten 1–3 pF, TP1 2–3 pF, Stift + Draht +
+Puffer 5–10 pF, DIO20 7–9 pF, blaue LED 0–30 pF. Bericht `programmer/prog_uart_report.txt`.
+
+| Fall | Ergebnis | Grenze |
+|---|---|---|
+| A0 ohne Puffer (bisheriges Konzept), CH343-RXD an TP1 | Low 0.64 V (Pull-up 3 µA, 1.8 V) bis 1.99 V (Pull-up typ/max) | 0.5 V → **nicht lesbar** |
+| A1 SN74AUP1G17 am Federstift, R1 10 MΩ, Leck ±0.5 µA, 1.96–2.04 V | Low 0.331–0.369 V, High 1.862–1.942 V | VT− ≥ 0.47 V, VT+ ≤ 1.77 V (Hülle 1.65/2.3 V): Reserve **+101 / +92 mV** |
+| A2 Behelf, CH343-RXD an R9 Pad 1 (DIO6), 2.0 / 2.2 V | Low 0.253 / 0.359 V | 0.5 V |
+| A3 Behelf am falschen Pad (R9 Pad 2) | Low 0.43 V (3 µA) bis 1.97 V (30 µA) | **nicht lesbar** |
+| B Sensor-RX DIO20 (blaue LED VF-min), 1.96 / 2.04 / 2.2 V | Low 0.136 / 0.190 / 0.313 V | VIL 0.2 × VDDS: Reserve +256 / +218 / +127 mV |
+| Zeitverhalten TX (Puffer am Stift), 57600 Baud | t10–90 3.1 µs (nominal) / 6.0 µs (schlecht); Reserve 0.290 / 0.216 Bit | ≥ 0.20 Bit (**ANNAHME**) |
+| Zeitverhalten TX, Puffer am Kabelende (40 pF) | 18.2 µs; 57600 Baud: Bytes falsch | → Puffer muss am Stift sitzen |
+| Zeitverhalten RX (DIO20), 57600 Baud | t10–90 3.2/2.4 µs (LED 0 pF) bis 17.5/13.3 µs (LED 30 pF); Reserve ≥ 0.300 Bit | ≥ 0.20 Bit |
 
 ## Offene Punkte
 

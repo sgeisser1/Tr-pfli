@@ -8,10 +8,13 @@ Protokoll nach docs/datasheets/TI_CC23xx_TechnicalReferenceManual_SWCU193A.pdf K
   - Befehle (Tab. 8-39): PING 0x20, GET_STATUS 0x21, GET_PART_ID 0x22, RESET 0x23, CHIP_ERASE 0x24, CRC32 0x25,
     DOWNLOAD 0x26, DOWNLOAD_CRC 0x27, SEND_DATA 0x28 (max. 253 Datenbyte, hier 248). Statuscodes Tab. 8-40.
   - Ablauf wie TRM 8.5.4: Chip-Erase -> Hauptflash (DOWNLOAD_CRC + SEND_DATA) -> CCFG 0x4E020000 (2048 B) -> Reset.
-  - Bootloader-Start: Taster (DIO21) beim Einsetzen des Dummy-Zellen-Adapters gedrueckt halten (TRM S.465).
+  - Bootloader-Start: Taster (DIO21) beim Einsetzen des Dummy-Zellen-Adapters gedrueckt halten, danach loslassen
+    (TRM S.465; ein leerer Chip startet den Bootloader ohnehin, TRM S.461). Ablauf: docs/manuals/PROGRAMMIEREN_SENSOR.md.
 
 Sicherheit (CONCEPTS 2.7, Auflagen R2-A1..A4): nur mit Dummy-Zellen-Adapter (keine Zelle im Halter), UART-Pegel
-1.8-2.0 V (PINMAP Rev B, DIO20), 2 x 100 kOhm je Pad -> hoechstens 57600 Baud (Werkzeug erzwingt das).
+2.0 V (Programmieradapter hardware/programmer, CH343-VIO an derselben 2.0-V-Speisung; Behelf am offenen Board:
+Labornetzteil 2.0-2.2 V), 2 x 100 kOhm je Pad -> hoechstens 57600 Baud (Werkzeug erzwingt das; SPICE
+simulation/spice/programmer: Reserve >= 0.22 Bit bei 57600 Baud mit Puffer am Federstift).
 
 Serie (--lock, Befunde F-W1/F-W2 Sicherheitspruefung): nur zusammen mit --expect-key-fp <Fingerabdruck des
 PRODUKTIONS-Signierschluessels>; das Werkzeug liest den in MCUboot eingebauten oeffentlichen Schluessel aus dem Hex,
@@ -86,6 +89,9 @@ class Link:
         raise BootloaderError("nur 0x00 empfangen")
 
     def sync(self):
+        # Bytes, die vor dem Sync ankamen (z. B. Stoerungen beim Einsetzen des Adapters), verwerfen
+        if hasattr(self.port, "reset_input_buffer"):
+            self.port.reset_input_buffer()
         self.port.write(b"\x55\x55")
         if self._read_nonzero() != ACK:
             raise BootloaderError("Autobaud: kein ACK")
@@ -416,7 +422,8 @@ def program(link: Link, hexfile: str, lock: bool, out=print, do_reset: bool = Tr
     out("[flash] CCFG geschrieben und verifiziert%s" % (" – BOOTLOADER/SWD GESPERRT" if lock else ""))
     if do_reset:
         link.reset()
-        out("[flash] Reset – Taster loslassen, Sensor startet (L11)")
+        out("[flash] Reset – Sensor startet die Anwendung (Taster muss losgelassen sein, sonst startet wieder der "
+            "Bootloader)")
 
 
 def main(argv=None):
@@ -456,8 +463,9 @@ def main(argv=None):
         if not a.port:
             ap.error("--port fehlt (oder --sim / --dry-run)")
         if not a.yes:
-            print("Sicherheit (CONCEPTS 2.7): KEINE Zelle im Halter, Dummy-Zellen-Adapter 1.8-2.0 V, UART 1.8 V,")
-            print("Taster beim Einsetzen gedrueckt halten (ROM-Bootloader). Weiter mit 'ja': ", end="")
+            print("Sicherheit (CONCEPTS 2.7): KEINE Zelle im Halter. Speisung nur ueber den Dummy-Zellen-Adapter 2.0 V")
+            print("(bzw. Behelf: Labornetzteil 2.0-2.2 V, <= 20 mA). CH343-VIO = dieselbe 2.0-V-Speisung.")
+            print("Taster beim Einsetzen gedrueckt halten, dann loslassen (ROM-Bootloader). Weiter mit 'ja': ", end="")
             if input().strip().lower() != "ja":
                 return 1
         import serial  # pyserial

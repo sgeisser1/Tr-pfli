@@ -2,7 +2,7 @@
 	(version "E")
 	(design
 		(source "/home/sgeisser/git/Tr-pfli/hardware/sensor/fluidi_sensor.kicad_sch")
-		(date "2026-11-08T00:47:32")
+		(date "2026-11-08T10:51:32")
 		(tool "Eeschema 10.0.8-10.0.8~ubuntu24.04.1")
 		(textvar
 			(name "REV") "B")
@@ -5299,7 +5299,7 @@
 				(field
 					(name "Value") "TMP1075NDRLR")
 				(field
-					(name "Footprint") "Package_TO_SOT_SMD:SOT-563")
+					(name "Footprint") "fluidi:SOT-563_TI_DRL0006A")
 				(field
 					(name "Datasheet") "docs/datasheets/TI_TMP1075_Datasheet_SBOS854F.pdf")
 				(field

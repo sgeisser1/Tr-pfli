@@ -1,0 +1,1528 @@
+(export
+	(version "E")
+	(design
+		(source "/home/sgeisser/git/Tr-pfli/hardware/programmer/fluidi_programmer.kicad_sch")
+		(date "2026-11-08T11:22:59")
+		(tool "Eeschema 10.0.8-10.0.8~ubuntu24.04.1")
+		(textvar
+			(name "REV") "1")
+		(sheet
+			(number "1")
+			(name "/")
+			(tstamps "/")
+			(title_block
+				(title "fluidi Programmieradapter (Dummy-Zelle + TX-Puffer)")
+				(company "fluidi (Projekt Tr-pfli)")
+				(rev "1")
+				(date "2026-11-08")
+				(source "fluidi_programmer.kicad_sch")
+				(comment
+					(number "1")
+					(value "Werkzeug, nicht Teil des Sensors. Erstprogrammierung ueber ROM-UART-Bootloader")
+				)
+				(comment
+					(number "2")
+					(value "Generiert: hardware/programmer/gen/gen_programmer.py - nicht von Hand aendern")
+				)
+				(comment
+					(number "3")
+					(value "Sicherheit: Speisung NUR ueber die Dummy-Zelle, nie mit echter Zelle (R2-A2)")
+				)
+				(comment
+					(number "4")
+					(value "Begruendung, Stueckliste, Aufbau: hardware/programmer/README.md")
+				)
+				(comment
+					(number "5")
+					(value "")
+				)
+				(comment
+					(number "6")
+					(value "")
+				)
+				(comment
+					(number "7")
+					(value "")
+				)
+				(comment
+					(number "8")
+					(value "")
+				)
+				(comment
+					(number "9")
+					(value "")
+				)
+			)
+		)
+	)
+	(components
+		(comp
+			(ref "C1")
+			(value "1u")
+			(footprint "Capacitor_SMD:C_0805_2012Metric")
+			(datasheet "docs/datasheets/Samsung_CL31A107MQHNNNE_Catalog_2015-11.pdf")
+			(description "MLCC 1 uF 50 V X7R 0805 (CIN/CL nach XC6206 DS S. 1); CIN U1")
+			(fields
+				(field
+					(name "LCSC") "C28323")
+				(field
+					(name "Hersteller") "Samsung Electro-Mechanics")
+				(field
+					(name "MPN") "CL21B105KBFNNNE")
+				(field
+					(name "Footprint") "Capacitor_SMD:C_0805_2012Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/Samsung_CL31A107MQHNNNE_Catalog_2015-11.pdf")
+				(field
+					(name "Description") "MLCC 1 uF 50 V X7R 0805 (CIN/CL nach XC6206 DS S. 1); CIN U1")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "LCSC")
+				(value "C28323")
+			)
+			(property
+				(name "Hersteller")
+				(value "Samsung Electro-Mechanics")
+			)
+			(property
+				(name "MPN")
+				(value "CL21B105KBFNNNE")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_programmer")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_programmer.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "ddb1127f-d85b-50ec-a716-69a82fea32c5")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C2")
+			(value "1u")
+			(footprint "Capacitor_SMD:C_0805_2012Metric")
+			(datasheet "docs/datasheets/Samsung_CL31A107MQHNNNE_Catalog_2015-11.pdf")
+			(description "MLCC 1 uF 50 V X7R 0805 (CIN/CL nach XC6206 DS S. 1); CL U1 = CIN U2/U3")
+			(fields
+				(field
+					(name "LCSC") "C28323")
+				(field
+					(name "Hersteller") "Samsung Electro-Mechanics")
+				(field
+					(name "MPN") "CL21B105KBFNNNE")
+				(field
+					(name "Footprint") "Capacitor_SMD:C_0805_2012Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/Samsung_CL31A107MQHNNNE_Catalog_2015-11.pdf")
+				(field
+					(name "Description") "MLCC 1 uF 50 V X7R 0805 (CIN/CL nach XC6206 DS S. 1); CL U1 = CIN U2/U3")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "LCSC")
+				(value "C28323")
+			)
+			(property
+				(name "Hersteller")
+				(value "Samsung Electro-Mechanics")
+			)
+			(property
+				(name "MPN")
+				(value "CL21B105KBFNNNE")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_programmer")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_programmer.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "0f943f80-75a8-5570-b5d6-c36e40a9704b")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C3")
+			(value "1u")
+			(footprint "Capacitor_SMD:C_0805_2012Metric")
+			(datasheet "docs/datasheets/Samsung_CL31A107MQHNNNE_Catalog_2015-11.pdf")
+			(description "MLCC 1 uF 50 V X7R 0805 (CIN/CL nach XC6206 DS S. 1); CL U2")
+			(fields
+				(field
+					(name "LCSC") "C28323")
+				(field
+					(name "Hersteller") "Samsung Electro-Mechanics")
+				(field
+					(name "MPN") "CL21B105KBFNNNE")
+				(field
+					(name "Footprint") "Capacitor_SMD:C_0805_2012Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/Samsung_CL31A107MQHNNNE_Catalog_2015-11.pdf")
+				(field
+					(name "Description") "MLCC 1 uF 50 V X7R 0805 (CIN/CL nach XC6206 DS S. 1); CL U2")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "LCSC")
+				(value "C28323")
+			)
+			(property
+				(name "Hersteller")
+				(value "Samsung Electro-Mechanics")
+			)
+			(property
+				(name "MPN")
+				(value "CL21B105KBFNNNE")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_programmer")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_programmer.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "185378b0-b64d-5879-8251-4609b177f875")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C4")
+			(value "1u")
+			(footprint "Capacitor_SMD:C_0805_2012Metric")
+			(datasheet "docs/datasheets/Samsung_CL31A107MQHNNNE_Catalog_2015-11.pdf")
+			(description "MLCC 1 uF 50 V X7R 0805 (CIN/CL nach XC6206 DS S. 1); CL U3")
+			(fields
+				(field
+					(name "LCSC") "C28323")
+				(field
+					(name "Hersteller") "Samsung Electro-Mechanics")
+				(field
+					(name "MPN") "CL21B105KBFNNNE")
+				(field
+					(name "Footprint") "Capacitor_SMD:C_0805_2012Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/Samsung_CL31A107MQHNNNE_Catalog_2015-11.pdf")
+				(field
+					(name "Description") "MLCC 1 uF 50 V X7R 0805 (CIN/CL nach XC6206 DS S. 1); CL U3")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "LCSC")
+				(value "C28323")
+			)
+			(property
+				(name "Hersteller")
+				(value "Samsung Electro-Mechanics")
+			)
+			(property
+				(name "MPN")
+				(value "CL21B105KBFNNNE")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_programmer")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_programmer.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "e63e502c-6aa4-5315-bee7-8c3d1f5ac90f")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C5")
+			(value "100n")
+			(footprint "Capacitor_SMD:C_0805_2012Metric")
+			(datasheet "docs/datasheets/Samsung_CL31A107MQHNNNE_Catalog_2015-11.pdf")
+			(description "MLCC 100 nF 50 V X7R 0805; an U4 VCC")
+			(fields
+				(field
+					(name "LCSC") "C1711")
+				(field
+					(name "Hersteller") "Samsung Electro-Mechanics")
+				(field
+					(name "MPN") "CL21B104KBCNNNC")
+				(field
+					(name "Footprint") "Capacitor_SMD:C_0805_2012Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/Samsung_CL31A107MQHNNNE_Catalog_2015-11.pdf")
+				(field
+					(name "Description") "MLCC 100 nF 50 V X7R 0805; an U4 VCC")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "LCSC")
+				(value "C1711")
+			)
+			(property
+				(name "Hersteller")
+				(value "Samsung Electro-Mechanics")
+			)
+			(property
+				(name "MPN")
+				(value "CL21B104KBCNNNC")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_programmer")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_programmer.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "6f60ff42-a126-5bc1-b234-b31458ef645f")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "J1")
+			(value "zu Waveshare CH343")
+			(footprint "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical")
+			(description "Kabel <= 20 cm (ANNAHME); 1 = H3.3 +5V, 2 = H2.2 GND, 3 = H3.2 VIO (Jumper H3 ENTFERNT), 4 = H2.4 RXD, 5 = H2.3 TXD; +5V alternativ H1.1, falls H1 bestueckt")
+			(fields
+				(field
+					(name "LCSC")
+				)
+				(field
+					(name "Hersteller") "-")
+				(field
+					(name "MPN") "Litze/Steckbruecken zum Waveshare CH343 USB UART Board")
+				(field
+					(name "Footprint") "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Kabel <= 20 cm (ANNAHME); 1 = H3.3 +5V, 2 = H2.2 GND, 3 = H3.2 VIO (Jumper H3 ENTFERNT), 4 = H2.4 RXD, 5 = H2.3 TXD; +5V alternativ H1.1, falls H1 bestueckt")
+			)
+			(libsource
+				(lib "Connector_Generic")
+				(part "Conn_01x05")
+				(description "Generic connector, single row, 01x05, script generated (kicad-library-utils/schlib/autogen/connector/)")
+			)
+			(property
+				(name "LCSC")
+				(value "")
+			)
+			(property
+				(name "Hersteller")
+				(value "-")
+			)
+			(property
+				(name "MPN")
+				(value "Litze/Steckbruecken zum Waveshare CH343 USB UART Board")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_programmer")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_programmer.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "connector")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "Connector*:*_1x??_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "977e8f47-1f55-5115-be6d-bf2792b1a93f")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+						(pin
+							(num "3")
+						)
+						(pin
+							(num "4")
+						)
+						(pin
+							(num "5")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "J2")
+			(value "Dummy-Zelle CR2032")
+			(description "Dummy-Zelle CR2032-Form (README Kap. 4); 1 = Oberseite (+, Clip), 2 = Mittelinsel D 8 mm (-, Minuspad); keine Zelle!")
+			(fields
+				(field
+					(name "LCSC")
+				)
+				(field
+					(name "Hersteller") "-")
+				(field
+					(name "MPN") "Eigenbau: 2 x FR4 1.6 mm Cu, D 20.0 mm")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Dummy-Zelle CR2032-Form (README Kap. 4); 1 = Oberseite (+, Clip), 2 = Mittelinsel D 8 mm (-, Minuspad); keine Zelle!")
+			)
+			(libsource
+				(lib "Connector_Generic")
+				(part "Conn_01x02")
+				(description "Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)")
+			)
+			(property
+				(name "LCSC")
+				(value "")
+			)
+			(property
+				(name "Hersteller")
+				(value "-")
+			)
+			(property
+				(name "MPN")
+				(value "Eigenbau: 2 x FR4 1.6 mm Cu, D 20.0 mm")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_programmer")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_programmer.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "connector")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "Connector*:*_1x??_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "a7805faa-ec3b-5de3-b5fa-f2a538593a29")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "J3")
+			(value "Federstifte TP1/TP2")
+			(description "Federstifte auf TP1/TP2 (ANNAHME, README Kap. 4); 1 = TP1 UART_TX_PAD (Sensor sendet), 2 = TP2 UART_RX_PAD (Sensor empfaengt)")
+			(fields
+				(field
+					(name "LCSC")
+				)
+				(field
+					(name "Hersteller") "-")
+				(field
+					(name "MPN") "Federkontaktstift, Handelsware")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Federstifte auf TP1/TP2 (ANNAHME, README Kap. 4); 1 = TP1 UART_TX_PAD (Sensor sendet), 2 = TP2 UART_RX_PAD (Sensor empfaengt)")
+			)
+			(libsource
+				(lib "Connector_Generic")
+				(part "Conn_01x02")
+				(description "Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)")
+			)
+			(property
+				(name "LCSC")
+				(value "")
+			)
+			(property
+				(name "Hersteller")
+				(value "-")
+			)
+			(property
+				(name "MPN")
+				(value "Federkontaktstift, Handelsware")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_programmer")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_programmer.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "connector")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "Connector*:*_1x??_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "2159e80a-5949-525f-b4e7-46ccccf63ea6")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "R1")
+			(value "10M")
+			(footprint "Resistor_SMD:R_0402_1005Metric")
+			(datasheet "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf")
+			(description "R 10 MOhm 1 % 0402 (Seriendatenblatt 01005-2512, Kap. 6 Resistance Range: 0402 1 Ohm-10 MOhm); schwacher Ruhepegel high, solange DIO6 im Bootloader noch hochohmig ist (TRM S. 464); groesser = mehr Low-Reserve, kleiner = sichererer Ruhepegel (SPICE A1/A1z)")
+			(fields
+				(field
+					(name "LCSC") "C26082")
+				(field
+					(name "Hersteller") "UNI-ROYAL")
+				(field
+					(name "MPN") "0402WGF1005TCE")
+				(field
+					(name "Footprint") "Resistor_SMD:R_0402_1005Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf")
+				(field
+					(name "Description") "R 10 MOhm 1 % 0402 (Seriendatenblatt 01005-2512, Kap. 6 Resistance Range: 0402 1 Ohm-10 MOhm); schwacher Ruhepegel high, solange DIO6 im Bootloader noch hochohmig ist (TRM S. 464); groesser = mehr Low-Reserve, kleiner = sichererer Ruhepegel (SPICE A1/A1z)")
+			)
+			(libsource
+				(lib "Device")
+				(part "R")
+				(description "Resistor")
+			)
+			(property
+				(name "LCSC")
+				(value "C26082")
+			)
+			(property
+				(name "Hersteller")
+				(value "UNI-ROYAL")
+			)
+			(property
+				(name "MPN")
+				(value "0402WGF1005TCE")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_programmer")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_programmer.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "R res resistor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "R_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "cf829a1d-069d-5d87-9678-c8a0b086fed0")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "U1")
+			(value "XC6206P332MR")
+			(footprint "Package_TO_SOT_SMD:SOT-23")
+			(datasheet "docs/datasheets/Torex_XC6206_Datasheet_ETR0305-004b.pdf")
+			(description "LDO 3.3 V 200 mA SOT-23 (Vorstufe, begrenzt Einzelfehler auf 3.3 V)")
+			(fields
+				(field
+					(name "LCSC") "C5446")
+				(field
+					(name "Hersteller") "Torex")
+				(field
+					(name "MPN") "XC6206P332MR-G")
+				(field
+					(name "Footprint") "Package_TO_SOT_SMD:SOT-23")
+				(field
+					(name "Datasheet") "docs/datasheets/Torex_XC6206_Datasheet_ETR0305-004b.pdf")
+				(field
+					(name "Description") "LDO 3.3 V 200 mA SOT-23 (Vorstufe, begrenzt Einzelfehler auf 3.3 V)")
+			)
+			(libsource
+				(lib "fluidi_programmer")
+				(part "XC6206PxxxMR")
+				(description "LDO Torex XC6206, SOT-23: 1 VSS, 2 VOUT, 3 VIN (DS S. 2); CIN = CL = 1 uF Keramik (S. 1)")
+			)
+			(property
+				(name "LCSC")
+				(value "C5446")
+			)
+			(property
+				(name "Hersteller")
+				(value "Torex")
+			)
+			(property
+				(name "MPN")
+				(value "XC6206P332MR-G")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_programmer")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_programmer.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "Torex LDO Voltage Regulator Fixed Positive")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "SOT?23?3*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "32fa4e66-6bbc-5959-8bdb-40849f41f636")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "3")
+						)
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "U2")
+			(value "XC6206P202MR")
+			(footprint "Package_TO_SOT_SMD:SOT-23")
+			(datasheet "docs/datasheets/Torex_XC6206_Datasheet_ETR0305-004b.pdf")
+			(description "LDO 2.0 V +-2 % SOT-23 (1.960-2.040 V, S. 5 Tab. E-1); Speisung Dummy-Zelle (Sensor-VDD)")
+			(fields
+				(field
+					(name "LCSC") "C2891260")
+				(field
+					(name "Hersteller") "Torex")
+				(field
+					(name "MPN") "XC6206P202MR-G")
+				(field
+					(name "Footprint") "Package_TO_SOT_SMD:SOT-23")
+				(field
+					(name "Datasheet") "docs/datasheets/Torex_XC6206_Datasheet_ETR0305-004b.pdf")
+				(field
+					(name "Description") "LDO 2.0 V +-2 % SOT-23 (1.960-2.040 V, S. 5 Tab. E-1); Speisung Dummy-Zelle (Sensor-VDD)")
+			)
+			(libsource
+				(lib "fluidi_programmer")
+				(part "XC6206PxxxMR")
+				(description "LDO Torex XC6206, SOT-23: 1 VSS, 2 VOUT, 3 VIN (DS S. 2); CIN = CL = 1 uF Keramik (S. 1)")
+			)
+			(property
+				(name "LCSC")
+				(value "C2891260")
+			)
+			(property
+				(name "Hersteller")
+				(value "Torex")
+			)
+			(property
+				(name "MPN")
+				(value "XC6206P202MR-G")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_programmer")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_programmer.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "Torex LDO Voltage Regulator Fixed Positive")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "SOT?23?3*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "ee944a13-6c59-544c-8714-3dc3c38a85f0")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "3")
+						)
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "U3")
+			(value "XC6206P202MR")
+			(footprint "Package_TO_SOT_SMD:SOT-23")
+			(datasheet "docs/datasheets/Torex_XC6206_Datasheet_ETR0305-004b.pdf")
+			(description "LDO 2.0 V +-2 % SOT-23 (1.960-2.040 V, S. 5 Tab. E-1); eigene Schiene fuer CH343-VIO und Puffer: Einstecken der Dummy-Zelle (Einschaltstrom in 4 x 100 uF) stoert die USB-Bruecke nicht")
+			(fields
+				(field
+					(name "LCSC") "C2891260")
+				(field
+					(name "Hersteller") "Torex")
+				(field
+					(name "MPN") "XC6206P202MR-G")
+				(field
+					(name "Footprint") "Package_TO_SOT_SMD:SOT-23")
+				(field
+					(name "Datasheet") "docs/datasheets/Torex_XC6206_Datasheet_ETR0305-004b.pdf")
+				(field
+					(name "Description") "LDO 2.0 V +-2 % SOT-23 (1.960-2.040 V, S. 5 Tab. E-1); eigene Schiene fuer CH343-VIO und Puffer: Einstecken der Dummy-Zelle (Einschaltstrom in 4 x 100 uF) stoert die USB-Bruecke nicht")
+			)
+			(libsource
+				(lib "fluidi_programmer")
+				(part "XC6206PxxxMR")
+				(description "LDO Torex XC6206, SOT-23: 1 VSS, 2 VOUT, 3 VIN (DS S. 2); CIN = CL = 1 uF Keramik (S. 1)")
+			)
+			(property
+				(name "LCSC")
+				(value "C2891260")
+			)
+			(property
+				(name "Hersteller")
+				(value "Torex")
+			)
+			(property
+				(name "MPN")
+				(value "XC6206P202MR-G")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_programmer")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_programmer.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "Torex LDO Voltage Regulator Fixed Positive")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "SOT?23?3*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "9e86081d-0f10-5852-a92a-25b273301106")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "3")
+						)
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "U4")
+			(value "SN74AUP1G17DBVR")
+			(footprint "Package_TO_SOT_SMD:SOT-23-5")
+			(datasheet "docs/datasheets/TI_SN74AUP1G17_Datasheet_SCES579J.pdf")
+			(description "Schmitt-Puffer, II <= 0.1 uA (25 degC) / 0.5 uA (-40..85 degC), SOT-23-5; direkt am Federstiftkopf (SPICE: Puffer am Kabelende faellt bei 57600 Baud aus)")
+			(fields
+				(field
+					(name "LCSC") "C183012")
+				(field
+					(name "Hersteller") "Texas Instruments")
+				(field
+					(name "MPN") "SN74AUP1G17DBVR")
+				(field
+					(name "Footprint") "Package_TO_SOT_SMD:SOT-23-5")
+				(field
+					(name "Datasheet") "docs/datasheets/TI_SN74AUP1G17_Datasheet_SCES579J.pdf")
+				(field
+					(name "Description") "Schmitt-Puffer, II <= 0.1 uA (25 degC) / 0.5 uA (-40..85 degC), SOT-23-5; direkt am Federstiftkopf (SPICE: Puffer am Kabelende faellt bei 57600 Baud aus)")
+			)
+			(libsource
+				(lib "fluidi_programmer")
+				(part "74AUP1G17")
+				(description "Schmitt-Puffer SN74AUP1G17 DBV: 1 NC, 2 A, 3 GND, 4 Y, 5 VCC (DS S. 3)")
+			)
+			(property
+				(name "LCSC")
+				(value "C183012")
+			)
+			(property
+				(name "Hersteller")
+				(value "Texas Instruments")
+			)
+			(property
+				(name "MPN")
+				(value "SN74AUP1G17DBVR")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_programmer")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_programmer.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "Single Gate Buff Schmitt LVC CMOS")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "SOT?23* SOT?553* Texas?R-PDSO-G5?DCK* Texas?R-PDSO-N5?DRL* Texas?X2SON*0.8x0.8mm*P0.48mm*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "3a645b65-8447-5e6c-83df-69e6afd2887c")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "2")
+						)
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "5")
+						)
+						(pin
+							(num "3")
+						)
+						(pin
+							(num "4")
+						)
+					)
+				)
+			)
+		)
+	)
+	(groups)
+	(variants)
+	(libparts
+		(libpart
+			(lib "Connector_Generic")
+			(part "Conn_01x02")
+			(description "Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)")
+			(footprints
+				(fp "Connector*:*_1x??_*")
+			)
+			(fields
+				(field
+					(name "Reference") "J")
+				(field
+					(name "Value") "Conn_01x02")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "Pin_1")
+					(type "passive")
+				)
+				(pin
+					(num "2")
+					(name "Pin_2")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
+			(lib "Connector_Generic")
+			(part "Conn_01x05")
+			(description "Generic connector, single row, 01x05, script generated (kicad-library-utils/schlib/autogen/connector/)")
+			(footprints
+				(fp "Connector*:*_1x??_*")
+			)
+			(fields
+				(field
+					(name "Reference") "J")
+				(field
+					(name "Value") "Conn_01x05")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Generic connector, single row, 01x05, script generated (kicad-library-utils/schlib/autogen/connector/)")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "Pin_1")
+					(type "passive")
+				)
+				(pin
+					(num "2")
+					(name "Pin_2")
+					(type "passive")
+				)
+				(pin
+					(num "3")
+					(name "Pin_3")
+					(type "passive")
+				)
+				(pin
+					(num "4")
+					(name "Pin_4")
+					(type "passive")
+				)
+				(pin
+					(num "5")
+					(name "Pin_5")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
+			(lib "Device")
+			(part "C")
+			(description "Unpolarized capacitor")
+			(footprints
+				(fp "C_*")
+			)
+			(fields
+				(field
+					(name "Reference") "C")
+				(field
+					(name "Value") "C")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Unpolarized capacitor")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "")
+					(type "passive")
+				)
+				(pin
+					(num "2")
+					(name "")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
+			(lib "Device")
+			(part "R")
+			(description "Resistor")
+			(footprints
+				(fp "R_*")
+			)
+			(fields
+				(field
+					(name "Reference") "R")
+				(field
+					(name "Value") "R")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Resistor")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "")
+					(type "passive")
+				)
+				(pin
+					(num "2")
+					(name "")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
+			(lib "fluidi_programmer")
+			(part "74AUP1G17")
+			(description "Schmitt-Puffer SN74AUP1G17 DBV: 1 NC, 2 A, 3 GND, 4 Y, 5 VCC (DS S. 3)")
+			(docs "docs/datasheets/TI_SN74AUP1G17_Datasheet_SCES579J.pdf")
+			(footprints
+				(fp "SOT?23*")
+				(fp "SOT?553*")
+				(fp "Texas?R-PDSO-G5?DCK*")
+				(fp "Texas?R-PDSO-N5?DRL*")
+				(fp "Texas?X2SON*0.8x0.8mm*P0.48mm*")
+			)
+			(fields
+				(field
+					(name "Reference") "U")
+				(field
+					(name "Value") "74AUP1G17")
+				(field
+					(name "Footprint") "Package_TO_SOT_SMD:SOT-23-5")
+				(field
+					(name "Datasheet") "docs/datasheets/TI_SN74AUP1G17_Datasheet_SCES579J.pdf")
+				(field
+					(name "Description") "Schmitt-Puffer SN74AUP1G17 DBV: 1 NC, 2 A, 3 GND, 4 Y, 5 VCC (DS S. 3)")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "NC")
+					(type "no_connect")
+				)
+				(pin
+					(num "2")
+					(name "")
+					(type "input")
+				)
+				(pin
+					(num "3")
+					(name "GND")
+					(type "power_in")
+				)
+				(pin
+					(num "4")
+					(name "")
+					(type "output")
+				)
+				(pin
+					(num "5")
+					(name "VCC")
+					(type "power_in")
+				)
+			)
+		)
+		(libpart
+			(lib "fluidi_programmer")
+			(part "XC6206PxxxMR")
+			(description "LDO Torex XC6206, SOT-23: 1 VSS, 2 VOUT, 3 VIN (DS S. 2); CIN = CL = 1 uF Keramik (S. 1)")
+			(docs "docs/datasheets/Torex_XC6206_Datasheet_ETR0305-004b.pdf")
+			(footprints
+				(fp "SOT?23?3*")
+			)
+			(fields
+				(field
+					(name "Reference") "U")
+				(field
+					(name "Value") "XC6206PxxxMR")
+				(field
+					(name "Footprint") "Package_TO_SOT_SMD:SOT-23")
+				(field
+					(name "Datasheet") "docs/datasheets/Torex_XC6206_Datasheet_ETR0305-004b.pdf")
+				(field
+					(name "Description") "LDO Torex XC6206, SOT-23: 1 VSS, 2 VOUT, 3 VIN (DS S. 2); CIN = CL = 1 uF Keramik (S. 1)")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "GND")
+					(type "power_in")
+				)
+				(pin
+					(num "2")
+					(name "VO")
+					(type "power_out")
+				)
+				(pin
+					(num "3")
+					(name "VI")
+					(type "power_in")
+				)
+			)
+		)
+	)
+	(libraries
+		(library
+			(logical "Connector_Generic")
+			(uri "${KICAD10_SYMBOL_DIR}/Connector_Generic.kicad_sym")
+		)
+		(library
+			(logical "Device")
+			(uri "${KICAD10_SYMBOL_DIR}/Device.kicad_sym")
+		)
+		(library
+			(logical "fluidi_programmer")
+			(uri "${KIPRJMOD}/lib/fluidi_programmer.kicad_sym")
+		)
+	)
+	(nets
+		(net
+			(code "1")
+			(name "/+3V3")
+			(class "Default")
+			(node
+				(ref "C2")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "2")
+				(pinfunction "VO_2")
+				(pintype "power_out")
+			)
+			(node
+				(ref "U2")
+				(pin "3")
+				(pinfunction "VI_3")
+				(pintype "power_in")
+			)
+			(node
+				(ref "U3")
+				(pin "3")
+				(pinfunction "VI_3")
+				(pintype "power_in")
+			)
+		)
+		(net
+			(code "2")
+			(name "/+5V")
+			(class "Default")
+			(node
+				(ref "C1")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "J1")
+				(pin "1")
+				(pinfunction "Pin_1_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "3")
+				(pinfunction "VI_3")
+				(pintype "power_in")
+			)
+		)
+		(net
+			(code "3")
+			(name "/RXD_HOST")
+			(class "Default")
+			(node
+				(ref "J1")
+				(pin "4")
+				(pinfunction "Pin_4_4")
+				(pintype "passive")
+			)
+			(node
+				(ref "U4")
+				(pin "4")
+				(pintype "output")
+			)
+		)
+		(net
+			(code "4")
+			(name "/TXD_HOST")
+			(class "Default")
+			(node
+				(ref "J1")
+				(pin "5")
+				(pinfunction "Pin_5_5")
+				(pintype "passive")
+			)
+			(node
+				(ref "J3")
+				(pin "2")
+				(pinfunction "Pin_2_2")
+				(pintype "passive")
+			)
+		)
+		(net
+			(code "5")
+			(name "/TX_PAD")
+			(class "Default")
+			(node
+				(ref "J3")
+				(pin "1")
+				(pinfunction "Pin_1_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "R1")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "U4")
+				(pin "2")
+				(pintype "input")
+			)
+		)
+		(net
+			(code "6")
+			(name "/VDD_DUT")
+			(class "Default")
+			(node
+				(ref "C3")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "J2")
+				(pin "1")
+				(pinfunction "Pin_1_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "U2")
+				(pin "2")
+				(pinfunction "VO_2")
+				(pintype "power_out")
+			)
+		)
+		(net
+			(code "7")
+			(name "/VIO")
+			(class "Default")
+			(node
+				(ref "C4")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "C5")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "J1")
+				(pin "3")
+				(pinfunction "Pin_3_3")
+				(pintype "passive")
+			)
+			(node
+				(ref "R1")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "U3")
+				(pin "2")
+				(pinfunction "VO_2")
+				(pintype "power_out")
+			)
+			(node
+				(ref "U4")
+				(pin "5")
+				(pinfunction "VCC_5")
+				(pintype "power_in")
+			)
+		)
+		(net
+			(code "8")
+			(name "GND")
+			(class "Default")
+			(node
+				(ref "C1")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "C2")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "C3")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "C4")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "C5")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "J1")
+				(pin "2")
+				(pinfunction "Pin_2_2")
+				(pintype "passive")
+			)
+			(node
+				(ref "J2")
+				(pin "2")
+				(pinfunction "Pin_2_2")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "1")
+				(pinfunction "GND_1")
+				(pintype "power_in")
+			)
+			(node
+				(ref "U2")
+				(pin "1")
+				(pinfunction "GND_1")
+				(pintype "power_in")
+			)
+			(node
+				(ref "U3")
+				(pin "1")
+				(pinfunction "GND_1")
+				(pintype "power_in")
+			)
+			(node
+				(ref "U4")
+				(pin "3")
+				(pinfunction "GND_3")
+				(pintype "power_in")
+			)
+		)
+		(net
+			(code "9")
+			(name "unconnected-(U4-NC-Pad1)")
+			(class "Default")
+			(node
+				(ref "U4")
+				(pin "1")
+				(pinfunction "NC_1")
+				(pintype "no_connect")
+			)
+		)
+	)
+)
