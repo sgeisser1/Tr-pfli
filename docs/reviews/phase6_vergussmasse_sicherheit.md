@@ -246,3 +246,30 @@ W-3, W-4 → Mechanik (Anleitung); A-4 → Sicherheit (FMEA) nach Rückmeldung.
 
 Quellen Websuche (2026-11-09): https://macdermidalpha.com/sites/default/files/2023-08/ER2223-Encapsulation-Resins-EN-09Aug23-TB.pdf (404 beim Abruf);
 https://res.cloudinary.com/electrolube/image/upload/v1573042102/044-ER2223A-SDS532_n9s3vc.pdf (Teil A EN, bereits lokal).
+
+## Antwort Ersteller (Mechanik-Agent, 2026-11-09)
+
+| Befund | Antwort | Umsetzung |
+|---|---|---|
+| A-1 | *umgesetzt* | Testplan PT11.19: ≥ 2 vollständige Muster nach freigegebenem Verfahren, V-4-Muster zählt nicht (V-4 nicht an S4/S5); Konzept Kap. 12 K-7 |
+| A-2 | *umgesetzt* | Testplan PT11.23: Schliff/Farbeindringprüfung nach 50 Zyklen + 168 h an Kragenunterkante z 1.3 … 3.5 (F, B), Taschenwand U3/C24, Kragenoberseite/Clip; Eindringen ≤ 0.5 mm |
+| A-3 | *umgesetzt* | Konzept Kap. 9a: ohne Bestehen keine Serie; Rückfall 1 ER2221 unter Bedingungen (Tg ≥ 80 °C schriftlich oder V-6, SDB A/B in Landessprache, V-1 … V-3, ganzer Beutel wegen 13.91 : 1, Vakuum/längere Entlüftung, CH-Bezug klären); Rückfall 2 gleichwertige gefüllte Masse mit neuer Prüfung |
+| A-4 | *umgesetzt* (Text), O/D-Neubewertung bleibt bei der Sicherheit | `phase5_fmea_light.md` F-60: „Vergussmasse mit Datenblatt wählen“ erledigt (ER2223, D-030-Vorschlag); F-63: Massnahme „ER2223 ungefüllt, Abweichung K-4 nach D-030, Gate A-1/A-2, Rückfall A-3, Tg-Nachweis vor Serie“. RPZ-Zahlen nicht verändert |
+| A-5 | *umgesetzt* | `PCB_OUTLINE.md` nicht geändert; MONTAGE O-1 trägt wieder den vollen K-4-Wortlaut („mineralisch gefüllt, … niedriger CTE“, gilt bis D-030), Abweichung daneben |
+| W-1 | *umgesetzt* | MONTAGE Kap. 3a (Vorbedingung jeder Sitzung und der Nachhärtung „Clip leer, kontrolliert, abgehakt“), Kap. 4 Schritt 0, Kap. 5 Schritt 0, Kap. 5a Schritt 1, V-4 (Zelle **vor dem Auftragen** entnehmen), Kap. 6 (nach Weg B Zelle nach der Funktionsprüfung wieder entnehmen), Kap. 8 (Nacharbeit eigener Absatz nach Zellentnahme, nur nach Rücksprache Projektleitung). `PROGRAMMIEREN_SENSOR.md` Kap. 5 Schritt 9: „Funktionsprüfung, danach Zelle wieder entnehmen, mit leerem Clip vergiessen“; übrige Regeln dort unverändert (Reihenfolge Schritt 8, Zellen < 2.6 V entsorgen) |
+| W-2 | *umgesetzt* | Konzept Kap. 6 Nr. 1 und D-030: „Tg 140 °C laut TDS, Härtebedingung unbekannt; Tg nach 60-°C-Härtung offen“; Anfrage an Electrolube als Textvorlage (Konzept Anhang A: Tg/CTE nach 24 h RT und nach 24 h RT + 4 h 60 °C); Kriechprobe **V-6** (Stab 4 × 10 × 60, Stützweite 50, ≈ 1.0 N → 0.45 MPa, 1 h 80 °C, bleibend < 0.2 mm) als Pflicht vor der Serie ohne schriftlichen Tg; Prototypen über K-7/A-1 |
+| W-3 | *umgesetzt* | MONTAGE Kap. 3a: Augen ≥ 15 min, Lider offen, immer Arzt; Haut: Kleidung **und Schuhe** aus, Arzt nach Härter-/Mischungskontakt; Einatmen: verzögertes Lungenödem; Visier, Schürze, Augenspülflasche; Lagerung unter Verschluss, für Kinder unzugänglich, 15–35 °C. **Voraussetzung vor dem ersten Beutel (auch V-1 … V-3): SDB Teil B in DE/EN/FR/IT**; Textvorlage für die Händleranfrage im Konzept Anhang B (versendet der Auftraggeber) |
+| W-4 | *umgesetzt* | MONTAGE Kap. 3a „Arbeitsplatz und Lüftung“: offenes Fenster mit Ventilator nach aussen, nicht in Wohn-/Schlafräumen (auch Restschale und Trockner), abbrechen bei Geruch/Reizung, Halbmaske Filter A (EN 14387) bereit, Trockner auslüften (**ANNAHME**) |
+| W-5 | *umgesetzt* | siehe A-1 … A-4 |
+| K-1 | *umgesetzt* | Alu-Schale ≥ 20 × 15 cm oder zwei (≈ 7.5 mm), nicht brennbare Unterlage, Rest nicht in den Trockner; Beleg TDS S. 3 statt MG-Fremdreferenz (Variante M-B) |
+| K-2 | *umgesetzt* | Kap. 3a „Geltung“: Schutz, Erste Hilfe, Lagerung, Entsorgung ab dem ersten Beutel, auch für V-1 … V-3 |
+| K-3 | *umgesetzt* | Nitril ≥ 0.1 mm, zwei Paar, äusseres sofort wechseln; Beständigkeitsliste für CAS 1761-71-3 und 25068-38-6 ablegen (offen, vor dem ersten Beutel) |
+| K-4 | *umgesetzt* | „ungefüllt (**ANNAHME**, Dichte 1.10, SDB A Abschn. 3)“ im Konzept und INDEX.csv; neuere TDS-Fassung 09Aug23 nicht abrufbar → in der Anfrage an Electrolube (Anhang A) angefordert |
+| K-5 | *umgesetzt* | Prüfung 5a: Kante nach Nachhärtung nicht klebrig (Wattestäbchen ohne Faser), sonst nicht in Erde einsetzen |
+| K-6 | *umgesetzt* | O-1-Wortlaut wiederhergestellt (A-5); INDEX.csv REF-VG4: Datei enthält ab S. 14 Teil A (HU) |
+
+**Neu seit Runde 1 (bitte mitprüfen):** Zur Kostensenkung schlage ich die Variante **M-A** vor (MONTAGE Kap. 3a, Konzept
+Kap. 7): Den Beutel einmal ohne Mischen in zwei dicht schliessende, etikettierte Flaschen abfüllen, dann je Sitzung kleine
+Ansätze wägen (3.45 g A + 1.00 g B, Waage 0.01 g, TDS S. 3 „Bulk Mixing“). Sie gilt erst, wenn Electrolube keine Einwände hat
+(Anhang A) und die Sicherheit den Abfüllschritt geprüft hat (zusätzlicher Umgang mit dem ätzenden Härter, Visier, Lagerung
+unter Verschluss). Bis dahin gilt M-B (ganzer Beutel).

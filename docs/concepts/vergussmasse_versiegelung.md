@@ -2,11 +2,11 @@
 
 | | |
 |---|---|
-| Stand | 2026-11-08, Phase 6, Mechanik-Agent. **Entwurf zur Prüfung** (Sicherheit, Elektronik) und Entscheidungsvorlage für den Orchestrator |
+| Stand | 2026-11-09, Phase 6, Mechanik-Agent. Runde 2 nach Sicherheitsprüfung `docs/reviews/phase6_vergussmasse_sicherheit.md` (kein Veto, Auflagen A-1 … A-5, W-1 … W-5, K-1 … K-6 – Antworten dort am Ende). Entscheidungsvorlage für den Orchestrator |
 | Offene Punkte | O-1 Vergussmasse, O-2 Kantenversiegelung Sonde (`docs/manuals/MONTAGE_SENSOR.md` Kap. 0), REQ-MECH-07, PROJEKTAUFTRAG Techn. Anf. 1 („Versiegelung der Schnittkanten und der Sonde bewerten … mit Anleitung“) |
-| Ergebnis | Empfehlung **Electrolube ER2223** (2K-Epoxid, Tg 140 °C, 800 mPa·s) für Schott, Kragen **und** Kantenversiegelung der Sonde; Sondenflächen bleiben unbeschichtet. Abweichung von K-4 („mineralisch gefüllt, niedriger CTE“) → Entscheid Sicherheit (Kap. 9) |
+| Ergebnis | Empfehlung **Electrolube ER2223** (2K-Epoxid, Tg 140 °C, 800 mPa·s) für Schott, Kragen **und** Kantenversiegelung der Sonde; Sondenflächen bleiben unbeschichtet. Abweichung von K-4 („mineralisch gefüllt, niedriger CTE“): Sicherheit **zulässig unter A-1 … A-5** (Kap. 9). Kosten: Beutel einmal abfüllen und Kleinmengen wägen (Variante M-A) → **1 Beutel + 1 Reserve statt 6** (Kap. 7) |
 | Rechnung | `simulation/field/coat_epoxy.py` → `simulation/field/results/coat_epoxy.{txt,csv}` (neu), Grundlagen `simulation/field/REPORT.md` |
-| Anleitung | `docs/manuals/MONTAGE_SENSOR.md` Kap. 1, 4, 5, 5a (ergänzt) |
+| Anleitung | `docs/manuals/MONTAGE_SENSOR.md` Kap. 0, 1, 3a, 4, 5, 5a, 6, 8; `docs/manuals/PROGRAMMIEREN_SENSOR.md` Kap. 5 Schritt 9 (Zelle vor dem Verguss entnehmen) |
 
 Zitierweise: Datei, Seite. Alle Dateien unter `docs/references/`, Abruf 2026-11-08.
 
@@ -80,7 +80,7 @@ scheiden nach K-4 aus (weiche, schlecht haftende Grenzfläche im Leckpfad).
 | Eigenschaft | **Electrolube ER2223** | Electrolube ER2221 | MG Chemicals 832HT | Henkel Loctite Stycast 2651-40 W1 + Cat 9 |
 |---|---|---|---|---|
 | Typ | 2K-Epoxid, „high Tg, low viscosity“ (TDS S. 1) | 2K-Epoxid, gefüllt, wärmeleitend (TDS S. 1) | 2K-Epoxid, schwarz (TDS S. 1) | 2K-Epoxid, gefüllt (Füllstoff setzt sich ab, TDS S. 2) |
-| Füllstoff / Dichte gehärtet | ungefüllt, 1.10 g/ml (S. 2) | gefüllt, 1.88 g/ml (S. 2) | ungefüllt, 1.1 g/ml (S. 2) | gefüllt, Harz 1.5 g/cm³ (S. 1) |
+| Füllstoff / Dichte gehärtet | ungefüllt (**ANNAHME**: TDS sagt es nicht; Dichte 1.10 g/ml, S. 2, und SDB A Abschn. 3 nur organische Stoffe) | gefüllt, 1.88 g/ml (S. 2) | ungefüllt, 1.1 g/ml (S. 2) | gefüllt, Harz 1.5 g/cm³ (S. 1) |
 | **Tg** | **140 °C** (S. 2; Härtebedingung nicht angegeben) | **nicht angegeben** | **89 °C** (S. 2, ASTM E1545) | **117 °C** TMA (S. 1; mit Nachhärtung empfohlen) |
 | CTE | 70 ppm/K (S. 2) | **30** ppm/K (S. 2) | 86 ppm/K unter Tg (S. 2) | 60 ppm/K unter Tg (S. 1) |
 | Viskosität gemischt | **800 mPa·s** @ 23 °C (S. 1) | 6000 (S. 1) | 22 000 cP @ 25 °C (S. 2) | nicht angegeben (Harz 33 000, S. 1) |
@@ -129,14 +129,18 @@ Vergussprobe vor dem ersten Muster (**PROTOTYP-PRÜFUNG** V-1).
 
 **Electrolube ER2223, ein Material für Schott, Kragen und Kantenversiegelung der Sonde.**
 
-1. **Tg 140 °C** (TDS S. 2), mit Abstand über 80 °C (K-4) und 65 °C Kopftemperatur (RB-03). Weil das TDS die
-   Härtebedingung zum Tg nicht nennt, wird **nachgehärtet: 24 h Raumtemperatur, danach 4 h bei 60 °C** (TDS S. 1 „Cure Time
+1. **Tg 140 °C laut TDS** (S. 2), **Härtebedingung unbekannt**. Bei aminisch gehärteten Epoxiden begrenzt die Härtetemperatur
+   den erreichbaren Tg; ob nach 60-°C-Härtung Tg ≥ 80 °C (K-4) erreicht wird, ist **offen** (W-2). Nachweis: Anfrage an
+   Electrolube (Anhang A) oder Kriechprobe V-6 (Kap. 12); für die Prototypen genügt K-7 nach A-1 (168 h bei 65 °C ohne
+   Erweichen/Ablösen), für die **Serie ist der Tg-Nachweis Pflicht**. Es wird **nachgehärtet: 24 h Raumtemperatur, danach 4 h bei 60 °C** (TDS S. 1 „Cure Time
    (60 °C) 4 hours“; S. 3 „post-cure at high temperature if required“). 60 °C liegt 32 K unter der HDT von ASA. Gerät:
    Wärmeschrank oder Filamenttrockner mit separatem Thermometer (**ANNAHME**: in der Werkstatt mit Bambu-Drucker vorhanden).
-   Rückfrage an Electrolube (Tg nach 24 h RT) offen; bestätigt Electrolube Tg ≥ 80 °C nach RT-Härtung, entfällt die Nachhärtung.
+   Rückfrage an Electrolube (Tg nach 24 h RT und nach 24 h RT + 4 h 60 °C, Anhang A) offen.
 2. **800 mPa·s** (S. 1): füllt 0.15-mm-Spalte und die Tasche U3/C24, entgast ohne Vakuum, lässt sich als dünne Kantenschicht
    auftragen.
-3. **Resin Pack** (S. 1–2): Harz und Härter vorgewogen, Mischen im Beutel, kein Wägefehler bei 3.45 : 1.
+3. **Resin Pack** (S. 1–2): Harz und Härter vordosiert. Für kleine Ansätze wird der Beutel einmal in zwei Flaschen
+   abgefüllt und je Ansatz 3.45 : 1 auf 0.01 g gewogen (Variante M-A, TDS S. 3 „Bulk Mixing“; Kap. 7); Mischen des ganzen
+   Beutels bleibt Rückfall (M-B).
 4. **Kein CMR-Stoff** (SDB A und B: keine H340/H350/H360), im Gegensatz zu 832HT (H360).
 5. Bezug in der Schweiz (Simpex), Datenblatt beim Händler verlinkt.
 
@@ -145,33 +149,53 @@ Nachteile, offen ausgewiesen:
   (`Kingboard_KB-6160A_TechnicalInformation.pdf` S. 1), in der Ebene nicht im lokalen Datenblatt (**ANNAHME** 14–17 ppm/K). Die
   Fuge ist dünn (0.15 mm) und das Volumen klein (62 mm³). Nachweis der Dichtheit über Temperaturwechsel ist ohnehin
   K-7 (50 Zyklen −10/+65 °C, Farbeindringprüfung). → Entscheid Sicherheit (Kap. 9).
-- **Beutel muss ganz gemischt werden** (250 g für ≈ 0.2 g Bedarf je Sensor); Rest sicher aushärten lassen (Exothermie,
-  MONTAGE Kap. 3a). Kosten Kap. 7.
-- **Topfzeit 30 min** (S. 1): Sensoren vor dem Mischen vollständig vorbereiten; ≤ 8 Sensoren pro Beutel (**ANNAHME**, am
+- **Kleinste Gebinde 250 g** (Beutel; sonst 5-kg-Kit). Ohne Abfüllen müsste je Sitzung ein Beutel ganz gemischt werden
+  (250 g für ≈ 0.2 g je Sensor). Abfüllen (M-A) ist vom Hersteller für Resin Packs nicht beschrieben → Anfrage Anhang A,
+  Sicherheitsprüfung des Abfüllschritts, V-3 je Ansatz. Kosten Kap. 7.
+- **Topfzeit 30 min** (S. 1): Sensoren vor dem Mischen vollständig vorbereiten; ≤ 8 Sensoren pro Ansatz (**ANNAHME**, am
   Muster Zeit pro Sensor messen).
 - Lieferzeit laut Simpex 8 Wochen → früh bestellen.
 - Haftung auf ASA nicht im Datenblatt → Anrauen (K-5), **PROTOTYP-PRÜFUNG** V-2.
+- Eine neuere TDS-Fassung „ER2223-Encapsulation-Resins-EN-09Aug23-TB.pdf“ (MacDermid Alpha) ist im Netz verzeichnet, die
+  URL liefert aber nichts Lesbares (Abruf 2026-11-08/09). Abgelegt ist Rev. 4 (Mar 2019). Neuere Fassung beim Hersteller
+  anfordern (Anhang A) und Tg, CTE, Härtung vergleichen.
 
 ## 7 Kosten (15–20 Sensoren)
 
-| Posten | Menge | CHF |
-|---|---|---|
-| ER2223 Resin Pack 250 g, Simpex | 1 Beutel | 38.20 exkl. MWST, 41.29 inkl. 8.1 % MWST, zzgl. Versand (Betrag nicht angegeben) |
-| Verbrauch je Sensor | ≈ 0.19 g | ≈ 0.03 (bei 0.165 CHF/g inkl. MWST) |
-| Beutel je Bauserie | Schott und Kragen in **getrennten Sitzungen** (Schott muss vor dem Kragen hart sein) | 2 Sitzungen je Gruppe ≤ 8 Sensoren |
-| Prototyp (5 Sensoren) | Beutel 1: Vorversuche V-1/V-2/V-3; Beutel 2: Schott aller 5; Beutel 3: Kragen aller 5 + Kanten von 4. Kanten des V-4-Musters nach der Messung in der ersten Serien-Sitzung (sonst 4. Beutel) | 3 Beutel = 123.87 inkl. MWST (4 Beutel: 165.16) |
-| Serie 15 Sensoren in 2 Gruppen, rollierend (Sitzung 1: Schott G1; 2: Kragen G1 + Schott G2; 3: Kragen G2) | 3 Beutel | 123.87 inkl. MWST = **8.26 CHF/Sensor** |
-| Serie 20 Sensoren, 3 Gruppen rollierend | 4 Beutel | 165.16 inkl. MWST = 8.26 CHF/Sensor |
-| Kleinmaterial: Einwegspritzen 1/3 ml Luer-Lock, stumpfe Kanülen 18–20 G, Mischbecher, Alu-Schale, Nitrilhandschuhe, Schutzbrille | – | **ANNAHME** ≈ 20 CHF einmalig, nicht recherchiert |
+**Gebinde (Recherche 2026-11-09):** ER2223 gibt es nur als Resin Pack 250 g (EER2223RP250G) und als Kit 5 kg (EER2223K5K)
+(Produktcodes `Electrolube_ER2223-PartA_SDS_Rev0.64-2023-10-27_SV.pdf` S. 1). Eine Doppelkartusche oder kleinere Beutel wurden
+nicht gefunden (Suche Simpex, Distrelec, RS; RS UK listet nur den 250-g-Beutel, £ 34.23 für 1–5 Stück, Suchtreffer). Die 5 kg
+sind für 20 Sensoren unsinnig (Haltbarkeit 12 Monate, TDS S. 1). Doppelkartuschen 50 ml anderer Hersteller mit Tg ≥ 80 °C und
+niedriger Viskosität wurden nicht gefunden (MG 832HD 50 ml: Tg 41 °C; 832FXT: Tg 20 °C; Loctite E-60NC: 13 000 cP, Tg nicht
+angegeben). Der Kostenhebel ist deshalb das **Abfüllen und Wägen kleiner Ansätze** (Variante M-A, MONTAGE Kap. 3a): Das TDS
+beschreibt neben dem Resin Pack ausdrücklich „Bulk Mixing“ im richtigen Verhältnis (S. 3) und das Verhältnis 3.45 : 1 nach
+Gewicht (S. 1). Mit einer Waage 0.01 g und Mindestansatz 4 g (3.45 g A + 1.00 g B) bleibt der Wägefehler ≤ ± 1 %
+(**ANNAHME** Toleranz, das TDS nennt keine). Neu ist nur das Umfüllen aus dem Beutel in dicht schliessende Flaschen.
 
-Bewertung gegen REQ-FAB-04 (D-005): Der Materialverbrauch (0.03 CHF/Sensor) liegt unter der bisherigen ANNAHME 0.40 CHF.
-Der Beutelpreis ist aber **pro Sitzung fix** und unabhängig von der Stückzahl, also wie ein Setup-Posten. Zählt man ihn zu den
-Stückkosten, steigen sie in der Serie um ≈ 7.9 CHF (8.26 − 0.40) auf ≈ 16 CHF → REQ-FAB-04 **verfehlt**. Als Einmalkosten pro
-Bauserie (analog JLC-Setup) bleiben die Stückkosten bei ≈ 8.0 CHF (8.38 − 0.40 + 0.03, ohne 5 % Ausschussaufschlag; `docs/reviews/phase5_kosten_final.md`
-Kap. 1, Posten 0.40 in `hardware/sensor/gen/cost_rev_b.py` Z. 59). → **Einordnung entscheidet der Orchestrator bzw. der Auftraggeber** (Vorschlag: Einmalkosten pro Sitzung).
-Hebel: grössere Gruppen pro Beutel, wenn die gemessene Zeit pro Sensor es zulässt (z. B. 15 Sensoren in einer Gruppe:
-2 Beutel = 82.58 CHF = 5.51 CHF/Sensor). Gebinde unter 250 g bietet Electrolube für ER2223 laut SDB-Produktcodes nicht an
-(Pack 250 g, Kit 5 kg: `Electrolube_ER2223-PartA_SDS_Rev0.64-2023-10-27_SV.pdf` S. 1 „EER2223RP250G, EER2223K5K“).
+| Posten | Variante M-B (ganzer Beutel je Sitzung) | **Variante M-A (Beutel abfüllen, Ansätze wägen)** |
+|---|---|---|
+| Beutel ER2223 250 g, Simpex, CHF 38.20 exkl. / **41.29 inkl. 8.1 % MWST**, zzgl. Versand (Betrag nicht angegeben), Lieferzeit 8 Wochen | – | – |
+| Prototyp 5 Sensoren: Vorversuche, Schott, Kragen + Kanten | 3 Beutel (V-4-Kanten in der ersten Serien-Sitzung, sonst 4) | aus Beutel 1 |
+| Serie 15 Sensoren (2 Gruppen ≤ 8, rollierend: Schott G1 / Kragen G1 + Schott G2 / Kragen G2) | 3 Beutel | aus Beutel 1 |
+| Serie 20 Sensoren (3 Gruppen) | 4 Beutel | aus Beutel 1 |
+| Reserve (Lieferzeit, Rückfall M-B, Ablauf nach 12 Monaten) | – | 1 Beutel |
+| **Beutel Prototyp + Serie 15** | **6 Beutel = 247.74 CHF** | **2 Beutel = 82.58 CHF** |
+| Flaschen HDPE/Glas 250 ml + 60 ml, Etiketten | – | ≈ 10 CHF (**ANNAHME**, nicht recherchiert) |
+| Waage 0.01 g | – | in MONTAGE Kap. 1 schon gelistet (**ANNAHME** vorhanden; sonst ≈ 20–30 CHF, nicht recherchiert) |
+| Kleinmaterial (Spritzen, Kanülen, Becher, Spatel, Handschuhe, Visier, Schürze, Augenspülflasche, Filter A) | **ANNAHME** ≈ 40 CHF einmalig, nicht recherchiert | gleich |
+| Verbrauch je Sensor (≈ 0.19 g inkl. Kanten; je Ansatz ≥ 4 g, Rest verworfen) | ≈ 0.03 CHF Masse (Beutel als Einmalkosten) | ≈ 0.17 CHF (2 Ansätze à 4 g – Schott, Kragen – auf je 8 Sensoren, 0.165 CHF/g) |
+
+**Einordnung nach D-005 (Vorgabe Orchestrator: Einmalkosten):** Beutel, Flaschen und Kleinmaterial sind Einmalkosten pro
+Bauserie; Stückkosten enthalten nur den Verbrauch. Stückkosten Serie damit **8.38 − 0.40 + 0.17 ≈ 8.15 CHF** (ohne
+Ausschussaufschlag; Basis `docs/reviews/phase5_kosten_final.md` Kap. 1, Posten 0.40 in `hardware/sensor/gen/cost_rev_b.py`
+Z. 59) → REQ-FAB-04 bleibt erfüllt (unter dem Vorbehalt „Pre-reflow“ wie bisher). Einmalkosten Vergussmaterial für
+Prototyp + Serie: **M-A ≈ 133 CHF** (82.58 + 10 + 40), M-B ≈ 288 CHF (247.74 + 40). Pro Sensor (20 Sensoren gesamt)
+Vollkosten-Anteil M-A ≈ 6.6 CHF, M-B ≈ 14.4 CHF.
+
+**Bedingungen für M-A:** (1) Electrolube hat keine Einwände gegen das Umfüllen und nennt die Haltbarkeit der angebrochenen
+Komponenten (Anhang A); (2) die Sicherheit prüft den Abfüllschritt (zusätzlicher Umgang mit dem ätzenden Härter, Etiketten,
+Lagerung unter Verschluss) – neu gegenüber der Prüfung Runde 1; (3) V-3 (Härteprobe) an jedem Ansatz, V-6 einmal für das
+Verfahren. Bis dahin gilt M-B.
 
 ## 8 Sicherheit nach SDB (für MONTAGE Kap. 1/4/5)
 
@@ -182,10 +206,11 @@ Hebel: grössere Gruppen pro Beutel, wenn die gemessene Zeit pro Sensor es zulä
 | Schutz | P280 Schutzhandschuhe/Schutzkleidung/Augenschutz/Gesichtsschutz; Handschuhe nach EN 374, Material nach Angabe des Handschuhherstellers; dicht schliessende Chemikalien-Schutzbrille nach EN 166; ausreichende Lüftung; nicht essen, trinken, rauchen | A (EN): S. 6 (Abschn. 8); B (HU): S. 2, S. 6 |
 
 - Das SDB nennt **kein Handschuhmaterial**. Nitril-Einweghandschuhe sind **ANNAHME**; bei Kontakt sofort wechseln.
-- Härter B ist ätzend und sensibilisierend: Beutel erst nach Anziehen von Brille und Handschuhen öffnen, Ecke über der
-  Alu-Schale abschneiden.
-- Der deutschsprachige SDB-Stand 2023 für Teil B lag nicht vor (nur Ungarisch; H-Sätze sprachunabhängig). Beim Kauf das SDB
-  in einer Landessprache beim Händler anfordern (**offen**).
+- Härter B ist ätzend und sensibilisierend: Beutel erst nach Anziehen von Brille, Visier, Handschuhen und Schürze öffnen,
+  Ecke über der Alu-Schale abschneiden. Erste Hilfe, Lüftung und Lagerung nach SDB B Abschn. 4/7/8 (S. 3/5/6) vollständig in
+  MONTAGE Kap. 3a übernommen (W-3, W-4).
+- **SDB Teil B in DE/EN/FR/IT ist Voraussetzung vor dem ersten Beutel** (auch Vorversuche). Heute nur Ungarisch (H-Sätze
+  sprachunabhängig; die Datei enthält ab S. 14 zusätzlich Teil A). Der Auftraggeber fordert es beim Händler an (Anhang B).
 - 832HT Teil A ist als Repr. 1B (**H360**) eingestuft (`MGChemicals_832HT-Kit_SDS_V6.13-2026-07-17_EN-CA.pdf` S. 2–3,
   Einstufung nach WHMIS/HCS), deshalb nicht empfohlen.
 
@@ -193,29 +218,49 @@ Hebel: grössere Gruppen pro Beutel, wenn die gemessene Zeit pro Sensor es zulä
 
 | Nr | Frage | Vorschlag |
 |---|---|---|
-| F-1 (Sicherheit) | K-4 verlangt „mineralisch gefüllt, niedriger CTE“. ER2223 ist ungefüllt (CTE 70). Kein recherchiertes Produkt erfüllt gleichzeitig: gefüllt, Tg ≥ 80 °C laut Datenblatt, fliessfähig für 0.15-mm-Spalte, kleines Gebinde, CH-Bezug, Kosten | ER2223 zulassen; Gate ist K-7 (Temperaturwechsel + Farbeindringprüfung) am Muster. Rückfall: ER2221 (gefüllt, CTE 30), wenn Electrolube Tg ≥ 80 °C bestätigt |
+| F-1 (Sicherheit) | K-4 verlangt „mineralisch gefüllt, niedriger CTE“. ER2223 ist ungefüllt (CTE 70). Kein recherchiertes Produkt erfüllt gleichzeitig: gefüllt, Tg ≥ 80 °C laut Datenblatt, fliessfähig für 0.15-mm-Spalte, kleines Gebinde, CH-Bezug, Kosten | **Antwort Sicherheit (phase6_vergussmasse_sicherheit.md Kap. 1): zulässig unter A-1 … A-5.** A-1/A-2 im Testplan PT11.19/PT11.23, A-3 Kap. 9a, A-4 in der FMEA F-60/F-63 eingetragen, A-5: PCB_OUTLINE und O-1-Wortlaut erst nach D-030 |
 | F-2 (Elektronik) | Kantenversiegelung ändert C nur am Rand; Kalibrierung danach | Versiegeln **vor** der Vorkonditionierung (≥ 14 d wässern) und vor der 2-Punkt-Kalibrierung; Frequenz in Luft/Wasser vor und nach dem Versiegeln an einem Muster messen (V-4) |
 | F-3 (Elektronik) | U3 im Kragen: ER2223 nennt keine Wärmeleitfähigkeit (ungefüllt, **ANNAHME** ≈ 0.2 W/m·K) | Für REQ-TMP-01 (Bodentemperatur) unkritisch, die Schicht über U3 ist 0.5 mm; am Muster prüfen (bestehende PROTOTYP-PRÜFUNG) |
+
+## 9a Rückfallmasse (A-3)
+
+Fällt K-7 an den ≥ 2 Mustern (A-1) oder der Schliff (A-2) durch, wird **keine Serie** mit ER2223 gebaut. Rückfall in dieser
+Reihenfolge:
+1. **Electrolube ER2221** (gefüllt, CTE 30 ppm/K, 6000 mPa·s, −40 … +150 °C; `Electrolube_ER2221_TDS_Rev8-2019-03.pdf`
+   S. 1–2), **Bedingung:** Electrolube bestätigt schriftlich Tg ≥ 80 °C nach 24 h RT + ≤ 4 h 60 °C (oder V-6 bestanden),
+   SDB A und B in DE/EN/FR/IT liegen vor, Vorversuche V-1 … V-3 mit ER2221 bestanden. Verarbeitung: höhere Viskosität →
+   Vakuum oder längere Entlüftung (Kap. 5: Blase 5 mm in ≈ 3.5 min), Mischverhältnis 13.91 : 1 nach Gewicht nur als ganzer
+   Beutel (Wägen von 0.27 g Härter auf 4 g ist mit 0.01 g zu ungenau, ± 3.7 %). CH-Bezug offen (nicht bei Simpex gefunden,
+   RS UK Auslauf) → vor dem Rückfall Bezug klären.
+2. Gleichwertige gefüllte Masse mit Datenblatt (Tg ≥ 80 °C nach Härtung ≤ 60 °C belegt, CTE ≤ 40 ppm/K, ≤ 10 000 mPa·s,
+   kein CMR-Stoff), neue Auswahl mit Prüfung durch die Sicherheit.
 
 ## 10 Entscheidungsvorlage (Vorschlag D-030)
 
 - **Entscheid:** Vergussmasse für Schott und Kragen sowie Kantenversiegelung der Sonde: **Electrolube ER2223** (Resin Pack
-  250 g). Sondenflächen bleiben ohne Zusatzschicht (Lötstopplack). Aushärtung 24 h RT + 4 h 60 °C.
+  250 g; Verarbeitung M-A „abfüllen und wägen“ nach Bedingungen Kap. 7, sonst M-B). Sondenflächen bleiben ohne Zusatzschicht
+  (Lötstopplack). Aushärtung 24 h RT + 4 h 60 °C. Abweichung von K-4 („gefüllt, niedriger CTE“) unter A-1 … A-5.
+  **Kosten:** Vergussmaterial als **Einmalkosten pro Bauserie nach D-005** (Vorgabe Orchestrator), Stückkosten nur Verbrauch
+  ≈ 0.17 CHF.
 - **Alternativen:** ER2221 (gefüllt, Tg unbekannt), MG 832HT (H360, 22 000 cP), Stycast 2651-40/Cat 9 (≈ 300 CHF),
   ER2188/832B (Tg < 80 °C); für die Sonde Acryllack, Epoxid vollflächig, Schrumpfschlauch (Kap. 3).
-- **Begründung:** Tg 140 °C, 800 mPa·s, Resin Pack ohne Wägen, kein CMR-Stoff, CH-Bezug; Kantenversiegelung kostet ≈ 1–2 %
-  Spanne statt 12–39 % bei Flächenbeschichtung.
-- **Auflagen:** F-1 durch Sicherheit; Kosteneinordnung Kap. 7; Vorversuche V-1 … V-3 vor dem ersten Muster-Verguss.
+- **Begründung:** Tg 140 °C laut TDS (Härtebedingung unbekannt; Tg nach 60-°C-Härtung offen, W-2), 800 mPa·s, kein CMR-Stoff,
+  CH-Bezug; Kantenversiegelung kostet ≈ 1–2 % Spanne statt 12–39 % bei Flächenbeschichtung.
+- **Auflagen:** A-1 … A-5 (Sicherheit); vor dem ersten Beutel MONTAGE Kap. 3a (W-1, W-3, W-4, K-1, K-2) umgesetzt und SDB Teil B
+  in DE/EN/FR/IT vorhanden; Vorversuche V-1 … V-3 vor dem ersten Muster-Verguss; **Tg-Nachweis (W-2: Electrolube oder V-6) vor
+  der Serienfreigabe**; M-A nur nach Kap. 7 Bedingungen.
 - **Folgeänderungen bei Freigabe:** `docs/interfaces/PCB_OUTLINE.md` Kap. 7 („Epoxid mineralisch gefüllt … ANNAHME Typ“) in
   der nächsten Revision nachführen; `hardware/sensor/gen/cost_rev_b.py` Z. 59 („Versiegelung Sonde/Kragen (ANNAHME)“ 0.40 CHF) und `scripts/cost_final_phase5.py` neu rechnen; INDEX.csv EP-K (vorläufig eingetragen).
 
 ## 11 Offene Punkte
 
-1. Tg von ER2223 nach 24 h Raumtemperatur bei Electrolube anfragen (TechnicalSupportTeam, Adresse im TDS-Bulletin); bis dahin
-   Nachhärtung 4 h @ 60 °C Pflicht.
-2. SDB Teil B in Deutsch/Französisch/Italienisch beim Händler anfordern; SDB ER2221 Teil B und Stycast/Cat 9 nicht beschafft.
+1. Anfrage an Electrolube (Anhang A, versendet der Auftraggeber bzw. Orchestrator): Tg/CTE nach 24 h RT und nach 24 h RT + 4 h
+   60 °C, Umfüllen aus dem Resin Pack, aktuelle TDS-Fassung. Nachhärtung 4 h @ 60 °C bleibt Pflicht. Ohne Antwort: V-6 vor der Serie.
+2. **SDB Teil B in DE/EN/FR/IT beim Händler anfordern (Anhang B) – Voraussetzung vor dem ersten Beutel.** SDB ER2221 Teil B und
+   Stycast/Cat 9 nicht beschafft. Beständigkeitsliste Handschuhe (CAS 1761-71-3, 25068-38-6) beim Handschuhhersteller holen.
 3. Preis/Lager Distrelec CH (301-16-965) und Versandkosten Simpex im Warenkorb prüfen; Lieferzeit 8 Wochen → vor Musterankunft bestellen.
-4. Kosteneinordnung Beutelpreis (Kap. 7) – Orchestrator/Auftraggeber.
+4. Kosteneinordnung: Einmalkosten nach D-005 (Vorgabe Orchestrator), Kap. 7. Sicherheitsprüfung des Abfüllschritts (M-A) offen.
+7. Wärmeschrank ≥ 80 °C für V-3/V-6 vorhanden? (**ANNAHME**; Filamenttrockner reichen oft nicht bis 80 °C, sonst DSC im Labor).
 5. Membranrand (W-1), Fensterkleber (O-3) und Klemmring (O-4) sind **nicht** Teil dieser Wahl (ER2223 ist schwarz und so dünn,
    dass es in die Membran laufen würde).
 6. Wärmeschrank/Filamenttrockner 60 °C vorhanden? (**ANNAHME**).
@@ -227,6 +272,46 @@ Hebel: grössere Gruppen pro Beutel, wenn die gemessene Zeit pro Sensor es zulä
 | V-1 | Vergussprobe an Kragen + Schott mit FR4-Reststreifen 1.6 mm bzw. Ausschussplatine (Beutel 1) | Spalt rundum gefüllt, keine Blase in der Tasche (Schnitt), Austritt ≤ 0.3 mm über die Kragen-/Schottkante, Zeit pro Sensor notieren |
 | V-2 | Haftung auf angerautem ASA und Lötstopplack: Probekörper 24 h RT + 4 h 60 °C, dann 7 d Wasser | kein Ablösen beim Abhebeln mit Klinge (Kohäsionsbruch im Epoxid oder Kunststoff) |
 | V-3 | Härteprobe: Rest im Mischbecher (≥ 5 mm), wie Bauteile gehärtet, 1 h bei 80 °C | bleibt hart (Fingernagel ohne Eindruck), nicht klebrig |
-| V-4 | Ein Muster: Kanten erst in der Folgesitzung versiegeln; Messfrequenz in Luft und Wasser vor und nach der Versiegelung (Zelle vor der 60-°C-Nachhärtung entnehmen; MONTAGE Prüfung 5a) | Änderung der Spanne ≤ 3 % (Abschätzung 1–2 %) |
+| V-4 | Ein Muster (nicht S4/S5, A-1): Kanten erst in der Folgesitzung versiegeln; Messfrequenz in Luft und Wasser vor und nach der Versiegelung (Zelle **vor dem Auftragen** entnehmen, W-1; MONTAGE Prüfung 5a) | Änderung der Spanne ≤ 3 % (Abschätzung 1–2 %) |
 | V-5 | Kantenversiegelung nach 30 d nass (Teil des Drifttests REQ-MES-06) | keine Ablösung an der Kante, kein Aufquellen; Drift mit/ohne Versiegelung vergleichen, falls eine Reserveplatine verfügbar |
-| K-7 | wie `phase4_sicherheit_kragen_firmware.md` (unverändert) | Gate für F-1 |
+| V-6 | **Kriechprobe 80 °C (Tg-Ersatznachweis, W-2), Pflicht vor der Serie** ohne schriftliche Tg-Angabe von Electrolube: Stab ≈ 4 × 10 × 60 mm (in Kapton-ausgekleideter Rinne gegossen, gehärtet wie die Bauteile), flach auf 2 Auflagen, Stützweite 50 mm, Mittellast **≈ 1.0 N (≈ 100 g)** → Randfaserspannung σ = 3FL/(2bh²) ≈ 0.45 MPa; 1 h bei 80 °C, unter Last auf Raumtemperatur abkühlen, entlasten, bleibende Durchbiegung mit Haarlineal und Fühlerlehre messen. Abschätzung: glasig (E ≈ 3 GPa, **ANNAHME**) elastisch ≈ 0.02 mm, oberhalb Tg (E ≈ 30 MPa, **ANNAHME**) ≈ 1.6 mm, die beim Abkühlen einfriert | bleibende Durchbiegung **< 0.2 mm** (**ANNAHME** Kriterium, an der Probe bestätigen); sonst Tg < 80 °C → Rückfall Kap. 9a bzw. DSC im Labor |
+| K-7 | wie `phase4_sicherheit_kragen_firmware.md`, **mit A-1** (≥ 2 vollständige Muster nach freigegebenem Verfahren) und **A-2** (Schliff an Kragenunterkante z 1.3 … 3.5, Taschenwand U3, Kragenoberseite/Clip; Eindringen ≤ 0.5 mm); Testplan PT11.19/PT11.23 | Gate für F-1; Fail → A-3 (Kap. 9a) |
+
+## Anhang A – Textvorlage Anfrage an Electrolube (Englisch)
+
+An: Electrolube Technical Support (TechnicalSupportTeam@hkw.co.uk laut TDS-Bulletin; Adresse vor dem Versand auf
+electrolube.com prüfen). Versand durch den Auftraggeber bzw. Orchestrator.
+
+> Subject: ER2223 – Tg after low-temperature cure, decanting of resin packs, current TDS/SDS
+>
+> Dear Electrolube Technical Support,
+>
+> we intend to use ER2223 (EER2223RP250G) to pot a small sensor (approx. 0.2 g per unit, FR4 PCB with solder mask, ASA
+> housing; ASA limits the cure temperature to 60 °C). Could you please answer the following:
+>
+> 1. The TDS (Revision 4, Mar 2019) states Tg 140 °C. Under which cure schedule was this measured? What Tg (and CTE below Tg)
+>    is reached after (a) 24 h at 23 °C and (b) 24 h at 23 °C followed by 4 h at 60 °C? Is a Tg of at least 80 °C reached?
+> 2. We need only small quantities per session (approx. 4 g). Is it acceptable to transfer part A and part B from an
+>    unopened resin pack into separate, tightly closed containers (HDPE or glass) and to mix small batches by weight at
+>    3.45 : 1 (balance resolution 0.01 g)? Which mix-ratio tolerance is acceptable, and how long may the opened components
+>    be stored (15–35 °C, dry)?
+> 3. Please send the current TDS (we found a reference to "ER2223 Encapsulation Resins EN 09Aug23") and the current Safety
+>    Data Sheets for part A and part B in German or English.
+>
+> Thank you and kind regards
+
+## Anhang B – Textvorlage Anforderung SDB beim Händler (Deutsch)
+
+An: Simpex Electronic AG (Kontakt laut simpex.ch) bzw. Distrelec Schweiz. Versand durch den Auftraggeber.
+
+> Betreff: Sicherheitsdatenblatt Electrolube ER2223 Teil B (Härter) – Artikel EER2223RP250G / Distrelec 301-16-965
+>
+> Guten Tag
+>
+> Wir möchten die Epoxid-Vergussmasse Electrolube ER2223, Resin Pack 250 g (EER2223RP250G), bestellen. Für die Verarbeitung
+> benötigen wir vorab die aktuellen Sicherheitsdatenblätter für **Teil A (Harz) und Teil B (Härter)** in **Deutsch**
+> (ersatzweise Französisch, Italienisch oder Englisch). Auf Ihrer Website bzw. bei Distrelec ist für Teil B nur eine
+> ungarische Fassung (Stand 2023-10-02) verfügbar. Zusätzlich bitten wir um das aktuelle technische Datenblatt und um die
+> aktuelle Lieferzeit.
+>
+> Freundliche Grüsse

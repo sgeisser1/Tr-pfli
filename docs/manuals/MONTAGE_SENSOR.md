@@ -17,7 +17,7 @@ sondern die Projektleitung fragen.
 
 | Nr | Punkt | Stand |
 |---|---|---|
-| O-1 | **Vergussmasse** (Kragen, Schott): Epoxid 2K, Tg ≥ 80 °C, *ein* Material für den ganzen Kragen (K-4) | **Vorschlag Electrolube ER2223** (Tg 140 °C, ungefüllt; `docs/concepts/vergussmasse_versiegelung.md`, INDEX.csv EP-K). **Freigabe offen:** Abweichung von K-4 „mineralisch gefüllt“ (F-1, Sicherheit), Kosteneinordnung (Orchestrator). Bis zur Freigabe nur Vorversuche V-1 … V-3 (Kap. 3a), **kein Verguss an Mustern**. Ohne Datenblatt und SDB keine andere Masse verwenden. |
+| O-1 | **Vergussmasse** (Kragen, Schott): Epoxid 2K, mineralisch gefüllt, Tg ≥ 80 °C, niedriger CTE, *ein* Material für den ganzen Kragen (K-4, Wortlaut gilt bis zum Entscheid D-030) | **Vorschlag Electrolube ER2223** (Tg 140 °C laut TDS, Härtebedingung unbekannt; ungefüllt **ANNAHME**; `docs/concepts/vergussmasse_versiegelung.md`, INDEX.csv EP-K). **Abweichung von K-4** („gefüllt, niedriger CTE“): Sicherheit kein Veto, zulässig unter Auflagen A-1 … A-5 (`docs/reviews/phase6_vergussmasse_sicherheit.md`). **Freigabe D-030 offen.** Vor dem ersten Beutel (auch Vorversuche V-1 … V-3): SDB Teil B in DE/EN/FR/IT liegt vor (Kap. 3a). Bis zur Freigabe **kein Verguss an Mustern**. Ohne Datenblatt und SDB keine andere Masse verwenden. |
 | O-2 | **Kantenversiegelung der Sonde** (REQ-MECH-07) | **Vorschlag:** ER2223 nur auf Schnittkante und Spitze, Flächen frei (Kap. 5a; Feldsimulation `simulation/field/results/coat_epoxy.txt`). Freigabe wie O-1 |
 | O-3 | Klebstoff Lichtfenster | **ANNAHME** transparentes 2K-Epoxid oder UV-Kleber (PRINT_SETTINGS Kap. 5) |
 | O-4 | Klemmring (Pos. 6): **Presssitz** 0.05 je Seite in der Senkung Ø 6.4, Schürze verpresst die Membran um 0.1 mm (20 %) – Phase 5 R3-W2 (`check_sensor.txt` 2e) | Auszugskraft und Dichtheit am Muster: PROTOTYP-PRÜFUNG ST-W6 (a), M-W3; Klebung nur, wenn ein Kleber mit Datenblatt gewählt ist |
@@ -38,13 +38,14 @@ Teile: Pos. 1–17 laut Stückliste FL-S-00 (gedruckt nach `PRINT_SETTINGS.md`, 
 | 600er Schleifpapier | FDM-Naht auf den O-Ring-Gleitflächen der Hülse glätten (PRINT_SETTINGS Kap. 5) |
 | Silikonfett | O-Ringe (Pos. 11) |
 | Kapton-Punkt (Ø ≈ 3 mm) | Gewinde der Mutter vor Epoxid schützen (PCB_OUTLINE Kap. 7) |
-| Dosierspritzen + Kanülen, Mischbecher, Waage | Verguss (Mengen siehe Kap. 4/5) |
-| Vergussmasse **Electrolube ER2223, Resin Pack 250 g** (Vorschlag O-1), TDS und SDB A/B ausgedruckt am Arbeitsplatz | Schott, Kragen, Sondenkanten (Kap. 3a) |
+| Dosierspritzen + Kanülen, Mischbecher, Spatel, **Waage 0.01 g** | Verguss (Mengen siehe Kap. 4/5), Variante M-A (Kap. 3a) |
+| Vergussmasse **Electrolube ER2223, Resin Pack 250 g** (Vorschlag O-1), TDS und SDB A/B (**B in DE/EN/FR/IT**, Kap. 3a) ausgedruckt am Arbeitsplatz | Schott, Kragen, Sondenkanten (Kap. 3a) |
+| Weithalsflaschen HDPE oder Glas ≈ 250 ml und ≈ 60 ml mit dicht schliessendem Deckel, Etiketten (Variante M-A) | Harz A und Härter B nach dem Abfüllen (Kap. 3a) |
 | Einwegspritzen 1 ml und 3 ml Luer-Lock, stumpfe Dosierkanülen 18–20 G, feiner Synthetikpinsel (≤ 3 mm), Wattestäbchen, kleiner Spiegel | Dosieren, Kanten auftragen, Austritt kontrollieren |
-| Einweg-Alu-Schale (≥ 15 × 10 cm), Schere, Unterlage (Karton/Folie) | Beutelrest flach aushärten lassen (Exothermie, Kap. 3a) |
+| Einweg-Alu-Schale (**≥ 20 × 15 cm** oder zwei), Schere, **nicht brennbare Unterlage** (Fliese, Blech) | Beutelrest flach aushärten lassen (Variante M-B), Abfüllen (M-A), Kap. 3a |
 | Wärmeschrank oder Filamenttrockner mit separatem Thermometer, einstellbar 60 °C (**ANNAHME** vorhanden) | Nachhärtung 4 h bei 60 °C (Kap. 3a) |
 | Vakuumkammer (falls vorhanden) | blasenfreier Verguss (K-4), sonst kopfüber mit Entlüftung; bei ER2223 (800 mPa·s) nicht nötig |
-| Nitrilhandschuhe (Einweg, **ANNAHME** Material: das SDB nennt nur „EN 374, Material nach Angabe des Handschuhherstellers“), **dicht schliessende Chemikalien-Schutzbrille (EN 166)**, langärmlige Kleidung | Epoxid: Härter B ist **ätzend (H314) und hautsensibilisierend (H317)**, Harz A reizend und sensibilisierend (Kap. 3a) |
+| Nitrilhandschuhe ≥ 0.1 mm, zwei Paar übereinander (Einweg, **ANNAHME** Material: das SDB nennt nur „EN 374“), **dicht schliessende Chemikalien-Schutzbrille (EN 166)** und **Gesichtsschutz (Visier)**, langärmlige Kleidung, **Kunststoffschürze**, **Augenspülflasche**, Halbmaske mit **Filter A (EN 14387)** bereit, Ventilator | Epoxid: Härter B ist **ätzend (H314) und hautsensibilisierend (H317)**, Harz A reizend und sensibilisierend (Kap. 3a) |
 | Halter „kopfüber“ (z. B. Lochplatte, Schraubstock mit Schutzbacken) | Kappe bzw. Sensor beim Aushärten senkrecht halten |
 
 ## 2 Vorbereitung der Druckteile
@@ -81,54 +82,108 @@ sich die Zunge sichtbar nach hinten (Nase), in Ruhe ist sie nicht vorgespannt. F
 
 Grundlage: `docs/references/Electrolube_ER2223_TDS_Rev4-2019-03.pdf` (TDS), SDB Teil A
 `Electrolube_ER2223-PartA_SDS_Rev0-2016-10-19_EN.pdf` (Stand 2023: `…_Rev0.64-2023-10-27_SV.pdf`), SDB Teil B
-`Electrolube_ER2223-PartB_SDS_2023-10-02_HU.pdf`. Auswahl und Begründung: `docs/concepts/vergussmasse_versiegelung.md`.
-**Gilt erst nach Freigabe von O-1/O-2**; vorher nur die Vorversuche (unten).
+`Electrolube_ER2223-PartB_SDS_2023-10-02_HU.pdf`. Auswahl und Begründung: `docs/concepts/vergussmasse_versiegelung.md`;
+Sicherheitsprüfung `docs/reviews/phase6_vergussmasse_sicherheit.md`.
+
+**Geltung (K-2):** Gefahren, Schutzmassnahmen, Erste Hilfe, Lagerung und Entsorgung gelten **ab dem ersten Beutel, auch
+für die Vorversuche V-1 … V-3**. Der Verguss an Mustern ist erst nach Freigabe von O-1/O-2 (D-030) erlaubt.
+
+**Voraussetzung vor dem Öffnen des ersten Beutels (W-3):** Das SDB Teil B liegt in **Deutsch, Englisch, Französisch oder
+Italienisch** vor (abgelegt unter `docs/references/`, ausgedruckt am Arbeitsplatz). Heute liegt Teil B nur ungarisch vor.
+Der Auftraggeber fordert es beim Händler an (Textvorlage: Konzept Anhang B). Ohne dieses SDB keinen Beutel öffnen.
 
 **Gefahren (SDB):** Teil A (Harz, schwarz): Achtung – H315 Hautreizung, H317 kann allergische Hautreaktion verursachen,
 H319 schwere Augenreizung, H411 giftig für Wasserorganismen (SDB A S. 1). Teil B (Härter): **Gefahr – H314 schwere
 Verätzungen der Haut und schwere Augenschäden**, H302, H317, H318, H373 (SDB B S. 2). Gemischt bis zur Aushärtung wie A + B behandeln.
 
-**Schutzmassnahmen (SDB A S. 6, SDB B S. 2/6, P280):**
-1. Arbeitsplatz gut lüften, Unterlage auslegen, **kein Essen, Trinken, Rauchen**; Kinder und Unbeteiligte fernhalten.
-2. Vor dem Öffnen des Beutels: **Chemikalien-Schutzbrille** (dicht schliessend, EN 166), Nitrilhandschuhe, lange Ärmel.
-   Handschuhe nach Kontakt mit der Masse sofort wechseln, nicht mit Handschuhen ins Gesicht fassen. Wer bereits auf
-   Epoxid allergisch reagiert, verarbeitet die Masse nicht (H317).
-3. **Haut:** verunreinigte Kleidung ausziehen, Haut sofort mit viel Wasser und Seife waschen (kein Lösungsmittel, auch
-   kein Isopropanol auf der Haut). **Augen:** sofort mehrere Minuten mit Wasser spülen, Kontaktlinsen entfernen, Arzt
-   (SDB B S. 2, P305 + P351 + P338). **Verschlucken:** Mund ausspülen, **kein Erbrechen** herbeiführen, Arzt (P301 + P330 + P331).
-   Notfall Schweiz: Tox Info Suisse **145**.
-4. Isopropanol (Kap. 2/5) ist leicht entzündlich: Gebinde geschlossen und weg vom Wärmeschrank halten.
-5. **Rest im Beutel nicht liegen lassen:** sofort nach dem Abfüllen den Beutelinhalt in die Alu-Schale ausdrücken und
-   **flach (≤ 10 mm)** im gelüfteten Raum aushärten lassen. Grund: Ein 250-g-Paket erwärmt sich beim Aushärten selbst;
-   das TDS gibt für ER2223 keine Exothermie an (**ANNAHME** flach ausgiessen; vgl. MG-TDS „Mixing > 500 g … flash cure“).
-6. Entsorgung: ausgehärtete Reste, leere Beutel, Spritzen und Handschuhe erst nach vollständiger Aushärtung in den
-   Kehricht (**ANNAHME**, Abschn. 13 der SDB beachten); **flüssige Reste nie in den Ausguss** (H411). Ungemischte
-   Beutel bei der Sammelstelle für Sonderabfälle abgeben.
+**Schutzausrüstung (SDB A S. 6, SDB B S. 2/6, P280):**
+1. **Chemikalien-Schutzbrille** (dicht schliessend, EN 166) und darüber ein **Gesichtsschutz (Visier)** beim Aufschneiden,
+   Ausdrücken, Abfüllen und Kneten (SDB B Abschn. 8.2, S. 6).
+2. **Handschuhe** (K-3): Nitril ≥ 0.1 mm (**ANNAHME** Material; das SDB nennt nur EN 374 und „dicht schliessend“), **zwei Paar
+   übereinander**, das äussere bei Kontakt sofort wechseln; nicht mit Handschuhen ins Gesicht fassen. Beständigkeitsliste des
+   Handschuhherstellers für CAS 1761-71-3 (Härter) und 25068-38-6 (Harz) vor dem ersten Beutel ablegen (offen).
+3. Langärmlige Kleidung und **chemikalienbeständige Kunststoffschürze**; geschlossene Schuhe.
+4. **Augenspülflasche** (oder fliessendes Wasser in Griffnähe) am Arbeitsplatz (SDB A S. 6 „eyewash“).
+5. Wer bereits auf Epoxid allergisch reagiert, verarbeitet die Masse nicht (H317).
 
-**Sitzungsplan:** Ein Beutel (250 g) wird immer ganz gemischt und ist **30 min verarbeitbar** (20 °C, TDS S. 1), Gelzeit
-90 min. Bedarf je Sensor ≈ 0.2 g. Schott und Kragen brauchen getrennte Sitzungen (Schott muss hart sein, bevor der
-Kragen gesetzt wird). Deshalb pro Beutel höchstens eine Gruppe von **≤ 8 Sensoren** (**ANNAHME**, Zeit pro Sensor beim
-Vorversuch V-1 messen) und rollierend arbeiten: Sitzung 1 Schott Gruppe 1; Sitzung 2 Kragen + Kanten Gruppe 1 und Schott
-Gruppe 2; usw. **Alles, was nicht mit Masse zu tun hat (Einspannen, Lehren, Kapton, Reinigen), vor dem Mischen erledigen.**
+**Arbeitsplatz und Lüftung (W-4, SDB B Abschn. 7.1 S. 5):**
+1. Nicht in Wohn- oder Schlafräumen arbeiten. Am **geöffneten Fenster**, möglichst mit einem Ventilator, der **nach aussen**
+   bläst (behelfsmässige Absaugung). Unterlage auslegen. **Kein Essen, Trinken, Rauchen.** Kinder, Unbeteiligte und
+   Haustiere fernhalten.
+2. Schale mit Resten (Variante M-B) und den Trockner zum Nachhärten in einen belüfteten Raum stellen, **nicht in Wohn- oder
+   Schlafräume**, ausser Reichweite von Kindern und Haustieren.
+3. Bei Geruch oder Reizung abbrechen und lüften. Wer regelmässig vergiesst: **Halbmaske mit Filter A (EN 14387)** bereithalten
+   (SDB A S. 6).
+4. Den Filamenttrockner nach der Nachhärtung geöffnet auslüften lassen, bevor er wieder für Filament verwendet wird (**ANNAHME**).
+5. Isopropanol (Kap. 2/5) ist leicht entzündlich: Gebinde geschlossen und weg vom Wärmeschrank halten.
 
-**Vorversuche vor dem ersten Muster (Beutel 1, PROTOTYP-PRÜFUNG, Konzept Kap. 12):** V-1 Vergussprobe Kragen und Schott
-mit FR4-Reststreifen 1.6 mm (Füllung, Blasen, Austritt, Zeit pro Sensor), V-2 Haftprobe auf angerautem ASA, V-3 Härteprobe
-(Becherrest 1 h bei 80 °C bleibt hart). Muster erst vergiessen, wenn V-1 … V-3 bestanden sind.
+**Erste Hilfe (W-3; SDB B Abschn. 4.1 S. 3, SDB A 2023 S. 3):** Notfall Schweiz: Tox Info Suisse **145**, Rettung **144**;
+SDB zum Arzt mitnehmen.
+- **Augen:** sofort mit viel Wasser, auch unter den Lidern, **mindestens 15 min** spülen, Lider offen halten, Kontaktlinsen
+  entfernen; **immer sofort Arzt**.
+- **Haut:** verunreinigte Kleidung **und Schuhe** sofort ausziehen, Haut sofort mit Seife und viel Wasser waschen (kein
+  Lösungsmittel, auch kein Isopropanol auf der Haut); nach Kontakt mit Härter oder frischer Mischung **Arzt**.
+- **Einatmen:** an die frische Luft, bei Beschwerden Arzt; Hinweis an den Arzt: **verzögertes Lungenödem möglich**.
+- **Verschlucken:** Mund ausspülen, **kein Erbrechen** herbeiführen, sofort Arzt (P301 + P330 + P331).
 
-**Mischen (TDS S. 1–2, Resin Pack):**
-1. Raum und Beutel 20–25 °C (Lagerung über 15 °C, TDS S. 1; kristallisierter Härter: Beutel bei 40 °C anwärmen, TDS S. 3).
-   Ablaufdatum prüfen (Haltbarkeit 12 Monate).
-2. Beide Endkappen abnehmen, Clip durch vorsichtiges Auseinanderziehen entfernen; Harz und Härter im Beutel **3–4 min**
+**Lagerung (SDB B Abschn. 7.2 S. 5, TDS S. 1):** dicht verschlossen, trocken, 15–35 °C, gut belüftet, **unter Verschluss und
+für Kinder unzugänglich**; nicht neben Lebensmitteln. Ablaufdatum auf dem Beutel (Haltbarkeit 12 Monate, TDS S. 1).
+
+**Entsorgung:** ausgehärtete Reste, leere Beutel/Flaschen, Spritzen und Handschuhe erst nach vollständiger Aushärtung in
+den Kehricht (**ANNAHME**, Abschn. 13 der SDB beachten); **flüssige Reste nie in den Ausguss** (H411). Ungemischte Beutel und
+Restmengen A/B bei der Sammelstelle für Sonderabfälle abgeben.
+
+**Vorbedingung jeder Vergusssitzung (W-1): Clip leer** – keine Zelle, keine Dummy-Scheibe im Clip, an jedem Sensor vor dem
+Mischen kontrolliert und in der Musterliste abgehakt. Gilt für Schott (Kap. 4), Kragen (Kap. 5), Kanten (Kap. 5a), jede
+Nacharbeit (Kap. 8) und die Nachhärtung.
+
+**Sitzungsplan:** Schott und Kragen brauchen getrennte Sitzungen (Schott muss hart sein, bevor der Kragen gesetzt wird).
+Gemischte Masse ist **30 min verarbeitbar** (20 °C, TDS S. 1), Gelzeit 90 min. Bedarf je Sensor ≈ 0.2 g. Pro Ansatz eine
+Gruppe von **≤ 8 Sensoren** (**ANNAHME**, Zeit pro Sensor beim Vorversuch V-1 messen). **Alles, was nicht mit Masse zu tun
+hat (Clip leer, Einspannen, Lehren, Kapton, Reinigen), vor dem Mischen erledigen.**
+
+**Vorversuche vor dem ersten Muster (PROTOTYP-PRÜFUNG, Konzept Kap. 12):** V-1 Vergussprobe Kragen und Schott mit
+FR4-Reststreifen 1.6 mm (Füllung, Blasen, Austritt, Zeit pro Sensor), V-2 Haftprobe auf angerautem ASA, V-3 Härteprobe
+(Becherrest 1 h bei 80 °C bleibt hart), V-6 Kriechprobe 80 °C (Tg-Ersatznachweis, Konzept Kap. 12). Muster erst
+vergiessen, wenn V-1 … V-3 bestanden sind (V-6 vor der Serie).
+
+**Mischen – zwei Varianten.** Variante **M-A (Vorschlag, spart Beutel)** gilt erst, wenn Electrolube keine Einwände hat
+(Anfrage Konzept Anhang A) und die Sicherheit den Abfüllschritt geprüft hat; bis dahin **Variante M-B**.
+
+*Gemeinsam:* Raum und Material 20–25 °C (Lagerung über 15 °C, TDS S. 1; kristallisierter Härter: bei 40 °C anwärmen, bis
+die Kristalle geschmolzen sind, TDS S. 3). Ablaufdatum prüfen. Uhrzeit des Mischens notieren: **Ende der Verarbeitung =
+Mischzeit + 30 min.** Masse, die bereits zieht (Fäden, deutlich zäher), nicht mehr verwenden. Von jedem Ansatz einen
+Becherrest (≥ 5 mm hoch) für V-3 behalten.
+
+*Variante M-A – Beutel einmal abfüllen, Kleinmengen wägen (TDS S. 3 „Bulk Mixing“):*
+1. Abfüllen (einmal je Beutel, volle Schutzausrüstung inkl. Visier, über der Alu-Schale auf nicht brennbarer Unterlage):
+   Clip **nicht** entfernen. Eine Ecke der Harzkammer A abschneiden, Harz in eine saubere, trockene Weithalsflasche A
+   (HDPE oder Glas mit dicht schliessendem Deckel, ≈ 250 ml) ausdrücken. Dann die Härterkammer B ebenso in eine kleine
+   Flasche B (≈ 60 ml) ausdrücken. Flaschen fast voll, sofort schliessen. **Etiketten:** Produkt (ER2223 Teil A bzw. B),
+   Gefahrenpiktogramme und H-Sätze wie oben, Abfülldatum, Ablaufdatum des Beutels. Leeren Beutel aushärten lassen bzw. als
+   Sonderabfall entsorgen. Lagerung wie oben, unter Verschluss.
+2. Je Ansatz: Flasche A vor der Entnahme gründlich aufrühren (Sediment, TDS S. 3), Mischbecher auf der **Waage 0.01 g**
+   tarieren, **Harz A 3.45 Teile, dann Härter B 1 Teil nach Gewicht** in denselben Becher, z. B. **3.45 g A + 1.00 g B**
+   (Mindestansatz 4 g, damit der Wägefehler ≤ ± 1 % bleibt; **ANNAHME** Toleranz, das TDS nennt keine). Bei Überschiessen
+   nicht zurückschütten, sondern den Partner nachrechnen und nachwägen. Werte in die Musterliste schreiben.
+3. Mit einem Spatel **2 min** langsam rühren, Wand und Boden abstreifen, bis gleichmässig schwarz ohne Schlieren; ≈ 2 min
+   stehen lassen, Blasen steigen auf. Spritzen von unten befüllen (Kolben ziehen), Kanüle aufsetzen, Luft ausstossen.
+4. Flaschen nach der Entnahme Gewinde abwischen, sofort schliessen. Härter B, der trüb wird oder eine Kruste bildet, nicht
+   verwenden (**ANNAHME**).
+
+*Variante M-B – ganzer Beutel (TDS S. 1–2, Resin Pack):*
+1. Beide Endkappen abnehmen, Clip durch vorsichtiges Auseinanderziehen entfernen; Harz und Härter im Beutel **3–4 min**
    durchkneten, mit dem Clip das Material aus den Ecken streichen, bis die Farbe gleichmässig schwarz ohne Schlieren ist.
-   Nicht von Hand Teilmengen abwiegen (Mischverhältnis 3.45 : 1 nach Gewicht ist im Beutel vorgegeben).
-3. Eine Ecke abschneiden und sofort 3–5 Spritzen à 1–3 ml füllen (Kolben ziehen, Spritze von unten befüllen), Kanüle
-   aufsetzen, Luft nach oben ausstossen. Den Rest sofort in die Alu-Schale (Schutzmassnahme 5). Uhrzeit notieren:
-   **Ende der Verarbeitung = Mischzeit + 30 min.** Masse, die bereits zieht (Fäden, deutlich zäher), nicht mehr verwenden.
+2. Eine Ecke abschneiden und sofort 3–5 Spritzen à 1–3 ml füllen. **Den Rest sofort ausgiessen (K-1):** in eine Alu-Schale
+   **≥ 20 × 15 cm** (≈ 227 ml → ≈ 7.5 mm Schichtdicke) oder zwei Schalen, auf eine **nicht brennbare Unterlage** (Fliese,
+   Blech, nicht Karton), im belüfteten Raum aushärten lassen. **Den Rest nicht in den Trockner stellen** (TDS S. 3: „Do not
+   heat cure large volumes immediately“; dieselbe Seite: „Small volumes (250ml) may be heat cured immediately“ – die
+   Selbsterwärmung der Beutelmenge ist also beherrschbar).
 
 **Aushärten:** kopfüber im Halter **24 h bei 20–25 °C**, danach **4 h bei 60 °C** (TDS S. 1 „Cure Time (60 °C)“, S. 3
 „post-cure … if required“) im Wärmeschrank/Filamenttrockner. Temperatur mit eigenem Thermometer prüfen, **nie über 65 °C**
-(ASA, Fenster, Membran). **Zelle nie eingesetzt** (Kap. 4 Schritt 1). Die Nachhärtung entfällt nur, wenn Electrolube
-einen Tg ≥ 80 °C nach Raumtemperatur-Härtung schriftlich bestätigt (offen). Erst danach Lehren entfernen, prüfen, weiter.
+(ASA, Fenster, Membran). **Clip leer** (W-1, siehe oben). Die Nachhärtung entfällt nur, wenn Electrolube schriftlich
+einen Tg ≥ 80 °C nach Raumtemperatur-Härtung bestätigt (offen). Erst danach Lehren entfernen, prüfen, weiter.
 
 ## 4 Platine einsetzen und Schott vergiessen (Pos. 9, 15, 16)
 
@@ -138,6 +193,7 @@ unvergossenen Kern messen (Gewichte/Kraftmesser): ≤ 12 N, über 15 N nicht ver
 nach Wahl der Mechanik, ANNAHME bis Datenblatt); (3) Gleitfläche der Nase nach dem Druck glätten (N-3);
 (4) Farbeindringprüfung der Membranabdichtung an den ersten 3 Mustern (M-W3).
 
+0. **Clip leer (W-1):** keine Zelle, keine Dummy-Scheibe im Clip – kontrollieren und in der Musterliste abhaken.
 1. Platine (Pos. 16, Zelle **nicht** eingesetzt) mit der bestückten Seite F **zum Fenster** von unten durch den
    Schottschlitz (26.4 × 4.0) einschieben, bis die Platinenoberkante am **Anschlag der Kappe** liegt (z 53.5). Die
    Quetschrippen (Gabel und Schott-Rückwand) drücken die Platine nach vorn an die F-Referenz.
@@ -162,6 +218,8 @@ Aushärten (Kap. 3a) hart und nicht klebrig; Becherrest der Sitzung gleich (V-3)
 
 Der Kragenverguss ist die **Sondendichtung** (S3-K2, REQ-MECH-08). Er wird nie wieder gelöst.
 
+0. **Clip leer (W-1):** keine Zelle, keine Dummy-Scheibe im Clip (auch nach Programmieren Weg B, Kap. 6) – kontrollieren
+   und abhaken.
 1. **Reinigen (K-5):** Platine im Bereich z 0 … 8 (Dichtstreifen und Feld U3/C24) **und die ganze Sonde bis zur Spitze**
    (Kanten für Kap. 5a) mit Isopropanol von Flussmittel und Fett befreien, ≥ 15 min trocknen lassen; danach die Sonde
    nur noch mit Handschuhen anfassen. Ein Primer ist für ER2223 im TDS nicht vorgesehen. Schlitz und Taschenwände des
@@ -204,7 +262,7 @@ beschichten. Eine Schicht auf den Flächen senkt die Messspanne stark (50 µm �
 liegt ≥ 1.25 mm innerhalb der Kontur und ist von aussen nicht zugänglich (4 Lagen). Gleiche Masse wie der Kragen (K-4:
 ein Material im Leckpfad), gleiche Sitzung wie Kap. 5 (Masse noch nicht über 30 min alt).
 
-1. Sensor bleibt kopfüber eingespannt (Spitze oben). Sonde ist nach Kap. 5 Schritt 1 sauber und trocken.
+1. Sensor bleibt kopfüber eingespannt (Spitze oben), **Clip leer** (W-1). Sonde ist nach Kap. 5 Schritt 1 sauber und trocken.
 2. Mit dem feinen Pinsel (oder der Kanüle, Masse als Raupe ziehen und mit dem Pinsel verstreichen) die Masse auf
    **beide Längskanten, die Fasen der Spitze und die Stirnfläche der Spitze** auftragen, von der Spitze nach unten bis in
    die noch flüssige Hohlkehle des Kragens: Kante und Kragen bilden so eine durchgehende Schicht ohne Fuge.
@@ -217,11 +275,14 @@ ein Material im Leckpfad), gleiche Sitzung wie Kap. 5 (Masse noch nicht über 30
 **Prüfung 5a:**
 - Lupe ≥ 10×: Kante und Spitze rundum geschlossen glänzend schwarz, keine sichtbaren Glasfasern, keine Blasen/Krater,
   lückenloser Übergang in die Hohlkehle des Kragens.
+- Nach der Nachhärtung **nicht klebrig** (K-5): ein Wattestäbchen, über Kante und Spitze gestrichen, lässt keine Faser
+  zurück. Sensoren mit klebriger Kante **nicht** in Erde einsetzen (ungehärtete Reste laugen aus, H411/H314) und melden.
 - Messschieber: Sondenbreite an 3 Stellen 0.1 … 0.4 mm grösser als vor dem Versiegeln (Schicht 0.05 … 0.2 mm je Kante,
   **ANNAHME**). Flächen ausserhalb des 1-mm-Randes ohne Masse.
 - Nur **ein** Muster (PROTOTYP-PRÜFUNG V-4): Kanten erst in der **nächsten** Sitzung versiegeln (Kragen dann schon hart).
-  Vorher und nachher Messfrequenz in Luft und in Wasser notieren (Testfirmware, Zelle eingesetzt, Hülse montiert); vor
-  der Nachhärtung 60 °C die **Zelle entnehmen**. Kriterium: Spanne um ≤ 3 % geändert. Dieses Muster hat am Übergang
+  Vorher Messfrequenz in Luft und in Wasser notieren (Testfirmware, Zelle eingesetzt, Hülse montiert). Dann Hülse ab,
+  **Zelle entnehmen, Clip leer** (W-1), erst danach Masse auftragen und nachhärten. Nachher Zelle wieder einsetzen
+  (Kap. 7) und gleich messen. Kriterium: Spanne um ≤ 3 % geändert. Dieses Muster hat am Übergang
   Kante/Hohlkehle eine Fuge „nass auf hart“ und ist für K-7 nicht repräsentativ.
 - Kalibrierung (2-Punkt) und Vorkonditionierung (≥ 14 Tage wässern, `simulation/field/REPORT.md` Kap. 7) erst **nach**
   dem Versiegeln und Aushärten.
@@ -233,7 +294,9 @@ Zellfach). Keine Zelle im Clip. Danach Dummy-Zelle entnehmen.
 
 **Solange Weg A nicht freigegeben ist** (Test ST-P1, Sicherheitsauflagen PS-W1/A1–A5): Muster **vor dem Verguss**
 nach Weg B (Kap. 5 der Programmieranleitung, nur mit Dummy-Scheibe) programmieren, d. h. diesen Schritt vor Kap. 5
-dieser Anleitung ausführen (R3-K4).
+dieser Anleitung ausführen (R3-K4). **Nach der Funktionsprüfung mit Zelle (PROGRAMMIEREN Kap. 5 Schritt 9) die Zelle
+wieder entnehmen** (kein Metallwerkzeug); erst mit leerem Clip vergiessen (W-1). Eine geprüfte Zelle ≥ 3.0 V darf in
+Kap. 7 wieder eingesetzt werden, Zellen < 2.6 V entsorgen (PROGRAMMIEREN Kap. 6).
 
 ## 7 Zelle einsetzen, O-Ringe, Hülse schliessen (Pos. 2, 11, 12, 17)
 
@@ -263,13 +326,17 @@ Ablauf für Nutzer: `docs/manuals/BATTERIEWECHSEL.md` (mit Sicherheitshinweisen)
 1. Sonde reinigen, über einer Schale arbeiten (FMEA F-22). Schraube lösen (PH1), Hülse nach unten über die Sonde
    abziehen (`renders/final/fluidi_04_batteriewechsel.png`).
    Dabei Kantenversiegelung (Kap. 5a) und Hohlkehle des Kragens unter der Lupe ansehen: abgeplatzte Stellen oder
-   sichtbare Glasfasern in der Musterliste notieren und melden (Nachbessern nur nach Kap. 3a/5a mit frischer Masse).
+   sichtbare Glasfasern in der Musterliste notieren und melden.
 2. Zelle zur offenen Clip-Seite (+x) herausschieben, **kein Metallwerkzeug** (S3-L1, F-24). Clip-Lötstellen unter der
    Lupe prüfen (Pads am Katalogminimum, Red-Team K-4).
 3. Nur neue Markenzellen (Panasonic CR2032) mit **≥ 3.0 V Leerlauf** einsetzen; Zellen < 2.6 V nicht wieder verwenden,
    abkleben, entsorgen (PS-K1 Bed. 3). Taste nicht berühren, L11 beobachten.
 4. O-Ringe prüfen und fetten, beschädigte ersetzen. Hülse aufschieben, Schraube handfest.
 5. Prüfung 7 wiederholen. Wechsel in der Musterliste zählen (Testplan: 50 Wechsel ST-K6, Spritzwasser nach 10 Wechseln).
+
+**Nacharbeit an Kantenversiegelung oder Hohlkehle (W-1):** nur nach Rücksprache mit der Projektleitung (eigener Ansatz,
+Fuge „nass auf hart“). Ablauf: Zelle nach Schritt 2 entnehmen, **Clip leer** kontrollieren, dann Kap. 3a und 5a, Nachhärtung
+ohne Zelle; erst danach Schritt 3–5.
 
 ## 9 Demontage / Reparatur
 

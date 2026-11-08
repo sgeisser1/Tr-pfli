@@ -139,7 +139,9 @@ Ablauf:
 9. **Nacharbeit (Pflicht):** Flussmittel mit Isopropanol reinigen, unter der Lupe prüfen: R9 auf beiden Pads gelötet,
    kein Zinn zwischen den Pads oder zu R8/D1, kein Drahtrest. **Foto** von R9/R6/TP2 unter der Lupe ablegen (die
    Widerstandsmessung erkennt einen vergessenen Draht nicht, PS-W4). Kontrollmessung ohne Speisung: TP1 ↔ R9 Pad 1
-   ≈ 200 kΩ (R9 + R10). Erst dann Zelle einsetzen (Funktionsprüfung wie Weg A Schritt 7) und vergiessen.
+   ≈ 200 kΩ (R9 + R10). Erst dann Zelle einsetzen (Funktionsprüfung wie Weg A Schritt 7), **danach die Zelle wieder
+   entnehmen** (kein Metallwerkzeug) und erst mit **leerem Clip** vergiessen (`MONTAGE_SENSOR.md` Kap. 3a/4/5, W-1 aus
+   `docs/reviews/phase6_vergussmasse_sicherheit.md`). Eine geprüfte Zelle ≥ 3.0 V darf nach dem Verguss wieder eingesetzt werden.
    **Zellen unter 2.6 V** (z. B. nach der Bootloader-Falle, Kap. 6) **nicht wiederverwenden**, sondern entsorgen.
 
 Folgen und Grenzen von Weg B:
