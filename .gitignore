@@ -18,3 +18,10 @@ app/docs/concept/
 simulation/fem/*.FCStd
 *.FCBak
 renders/final/mesh/
+# Schluessel nie ins Repo (CK-L1); einzige Ausnahme der DEV-Schluessel
+*.pem
+*.key
+*.p8
+*.p12
+*.pfx
+!firmware/sensor/keys/DEV_ONLY_fluidi_signing_ec-p256.pem

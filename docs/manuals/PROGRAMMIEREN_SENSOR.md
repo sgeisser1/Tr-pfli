@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | Dokument | `docs/manuals/PROGRAMMIEREN_SENSOR.md` |
-| Version | 1.0, 2026-11-08 (Elektronik; Red-Team B-4 / W-4 / W-10) |
+| Version | 1.1, 2026-11-08 (Elektronik; Red-Team B-4 / W-4 / W-10; 1.1: Veto PS-K1, Weg B nur mit Dummy-Scheibe) |
 | Gilt für | Sensor Rev C (`hardware/sensor/`), Firmware `firmware/sensor` (Werks-Hex), Werkzeug `scripts/flash_sensor.py` |
 | Adapter | `hardware/programmer/README.md` (Programmieradapter Rev 1: Dummy-Zelle 2.0 V + TX-Puffer) |
 | Ersetzt | `docs/manuals/INSTALL_FIRMWARE_TOOLS.md` Kap. 5 (dort: XIAO-Gateway und `cc23_bsl.py`, beides veraltet) |
@@ -14,8 +14,10 @@ fehlt: am **offenen Board vor dem Verguss**, mit Labornetzteil und gelöteten Dr
 
 ## 1 Sicherheitsregeln (CONCEPTS 2.7, Auflagen R2-A2/R2-A3)
 
-1. **Nie mit eingesetzter Zelle programmieren.** Speisung nur über die Dummy-Zelle (Weg A) bzw. über das Labornetzteil
-   am Clip/Minuspad (Weg B). Keine Quelle an TP1/TP2.
+1. **Nie mit eingesetzter Zelle programmieren.** Speisung **nur über die Dummy-Zelle bzw. Dummy-Scheibe im Clip**
+   (Weg A und Weg B). Die Scheibe belegt den Clip, so dass keine Zelle parallel zum Netzteil eingesetzt werden kann
+   (Veto PS-K1, `docs/reviews/phase5_programmer_sicherheit.md`). Keine Prüfklemme am Clip, kein Draht am Minuspad,
+   keine Quelle an TP1/TP2.
 2. Labornetzteil (Weg B): **2.0 V** (höchstens 2.2 V), Strombegrenzung **≤ 20 mA**, Polarität vor dem Anschliessen messen.
 3. Der CH343 bekommt seine I/O-Spannung (VIO) immer aus **derselben 2.0-V-Speisung** (Weg A: Adapter-Regler U3,
    Weg B: dasselbe Labornetzteil). **Jumper H3** auf dem Waveshare-Board **abziehen**. Mit 3.3-V- oder 5-V-Pegeln wird
@@ -32,7 +34,7 @@ fehlt: am **offenen Board vor dem Verguss**, mit Labornetzteil und gelöteten Dr
 | Waveshare CH343 USB UART Board, Jumper H3 abgezogen | ✓ | ✓ | `WCH_CH343_Datasheet_V1E.pdf`; Belegung `docs/references/Waveshare_CH343-USB-UART-Board_Schematic_2026-11-08.pdf` |
 | Programmieradapter Rev 1 (Dummy-Zelle + Federstiftkopf + Puffer) | ✓ | – | `hardware/programmer/README.md` |
 | Labornetzteil mit Strombegrenzung, Kupferlackdraht 0.1–0.2 mm, Lötstation mit feiner Spitze, Lupe/Mikroskop, Isopropanol | – | ✓ | |
-| Dummy-Scheibe (nur die Dummy-Zelle des Adapters, ohne Federstiftkopf) | – | empfohlen | Kap. 5 Schritt 2 |
+| Dummy-Scheibe (nur die Dummy-Zelle des Adapters, ohne Federstiftkopf; Dicke 3.0–3.2 mm, PS-W3) | – | **Pflicht** | Kap. 5 Schritt 2 (Veto PS-K1) |
 | Werks-Hex `firmware/sensor/build/fluidi-sensor-factory-<ver>-key<fp>.hex` | ✓ | ✓ | erzeugt mit `make` in `firmware/sensor` (`firmware/sensor/README.md`) |
 
 ## 3 Software vorbereiten
@@ -105,8 +107,8 @@ unterhalb der RGB-LED D1; Pad 1 ist das **linke** Pad (F-Seite, Antenne oben), P
 
 | Anschluss | Sensor | CH343-Board / Netzteil | Begründung |
 |---|---|---|---|
-| Speisung + | Clip (VBAT, über Q1 auf VDD) | Netzteil + 2.0 V | Speisung wie mit einer Zelle; Q1 bleibt Verpolschutz |
-| Speisung − | Minuspad (GND) | Netzteil −, CH343 GND (H2.2) | gemeinsame Masse |
+| Speisung + | Dummy-Scheibe im Clip (VBAT, über Q1 auf VDD) | Netzteil + 2.0 V | Speisung wie mit einer Zelle; Q1 bleibt Verpolschutz |
+| Speisung − | Dummy-Scheibe auf dem Minuspad (GND) | Netzteil −, CH343 GND (H2.2) | gemeinsame Masse |
 | VIO | – | H3 Mittelstift (Jumper weg) an Netzteil + | VIO = VDD, kein Rückspeisen, wenn das Netzteil aus ist |
 | Sensor-TX | **R9 Pad 1** (DIO6) | H2.4 **RXD** | direkt, ohne die 200 kΩ |
 | Sensor-RX | TP2 (UART_RX_PAD) | H2.3 **TXD** | über die 200 kΩ des Sensors (SPICE B) |
@@ -120,20 +122,23 @@ CH343, 0.13 V am Sensor-RX).
 Ablauf:
 
 1. Board liegt offen, Hülse und Verguss fehlen noch, **keine Zelle**.
-2. Speisung: Am einfachsten mit der **Dummy-Scheibe** des Adapters (`hardware/programmer/README.md` Kap. 4) im Clip
-   und den zwei Litzen ans Netzteil. Ohne Scheibe: + mit einer Mikro-Prüfklemme am Clip-Quersteg (geschlossenes Ende,
-   −X), − mit einem angelöteten Draht am Rand des Minuspads. Ein Lötpunkt auf dem Minuspad muss danach **plan
-   abgesaugt** werden, weil dort später die Zelle aufliegt.
+2. Speisung **nur** mit der **Dummy-Scheibe** des Adapters (`hardware/programmer/README.md` Kap. 4, Dicke 3.0–3.2 mm)
+   im Clip und den zwei Litzen ans Netzteil. **Ohne Scheibe kein Weg B** (Veto PS-K1): Eine Prüfklemme am Clip liesse
+   den Clip frei, eine Zelle könnte parallel zum Netzteil eingesetzt und geladen werden. Nicht auf dem Minuspad oder
+   den gefüllten Via-in-Pad-Flächen im Fach löten (PS-W2).
 3. CH343-RXD: Kupferlackdraht 0.1–0.2 mm auf **R9 Pad 1** löten (wenig Zinn, kurz, R9 nicht ablöten), Draht mit
    Kaptonband zugentlasten.
 4. CH343-TXD: Draht an TP2 (Ø 1.5 mm, leicht zu löten) oder Prüfspitze.
-5. Netzteil auf 2.0 V, 20 mA einstellen, **erst dann** anschliessen. VIO am Waveshare-Board messen: 2.0 V.
+5. Netzteil auf 2.0 V, **10 mA** (höchstens 20 mA) einstellen, **erst dann** anschliessen (PS-L3). VIO am Waveshare-Board messen: 2.0 V.
 6. **Taster drücken und halten**, Netzteil einschalten, nach ≈ 1 s loslassen (leerer Chip: Taster unnötig).
 7. `flash_sensor.py info …`, dann `program …` wie Weg A Schritt 4–5. Bei Fehlern `--baud 19200`.
-8. Netzteil aus, Drähte ab.
-9. **Nacharbeit (Pflicht):** Draht an R9 und TP2 entfernen, Flussmittel mit Isopropanol reinigen, unter der Lupe prüfen:
-   R9 auf beiden Pads gelötet, kein Zinn zwischen den Pads oder zu R8/D1. Kontrollmessung ohne Speisung: TP1 ↔ R9 Pad 1
+8. **Feste Reihenfolge (Veto PS-K1):** (a) Netzteil **aus und abziehen**, (b) **Dummy-Scheibe heraus**,
+   (c) Draht an R9 und TP2 **entfernen**. Erst nach Schritt 9 eine Zelle einsetzen.
+9. **Nacharbeit (Pflicht):** Flussmittel mit Isopropanol reinigen, unter der Lupe prüfen: R9 auf beiden Pads gelötet,
+   kein Zinn zwischen den Pads oder zu R8/D1, kein Drahtrest. **Foto** von R9/R6/TP2 unter der Lupe ablegen (die
+   Widerstandsmessung erkennt einen vergessenen Draht nicht, PS-W4). Kontrollmessung ohne Speisung: TP1 ↔ R9 Pad 1
    ≈ 200 kΩ (R9 + R10). Erst dann Zelle einsetzen (Funktionsprüfung wie Weg A Schritt 7) und vergiessen.
+   **Zellen unter 2.6 V** (z. B. nach der Bootloader-Falle, Kap. 6) **nicht wiederverwenden**, sondern entsorgen.
 
 Folgen und Grenzen von Weg B:
 - Barriere 2 ist auf dem TX-Pfad während der Programmierung überbrückt; zulässig nur ohne Zelle (Regel 1).
