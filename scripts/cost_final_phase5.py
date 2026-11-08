@@ -108,13 +108,13 @@ def main():
     w = md.write
     w("# Phase 5 – Kostenrechnung final (Sensor, Gateway, System)\n\n")
     w("| | |\n|---|---|\n")
-    w("| Stand | 2026-11-08, erzeugt von `.venv/bin/python scripts/cost_final_phase5.py` (nicht von Hand ändern) |\n")
+    w("| Stand | Sensor 2026-11-08, Gateway 2026-11-09 (D-028/D-029), erzeugt von `.venv/bin/python scripts/cost_final_phase5.py` (nicht von Hand ändern) |\n")
     w(f"| Kurs | 1 USD = {cm.USD_TO_CHF:.4f} CHF, {cm.FX_DATE}; + {cm.FX_CARD_MARKUP*100:.1f} % Kartenaufschlag (ANNAHME) "
       f"= {fx():.4f} CHF; 2026-11-08 ist ein Sonntag, neuester EZB-Kurs = 2026-11-06 |\n")
     w("| Sensor | `hardware/sensor/gen/cost_rev_b.py` → `scripts/cost_model.compute` (D-005), Teilepreise "
       f"`docs/concepts/bom/jlc_prices.json` (Abruf {cr.PRICES['_abruf']}), Lager live 2026-11-08 13:06 (`order_check.py --live`) |\n")
-    w("| Gateway | `hardware/gateway/BOM_GATEWAY.csv` (Preise pi-shop.ch, Abruf 2026-11-08, "
-      "`docs/references/pi-shop_Gateway-Teile_Auszug_2026-11-08.txt`) |\n")
+    w("| Gateway | `hardware/gateway/BOM_GATEWAY.csv` (Preise pi-shop.ch/bastelgarage.ch, Abruf 2026-11-08/09, "
+      "`docs/references/pi-shop_Gateway-Teile_Auszug_2026-11-08.txt`, `docs/references/Haendler_Einkauf_Auszug_2026-11-09.txt`; D-028/D-029) |\n")
     w("| Bestellunterlage | `hardware/sensor/out/ORDER_JLC_REV_C.md`, Anleitung `docs/manuals/BESTELLEN_JLC.md` |\n\n")
 
     w("## 0 Fazit\n\n")
@@ -176,23 +176,21 @@ def main():
     w("| Zahlungsweg | Modell +1.5 % (ANNAHME); PayPal-Umrechnung meist teurer (ANNAHME, < 3 CHF je Bestellung) | Karte ohne Fremdwährungsgebühr empfohlen |\n\n")
 
     w("## 3 Gateway (W-8, REQ-FAB-06 separat ausgewiesen)\n\n")
-    w("RTC-Entscheid (Vorschlag, OP-GW-3): **Adafruit PiRTC Precise DS3231** mit CR1220-Primärzelle. Belege: "
-      "DS3231 ±2 ppm 0–40 °C (`docs/datasheets/Maxim_DS3231_Datasheet_19-5170Rev10.pdf` S. 1) ≙ 5 s/Monat "
-      "(REQ-GW-09 ±2 min/Monat); Pufferstrom IBATT ≤ 3.0 µA (S. 3) → ≥ 24 h Haltezeit weit erfüllt; "
-      "**kein Ladepfad**: VBAT nur Zelle + IC (`hardware/gateway/check_rtc_schematic.py` auf dem Adafruit-Schaltplan), "
-      "VBAT-Pin UL-anerkannt gegen Rückladung einer Lithium-Primärzelle (S. 9). Linux-Treiber: `dtoverlay=i2c-rtc,ds3231` "
-      "(`docs/appnotes/Adafruit_AddingRTC-RaspberryPi_Guide_2026-04-07.pdf`).\n\n")
+    w("Stand Phase 6 (2026-11-09): **D-028** Gateway ohne RTC (G4 PiRTC DS3231 und G5 CR1220 gestrichen, Zeit per NTP, "
+      "Rückfall `phase5_gateway_zeit.md`); **D-029** Klimasensor = DFRobot Fermion SHT40 SEN0428 (14 × 17 mm, passt in die "
+      "Klimakammer; Auswahl und Belege `docs/manuals/EINKAUFSLISTE.md` Kap. 2). Bezugsquellen und Versand: Einkaufsliste.\n\n")
     w("| Pos | Teil | Typ | Menge | CHF/Stk | Summe CHF | Status | Lager (Abruf) | Quelle |\n")
     w("|---|---|---|---|---|---|---|---|---|\n")
     for r in gw:
         w(f"| {r['Pos']} | {r['Teil']} | {r['Hersteller_Typ']} | {r['Menge']:g} | {r['Preis_CHF_Stk']:.2f} | "
           f"{r['sum']:.2f} | {r['Status']} | {r['Lager_Abruf']} | {r['Preisquelle'].split(' http')[0]} |\n")
-    w(f"\n- **Kauffertig: {gw_buy:.2f} CHF** (Netzteil, Schrauben/Einsätze, Gehäusedruck, Versand), davon {gw_annahme:.2f} CHF "
-      f"ANNAHME. **Noch nicht kaufen: {gw_pend:.2f} CHF** (G4/G5 RTC-Montage ohne Buchsenleiste offen, G6 SHT41-Variante "
-      f"a/b/c offen, G3 microSD nicht an Lager). Geplant total {gw_plan:.2f} CHF (Systemsumme rechnet damit).\n")
+    w(f"\n- **Kauffertig: {gw_buy:.2f} CHF** (Netzteil, SHT40-Breakout, Status-LED, Schrauben/Einsätze, Gehäusedruck, Versand pi-shop.ch und "
+      f"bastelgarage.ch), davon {gw_annahme:.2f} CHF ANNAHME. **Noch nicht kaufbar: {gw_pend:.2f} CHF** (G3 microSD Industrial "
+      f"bei pi-shop.ch nicht an Lager; Alternative gleicher Serie sofort lieferbar, aber 56.95–63.95 CHF, Einkaufsliste). "
+      f"Geplant total {gw_plan:.2f} CHF (Systemsumme rechnet damit).\n")
     w(f"- Neuwert inkl. Pi Zero 2 W: {gw_new:.2f} CHF.\n")
     w(f"- Offen, nicht enthalten: {', '.join(r['Teil'] for r in gw_open)}.\n")
-    w("- Nicht an Lager (pi-shop.ch 2026-11-08): Pi Zero 2 W (nicht nötig), microSD Industrial, Grove SHT41.\n\n")
+    w("- Nicht an Lager (pi-shop.ch 2026-11-09): Pi Zero 2 W (vorhanden, nicht nötig), microSD Industrial (G3).\n\n")
 
     w("## 4 System (15 Sensoren + Gateway)\n\n")
     w("| Weg | Inhalt | CHF |\n|---|---|---|\n")
@@ -211,10 +209,9 @@ def main():
       "BESTELL-PRÜFUNG; Ausweichen auf Standard-PCBA kostet Serie "
       f"+{res['std_serie']['total_chf'] - s4['total_chf']:.2f} CHF je Bestellung.\n")
     w("- Versandpreis mit PCBA (Gewicht höher) erst am Checkout sichtbar (ANNAHME pauschal 23.52 USD).\n")
-    w("- Gateway: Netzteil-Konformität, microSD-Datenblatt, SHT41-Breakout-Schaltplan und CR1220-Datenblatt nicht lokal; "
-      "Mechanik passt für RTC (21.3 × 20.0 mm) und Grove SHT41 (20 × 40 mm) nicht in die CAD-Platzhalter (15 × 12 bzw. "
-      "24 × 14 mm) → Befund an Mechanik.\n\n")
-
+    w("- Gateway: Netzteil-Konformität nicht lokal (Sicherheits-Agent beim Wareneingang); microSD-Datenblatt "
+      "(`Kingston_SDCIT2_Datasheet_MKD-02122026.pdf`) und SHT40-Breakout-Schaltplan/Masse (`DFRobot_SEN0428_*`) seit 2026-11-09 lokal; "
+      "RTC/CR1220 entfallen (D-028). Klimakammer: Nutpfosten auf 17 mm Modulbreite nachführen (Mechanik).\n\n")
     w("## 6 Einzelposten Sensor (cost_model.report)\n\n")
     from contextlib import redirect_stdout
     for k, (n, *_r) in scen.items():

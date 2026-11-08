@@ -2,18 +2,18 @@
 
 | | |
 |---|---|
-| Stand | 2026-11-08, erzeugt von `.venv/bin/python scripts/cost_final_phase5.py` (nicht von Hand ändern) |
+| Stand | Sensor 2026-11-08, Gateway 2026-11-09 (D-028/D-029), erzeugt von `.venv/bin/python scripts/cost_final_phase5.py` (nicht von Hand ändern) |
 | Kurs | 1 USD = 0.8189 CHF, 2026-11-06 (EZB-Referenzkurs, Kreuzkurs); + 1.5 % Kartenaufschlag (ANNAHME) = 0.8312 CHF; 2026-11-08 ist ein Sonntag, neuester EZB-Kurs = 2026-11-06 |
 | Sensor | `hardware/sensor/gen/cost_rev_b.py` → `scripts/cost_model.compute` (D-005), Teilepreise `docs/concepts/bom/jlc_prices.json` (Abruf 2026-11-07), Lager live 2026-11-08 13:06 (`order_check.py --live`) |
-| Gateway | `hardware/gateway/BOM_GATEWAY.csv` (Preise pi-shop.ch, Abruf 2026-11-08, `docs/references/pi-shop_Gateway-Teile_Auszug_2026-11-08.txt`) |
+| Gateway | `hardware/gateway/BOM_GATEWAY.csv` (Preise pi-shop.ch/bastelgarage.ch, Abruf 2026-11-08/09, `docs/references/pi-shop_Gateway-Teile_Auszug_2026-11-08.txt`, `docs/references/Haendler_Einkauf_Auszug_2026-11-09.txt`; D-028/D-029) |
 | Bestellunterlage | `hardware/sensor/out/ORDER_JLC_REV_C.md`, Anleitung `docs/manuals/BESTELLEN_JLC.md` |
 
 ## 0 Fazit
 
 - **Stückkosten nach D-005** (REQ-FAB-04, Grenzkosten pro Sensor ohne Einmalkosten): Serie **8.38 CHF** → < 10 CHF erfüllt, **unter Vorbehalt**: Berechnet JLC „Pre-reflow Soldering“ (0.016 USD/Lötstelle), steigen sie auf **10.60 CHF** → REQ-FAB-04 **verfehlt** (Kap. 2.1, Stopp-Kriterium im Warenkorb).
-- **Vollkosten** (ganze Bestellung inkl. Einmalkosten / Sensoren): Serie **17.84 CHF/Sensor**; mit Prototyp-Los und Gateway 35.63 CHF/Sensor (15 Sensoren). Das ist, was ein Sensor real kostet.
+- **Vollkosten** (ganze Bestellung inkl. Einmalkosten / Sensoren): Serie **17.84 CHF/Sensor**; mit Prototyp-Los und Gateway 34.85 CHF/Sensor (15 Sensoren). Das ist, was ein Sensor real kostet.
 - D-005 (Definition Stückkosten) hat Status „zur Kenntnis“; der Auftraggeber sollte ausdrücklich bestätigen, dass REQ-FAB-04 die Stückkosten nach D-005 meint und nicht die Vollkosten.
-- Gateway: kauffertig 22.77 CHF, offen/nicht lieferbar 58.70 CHF, geplant total 81.47 CHF.
+- Gateway: kauffertig 41.86 CHF, offen/nicht lieferbar 27.90 CHF, geplant total 69.76 CHF.
 
 ## 1 Abgleich JLC-Screenshot ↔ Modell (Sensor-PCB, 2026-11-08)
 
@@ -70,37 +70,36 @@ REQ-FAB-04 (< 10 CHF Stückkosten bei 10–15 Stück, D-005): Serie **8.38 CHF**
 
 ## 3 Gateway (W-8, REQ-FAB-06 separat ausgewiesen)
 
-RTC-Entscheid (Vorschlag, OP-GW-3): **Adafruit PiRTC Precise DS3231** mit CR1220-Primärzelle. Belege: DS3231 ±2 ppm 0–40 °C (`docs/datasheets/Maxim_DS3231_Datasheet_19-5170Rev10.pdf` S. 1) ≙ 5 s/Monat (REQ-GW-09 ±2 min/Monat); Pufferstrom IBATT ≤ 3.0 µA (S. 3) → ≥ 24 h Haltezeit weit erfüllt; **kein Ladepfad**: VBAT nur Zelle + IC (`hardware/gateway/check_rtc_schematic.py` auf dem Adafruit-Schaltplan), VBAT-Pin UL-anerkannt gegen Rückladung einer Lithium-Primärzelle (S. 9). Linux-Treiber: `dtoverlay=i2c-rtc,ds3231` (`docs/appnotes/Adafruit_AddingRTC-RaspberryPi_Guide_2026-04-07.pdf`).
+Stand Phase 6 (2026-11-09): **D-028** Gateway ohne RTC (G4 PiRTC DS3231 und G5 CR1220 gestrichen, Zeit per NTP, Rückfall `phase5_gateway_zeit.md`); **D-029** Klimasensor = DFRobot Fermion SHT40 SEN0428 (14 × 17 mm, passt in die Klimakammer; Auswahl und Belege `docs/manuals/EINKAUFSLISTE.md` Kap. 2). Bezugsquellen und Versand: Einkaufsliste.
 
 | Pos | Teil | Typ | Menge | CHF/Stk | Summe CHF | Status | Lager (Abruf) | Quelle |
 |---|---|---|---|---|---|---|---|---|
 | G1 | Einplatinenrechner Gateway (D-014) | Raspberry Pi Zero 2 W | 1 | 17.15 | 17.15 | vorhanden | nicht an Lager | pi-shop.ch |
 | G2 | Netzteil 5 V 2.5 A Micro-USB (REQ-SAF-DOC-02 gepruefte Speisung) | Raspberry Pi Ltd, Original 12.5 W Micro-USB Steckernetzteil | 1 | 11.90 | 11.90 | kauffertig | Sofort-Versand ab Lager | pi-shop.ch |
-| G3 | microSD Industrial 16 GB (Stromausfall/Schreibzyklen, ARCHITECTURE Kap. 14.4) | Kingston microSDHC Industrial UHS-I 16 GB | 1 | 27.90 | 27.90 | nicht an Lager | nicht an Lager | pi-shop.ch |
-| G4 | Echtzeituhr mit Pufferung ohne Ladepfad (REQ-GW-09, OP-GW-3, W-8) | Adafruit PiRTC Precise DS3231 (Adafruit 4282) | 1 | 18.90 | 18.90 | Entscheid offen | Sofort-Versand ab Lager | pi-shop.ch |
-| G5 | Pufferzelle RTC (Primaerzelle, nicht wiederaufladbar) | CR1220 Lithium 3 V (Hersteller offen) | 1 | 3.00 | 3.00 | Entscheid offen | - | ANNAHME (kein Angebot abgefragt, pi-shop.ch fuehrt keine CR1220, Suche 2026-11-08) |
-| G6 | Raumklima-Sensor-Breakout (D-017, SHT4x an I2C 0x44) | Seeed Grove SHT41 (Grove-SHT4x) | 1 | 8.90 | 8.90 | Entscheid offen | nicht an Lager | pi-shop.ch |
+| G3 | microSD Industrial 16 GB (Stromausfall/Schreibzyklen, ARCHITECTURE Kap. 14.4) | Kingston SDCIT2/16GB (microSDHC Industrial UHS-I 16 GB, pSLC) | 1 | 27.90 | 27.90 | nicht an Lager | nicht an Lager | pi-shop.ch |
+| G6 | Raumklima-Sensor-Breakout (D-017/D-029, SHT40 an I2C 0x44) | DFRobot Fermion SHT40 Breakout (SEN0428) | 1 | 11.90 | 11.90 | kauffertig | Lagernd | bastelgarage.ch Art. 421989 |
 | G7 | Gehaeuse G1 v4 ASA (Wanne grau + Deckel blau + Fenster) | Eigendruck Bambu (mechanical/gateway_pi/print) | 1 | 0.97 | 0.97 | Eigenfertigung | - | ANNAHME ASA 0.035 CHF/g (scripts/concept_costs.py ASA_CHF_PER_G) |
 | G8 | Gewindeeinsaetze M2.5 (4) + Schrauben M2.5 x 8 ISO 7380 (4) | Handelsware | 1 | 2.00 | 2.00 | kauffertig | - | ANNAHME (kein Angebot abgefragt) |
-| G9 | Status-LED-Platine 8 x 8.2 mm (RGB wie Sensor) | nicht entworfen | 1 | 0.00 | 0.00 | offen | - | - |
+| G9 | Status-LED Gateway (D-027 vorlaeufig): 3-mm-LED gruen + Vorwiderstand 470 Ohm an GPIO17, ohne Platine | Kingbright WP710A10GD + YAGEO MFR-25FBF52-470R | 1 | 0.29 | 0.29 | kauffertig | 24503 / 19960 | Digi-Key CH 0.20 + 0.09 (docs/reviews/phase5_gateway_led.md Kap. 4) |
 | G10 | Litze AWG 28, Schrumpfschlauch | Werkstattbestand | 1 | 0.00 | 0.00 | vorhanden | - | ANNAHME |
 | G11 | Zusatz-BLE-Empfaenger (nur falls Koexistenz W-7 nicht genuegt) | Seeed XIAO nRF52840 Sense | 1 | 0.00 | 0.00 | vorhanden (optional) | - | - |
-| V1 | Versand pi-shop.ch (B-Post Economy) | Schweizer Post | 1 | 7.90 | 7.90 | kauffertig | - | pi-shop.ch |
+| V1 | Versand pi-shop.ch (B-Post Economy, Sammelbestellung G2, G3, Werkstatt) | Schweizer Post | 1 | 7.90 | 7.90 | kauffertig | - | pi-shop.ch |
+| V2 | Versand bastelgarage.ch (PostPac Economy, entfaellt ab CHF 80 Warenwert der Sammelbestellung, docs/manuals/EINKAUFSLISTE.md) | Schweizer Post | 1 | 6.90 | 6.90 | kauffertig | - | bastelgarage.ch |
 
-- **Kauffertig: 22.77 CHF** (Netzteil, Schrauben/Einsätze, Gehäusedruck, Versand), davon 2.97 CHF ANNAHME. **Noch nicht kaufen: 58.70 CHF** (G4/G5 RTC-Montage ohne Buchsenleiste offen, G6 SHT41-Variante a/b/c offen, G3 microSD nicht an Lager). Geplant total 81.47 CHF (Systemsumme rechnet damit).
-- Neuwert inkl. Pi Zero 2 W: 98.62 CHF.
-- Offen, nicht enthalten: Status-LED-Platine 8 x 8.2 mm (RGB wie Sensor).
-- Nicht an Lager (pi-shop.ch 2026-11-08): Pi Zero 2 W (nicht nötig), microSD Industrial, Grove SHT41.
+- **Kauffertig: 41.86 CHF** (Netzteil, SHT40-Breakout, Status-LED, Schrauben/Einsätze, Gehäusedruck, Versand pi-shop.ch und bastelgarage.ch), davon 2.97 CHF ANNAHME. **Noch nicht kaufbar: 27.90 CHF** (G3 microSD Industrial bei pi-shop.ch nicht an Lager; Alternative gleicher Serie sofort lieferbar, aber 56.95–63.95 CHF, Einkaufsliste). Geplant total 69.76 CHF (Systemsumme rechnet damit).
+- Neuwert inkl. Pi Zero 2 W: 86.91 CHF.
+- Offen, nicht enthalten: .
+- Nicht an Lager (pi-shop.ch 2026-11-09): Pi Zero 2 W (vorhanden, nicht nötig), microSD Industrial (G3).
 
 ## 4 System (15 Sensoren + Gateway)
 
 | Weg | Inhalt | CHF |
 |---|---|---|
-| A: direkt Serie | Serie 20 PCB / 16 bestückt / 15 Sensoren + Gateway (geplant total) | **349.05** |
-| B: Prototyp + Serie (geplant) | Prototyp 5 + Serie 15 Sensoren + Gateway (geplant total) | **534.52** |
-| B + Programmieradapter | wie B + Adapter Rev 1 (25–55 CHF, ANNAHME) | 559.52 – 589.52 |
+| A: direkt Serie | Serie 20 PCB / 16 bestückt / 15 Sensoren + Gateway (geplant total) | **337.34** |
+| B: Prototyp + Serie (geplant) | Prototyp 5 + Serie 15 Sensoren + Gateway (geplant total) | **522.81** |
+| B + Programmieradapter | wie B + Adapter Rev 1 (25–55 CHF, ANNAHME) | 547.81 – 577.81 |
 
-- Pro Sensor (Weg A, inkl. Gateway-Anteil): 23.27 CHF; Weg B: 35.63 CHF (die 5 Prototypen sind zusätzlich nutzbar, falls sie die Prüfungen bestehen → dann 20 Sensoren: 26.73 CHF).
+- Pro Sensor (Weg A, inkl. Gateway-Anteil): 22.49 CHF; Weg B: 34.85 CHF (die 5 Prototypen sind zusätzlich nutzbar, falls sie die Prüfungen bestehen → dann 20 Sensoren: 26.14 CHF).
 - Nicht enthalten: Arbeitszeit, Werkzeug, Verguss-/Dichtmittel über die Sensor-Pauschalen hinaus, Status-LED-Platine Gateway, Ersatzzellen.
 
 ## 5 Annahmen und offene Punkte
@@ -108,7 +107,7 @@ RTC-Entscheid (Vorschlag, OP-GW-3): **Adafruit PiRTC Precise DS3231** mit CR1220
 - PCB 5 Stk (65.21 USD) stammt aus dem Angebot vom 2026-11-08 (CLIENT_INPUT), nicht aus dem Screenshot.
 - Economic PCBA + ENIG + POFV + 4 Lagen: JLC-Doku sagt dazu nichts (`docs/references/JLCPCB_NOTES.md` Kap. 10) → BESTELL-PRÜFUNG; Ausweichen auf Standard-PCBA kostet Serie +58.22 CHF je Bestellung.
 - Versandpreis mit PCBA (Gewicht höher) erst am Checkout sichtbar (ANNAHME pauschal 23.52 USD).
-- Gateway: Netzteil-Konformität, microSD-Datenblatt, SHT41-Breakout-Schaltplan und CR1220-Datenblatt nicht lokal; Mechanik passt für RTC (21.3 × 20.0 mm) und Grove SHT41 (20 × 40 mm) nicht in die CAD-Platzhalter (15 × 12 bzw. 24 × 14 mm) → Befund an Mechanik.
+- Gateway: Netzteil-Konformität nicht lokal (Sicherheits-Agent beim Wareneingang); microSD-Datenblatt (`Kingston_SDCIT2_Datasheet_MKD-02122026.pdf`) und SHT40-Breakout-Schaltplan/Masse (`DFRobot_SEN0428_*`) seit 2026-11-09 lokal; RTC/CR1220 entfallen (D-028). Klimakammer: Nutpfosten auf 17 mm Modulbreite nachführen (Mechanik).
 
 ## 6 Einzelposten Sensor (cost_model.report)
 

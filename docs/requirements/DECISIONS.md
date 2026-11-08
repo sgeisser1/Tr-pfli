@@ -267,7 +267,7 @@ Format: Nr. · Datum · Entscheid · Alternativen · Begründung · Quelle · St
 - **Entscheid:** Statt Grove SHT41 (20 × 40 mm, nicht an Lager) ein kleineres SHT4x-Breakout, das in die Klimakammer
   passt (I2C 0x44, D-017). Auswahl mit Datenblatt, Massen und Bezugsquelle in Phase 6.
 - **Alternativen:** (a) Sensor aussen am Kabel, (b) Gateway grösser.
-- **Status:** gültig, Teilewahl offen (Phase 6).
+- **Status:** gültig. Teilewahl Phase 6: **DFRobot Fermion SHT40 SEN0428** (14 × 17 mm, bastelgarage.ch Art. 421989, CHF 11.90), Kammer-Nut auf 17 mm (Mechanik).
 
 ### Freigabe Phase 5 · 2026-11-08
 - Auftraggeber gibt Phase 5 frei und startet Phase 6. Musterbestellung erst am Schluss (nach Phase 6).

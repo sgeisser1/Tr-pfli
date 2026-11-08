@@ -1,0 +1,738 @@
+Quelle: Schweizer Haendler (bastelgarage.ch, pi-shop.ch, play-zone.ch, mediamarkt.ch, alltron.ch) und Herstellerwikis (Waveshare, DFRobot)
+Abgerufen: 2026-11-09 00:01 (CET) mit curl (User-Agent Browser), Textauszug (Tags entfernt), je Seite gekuerzt; sha256 des Roh-HTML
+Preise CHF inkl. MWST laut Shop; Verfuegbarkeit = Anzeige am Abrufzeitpunkt. Nicht abrufbar (Bot-Sperre/403): digitec/galaxus, mouser.ch, distrelec.ch, digikey.ch, conrad.ch, brack.ch, toppreise.ch
+Verwendung: docs/manuals/EINKAUFSLISTE.md/.csv, hardware/gateway/BOM_GATEWAY.csv (G3, G6), docs/manuals/INSTALL_FIRMWARE_TOOLS.md (FW-T3)
+======================================================================
+
+### URL: https://www.bastelgarage.ch/fermion-temperatur-und-feuchtigkeitssensor-sht40
+HTTP 200, sha256 Roh-HTML: 2dc9516552f6da3be66024014a152243c38b5e31cb3dcd02841c4498e9abf2b8
+Artikelnr. 421989 | Verfügbarkeit Lagernd | CHF11,90 | Netto CHF11,01 | Menge | + Warenkorb | 0 Bewertungen | / | + Bewertung | Ähnliche P
+Beschreibung
+Bewertungen (0)
+Fermion Temperatur und Feuchtigkeitssensor SHT40
+Dies ist ein Breakout Modul von DFRrobot mit einem SHT40 Temperatur und Feuchtigkeitssensor von Sensiron. Der SHT40 ist die vierte Generation von den industrieerprobten Sensiron SHT Sensoren. Er misst Temperaturen von -40°C bis 125°C mit einer Toleranz von nur ±0.2°C, Sowie die Luftfeuchtigkeit von 0-100% mit einer Toleranz von ±1.8%.
+Eigenschaften:
+Temperatur Messbereich von -40°C bis 125°C
+Temperatur Toleranz von ±0.2°C
+Luftfeuchtigkeit Messbereich von 0-100% RH
+Luftfeuchtigkeit Toleranz von ±1.8%RH
+niedriger Stromverbrauch
+kompakte Grösse
+Dokumentation:
+DFRobot Wiki
+Technische Details:
+Hersteller: DFRobot
+Hersteller SKU: SEN0428
+Arbeitsspannung: 3.3-5V
+Arbeitsstrom: 0.45mA
+Kommunikationsinterface: I2C
+Reaktionszeit: 8s
+Temperatur Messbereich: -40°C bis 125°C
+Temperatur Toleranz: ±0.2°C
+Luftfeuchtigkeit Messbereich: 0-100% RH
+Luftfeuchtigkeit Toleranz: ±1.8%RH
+Abmessung: 14 x 17 x 0.5mm
+Gewicht: 6.4g
+Lieferumfang:
+1x Fermion Temperatur und Feuchtigkeitssensor SHT40
++ Bewertung
+Mein Name
+Meine Bewertung
+Hinweis:
+HTML ist nicht verfügbar!
+Bewertung
+Weniger Gut
+Gut
+test
+test2
+Weiter
+Fermion Temperatur und Feuchtigkeitssensor SHT40
+Hersteller
+DFRobot
+Artikelnr. 421989
+Verfügbarkeit Lagernd
+CHF11,90
+Netto 
+
+### URL: https://www.bastelgarage.ch/cr2032-knopfzellen-batterie-3v
+HTTP 200, sha256 Roh-HTML: cddb4435aa36c1b8884cfb00f5365cf350d0cc5048178160063d19da77f999af
+Artikelnr. 420504 | Verfügbarkeit Lagernd | CHF1,30 | Netto CHF1,20 | Menge | + Warenkorb | 0 Bewertungen | / | + Bewertung | Ähnliche Pro
+Beschreibung
+Bewertungen (0)
+CR2032 Knopfzellen Batterie 3V
+Diese Lithium-Knopfzelle CR2032 von XinLU liefert 3 V und passt in Knopfzellenhalter für CR2032.
+Empfohlene Alternative im 5er-Pack:
+Varta Knopfzelle CR2032 5 Stück
+Empfohlenes Zubehör:
+CR2032 Batteriefach / Batteriehalter
+Eigenschaften:
+Lithium-Knopfzelle, nicht wiederaufladbar
+Anwendungsbeispiele:
+Fernbedienungen und Kleinelektronik
+Eigene Schaltungen mit Knopfzellenhalter
+Technische Daten:
+Typ: CR2032
+Spannung: 3 V
+Kapazität: 220 mAh
+Durchmesser: 20 mm
+Höhe: 3.2 mm
+Gewicht: 3 g
+Lieferumfang:
+1× CR2032 Knopfzellen Batterie 3V
+Sicherheits- und Entsorgungshinweise
+Diese Batterie ist nicht wiederaufladbar und darf nicht aufgeladen werden. Nicht kurzschliessen, öffnen oder erhitzen. Von Kindern fernhalten – insbesondere Knopfzellen können beim Verschlucken zu schweren Verletzungen führen; in diesem Fall sofort ärztliche Hilfe aufsuchen.
+Entsorgung: Batterien gehören nicht in den Hausmüll. Kostenlose Rückgabe bei uns oder jeder Verkaufsstelle – Details siehe
+Rücknahme & Entsorgung
+.
++ Bewertung
+Mein Name
+Meine Bewertung
+Hinweis:
+HTML ist nicht verfügbar!
+Bewertung
+Weniger Gut
+Gut
+test
+test2
+Weiter
+CR2032 Knopfzellen Batterie 3V
+Hersteller
+purecrea
+Artikelnr. 420504
+Verfügbarkeit Lagernd
+CHF1,30
+Netto CHF1,20
+Menge
++ Warenko
+
+### URL: https://www.bastelgarage.ch/varta-knopfzelle-cr2032-5-stuck
+HTTP 200, sha256 Roh-HTML: a16d5ea305320301d5fb8a0d8d351be01090b1e2812b37b32ccd0d1d9fb353c3
+Artikelnr. 424382 | Verfügbarkeit Lagernd | CHF8,90 | Netto CHF8,23 | Menge | + Warenkorb | 0 Bewertungen | / | + Bewertung | Ähnliche Pro
+Beschreibung
+Bewertungen (0)
+Varta Knopfzelle CR2032 5 Stück
+Die Varta Knopfzelle CR2032 bietet dir eine zuverlässige Energiequelle für zahlreiche Geräte in deinem Alltag. Mit einer Spannung von 3 V und einer Kapazität von 230 mAh liefert diese Primär-Lithium-Knopfzelle eine langlebige und konstante Leistung. Perfekt geeignet für den Einsatz in Fernbedienungen, Taschenrechnern, Uhren und vielen weiteren Anwendungen, zeichnet sie sich durch ihre hohe Qualität und Effizienz aus. In dieser praktischen Fünfer-Packung erhältst du gleich mehrere Batterien, sodass du immer einen Vorrat griffbereit hast. Dank der bewährten Varta-Technologie kannst du dich auf eine stabile und sichere Energieversorgung verlassen. Die kompakte Bauweise der CR2032 Zellen macht sie vielseitig einsetzbar, und ihre lange Lebensdauer minimiert den Bedarf an häufigem Austausch. Mit diesen Batterien bist du bestens gerüstet, um die Funktionalität deiner Geräte langfristig zu gewährleisten.
+Eigenschaften:
+Primär Lithium-Knopfzelle: Lange Haltbarkeit und stabile Leistung dank Li/MnO₂-Technologie.
+Hohe Kapazität: 230 mAh für eine langanhaltende Energieversorgung.
+Standard-Spannung: 3 V für universelle Kompatibilität mit vielen Geräten.
+Kompakte Bauweise: Ideal für kleine Geräte wie Uhren, Fernbedienungen und Taschen
+
+### URL: https://www.bastelgarage.ch/10-stuck-m2x3mm-linsenkopfschrauben-set-rostfrei
+HTTP 200, sha256 Roh-HTML: daea7330c0ea7fee40e14ca2a625636a5849519baa3000c7a11319a892b15bc4
+Artikelnr. 422191 | Verfügbarkeit Lagernd | CHF3,90 | Netto CHF3,61 | Menge | + Warenkorb | 0 Bewertungen | / | + Bewertung | Ähnliche Pro
+Beschreibung
+Bewertungen (0)
+10 Stück M2x3mm Linsenkopfschrauben Set rostfrei
+Diese rostfreien M2x3mm Torx Linsenkopfschrauben eignen sich perfekt für jeden Maker und Bastler zum Verschrauben und Befestigen von Leiterplatten, Sensoren und mechanischen Bauteilen. Wir setzen diese Schrauben selbst oft bei 3D gedruckten Teilen ein und können dir dieses Produkt weiterempfehlen.
+Empfohlenes Zubehör:
+PB 515 Schraubenzieher Set
+Technische Details:
+Gewinde: M2
+Länge: 3mm
+Material: A2 rostfreier Stahl
+Kopf: Linsenkopf mit Torx TX6
+Kopfhöhe: 1.6mm
+Gewicht: 2g
+Lieferumfang:
+10x M2x3mm Linsenkopfschrauben Set rostfrei
++ Bewertung
+Mein Name
+Meine Bewertung
+Hinweis:
+HTML ist nicht verfügbar!
+Bewertung
+Weniger Gut
+Gut
+test
+test2
+Weiter
+10 Stück M2x3mm Linsenkopfschrauben Set rostfrei
+Hersteller
+purecrea
+Artikelnr. 422191
+Verfügbarkeit Lagernd
+CHF3,90
+Netto CHF3,61
+Menge
++ Warenkorb
+0 Bewertungen
+/
++ Bewertung
+Ähnliche Produkte
+10 Stück M2x5mm Linsenkopfschrauben Set rostfrei
+Diese rostfreien M2x5mm Torx Linsenkopfschrauben eignen sich perfekt für jeden Maker und Bastler zum..
+CHF3,90
+Netto CHF3,61
++ Warenkorb
+10 Stück M2x10mm Linsenkopfschrauben Set rostfrei
+Diese rostfreien M2x10mm Torx Linsenkopfschrauben eignen sich perfekt für jeden Maker und Bastler zu..
+CHF3,90
+Netto CHF3,61
++ Warenkorb
+1
+
+### URL: https://www.bastelgarage.ch/10-stuck-m2-mutter-set-rostfrei
+HTTP 200, sha256 Roh-HTML: a007b1b1638d9864cf5e0c50b932b136a341968fdce0867ebd18a8b7ebaae35e
+Artikelnr. 422198 | Verfügbarkeit Lagernd | CHF2,90 | Netto CHF2,68 | Menge | + Warenkorb | 0 Bewertungen | / | + Bewertung | Ähnliche Pro
+Beschreibung
+Bewertungen (0)
+10 Stück M2 Mutter Set rostfrei
+Diese rostfreien M2 Muttern eignen sich perfekt für jeden Maker und Bastler zum Verschrauben und Befestigen von Leiterplatten, Sensoren und mechanischen Bauteilen. Wir setzen diese Schrauben selbst oft bei 3D gedruckten Teilen ein und können dir dieses Produkt weiterempfehlen.
+Technische Details:
+Gewinde: M2
+Material: A2 rostfreier Stahl
+Höhe: 1.6mm
+Schlüsselweite: SW4
+Gewicht: 1.5g
+Lieferumfang:
+10x M2 Mutter Set rostfrei
++ Bewertung
+Mein Name
+Meine Bewertung
+Hinweis:
+HTML ist nicht verfügbar!
+Bewertung
+Weniger Gut
+Gut
+test
+test2
+Weiter
+10 Stück M2 Mutter Set rostfrei
+Hersteller
+purecrea
+Artikelnr. 422198
+Verfügbarkeit Lagernd
+CHF2,90
+Netto CHF2,68
+Menge
++ Warenkorb
+0 Bewertungen
+/
++ Bewertung
+Ähnliche Produkte
+10 Stück M2x5mm Linsenkopfschrauben Set rostfrei
+Diese rostfreien M2x5mm Torx Linsenkopfschrauben eignen sich perfekt für jeden Maker und Bastler zum..
+CHF3,90
+Netto CHF3,61
++ Warenkorb
+10 Stück M2x3mm Linsenkopfschrauben Set rostfrei
+Diese rostfreien M2x3mm Torx Linsenkopfschrauben eignen sich perfekt für jeden Maker und Bastler zum..
+CHF3,90
+Netto CHF3,61
++ Warenkorb
+10 Stück M2x10mm Linsenkopfschrauben Set rostfrei
+Diese rostfreien M2x10mm Torx Linsenkopfschrauben eignen sich perfekt für jeden Maker und Bastl
+
+### URL: https://www.bastelgarage.ch/m2-5-4mm-gewindeeinsatze-messing-heat-insert-100stk
+HTTP 200, sha256 Roh-HTML: d22951c5c963f4f06569ed957ffc9927529ac4e5502f713948eb0c38143254dd
+Artikelnr. 425681 | Verfügbarkeit Lagernd | CHF15,90 | Netto CHF14,71 | Menge | + Warenkorb | 0 Bewertungen | / | + Bewertung | Ähnliche P
+Beschreibung
+Bewertungen (0)
+M2.5×4mm Gewindeeinsätze Messing Heat Insert 100Stk
+Die Messing Gewindeeinsätze M2.5 × 4 × 4.6 mm sind präzisionsgefertigte Einschmelzmuttern für den Einsatz in 3D-gedruckten Bauteilen aus PLA, PETG, ABS, ASA und anderen Thermoplasten. Der Aussendurchmesser von 4.6 mm und die Höhe von 4 mm machen diese Einsätze zur Standardwahl für M2.5-Gewindeanwendungen – besonders verbreitet in Raspberry Pi-Projekten und SBC-Halterungen. Die gerändelte Aussenfläche verankert sich beim Einschmelzen im plastifizierten Kunststoff und widersteht sowohl Auszugkräften als auch Drehmomenten zuverlässig.
+Empfohlenes Zubehör:
+C245 Lötkolben Einschmelzhilfe Gewindeeinsätze Insert M2-M8
+Lötkolben Einschmelzhilfe Gewindeeinsätze Insert M2-M8
+Gewindeeinsatz Presse Kit mit Lötkolben und Zubehör
+Gewindeeinsatz Presse Kit Pro mit Lötkolben und Zubehör
+Eigenschaften:
+Messing-Material mit hoher Wärmeleitfähigkeit ermöglicht schnelles, gleichmässiges Einschmelzen in alle gängigen FDM-Thermoplaste
+Gerändelte Aussenfläche verankert sich formschlüssig im erstarrenden Kunststoff und widersteht zuverlässig Auszug- und Drehmomentbelastungen
+Standardgrösse M2.5 × 4 × 4.6 mm (Innengewinde × Höhe × Aussendurchmesser) – Standardmass für Raspberry Pi und SBC-Montageprojekte
+Montage mit handelsü
+
+### URL: https://www.bastelgarage.ch/asa-grau-filament-1-75mm-1kg-esun
+HTTP 200, sha256 Roh-HTML: da08a1363499e869423ff46b652a08f870e64d0648844cb67e8566b6c6271f43
+Artikelnr. 424233 | Verfügbarkeit Ausverkauft | CHF19,90 | Netto CHF18,41 | Menge | + Warenkorb | 0 Bewertungen | / | + Bewertung | Ähnlic
+Beschreibung
+Bewertungen (0)
+ASA+ Grau Filament 1.75mm 1Kg eSun
+Mit dem ASA+ Filament von eSun bringst du deine 3D-Druckprojekte auf das nächste Level. Dieses hochwertige Filament ist eine verbesserte Version von ABS und bietet hervorragende UV- und Witterungsbeständigkeit. Dadurch ist es ideal für den Aussenbereich geeignet, da es nicht so schnell ausbleicht oder spröde wird. Dank seiner hohen Schlagfestigkeit und mechanischen Stabilität hält es auch extremen Bedingungen stand und bleibt langlebig. Mit einer Hitzebeständigkeit bis zu 90°C eignet es sich für Anwendungen, die hohen Temperaturen ausgesetzt sind. Die minimale Verformung bei mechanischer Beanspruchung sorgt für stabile und präzise Drucke. Beachte, dass ASA+ Material eine hohe Schrumpfung aufweist. Deshalb ist ein 3D-Drucker mit geschlossenem Bauraum empfohlen, um optimale Ergebnisse zu erzielen. Mit seiner guten Wetterbeständigkeit und mechanischen Stärke ist das eSun ASA+ Filament eine ausgezeichnete Wahl für langlebige und stabile Drucke.
+Fazit:
+ASA+ von Esun eignet sich für fortgeschrittene Anwender, ist im Vergleich zu ABS leicht zu drucken und bietet dir auch gute Hafteigenschaften! ASA ist die perfekte Alternative zu ABS und PETG. ASA verfügt über sehr gute Zähigkeit und Schlagzähigkeit, um Stürzen, Stössen und
+
+### URL: https://www.bastelgarage.ch/asa-blau-filament-1-75mm-1kg-esun
+HTTP 200, sha256 Roh-HTML: d904d71ea9501e85f0b980611301ccaec034ca10c460b5a9983181bc44141a0f
+Artikelnr. 424238 | Verfügbarkeit Lagernd | CHF19,90 | Netto CHF18,41 | Menge | + Warenkorb | 0 Bewertungen | / | + Bewertung | Ähnliche P
+Beschreibung
+Bewertungen (0)
+ASA+ Blau Filament 1.75mm 1Kg eSun
+Mit dem ASA+ Filament von eSun bringst du deine 3D-Druckprojekte auf das nächste Level. Dieses hochwertige Filament ist eine verbesserte Version von ABS und bietet hervorragende UV- und Witterungsbeständigkeit. Dadurch ist es ideal für den Aussenbereich geeignet, da es nicht so schnell ausbleicht oder spröde wird. Dank seiner hohen Schlagfestigkeit und mechanischen Stabilität hält es auch extremen Bedingungen stand und bleibt langlebig. Mit einer Hitzebeständigkeit bis zu 90°C eignet es sich für Anwendungen, die hohen Temperaturen ausgesetzt sind. Die minimale Verformung bei mechanischer Beanspruchung sorgt für stabile und präzise Drucke. Beachte, dass ASA+ Material eine hohe Schrumpfung aufweist. Deshalb ist ein 3D-Drucker mit geschlossenem Bauraum empfohlen, um optimale Ergebnisse zu erzielen. Mit seiner guten Wetterbeständigkeit und mechanischen Stärke ist das eSun ASA+ Filament eine ausgezeichnete Wahl für langlebige und stabile Drucke.
+Fazit:
+ASA+ von Esun eignet sich für fortgeschrittene Anwender, ist im Vergleich zu ABS leicht zu drucken und bietet dir auch gute Hafteigenschaften! ASA ist die perfekte Alternative zu ABS und PETG. ASA verfügt über sehr gute Zähigkeit und Schlagzähigkeit, um Stürzen, Stössen und
+
+### URL: https://www.bastelgarage.ch/asa-kaltweiss-filament-1-75mm-1kg-esun
+HTTP 200, sha256 Roh-HTML: fc36a424941813ced853f0d4f05e21ce5907b93e197afa9353593fccf0b73d20
+Artikelnr. 424234 | Verfügbarkeit Lagernd | CHF19,90 | Netto CHF18,41 | Menge | + Warenkorb | 0 Bewertungen | / | + Bewertung | Ähnliche P
+Beschreibung
+Bewertungen (0)
+ASA+ Kaltweiss Filament 1.75mm 1Kg eSun
+Mit dem ASA+ Filament von eSun bringst du deine 3D-Druckprojekte auf das nächste Level. Dieses hochwertige Filament ist eine verbesserte Version von ABS und bietet hervorragende UV- und Witterungsbeständigkeit. Dadurch ist es ideal für den Aussenbereich geeignet, da es nicht so schnell ausbleicht oder spröde wird. Dank seiner hohen Schlagfestigkeit und mechanischen Stabilität hält es auch extremen Bedingungen stand und bleibt langlebig. Mit einer Hitzebeständigkeit bis zu 90°C eignet es sich für Anwendungen, die hohen Temperaturen ausgesetzt sind. Die minimale Verformung bei mechanischer Beanspruchung sorgt für stabile und präzise Drucke. Beachte, dass ASA+ Material eine hohe Schrumpfung aufweist. Deshalb ist ein 3D-Drucker mit geschlossenem Bauraum empfohlen, um optimale Ergebnisse zu erzielen. Mit seiner guten Wetterbeständigkeit und mechanischen Stärke ist das eSun ASA+ Filament eine ausgezeichnete Wahl für langlebige und stabile Drucke.
+Fazit:
+ASA+ von Esun eignet sich für fortgeschrittene Anwender, ist im Vergleich zu ABS leicht zu drucken und bietet dir auch gute Hafteigenschaften! ASA ist die perfekte Alternative zu ABS und PETG. ASA verfügt über sehr gute Zähigkeit und Schlagzähigkeit, um Stürzen, Stösse
+
+### URL: https://www.bastelgarage.ch/uhu-plus-endfest-zweikomponenten-epoxidkleber-33g
+HTTP 200, sha256 Roh-HTML: 86a50165cbed91e3171445f14a64ffd492f7d9f56c9a45eb7061c7001e595f12
+Artikelnr. 422137 | Verfügbarkeit Lagernd | CHF12,90 | Netto CHF11,93 | Menge | + Warenkorb | 0 Bewertungen | / | + Bewertung | Gefahr | GHS
+Beschreibung
+Bewertungen (0)
+UHU Plus Endfest Zweikomponenten Epoxidkleber 33g
+Dies ist ein universeller, starker Zweikomponenten Epoxidharzkleber. Der Kleber kann Belastungen von bis zu 170Kg/cm2 widerstehen, und ist temperaturbeständig von -40°C bis +100°C. Der Kleber eignet sich besonders für Metall, Keramik, Porzellan, Glas, Kristallglas, Perlen, Edelsteinen, Polyester, Bakelite, Formica, Polystyrol, und Acrylglas. Ereignet sich weniger für Polyethylen, Polypropylen, PTFE, und Silikonkautschuk. Der Kleber eignet sich auch perfekt, um 3D gedruckte Teile zu verkleben.
+Eigenschaften:
+Sehr stark (bis zu 170 kg/cm²)
+Temperaturbeständig von -40 °C bis +100 °C
+Fugenfüllend
+Wasserfest
+Beständig gegen Chemikalien
+Lackierbar
+Technische Details:
+Hersteller: UHU
+Basis: Epoxidharz
+Chemische Beständigkeit: Wasser, Öl, Fett, Lösungsmittel
+Dichte: 1.1 g/cm3
+Endfestigkeit: 19 N/mm2
+Endfestigkeit erreicht nach: 24h
+Handfestigkeit nach: 6h
+Mischungsverhältnis: 1:1
+Verarbeitungszeit: 90min
+Lösungsmittelfrei: Ja
+UV-Beständigkeit: Sehr Gut
+Viskosität: 3500 mPa*s
+Wasserbeständigkeit: Gut
+Wasserlöslich: Nein
+Temperaturbeständigkeit: -40°C – 100°C
+Menge: 33g
+Gewicht: 54g
+Lieferumfang:
+1x 18g Tube Binder
+1x 15g Tube Härter
++ Bewertung
+Mein Name
+Meine Bewertung
+Hinweis:
+HTML ist nicht verfügbar!
+Bewert
+
+### URL: https://www.bastelgarage.ch/lieferung-versandkosten
+HTTP 200, sha256 Roh-HTML: a08b85a7b0319ab44bfcf268528b24668ab79369161a14f8178f10e6084f751a
+Versand in der Schweiz & Liechtenstein
+Alles, was im Shop bestellbar ist, ist bei uns am Lager.
+Falls ein Artikel nicht verfügbar ist, kann er nicht bestellt werden – du erhältst also garantiert sofort lieferbare Produkte.
+Bestellungen, die werktags bis
+15:00 Uhr
+inkl. Zahlung bei uns eingehen, werden in der Regel noch am selben Tag versendet.
+An Feiertagen oder bei
+Spezialöffnungszeiten
+erfolgt kein Versand.
+Versandkosten bei Bestellungen unter CHF 80.–
+Für Bestellungen unter CHF 80.– stehen dir folgende Versandarten zur Auswahl:
+PostPac Priority:
+CHF 8.90 – Lieferung am nächsten Werktag (ohne Samstag)*
+PostPac Economy:
+CHF 6.90 – Lieferung am übernächsten Werktag (ohne Samstag)*
+Kostenloser Versand ab CHF 80.–
+Ab einem Warenwert von
+CHF 80.–
+ist der Versand für dich kostenlos.
+Wir versenden automatisch mit
+PostPac Priority
+für eine schnelle Zustellung.
+*Wir versenden unsere Pakete zuve
+
+### URL: https://www.pi-shop.ch/raspberry-pi-12-5w-micro-usb-power-supply-2254
+HTTP 200, sha256 Roh-HTML: e31b7fb710dc62706132302485d18ae5d4707e2277fdd1d5d5c20b6d655fb042
+Artikelnummer:
+11715
+Delivery Time: ab Lager
+Verfügbarkeit:
+Sofort-Versand ab Lager
+CHF 11.90
+Menge
+In den Warenkorb
+E-Mail an einen Freund
+Zubehör
+Raspberry Pi 3 Model B+
+CHF 34.60
+Ab:
+CHF 31.90
+Artikelbeschrieb
+Artikelbeschrieb
+Details
+Specifications
+5.1V / 2.5A DC output
+96-264Vac operating input range
+Short circuit and overcurrent protection
+1.5m 18AWG captive cable with micro USB output connector
+Available in different variants to suit different international power sockets
+Raspberry Pi 12.5W Micro USB Power Supply
+Anmelden zum Newsletter (jederzeit abmeldbar)
+Abonnieren
+Firma
+Kontakt
+AGB
+Impressum
+Service
+Liefer- & Versandkosten
+Zahlungsmöglichkeiten
+Support
+Postadresse - kein Ladenlokal
+Josefstrasse 182
+­8005 Zürich - Switzerland­
+Telefon 044 508 50 77
+Raspberry Pi
+© 2020 Pi-Shop.ch - Totonic GmbH
+Raspberry Pi® ist eine geschützte Marke der
+Raspberry Pi Foundation
+© 2012 - 2025 Pi-Shop.ch - Totonic GmbH | Zürich | Switzerland. All Rights Reserved.
+video title
+video content
+
+### URL: https://www.pi-shop.ch/kingston-microsdhc-karte-industrial-uhs-i-16-gb
+HTTP 200, sha256 Roh-HTML: 2e41a9984a0143bd1e7c39d82e20b0faa2e88486fb8d5a5d215e9735192a8f7b
+Artikelnummer:
+10951
+Wir schicken Ihnen eine Email sobald das Produkt wieder verfügbar ist.
+Benachrichtigen
+Delivery Time: ab Lager
+Verfügbarkeit:
+Zur Zeit nicht an Lager
+CHF 27.90
+E-Mail an einen Freund
+Zubehör
+Raspberry Pi 3 Model B+
+CHF 34.60
+Ab:
+CHF 31.90
+Artikelbeschrieb
+Artikelbeschrieb
+Details
+Kingston microSDHC-Karte Industrial UHS-I 16 GB
+Industrielle microSDHC-Speicherkarte mit 16 GB
+Lesen: 100 MB/s, Schreiben: 80 MB/s
+Für den gewerblichen Einsatz, ideal für extreme Umweltbedingungen
+Passt in viele GPS-Geräte, Tablets, Smartphones und Industriegeräte
+Inkl. SD-Adapter
+Application Performance Class A1
+Diese Karte ist für Apps optimiert und liefert ein schnelles Starten und mehr Leistung für Ihre mobilen Anwendungen. Die App Performance Class ist vor allem für SD-Karten wichtig, welche in Smartphones und Tablets eingesetzt werden. Das A1-Symbol besagt, dass die SD-Karte die Anforderungen der entsprechenden App Performance Class 1 (A1) erfüllt: Mindestens 1.500/500 IOPS bei wahlfreien und mindestens 10 MB/s bei sequenziellen Transfers.
+Video Speed Class
+Die Video Speed Class umfasst die fünf Geschwindigkeitsstufen V6, V10, V30, V60 und V90, wobei die Zahl jeweils die Mindestschreibrate in Megabyte pro Sekunde (MB/s) angibt. Indem Sie ein Gerät mit Video Speed Class-Kennzeichen und eine SD-Speicherkarte mit dem gleichen Video Speed Class-Kennzeichen kombinieren, lassen sic
+
+### URL: https://www.pi-shop.ch/grove-temperature-humidity-sensor-sht41
+HTTP 200, sha256 Roh-HTML: 929f059049c55f971ee02d3bd91380a41261e8294f9387c7bbabdc0cffd44627
+Artikelnummer:
+12042
+Wir schicken Ihnen eine Email sobald das Produkt wieder verfügbar ist.
+Benachrichtigen
+Delivery Time: ab Lager
+Verfügbarkeit:
+Zur Zeit nicht an Lager
+CHF 8.90
+E-Mail an einen Freund
+Downloads & Links
+Handbücher
+SHT4x Datasheet
+(Grösse: 734.8 KB)
+Artikelbeschrieb
+Zusatzinformation
+Artikelbeschrieb
+Details
+Grove-SHT4x is a Sensirion’s digital Humidity and Temperature Sensor which has an accuracy rate of up to ±1.8% RH and ±0.2 °C, 32µA idle current, 5.0V or 3.3V supply voltage, and an operating range of 0% to 100% RH, -40°C to +125°C. It comes with SEEED’s standard grove l2C interface enabling developers or even beginners to easily communicate with the STH4x sensor on different hardware platforms. SHT4x is an optimized CMOSens® chip that offers reduced power consumption and improved accuracy specifications. Grove-SHT4x's combined features make it an excellent choice for a wide variety of applications.
+Features
+Accuracy Rate:
+It has relative humidity and temperature accuracy rate of up to ±1.8% RH and ±0.2 °C, respectively.
+Extended operating ranges:
+The sensor can operate between 0 and 100% RH and -40 and 125°C.
+Grove average current:
+An average current of 1.2 µA and idle up to 32µA.
+Grove power supply:
+Power supply voltage of 5v/3.3v.
+Condensing environments:
+Fully functional in condensing or environment close to saturation. (with a variable power heater)
+St
+
+### URL: https://www.pi-shop.ch/pl2303-usb-to-uart-ttl-communication-module-v2
+HTTP 200, sha256 Roh-HTML: 24024d3f92e02878a1b658d9c097bf911a6f260c2d29d734caf971b358cc7756
+Artikelnummer:
+11757
+Delivery Time: ab Lager
+Verfügbarkeit:
+Sofort-Versand ab Lager
+CHF 8.90
+Menge
+In den Warenkorb
+E-Mail an einen Freund
+Downloads & Links
+Handbücher
+Wiki
+Zubehör
+Raspberry Pi 4 Model B - 2GB RAM
+CHF 60.30
+Raspberry Pi 4 Model B - 4GB RAM
+CHF 92.90
+Raspberry Pi 4 Model B - 8GB RAM
+Regulärer Preis:
+CHF 149.90
+Sonderpreis
+CHF 139.00
+Artikelbeschrieb
+Artikelbeschrieb
+Details
+PL2303
+USB-A To UART Module
+V2
+Adopts PL2303, Compatible With 1.8V/2.5V/3.3V/5V Logic Level
+Features
+Adopts PL2303GS new version device
+Supports windows XP/7/8/10/11/...
+3x VCCIO power mode via jumper setting:
+VCCIO - 5V:
+5V output
+VCCIO - 3.3V:
+3.3V output
+open the jumper:
+powered from target board (1.8V/2.5V/3.3V/5V)
+3x LED indicators: TXD, RXD, PWR
+PL2303 Solution
+Adopts PL2303GS New Version Device
+Hardware Connection
+In The Case Of Working With MCU
+VCCIO ↔ 3.3V or 5V output (the module is powered from USB, and the onboard jumper should be shorted to 3.3V or 5V)
+GND ↔ GND
+TXD ↔ MCU.RX (signal direction: MCU.RX << PL2303 << PC.TX)
+RXD ↔ MCU.TX (signal direction: MCU.TX >> PL2303 >> PC.RX)
+CAUTION: the module is compatible with TTL level ONLY, to avoiding any damage, please DON'T direct connect it to RS232 circuit.
+Package content
+PL2303 USB UART Board (type A) V2 x1
+4-pin custom connector jumper wire x1
+Anmelden zum Newsletter (jederzeit abmeldbar)
+Abonnieren
+Firma
+Kontakt
+AGB
+Impressum
+Ser
+
+### URL: https://www.pi-shop.ch/industrial-usb-to-ttl-converter
+HTTP 200, sha256 Roh-HTML: 7e77778fcfab2aaed3b628c26761c7e10afe3771f272074846e7e79718124384
+Artikelnummer:
+11854
+Delivery Time: ab Lager
+Verfügbarkeit:
+Sofort-Versand ab Lager
+CHF 12.90
+Menge
+In den Warenkorb
+E-Mail an einen Freund
+Downloads & Links
+Handbücher
+Wiki
+Zubehör
+Raspberry Pi 4 Model B - 2GB RAM
+CHF 60.30
+Raspberry Pi 4 Model B - 4GB RAM
+CHF 92.90
+Raspberry Pi 4 Model B - 8GB RAM
+Regulärer Preis:
+CHF 149.90
+Sonderpreis
+CHF 139.00
+Artikelbeschrieb
+Artikelbeschrieb
+Details
+Original CH343G | Stable Transmission | Multi Devices | Multi Systems
+Industrial Grade Quality
+Features
+Onboard resettable fuse and TVS diode, providing protections including over-current, over-voltage, backward-proof, and ESD protection, improving shock resistance, safe and stable communications
+Onboard IO protection circuit for surge suppress
+Onboard TTL serial port 3.3V and 5V voltage level switch, allows selecting TTL level
+3x LED indicators for easily checking power connection and signal TX/RX statuses
+Quality plastic case with dull-polish surface, well-crafted
+IDC connector with fool-proof design
+Specifications
+PRODUCT CATEGORY
+Industrial USB TO TTL converter
+HOST PORT
+USB
+DATA RATE
+50bps ~ 6Mbps
+DEVICE PORT
+UART
+USB PORT
+Connector: USB-A
+Protection: resettable fuse, ESD protection
+UART PORT
+Connector: 8PIN fool-proof header
+Protection: IO protection diode
+INDICATOR
+PWR: power indicator, turns red when USB voltage is detected
+TXD: TX indicator, turns red while the USB port is sending d
+
+### URL: https://www.pi-shop.ch/adafruit-wch-ch9102f-friend-usb-to-serial-converter
+HTTP 200, sha256 Roh-HTML: 0741f43c935f5e6c9061637fce70604c5170e41b15d80977755038faac615940
+Artikelnummer:
+11975
+Delivery Time: ab Lager
+Verfügbarkeit:
+Sofort-Versand ab Lager
+CHF 7.90
+Menge
+In den Warenkorb
+E-Mail an einen Freund
+Artikelbeschrieb
+Artikelbeschrieb
+Details
+Description
+Long gone are the days of parallel ports and serial ports. Now the USB port reigns supreme! But USB is hard, and you just want to transfer your everyday serial data from a microcontroller to computer. What now? Enter the
+Adafruit CH9102F Friend
+, a version of our popular USB-Serial 'friend' breakouts that uses the affordable (and available) CH9102F - a 'near pin-compatible' to the CP2102N.
+This board features the CH9102F USB-Serial chip that can upload code at  3Mbit/s for fast development time. It also has auto-reset for Arduino/ATmega328 boards so no noodling with pins and reset button pressings. The CH9102F has fairly good driver support, and for 99% of use cases is a fine replacement of the FTR232, FT231x or CP210x series. With a modern USB Type C connector, it's ready to rock on any kind of computer.
+Some things we've noted as we have been working with this board:
+The RX LED blinks as you expect when data is received, however the TX LED does not blink constantly. Instead after a few seconds of data transmission the LED will blink slowly.
+On Linux, the CTS pin is not supported by the built in Linux kernel driver. Oddly enough, all the other flow control pins work perfectly fine - its 
+
+### URL: https://www.pi-shop.ch/catalogsearch/result/?q=ch343
+HTTP 200, sha256 Roh-HTML: 158e97a59b43b1d38118c89ec013082e342e6c5a687ad86409b45b5c57caee3d
+Treffer: Industrial USB TO TTL Converter <https://www.pi-shop.ch/industrial-usb-to-ttl-converter>; 7.3inch E6 Full Color E-Paper With Solid Wood Photo Frame For Raspberry Pi Zero <https://www.pi-shop.ch/7-3inch-e6-full-color-e-paper-with-solid-wood-photo-frame-for-raspberry-pi-zero>; ESP32-H2 Microcontroller <https://www.pi-shop.ch/esp32-h2-microcontroller>; 13.3inch Full Color E-Paper Display With ESP32-S3 E-Paper Driver Board <https://www.pi-shop.ch/13-3inch-full-color-e-paper-display-with-esp32-s3-e-paper-driver-board>; ESP32-S3 SIM7670G 4G Development Board <https://www.pi-shop.ch/esp32-s3-sim7670g-4g-development-board>; ESP32-H2 Microcontroller with pinheader, 96MHz Processor <https://www.pi-shop.ch/esp32-h2-microcontroller-with-pinheader-96mhz-processor>; Industrial Isolated USB To RS232/485 Converter, Original FT4232HL Chip <https://www.pi-shop.ch/industrial-isolated-usb-to-rs232-485-converter-original-ft4232hl-chip>; ESP32-S3 Development Board, 32-bit LX7 Dual-core Processor, With 1.28inch IPS Round LCD <https://www.pi-shop.ch/esp32-s3-development-board-32-bit-lx7-dual-core-processor-with-1-28inch-ips-round-lcd>; ESP32-S3 2.1inch Capacitive Touch Round Display Development Board <https://www.pi-shop.ch/esp32-s3-2-1inch-capacitive-touch-round-display-development-board>; ESP32-S3 2.8inch Round Display Development Board <https://www.pi-shop.ch/esp32-s3-2-8inch-round-display-development-board>; ESP32-S3 4.3inch Capacitive Touch Display Development Board, 800×480, 5-point Touch, 32-bit LX7 Dual-core Processor <https://www.pi-shop.ch/esp32-s3-4-3inch-capacitive-touch-display-development-board-800-480-5-point-touch-32-bit-lx7-dual-core-processor>; Industrial USB TO RS485 Bidirectional Converter <https://www.pi-shop.ch/industrial-usb-to-rs485-bidirectional-converter>; ESP32-S3 Development Board, with 1.28inch Round Touch LCD <https://www.pi-shop.ch/esp32-s3-development-board-with-1-28inch-round-touch-lcd>
+
+### URL: https://www.pi-shop.ch/catalogsearch/result/?q=sht40
+HTTP 200, sha256 Roh-HTML: 16608caabff1f862d214e933628c570a183e2bef20b18165772192cdb23c6f3f
+Treffer: Gravity: STCC4 True Carbon Dioxide (CO2) Sensor (3-in-1 Air Quality Monitoring, 400 ~ 5000ppm) <https://www.pi-shop.ch/gravity-stcc4-true-carbon-dioxide-co2-sensor-3-in-1-air-quality-monitoring-400-5000ppm>; XIAO ePaper DIY Kit EE03 for 10.3" Monochrome ePaper Display <https://www.pi-shop.ch/xiao-epaper-diy-kit-ee03-for-10-3-monochrome-epaper-display>
+
+### URL: https://www.play-zone.ch/de/adafruit-sensirion-sht41-temperature-humidity-sensor-stemma-qt-qwiic.html
+HTTP 200, sha256 Roh-HTML: 169e6829ab7ec721ae2193682243af53e5bf5be1ea85cd047c92509ed2475b81
+JSON-LD Offer: price CHF 9.9, availability http:\/\/schema.org\/InStock
+Artikelnummer: ada-5776 über 10 Stk. ab eigenem Lager sofort
+ab eigenem Lager sofort lieferbar CHF 9.90 Menge: In den Warenkorb Auf den Wunsc
+Schneller Versand ab eigenem Lager in Steinhausen/ZG. Ab CHF 300.00 portofrei! Produkte können auch abgeholt werden. Fra
+
+### URL: https://www.mediamarkt.ch/de/product/_kingston-technology-industrial-micro-sdhc-speicherkarte-16-gb-200-mbs-101764486.html
+HTTP 200, sha256 Roh-HTML: 8eb5658ef66dad16120005884786492c12d50e233cb172cddb306e22b76fdb3a
+Titel: KINGSTON microSDHC-Karte Industrial UHS-I, Micro-SDHC Speicherkarte Industrial, 16 GB, 100 MB/s | MediaMarkt
+JSON-LD Offer: ('63.95', 'https://schema.org/InStock'); Verkaeufer (Marktplatz): Ultimus.ch; Lieferfenster: ('2026-11-19T21:59:59.999Z', '2026-11-23T21:59:59.999Z'); Versandkosten CHF 0
+
+### URL: https://www.mediamarkt.ch/de/product/_kingston-technology-sdcit28gb-micro-sdhc-speicherkarte-8-gb-170-mbs-101764378.html
+HTTP 200, sha256 Roh-HTML: 7a1a0d059b0c23eac7c88de0e362a611cc25eda93e97dc9789dd5146d884a8e0
+Titel: KINGSTON SDCIT2/8GB, Micro-SDHC Speicherkarte, 8 GB, 100 MB/s | MediaMarkt
+JSON-LD Offer: ('56.95', 'https://schema.org/InStock'); Verkaeufer (Marktplatz): Ultimus.ch; Lieferfenster: ('2026-11-27T21:59:59.999Z', '2026-12-01T21:59:59.999Z'); Versandkosten CHF 0
+
+### URL: https://alltron.ch/de/product/1256228
+HTTP 200, sha256 Roh-HTML: 19380e8918ac237b19f4a1f673237c37f0a43658128b064e608f660d340b976a
+Titel: Kingston microSDHC-Karte Industrial UHS-I 16 GB | Alltron (Alltron = Grosshandel der Brack-Gruppe, Bestellung nur fuer Geschaeftskunden - ANNAHME)
+  Variante 8 GB (Art. 1256223): Lager 12, bestellt 
+  Variante 16 GB (Art. 1256228): Lager 0, bestellt {"deliveryDate":"23.11.2026","quantityOrdered":100}
+  Variante 32 GB (Art. 1256230): Lager 0, bestellt {"deliveryDate":"23.11.2026","quantityOrdered":50}
+  Variante 64 GB (Art. 1256233): Lager 3, bestellt 
+  Variante 128 GB (Art. 2052219): Lager 0, bestellt 
+
+### URL: https://www.waveshare.com/wiki/PL2303_USB_UART_Board_(type_A)_V2
+HTTP 200, sha256 Roh-HTML: 1ce85ee0e8ba674ac093d5ded3d28c67fd9aa98da0579a2c0740ded055afe7ec
+Features
+1.2
+Parameter
+2
+Resources
+3
+FAQ
+4
+Support
+Introduction
+PL2303 USB To UART (TTL) Communication Module V2, USB-A Connector
+More
+Features
+Adopts PL2303GS new version device
+Supports windows XP/7/8/10/11/...
+3x VCCIO power mode via jumper setting:
+VCCIO - 5V: 5V output
+VCCIO - 3.3V: 3.3V output
+open the jumper: powered from target board (1.8V/2.5V/3.3V/5V)
+3 x LED indicators: TXD, RXD, PWR
+Parameter
+Communication interface: USB/UART
+Chip: PL2303
+USB interface voltage: 5V
+UART interface voltage: 1.8V/2.5V/3.3V/5V
+Product size: 16.51mm x 48.26mm
+Resources
+Schematic
+Datasheets
+Software
+FAQ
+Question: What speed does the device offer?
+Answer:
+1.2Mbps.
+{{{5}}}
+Support
+Technical Support
+If you
+
+### URL: https://wiki.dfrobot.com/sen0428/
+HTTP 200, sha256 Roh-HTML: c45b1970c78baedb4c5c2443d1d94fb712eb07cae65103e4949c54069f82a5a5
+Specification
+Parameter
+Specification
+Operating Voltage
+3.3V-5V
+Operating Current
+0.45mA
+Communication Interface
+I2C
+Response Time
+8s (tau63%)
+Humidity Measurement Range
+0~100%RH
+Humidity Measurement Accuracy
+±1.8%
+Temperature Measurement Range
+-40~+125℃ (-40 to +275℉)
+Temperature Measurement Accuracy
+±0.2℃
+Dimension
+14×17mm/0.55×0.67”
+Mounting Hole Size
+M2 (2mm)
+Mounting Hole Pitch
+10mm
+Pinout
+NO.
+Silkscreen
+Function
+1
+VCC
+Positive Pole
+2
+GND
+Negative Pole
+3
+SCL
+I2C ClockLine
+4
+SDA
+I2C Data Line
+More
+More
+More
+More
+CE
+CE
+RoHS
+RoHS
+Was this article helpful?
+TOP
+Information
+About Us
+Warranty
+Terms & Conditions
+Shipping
+Payment
+FAQ
+Customer Service
+DFRobot Distributors
+Contact Us
+Site Map
+My Account
+Affiliates
+Specials
+Sign up for exclusive offers!
+Like us on
+Copyright © 2025 DFRobot. All rights reserved.

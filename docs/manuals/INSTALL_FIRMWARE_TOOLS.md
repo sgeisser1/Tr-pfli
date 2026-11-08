@@ -133,7 +133,7 @@ Board, Bootloader-Falle W-10). Adapter: `hardware/programmer/README.md`.
 
 | Teil | Zweck | Bezug / Preis (Abruf 2026-11-07) | Status |
 |---|---|---|---|
-| **USB-UART mit externem VIO**: Waveshare **CH343 USB UART Board** (CH343G, Micro/Mini/Type-A/Type-C, SKU 21440–21443), Jumper H3 entfernt | Sensor über ROM-UART-Bootloader flashen, Log lesen | waveshare.com **USD 3.49** (Micro, SKU 21441); eckstein-shop.de **EUR 4.15** (Type-C); Versand in die Schweiz nicht geprüft (FW-T3) | Bezug offen |
+| **USB-UART mit externem VIO**: Waveshare **CH343 USB UART Board** (CH343G, Micro/Mini/Type-A/Type-C, SKU 21440–21443), Jumper H3 entfernt | Sensor über ROM-UART-Bootloader flashen, Log lesen | waveshare.com **USD 3.49** (Micro, SKU 21441); eckstein-shop.de **EUR 4.15** (Type-C, „ca. 3 Wochen“); kein CH-Händler, Auslandsversand nicht ablesbar (**ANNAHME** 10–25 CHF). **Alternative (bedingt, Abruf 2026-11-09):** Waveshare PL2303 USB UART Board (type A) V2, pi-shop.ch Art. 11757, CHF 8.90, Sofort-Versand, ohne Zusatzversand mit den Gateway-Teilen – Bedingungen `docs/manuals/EINKAUFSLISTE.md` Kap. 3 (FW-T3) | Bezug offen, Entscheid Elektronik |
 | Programmieradapter Rev 1 (Dummy-Zelle 2.0 V, Federstifte TP1/TP2, Schmitt-Puffer SN74AUP1G17 am TX-Stift) | speist den Sensor statt der Zelle (R2-A2), Pegelanpassung TX | `hardware/programmer/README.md` Kap. 6: ≈ CHF 25–55 | Schaltplan Rev 1 (ERC 0), Mechanik offen (PA-1) |
 | Behelf (nur Muster vor dem Verguss): Labornetzteil 2.0 V/20 mA, CH343-RXD an **R9 Pad 1** | erste Muster ohne Adapter | Werkstatt | `PROGRAMMIEREN_SENSOR.md` Kap. 5 |
 | ~~USB-C-Datenkabel für Gateway XIAO ESP32-S3 Plus~~ | **veraltet** (D-014: Gateway = Pi Zero 2 W) | – | – |
@@ -191,7 +191,7 @@ SHA-256 (ti.com, 2026-11-07):
 |---|---|---|
 | FW-T1 | Build-Test mit SysConfig 1.28.2 statt 1.26.x (`basic_ble` für CC2340R5, ticlang) nach der Installation | Firmware |
 | FW-T2 | ~~Puffer am TX-Federstift~~ **entworfen** 2026-11-08: `hardware/programmer` (SN74AUP1G17, 2.0 V, VIO aus eigenem 2.0-V-Regler); Mechanik und Sicherheitsprüfung offen | Elektronik, Mechanik, Sicherheit |
-| FW-T3 | Bezug CH343-Board mit Versand in die Schweiz ≤ 10 CHF bestätigen | Auftraggeber/Orchestrator |
+| FW-T3 | Bezug CH343-Board mit Versand in die Schweiz ≤ 10 CHF bestätigen. **Stand 2026-11-09:** CH343 nur aus dem Ausland (Versand nicht belegt); PL2303GS-Board bei pi-shop.ch 8.90 CHF erfüllt VDD_IO 1.8 V…VIN+0.3 V (`docs/datasheets/Prolific_PL2303GS_Datasheet_Rev1.0.4.pdf` S. 39), aber VIL ≤ 0.4 V, RXD-LED 1 kΩ, VCCIO nur mit USB → SPICE A0–A2 und J1-Belegung prüfen (`docs/manuals/EINKAUFSLISTE.md` Kap. 3) | Elektronik, dann Auftraggeber |
 | FW-T4 | ~~`scripts/cc23_bsl.py`~~ **erledigt** als `scripts/flash_sensor.py` (Baudrate ≤ 57 600, `--sim`, `--dry-run`, `--lock`) | Firmware |
 
 ## Quellen (Abruf 2026-11-07)

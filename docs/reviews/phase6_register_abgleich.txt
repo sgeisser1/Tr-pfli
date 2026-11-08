@@ -1,0 +1,109 @@
+fluidi Registerabgleich, 2026-11-09 00:13, scripts/check_register.py
+INDEX.csv: 202 Zeilen
+
+== 1 JLC-BOM production/rev-C/1_jlc_upload/fluidi_sensor_bom_jlc.csv
+   Kopie hardware/sensor/out/fluidi_sensor_bom_jlc.csv inhaltsgleich: ja
+   ok   BT1  C5213768   Zeile 161 -> docs/datasheets/Keystone_3034_Catalog_M65.pdf  (Altzeilen mit anderer LCSC: C115412)
+   ok   C1   C15008     Zeile 162 -> docs/datasheets/Samsung_CL31A107MQHNNNE_Catalog_2015-11.pdf  (Altzeilen mit anderer LCSC: C77085)
+   ok   C2   C15008     Zeile 162 -> docs/datasheets/Samsung_CL31A107MQHNNNE_Catalog_2015-11.pdf
+   ok   C3   C15008     Zeile 162 -> docs/datasheets/Samsung_CL31A107MQHNNNE_Catalog_2015-11.pdf
+   ok   C4   C15008     Zeile 162 -> docs/datasheets/Samsung_CL31A107MQHNNNE_Catalog_2015-11.pdf
+   ok   C5   C15525     Zeile 163 -> docs/datasheets/Samsung_CL05A106MQ5NUNC_Datasheet_LCSC-2022-08.pdf
+   ok   C9   C15525     Zeile 163 -> docs/datasheets/Samsung_CL05A106MQ5NUNC_Datasheet_LCSC-2022-08.pdf
+   ok   C6   C1525      Zeile 164 -> docs/datasheets/Samsung_CL05-Serie_Datasheet_LCSC-2023-04.pdf
+   ok   C7   C1525      Zeile 164 -> docs/datasheets/Samsung_CL05-Serie_Datasheet_LCSC-2023-04.pdf
+   ok   C8   C1525      Zeile 164 -> docs/datasheets/Samsung_CL05-Serie_Datasheet_LCSC-2023-04.pdf
+   ok   C10  C1525      Zeile 164 -> docs/datasheets/Samsung_CL05-Serie_Datasheet_LCSC-2023-04.pdf
+   ok   C11  C1525      Zeile 164 -> docs/datasheets/Samsung_CL05-Serie_Datasheet_LCSC-2023-04.pdf
+   ok   C13  C1525      Zeile 164 -> docs/datasheets/Samsung_CL05-Serie_Datasheet_LCSC-2023-04.pdf
+   ok   C21  C1525      Zeile 164 -> docs/datasheets/Samsung_CL05-Serie_Datasheet_LCSC-2023-04.pdf
+   ok   C24  C1525      Zeile 164 -> docs/datasheets/Samsung_CL05-Serie_Datasheet_LCSC-2023-04.pdf
+   ok   C25  C1525      Zeile 164 -> docs/datasheets/Samsung_CL05-Serie_Datasheet_LCSC-2023-04.pdf
+   ok   C12  C52923     Zeile 165 -> docs/datasheets/Samsung_CL05-Serie_Datasheet_LCSC-2023-04.pdf
+   ok   C14  C1548      Zeile 166 -> docs/datasheets/FH_0402CG-Serie_Datasheet_LCSC-2023-04.pdf
+   ok   C15  C1548      Zeile 166 -> docs/datasheets/FH_0402CG-Serie_Datasheet_LCSC-2023-04.pdf
+   ok   C18  C1548      Zeile 166 -> docs/datasheets/FH_0402CG-Serie_Datasheet_LCSC-2023-04.pdf
+   ok   C16  C1552      Zeile 167 -> docs/datasheets/FH_0402CG-Serie_Datasheet_LCSC-2023-04.pdf
+   ok   C17  C1552      Zeile 167 -> docs/datasheets/FH_0402CG-Serie_Datasheet_LCSC-2023-04.pdf
+   ok   C22  C1555      Zeile 168 -> docs/datasheets/FH_0402CG-Serie_Datasheet_LCSC-2023-04.pdf
+   ok   D1   C7496855   Zeile 169 -> docs/datasheets/TUOZHAN_P4-1615G2B2R4TS2-06T-001-24_Datasheet_A0.pdf  (Altzeilen mit anderer LCSC: C158099, C2286, C8524, C965840)
+   ok   L1   C89132     Zeile 170 -> docs/datasheets/Sunlord_WPN201610H100MT_Datasheet_LCSC-2023-10.pdf
+   ok   L2   C27123     Zeile 171 -> docs/datasheets/Sunlord_SDCL1005-Serie_Datasheet_LCSC-2023-10.pdf  (Altzeilen mit anderer LCSC: C1035)
+   ok   Q1   C15127     Zeile 172 -> docs/datasheets/AOS_AO3401A_Datasheet_Rev3.1.pdf  (Altzeilen mit anderer LCSC: C150470)
+   ok   Q2   C15127     Zeile 172 -> docs/datasheets/AOS_AO3401A_Datasheet_Rev3.1.pdf  (Altzeilen mit anderer LCSC: C908265)
+   ok   R1   C25741     Zeile 173 -> docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf
+   ok   R9   C25741     Zeile 173 -> docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf
+   ok   R10  C25741     Zeile 173 -> docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf
+   ok   R11  C25741     Zeile 173 -> docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf
+   ok   R12  C25741     Zeile 173 -> docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf
+   ok   R13  C25741     Zeile 173 -> docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf
+   ok   R2   C17168     Zeile 174 -> docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf
+   ok   R3   C11702     Zeile 175 -> docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf  (Altzeilen mit anderer LCSC: C25900)
+   ok   R4   C25900     Zeile 176 -> docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf
+   ok   R5   C25900     Zeile 176 -> docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf
+   ok   R6   C25117     Zeile 177 -> docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf
+   ok   R7   C25087     Zeile 178 -> docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf
+   ok   R8   C25076     Zeile 179 -> docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf
+   ok   SW1  C720477    Zeile 180 -> docs/datasheets/XUNPU_TS-1088-AR02016_Datasheet_LCSC-2022-06.pdf  (Altzeilen mit anderer LCSC: C318884)
+   ok   U1   C20416850  Zeile 181 -> docs/datasheets/TI_CC2340R5_Datasheet_SWRS272F.pdf
+   ok   U2   C35740     Zeile 182 -> docs/datasheets/TI_SN74LVC1G14_Datasheet_SCES218AA.pdf  (Altzeilen mit anderer LCSC: C16581, C202311, C424093, C527572, C81080)
+   ok   U3   C3663690   Zeile 183 -> docs/datasheets/TI_TMP1075_Datasheet_SBOS854F.pdf  (Altzeilen mit anderer LCSC: C183096, C351410, C80628)
+   ok   U4   C473331    Zeile 184 -> docs/datasheets/TI_SN74LVC1G80_Datasheet_SCES221T.pdf  (Altzeilen mit anderer LCSC: C14289, C3747031, C5446, C841192)
+   ok   U5   C473331    Zeile 184 -> docs/datasheets/TI_SN74LVC1G80_Datasheet_SCES221T.pdf
+   ok   U6   C473331    Zeile 184 -> docs/datasheets/TI_SN74LVC1G80_Datasheet_SCES221T.pdf
+   ok   Y1   C2925606   Zeile 185 -> docs/datasheets/HCI_XC32M4-48.000-F08NLDT_Datasheet_LCSC-2022-05.pdf
+   ok   Y2   C99010     Zeile 186 -> docs/datasheets/Epson_Q13FC13500003_Datasheet_LCSC-2018-10.pdf
+   -> 50 Designatoren ok
+
+== 2 bom_extra hardware/sensor/out/fluidi_sensor_bom_extra.csv
+   n/a  AE1  AN043_IFA (Leiterplattenstruktur/Pad (nicht in BOM))
+   n/a  C19  DNM (DNP)
+   n/a  C20  DNM (DNP)
+   n/a  E1   Sonde_Innenlagen (Leiterplattenstruktur/Pad (nicht in BOM))
+   n/a  TP1  UART_TX (Leiterplattenstruktur/Pad (nicht in BOM))
+   n/a  TP2  UART_RX (Leiterplattenstruktur/Pad (nicht in BOM))
+   n/a  TP4  MEAS_CLK (Leiterplattenstruktur/Pad (nicht in BOM))
+   n/a  TP5  PROBE_SENSE (Leiterplattenstruktur/Pad (nicht in BOM))
+   ok   Panasonic CR2032: Zeile 27 -> docs/datasheets/Panasonic_CR2032_Datasheet_2026-02.pdf
+
+== 3 Gateway hardware/gateway/BOM_GATEWAY.csv
+   ok   G1   Raspberry Pi Zero 2 W -> docs/datasheets/RaspberryPi_Zero2W_MechanicalDrawing_RP-008358-DS-1.pdf, docs/datasheets/RaspberryPi_Zero2W_ProductBrief_2024-04.pdf, docs/datasheets/RaspberryPi_Zero2W_ReducedSchematics_RP-008360-DS-1.pdf
+   LUECKE G2 Raspberry Pi Ltd, Original 12.5 W Micro-USB Stecke: Register ['GW-PSU'] ohne lokale Datei (-)
+   ok   G3   Kingston SDCIT2/16GB (microSDHC Industrial UHS-I 1 -> docs/datasheets/Kingston_SDCIT2_Datasheet_MKD-02122026.pdf
+   ok   G6   DFRobot Fermion SHT40 Breakout (SEN0428) -> docs/datasheets/DFRobot_SEN0428_Schematic_V0.1.pdf + docs/datasheets/DFRobot_SEN0428_Dimensions_V0.1.png, docs/datasheets/Sensirion_SHT4x_Datasheet_V7.3.pdf
+   ok   G7   Eigendruck Bambu (mechanical/gateway_pi/print) -> docs/references/BambuLab_ASA_TechnicalDataSheet_V2.0.pdf
+   n/a  G8   Handelsware (Handelsware/Bestand, kein Register noetig)
+   ok   G9   Kingbright WP710A10GD + YAGEO MFR-25FBF52-470R -> docs/datasheets/Kingbright_WP710A10GD_Datasheet_V10B.pdf, docs/datasheets/Yageo_MFR_Datasheet_V4.pdf
+   n/a  G10  Werkstattbestand (Handelsware/Bestand, kein Register noetig)
+   n/a  G11  Seeed XIAO nRF52840 Sense (Handelsware/Bestand, kein Register noetig)
+   n/a  V1   Versand pi-shop.ch (B-Post Economy, Sammelbestellung G2, G3, (Versand)
+   n/a  V2   Versand bastelgarage.ch (PostPac Economy, entfaellt ab CHF 8 (Versand)
+
+== 4 Einkaufsliste docs/manuals/EINKAUFSLISTE.csv
+   ok   S1   BT1 (Vergleich)
+   ok   S2   MECH-OR1 (Rev B)
+   ok   S3   MECH-SCR1 (Rev C)  (ohne lokale Datei)
+   ok   S4   MECH-NUT1  (ohne lokale Datei)
+   ok   S5   MECH-MEM1  (ohne lokale Datei)
+   --   S6   Silikonfett fuer O-Ringe (kein Register angegeben)
+   --   S7   Kleber Lichtfenster (kein Register angegeben)
+   ok   S8   EP-K (Rev B)
+   ok   S9   MAT-ASA
+   ok   S10  MAT-ASA
+   --   S11  Filament Lichtfenster transluzent natur (kein Register angegeben)
+   ok   G2   GW-PSU  (ohne lokale Datei)
+   ok   G3   GW-SD
+   ok   G6   GW-CLIM1-BRD2 (Gateway G6, Empfehlung D-029)
+   --   G8a  Gewindeeinsaetze M2.5 (4 je Gateway) (kein Register angegeben)
+   --   G8b  Schrauben M2.5 x 8 (4 je Gateway) (kein Register angegeben)
+   ok   G9   GW-LED1 (Gateway, Vorschlag), GW-R1 (Gateway, Vorschlag)
+   --   G10  Litze AWG 28, Schrumpfschlauch (kein Register angegeben)
+   ok   W1   TOOL-UART2 (Werkzeug, Alternative zu TOOL-UART1)
+   ok   W2   P-U1 (Programmieradapter), P-U2 P-U3 (Programmieradapter), P-U4 (Progr
+
+== 5 Format INDEX.csv
+   ok: alle Zeilen 12 Spalten
+   Pfade angegeben, Datei fehlt: 0
+   Zeilen ohne lokale Datei (Normteile, nicht herunterladbar, Handelsware): 22
+
+ERGEBNIS: 1 Luecke(n)
