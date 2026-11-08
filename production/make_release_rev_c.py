@@ -6,8 +6,13 @@ die drei Bestelldateien zusaetzlich gegen die Hashes in hardware/sensor/out/ORDE
 production/rev-C/README.md (Inhalt, Quelle, sha256, Git-Stand) und production/rev-C/SHA256SUMS (Format sha256sum -c).
 Abbruch (Exit 1), wenn eine Bestelldatei nicht dem ORDER-Hash entspricht.
 
-Aufruf: .venv/bin/python production/make_release_rev_c.py
-Pruefen: cd production/rev-C && sha256sum -c SHA256SUMS
+Abbruch (Exit 1) auch, wenn eine Quelle nicht committete Aenderungen hat (Red Team W-1): Das Paket entsteht nur aus
+einem sauberen Git-Stand; Ausnahme nur zum Testen mit --allow-dirty (README markiert das).
+
+Aufruf : .venv/bin/python production/make_release_rev_c.py [--allow-dirty]
+Pruefen: .venv/bin/python production/make_release_rev_c.py --check
+         vergleicht das vorhandene Paket mit den aktuellen Quellen (sha256 je Datei, fehlende/zusaetzliche Dateien,
+         Git-Stand im README = HEAD). sha256sum -c SHA256SUMS allein prueft nur die Kopien gegen sich selbst.
 """
 import datetime
 import glob
@@ -32,6 +37,7 @@ ITEMS = [
     ("1_jlc_upload", ORDER_FILES[2], "CPL JLC-Format (Upload PCBA)"),
     ("2_bestellung", ORDER, "Bestellunterlage mit Checklisten (Kap. 4/5) und Remark (Kap. 8)"),
     ("2_bestellung", "docs/manuals/BESTELLEN_JLC.md", "Schritt-für-Schritt-Anleitung JLC-Formular"),
+    ("2_bestellung", "hardware/sensor/out/REMARK_JLC_REV_C.txt", "Remark-Text zum Kopieren (eine Zeile, ohne Markdown)"),
     ("2_bestellung", "hardware/sensor/out/fluidi_sensor_bom_extra.csv", "Teile ohne JLC-Bestückung (lokal, DNP, Leiterplattenstrukturen)"),
     ("2_bestellung", "hardware/sensor/out/fluidi_sensor_cpl_jlc_rotationen.csv", "Rotationskorrekturen CPL (für Confirm Parts Placement)"),
     ("2_bestellung", "hardware/sensor/out/pdf/fluidi_sensor_bestueckung_F.pdf", "Bestückungsansicht Oberseite mit Pin-1 (Vorschau-Vergleich)"),
@@ -63,7 +69,59 @@ def git(*a):
         return "-"
 
 
+def sources():
+    """Liste (Zielpfad relativ zum Paket, Quelle absolut, Zweck)."""
+    out = []
+    for sub, src, purpose in ITEMS:
+        srcs = sorted(glob.glob(os.path.join(ROOT, src))) if "*" in src else [os.path.join(ROOT, src)]
+        for s_ in srcs:
+            out.append((os.path.join(sub, os.path.basename(s_)), s_, purpose))
+    return out
+
+
+def check():
+    """Paket <-> Quellen vergleichen (W-1). Exit 0 nur ohne Abweichung."""
+    if not os.path.isdir(DST):
+        print("FEHLER: kein Paket", DST)
+        return 1
+    bad = []
+    want = set()
+    for rel, src, _ in sources():
+        want.add(rel)
+        d = os.path.join(DST, rel)
+        if not os.path.isfile(src):
+            bad.append(f"Quelle fehlt: {os.path.relpath(src, ROOT)}")
+        elif not os.path.isfile(d):
+            bad.append(f"fehlt im Paket: {rel}")
+        elif sha(src) != sha(d):
+            bad.append(f"veraltet: {rel} (Quelle {os.path.relpath(src, ROOT)} geaendert)")
+    have = {os.path.relpath(os.path.join(dp, f), DST) for dp, _, fs in os.walk(DST) for f in fs}
+    extra = have - want - {"README.md", "SHA256SUMS", os.path.join("5_firmware", "FIRMWARE_HINWEIS.md")}
+    bad += [f"nicht mehr in der Quellliste: {x}" for x in sorted(extra)]
+    readme = open(os.path.join(DST, "README.md"), encoding="utf-8").read()
+    m = re.search(r"Git-Stand \| `([0-9a-f]+)`", readme)
+    head = git("rev-parse", "--short", "HEAD")
+    if not m or not head.startswith(m.group(1)[:7]) and not m.group(1).startswith(head[:7]):
+        bad.append(f"Git-Stand im README {m.group(1) if m else '-'} != HEAD {head}")
+    if "nicht committete" in readme:
+        bad.append("Paket wurde aus einer Arbeitskopie mit nicht committeten Aenderungen erzeugt")
+    for b_ in bad:
+        print("ABWEICHUNG:", b_)
+    print("ERGEBNIS --check:", "Paket aktuell" if not bad else f"{len(bad)} Abweichung(en) -> Paket neu erzeugen")
+    return 0 if not bad else 1
+
+
 def main():
+    if "--check" in sys.argv:
+        return check()
+    allow_dirty = "--allow-dirty" in sys.argv
+    dirty_src = [os.path.relpath(s_, ROOT) for _, s_, _ in sources()
+                 if git("status", "--porcelain", "--", os.path.relpath(s_, ROOT))]
+    if dirty_src and not allow_dirty:
+        print("FEHLER: nicht committete Quellen -> erst committen (W-1):")
+        for x in dirty_src:
+            print("   ", x)
+        return 1
     order_txt = open(os.path.join(ROOT, ORDER), encoding="utf-8").read()
     for f in ORDER_FILES:
         m = re.search(re.escape(os.path.basename(f)) + r".*?`([0-9a-f]{64})`", order_txt)

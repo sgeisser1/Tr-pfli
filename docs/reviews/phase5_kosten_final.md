@@ -8,6 +8,13 @@
 | Gateway | `hardware/gateway/BOM_GATEWAY.csv` (Preise pi-shop.ch, Abruf 2026-11-08, `docs/references/pi-shop_Gateway-Teile_Auszug_2026-11-08.txt`) |
 | Bestellunterlage | `hardware/sensor/out/ORDER_JLC_REV_C.md`, Anleitung `docs/manuals/BESTELLEN_JLC.md` |
 
+## 0 Fazit
+
+- **Stückkosten nach D-005** (REQ-FAB-04, Grenzkosten pro Sensor ohne Einmalkosten): Serie **8.38 CHF** → < 10 CHF erfüllt, **unter Vorbehalt**: Berechnet JLC „Pre-reflow Soldering“ (0.016 USD/Lötstelle), steigen sie auf **10.60 CHF** → REQ-FAB-04 **verfehlt** (Kap. 2.1, Stopp-Kriterium im Warenkorb).
+- **Vollkosten** (ganze Bestellung inkl. Einmalkosten / Sensoren): Serie **17.84 CHF/Sensor**; mit Prototyp-Los und Gateway 35.63 CHF/Sensor (15 Sensoren). Das ist, was ein Sensor real kostet.
+- D-005 (Definition Stückkosten) hat Status „zur Kenntnis“; der Auftraggeber sollte ausdrücklich bestätigen, dass REQ-FAB-04 die Stückkosten nach D-005 meint und nicht die Vollkosten.
+- Gateway: kauffertig 22.77 CHF, offen/nicht lieferbar 58.70 CHF, geplant total 81.47 CHF.
+
 ## 1 Abgleich JLC-Screenshot ↔ Modell (Sensor-PCB, 2026-11-08)
 
 | Position (Screenshot, 20 Stk) | USD |
@@ -42,7 +49,7 @@ Die Aufschlüsselung bestätigt die Modellannahme D-005: Fixanteil (Engineering 
 | ALT Standard-PCBA Serie 7 Paneele = 21 PCB / 18 bestückt / 15 Sensoren | standard | **9.31** | 186.13 | 325.80 | 21.72 | 285.20 |
 | ALT Standard-PCBA Prototyp 2 Paneele = 6 PCB / 6 bestückt / 5 Sensoren | standard | **10.72** | 184.26 | 237.86 | 47.57 | 221.61 |
 
-REQ-FAB-04 (< 10 CHF Stückkosten bei 10–15 Stück, D-005): Serie **8.38 CHF** (4 × 100 µF) bzw. **8.17 CHF** (2 × 100 µF) → **erfüllt**; mit Standard-PCBA 9.31 CHF (erfüllt, Paneelpreis ANNAHME).
+REQ-FAB-04 (< 10 CHF Stückkosten bei 10–15 Stück, D-005): Serie **8.38 CHF** (4 × 100 µF) bzw. **8.17 CHF** (2 × 100 µF) → **erfüllt unter Vorbehalt** „Pre-reflow Soldering“ (falls berechnet: 10.60 CHF, **verfehlt**, Kap. 2.1); mit Standard-PCBA 9.31 CHF (erfüllt, Paneelpreis ANNAHME).
 
 ### 2.1 Versteckte Kosten und Empfindlichkeiten
 
@@ -52,12 +59,14 @@ REQ-FAB-04 (< 10 CHF Stückkosten bei 10–15 Stück, D-005): Serie **8.38 CHF**
 | Mindestabnahmen/Verlust LCSC | Prototyp 3.13 / Serie 2.97 USD | im Modell (Einmalkosten) |
 | Ausschuss lokale Teile | 5 % (ANNAHME) | im Modell |
 | Reserveboard Serie | 16 bestückt für 15 Sensoren | im Modell (Stückkosten × 16/15) |
-| „Pre-reflow Soldering“ 0.016 USD/Lötstelle (JLC-Preisseite, Anwendung nicht erklärt) – Prototyp 5 PCB / 5 bestückt (4 × 100 µF) | +10.41 CHF je Bestellung, falls berechnet | **nicht** im Modell; im Warenkorb prüfen |
-| „Pre-reflow Soldering“ 0.016 USD/Lötstelle (JLC-Preisseite, Anwendung nicht erklärt) – Serie 20 PCB / 16 bestückt / 15 Sensoren (4 × 100 µF) | +33.32 CHF je Bestellung, falls berechnet | **nicht** im Modell; im Warenkorb prüfen |
+| „Pre-reflow Soldering“ 0.016 USD/Lötstelle (JLC-Preisseite, Anwendung nicht erklärt) – Prototyp 5 PCB / 5 bestückt (4 × 100 µF) | +10.41 CHF je Bestellung, Stückkosten 9.23 → **11.31 CHF** (D-005: pro Lötstelle = Stückkosten) | **nicht** im Modell; **Stopp-Kriterium** im Warenkorb (Anleitung Schritt 9, ORDER Kap. 4 Nr. 11) |
+| „Pre-reflow Soldering“ 0.016 USD/Lötstelle (JLC-Preisseite, Anwendung nicht erklärt) – Serie 20 PCB / 16 bestückt / 15 Sensoren (4 × 100 µF) | +33.32 CHF je Bestellung, Stückkosten 8.38 → **10.60 CHF** (D-005: pro Lötstelle = Stückkosten) | **nicht** im Modell; **Stopp-Kriterium** im Warenkorb (Anleitung Schritt 9, ORDER Kap. 4 Nr. 11) |
 | Confirm Production File = Yes | Preis unbekannt | ANNAHME 0 USD, am Bestelltag ablesen |
 | Coupons 2 × 20 USD | bis −35.90 CHF | nicht abgezogen (Bedingungen unbekannt) |
 | Lager BT1 C5213768 (629 Stk, sinkend) | Ausfall → Ersatzteil/Layout | Bestand am Bestelltag prüfen |
 | Verzollung DHL | 19 CHF + max(3 CHF; 2 %) je Sendung (K-2) | im Modell |
+| Versand mit PCBA | Serie geschätzt ≈ 0.55 kg; DHL-Stufe über 0.5 kg evtl. einige USD teurer (ANNAHME) | pauschal 23.52 USD; im 10-%-Stoppkriterium enthalten |
+| Zahlungsweg | Modell +1.5 % (ANNAHME); PayPal-Umrechnung meist teurer (ANNAHME, < 3 CHF je Bestellung) | Karte ohne Fremdwährungsgebühr empfohlen |
 
 ## 3 Gateway (W-8, REQ-FAB-06 separat ausgewiesen)
 
@@ -66,19 +75,19 @@ RTC-Entscheid (Vorschlag, OP-GW-3): **Adafruit PiRTC Precise DS3231** mit CR1220
 | Pos | Teil | Typ | Menge | CHF/Stk | Summe CHF | Status | Lager (Abruf) | Quelle |
 |---|---|---|---|---|---|---|---|---|
 | G1 | Einplatinenrechner Gateway (D-014) | Raspberry Pi Zero 2 W | 1 | 17.15 | 17.15 | vorhanden | nicht an Lager | pi-shop.ch |
-| G2 | Netzteil 5 V 2.5 A Micro-USB (REQ-SAF-DOC-02 gepruefte Speisung) | Raspberry Pi Ltd, Original 12.5 W Micro-USB Steckernetzteil | 1 | 11.90 | 11.90 | kaufen | Sofort-Versand ab Lager | pi-shop.ch |
-| G3 | microSD Industrial 16 GB (Stromausfall/Schreibzyklen, ARCHITECTURE Kap. 14.4) | Kingston microSDHC Industrial UHS-I 16 GB | 1 | 27.90 | 27.90 | kaufen | nicht an Lager | pi-shop.ch |
-| G4 | Echtzeituhr mit Pufferung ohne Ladepfad (REQ-GW-09, OP-GW-3, W-8) | Adafruit PiRTC Precise DS3231 (Adafruit 4282) | 1 | 18.90 | 18.90 | kaufen | Sofort-Versand ab Lager | pi-shop.ch |
-| G5 | Pufferzelle RTC (Primaerzelle, nicht wiederaufladbar) | CR1220 Lithium 3 V (Hersteller offen) | 1 | 3.00 | 3.00 | kaufen | - | ANNAHME (kein Angebot abgefragt, pi-shop.ch fuehrt keine CR1220, Suche 2026-11-08) |
-| G6 | Raumklima-Sensor-Breakout (D-017, SHT4x an I2C 0x44) | Seeed Grove SHT41 (Grove-SHT4x) | 1 | 8.90 | 8.90 | kaufen | nicht an Lager | pi-shop.ch |
+| G2 | Netzteil 5 V 2.5 A Micro-USB (REQ-SAF-DOC-02 gepruefte Speisung) | Raspberry Pi Ltd, Original 12.5 W Micro-USB Steckernetzteil | 1 | 11.90 | 11.90 | kauffertig | Sofort-Versand ab Lager | pi-shop.ch |
+| G3 | microSD Industrial 16 GB (Stromausfall/Schreibzyklen, ARCHITECTURE Kap. 14.4) | Kingston microSDHC Industrial UHS-I 16 GB | 1 | 27.90 | 27.90 | nicht an Lager | nicht an Lager | pi-shop.ch |
+| G4 | Echtzeituhr mit Pufferung ohne Ladepfad (REQ-GW-09, OP-GW-3, W-8) | Adafruit PiRTC Precise DS3231 (Adafruit 4282) | 1 | 18.90 | 18.90 | Entscheid offen | Sofort-Versand ab Lager | pi-shop.ch |
+| G5 | Pufferzelle RTC (Primaerzelle, nicht wiederaufladbar) | CR1220 Lithium 3 V (Hersteller offen) | 1 | 3.00 | 3.00 | Entscheid offen | - | ANNAHME (kein Angebot abgefragt, pi-shop.ch fuehrt keine CR1220, Suche 2026-11-08) |
+| G6 | Raumklima-Sensor-Breakout (D-017, SHT4x an I2C 0x44) | Seeed Grove SHT41 (Grove-SHT4x) | 1 | 8.90 | 8.90 | Entscheid offen | nicht an Lager | pi-shop.ch |
 | G7 | Gehaeuse G1 v4 ASA (Wanne grau + Deckel blau + Fenster) | Eigendruck Bambu (mechanical/gateway_pi/print) | 1 | 0.97 | 0.97 | Eigenfertigung | - | ANNAHME ASA 0.035 CHF/g (scripts/concept_costs.py ASA_CHF_PER_G) |
-| G8 | Gewindeeinsaetze M2.5 (4) + Schrauben M2.5 x 8 ISO 7380 (4) | Handelsware | 1 | 2.00 | 2.00 | kaufen | - | ANNAHME (kein Angebot abgefragt) |
+| G8 | Gewindeeinsaetze M2.5 (4) + Schrauben M2.5 x 8 ISO 7380 (4) | Handelsware | 1 | 2.00 | 2.00 | kauffertig | - | ANNAHME (kein Angebot abgefragt) |
 | G9 | Status-LED-Platine 8 x 8.2 mm (RGB wie Sensor) | nicht entworfen | 1 | 0.00 | 0.00 | offen | - | - |
 | G10 | Litze AWG 28, Schrumpfschlauch | Werkstattbestand | 1 | 0.00 | 0.00 | vorhanden | - | ANNAHME |
 | G11 | Zusatz-BLE-Empfaenger (nur falls Koexistenz W-7 nicht genuegt) | Seeed XIAO nRF52840 Sense | 1 | 0.00 | 0.00 | vorhanden (optional) | - | - |
-| V1 | Versand pi-shop.ch (B-Post Economy) | Schweizer Post | 1 | 7.90 | 7.90 | kaufen | - | pi-shop.ch |
+| V1 | Versand pi-shop.ch (B-Post Economy) | Schweizer Post | 1 | 7.90 | 7.90 | kauffertig | - | pi-shop.ch |
 
-- **Kaufbetrag Gateway: 81.47 CHF** (Pi und XIAO vorhanden), davon 5.97 CHF ANNAHME (CR1220, Schrauben/Einsätze, ASA-Preis).
+- **Kauffertig: 22.77 CHF** (Netzteil, Schrauben/Einsätze, Gehäusedruck, Versand), davon 2.97 CHF ANNAHME. **Noch nicht kaufen: 58.70 CHF** (G4/G5 RTC-Montage ohne Buchsenleiste offen, G6 SHT41-Variante a/b/c offen, G3 microSD nicht an Lager). Geplant total 81.47 CHF (Systemsumme rechnet damit).
 - Neuwert inkl. Pi Zero 2 W: 98.62 CHF.
 - Offen, nicht enthalten: Status-LED-Platine 8 x 8.2 mm (RGB wie Sensor).
 - Nicht an Lager (pi-shop.ch 2026-11-08): Pi Zero 2 W (nicht nötig), microSD Industrial, Grove SHT41.
@@ -87,8 +96,8 @@ RTC-Entscheid (Vorschlag, OP-GW-3): **Adafruit PiRTC Precise DS3231** mit CR1220
 
 | Weg | Inhalt | CHF |
 |---|---|---|
-| A: direkt Serie | Serie 20 PCB / 16 bestückt / 15 Sensoren + Gateway-Kauf | **349.05** |
-| B: Prototyp + Serie (geplant) | Prototyp 5 + Serie 15 Sensoren + Gateway-Kauf | **534.52** |
+| A: direkt Serie | Serie 20 PCB / 16 bestückt / 15 Sensoren + Gateway (geplant total) | **349.05** |
+| B: Prototyp + Serie (geplant) | Prototyp 5 + Serie 15 Sensoren + Gateway (geplant total) | **534.52** |
 | B + Programmieradapter | wie B + Adapter Rev 1 (25–55 CHF, ANNAHME) | 559.52 – 589.52 |
 
 - Pro Sensor (Weg A, inkl. Gateway-Anteil): 23.27 CHF; Weg B: 35.63 CHF (die 5 Prototypen sind zusätzlich nutzbar, falls sie die Prüfungen bestehen → dann 20 Sensoren: 26.73 CHF).

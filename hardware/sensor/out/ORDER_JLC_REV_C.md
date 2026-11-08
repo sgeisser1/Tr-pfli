@@ -13,6 +13,8 @@
 
 Erzeugt mit `hardware/sensor/gen/run_pcb.sh` aus Commit `03341e8`. Vor dem Upload mit `sha256sum` vergleichen.
 
+**Achtung (Red Team W-4, Entscheid Projektleitung 2026-11-08):** Der Platzhalter `JLCJLCJLCJLC` wird aus dem Layout entfernt (Elektronik, `pcb_build.py`). Danach entstehen neue Gerber; die sha256 dieser Tabelle werden **erst dann** nachgeführt. Bis dahin meldet `order_check.py` „FEHLER Platzhalter … vorhanden“ (Exit 1) – **mit diesem Stand nicht bestellen**.
+
 | Datei | Inhalt | sha256 |
 |---|---|---|
 | `hardware/sensor/out/fluidi_sensor_gerber_jlc.zip` | 11 Gerber (F/In1/In2/B Cu, F/B Mask, F/B Paste, F/B Silkscreen, Edge.Cuts), `PTH.drl`, `NPTH.drl`, Job-Datei | `7da2269dff8755c042cce6fa71d2a57f487c33a3f83389d7f70775ff34791bc0` |
@@ -53,7 +55,7 @@ Referenzen), `out/pdf/fluidi_sensor_layout_lagen.pdf`, `out/fluidi_sensor_cpl_jl
 | Min via hole size/diameter | **0.3mm/(0.4/0.45mm)** | P/G: einzige Via-Grösse 0.45/0.30; G: `PTH.drl` 146 Bohrungen 0.30 mm (145 Vias + AE1 Pad 2). Kein Aufpreis (JLCPCB_NOTES Kap. 3/8) |
 | Min track / spacing | 0.15 mm genutzt / 0.10 mm | P: kleinste Leiterbahn 0.15 mm; J: Abstände 0.10 mm (JLC 4 L: 0.09/0.09) |
 | Board Outline Tolerance | ± 0.2 mm (Standard) | PCB_OUTLINE |
-| Mark on PCB | **Remove Mark** (Formular bietet nur „Remove Mark“ und „2D barcode (Serial Number)“) | JLC: „Order Number is not available since May 2026. Please DO NOT add "JLCJLCJLCJLC" in your silkscreen layer“; ohne Auswahl wird keine Markierung gesetzt (`docs/references/JLCPCB_HowToMarkOnPCB_Auszug_2026-11-08.txt`, „Last updated on May 22, 2026“). Der Platzhalter `JLCJLCJLCJLC` (B.Silkscreen, X 6.00 / Y −19.70, Zone Z2 Band B, im Kopf verdeckt) ist damit **überholt**. Was JLC mit dem Text macht, steht nirgends → **ANNAHME**: wird als normaler Text gedruckt oder vom Ingenieur entfernt; beides unschädlich (nur Silkscreen, kein Kupfer, keine Dicht-/Vergussfläche). Remark bittet um Entfernen (Kap. 8), Kontrolle in der Produktionsdatei Lage `bo` (Kap. 4 Nr. 2). „2D barcode“ **nicht** wählen: ohne Positionsquadrat setzt JLC den Code „in an empty area“, also evtl. auf Sonde, Schott oder Dichtstreifen. Aufräumen im Layout bei der nächsten Revision (Befund, Layout nicht geändert) |
+| Mark on PCB | **Remove Mark** (Formular bietet nur „Remove Mark“ und „2D barcode (Serial Number)“). **Platzhalter wird aus dem Layout entfernt** (W-4, Projektleitung; Prüfung `order_check.py`: kein Platzhalter) | JLC: „Order Number is not available since May 2026. Please DO NOT add "JLCJLCJLCJLC" in your silkscreen layer“; ohne Auswahl wird keine Markierung gesetzt (`docs/references/JLCPCB_HowToMarkOnPCB_Auszug_2026-11-08.txt`, „Last updated on May 22, 2026“). Der Platzhalter `JLCJLCJLCJLC` (B.Silkscreen, X 6.00 / Y −19.70) ist damit überholt und wird vor der Bestellung aus dem Layout gelöscht (W-4); Kontrolle in der Produktionsdatei Lage `bo` (Kap. 4 Nr. 2). „2D barcode“ **nicht** wählen: ohne Positionsquadrat setzt JLC den Code „in an empty area“, also evtl. auf Sonde, Schott oder Dichtstreifen |
 | Electrical Test | Flying Probe Fully Test (Vorgabe) | Screenshot |
 | Gold Fingers / Castellated / Edge Plating, übrige Optionen | No | Economic PCBA: Gold Fingers/Castellated/Edge Plating „Not Support“ (`…PCBA-Capabilities_Auszug…`) |
 | Confirm Production File | **Yes** (Screenshot stand auf „No“) | JLC empfiehlt die Option ausdrücklich für gefüllte Vias und Markierungen (`…ViaCovering_Auszug…`, `…HowToMarkOnPCB_Auszug…`); Produktionsdatei enthält Lage `sk` = zu füllende Vias (`docs/references/JLCPCB_ConfirmProductionFile_Auszug_2026-11-08.txt`). Preis nicht belegt → **ANNAHME 0 USD**, beim Umschalten ablesen (Kap. 4 Nr. 6) |
@@ -85,7 +87,7 @@ Stimmt ein Punkt nicht, **nicht bezahlen** und Projektleitung informieren.
 | Nr. | Prüfpunkt | Erwartung | OK | Beleg (Screenshot-Nr.) / Notiz |
 |---|---|---|---|---|
 | 1 | sha256 der drei Dateien vor dem Upload | wie Kap. 1 | [ ] | |
-| 2 | Gerber-Vorschau beim Upload und **Produktionsdatei** („Confirm Production File“, nach der Zahlung per E-Mail; Ordner `ok` mit Gerber-Viewer öffnen, nicht nur das Bild) | 4 Kupferlagen in der Reihenfolge GTL/G1/G2/GBL; Kontur geschlossen 26 × 158.5; Sondenelektroden nur auf L2/L3, Aussenkupfer endet bei Y −49.8; AE1 Pad 2 erscheint als Via (DFM K-2). Lage **`sk`** (gefüllte Vias) enthält **alle 146** Bohrungen 0.30 mm, mindestens die 8 Via-in-Pad (4 im U1-EP, BT1-Clip-Pad, Minuspad, TP1, TP2). Lage **`bo`**: keine Auftragsnummer, kein Barcode; `JLCJLCJLCJLC` entfernt oder als Text (beides ok). Erst dann „Yes, please proceed to production“ | [ ] | |
+| 2 | Gerber-Vorschau beim Upload und **Produktionsdatei** („Confirm Production File“, nach der Zahlung per E-Mail; Ordner `ok` mit Gerber-Viewer öffnen, nicht nur das Bild) | 4 Kupferlagen in der Reihenfolge GTL/G1/G2/GBL; Kontur geschlossen 26 × 158.5; Sondenelektroden nur auf L2/L3, Aussenkupfer endet bei Y −49.8 (die letzten ≈ 109 mm der Sonde ohne Aussenkupfer); AE1 Pad 2 erscheint als Via (DFM K-2). Lage **`sk`** (gefüllte Vias) enthält **alle 146** Bohrungen 0.30 mm, mindestens die 8 Via-in-Pad (4 im U1-EP, BT1-Clip-Pad, Minuspad, TP1, TP2). Lage **`bo`**: keine Auftragsnummer, kein Barcode, kein Text `JLCJLCJLCJLC`. Erst dann „Yes, please proceed to production“ | [ ] | |
 | 3 | PCB-Parameter wie Kap. 2 eingestellt | 4 L, 1.6 mm, Specify Stackup No, FR4 TG135, grün, Silk weiss, ENIG 1 U", 1 oz / 0.5 oz, Single PCB, Deburring Yes, Via Plating Horizontal Electroless, Min via 0.3mm/(0.4/0.45mm), Outline ±0.2, Flying Probe Fully Test | [ ] | |
 | 4 | **Via Covering = Epoxy Filled & Capped** ausgewählt | Option aktiv, im Preis enthalten. **Ohne POFV keine Bestellung** (A-2 D-023) | [ ] | |
 | 5 | **Economic PCBA zusammen mit ENIG und POFV wählbar?** (Option nicht ausgegraut, kein Hinweis „not supported“) | ja → weiter mit Nr. 6. **Nein** → nicht bestellen; Standard-PCBA nach Kap. 6 dem Auftraggeber vorlegen. POFV hat Vorrang vor Economic | [ ] ja [ ] nein | |
@@ -94,11 +96,17 @@ Stimmt ein Punkt nicht, **nicht bezahlen** und Projektleitung informieren.
 | 8 | Lagerbestand am Bestelltag (K-5), v. a. **BT1 C5213768** | ≥ 5 (Prototyp) bzw. ≥ 16 (Serie); Abfrage 2026-11-08 10:51: **629 Stk** (2026-11-07: 654), Kap. 7 | [ ] | Bestand heute: |
 | 9 | BOM-Zuordnung in JLC | 26 Zeilen, alle LCSC-Nummern erkannt, keine Zeile „not matched“; Basic/Extended wie Kap. 7 | [ ] | |
 | 10 | **Confirm Parts Placement** | Abhakliste Kap. 5 vollständig | [ ] | |
-| 11 | Gesamtbetrag vor dem Bezahlen | Prototyp ≈ 163.23 USD, Serie ≈ 220.33 USD JLC-Rechnung inkl. DHL (`docs/reviews/phase5_kosten_final.md` Kap. 2); Abweichung > 10 % klären. Posten „Pre-reflow Soldering“ vorhanden? (wäre +0.016 USD/Lötstelle, nicht im Modell) | [ ] | Betrag: |
+| 11 | Gesamtbetrag vor dem Bezahlen | Prototyp ≈ 163.23 USD, Serie ≈ 220.33 USD JLC-Rechnung inkl. DHL (`docs/reviews/phase5_kosten_final.md` Kap. 2); Abweichung > 10 % klären. **Stopp:** Posten „Pre-reflow Soldering“ vorhanden (0.016 USD/Lötstelle) → nicht bezahlen, Projektleitung: Serie dann ≈ 10.60 CHF/Stück > REQ-FAB-04 (W-3, `phase5_kosten_final.md` Kap. 0) | [ ] | Betrag: |
 | 12 | Versand | GSDL ist ab Warenwert 65 USD nicht zulässig → **DHL Express** (Screenshot 2026-11-08: 23.52 USD, 2–4 Tage, 0.41 kg für 20 unbestückte PCB; mit PCBA am Checkout ablesen). Bei Ankunft erwartet: MWST ≈ 12.4 CHF + Verzollung DHL 19 CHF + Vorlagegebühr 3 CHF (K-2) | [ ] | |
 | 13 | Auftragsnummer JLC | | [ ] | Auftragsnr.: ________ |
 
 ## 5 Abhakliste „Confirm Parts Placement“ (W-3, B-3)
+
+**Feste Regel (Red Team W-2): Nie selbst drehen.** Weicht ein Teil ab oder ist die Lage unklar: Screenshot, **nicht
+bezahlen**, Projektleitung fragen. Der rote Punkt in der JLC-Vorschau ist **nicht** Pin 1: „we do not call the red dot
+pin 1, but a marking only“ (JLC PCBA-FAQ Teil 2, Q1, Sep 09, 2026; `docs/references/JLCPCB_NOTES.md` Kap. 8). Pin 1 am
+Gehäusemerkmal des Bauteilbilds beurteilen (Fase, Kerbe, Pin-1-Punkt auf dem Gehäuse, Kathodenmarke) bzw. an der
+Pad-Lage des Footprints.
 
 **Ansicht wie `out/pdf/fluidi_sensor_bestueckung_F.pdf`:** Oberseite, Kopf mit Antenne oben (Y 0), Sonde unten. JLC
 zeigt die Platine evtl. gedreht: zuerst die Antenne (Kopf) und das Zellfach (grosses Minuspad) suchen, dann je Teil die
@@ -130,14 +138,14 @@ Sie nur auf grobe Fehllage prüfen (Teil neben den Pads).
 ## 6 Alternative Standard-PCBA (nur wenn Kap. 4 Nr. 5 = nein)
 
 Gerechnet mit `scripts/cost_model.py` über `hardware/sensor/gen/cost_rev_b.py` (`COSTS_REV_B.md` Kap. 1.3).
-PCB-Preislogik wie Angebot 2026-11-08 (nicht verändert).
+PCB-Preislogik wie Angebot 2026-11-08 (nicht verändert). Beträge mit DHL 23.52 USD (Stand 2026-11-08, `COSTS_REV_B.md`).
 
 | Szenario | PCBA | Stück CHF | Einmal CHF | Bestellung total CHF | Vollkosten/Sensor CHF |
 |---|---|---|---|---|---|
-| Prototyp 5 PCB / 5 bestückt | Economic | **9.23** | 139.27 | 185.40 | 37.08 |
-| Prototyp 2 Paneele = 6 PCB / 6 bestückt / 5 Sensoren | Standard | **10.72** | 184.19 | 237.79 | 47.56 |
-| Serie 20 PCB / 16 bestückt / 15 Sensoren | Economic | **8.38** | 141.78 | 267.51 | 17.83 |
-| Serie 7 Paneele = 21 PCB / 18 bestückt / 15 Sensoren | Standard | **9.31** | 186.06 | 325.73 | 21.72 |
+| Prototyp 5 PCB / 5 bestückt | Economic | **9.23** | 139.34 | 185.47 | 37.09 |
+| Prototyp 2 Paneele = 6 PCB / 6 bestückt / 5 Sensoren | Standard | **10.72** | 184.26 | 237.86 | 47.57 |
+| Serie 20 PCB / 16 bestückt / 15 Sensoren | Economic | **8.38** | 141.85 | 267.58 | 17.84 |
+| Serie 7 Paneele = 21 PCB / 18 bestückt / 15 Sensoren | Standard | **9.31** | 186.13 | 325.80 | 21.72 |
 
 Mehrkosten Standard: Prototyp +52 CHF, Serie +58 CHF je Bestellung. Sie sind überwiegend einmalig (Setup 25.56 statt
 8.18 USD, Schablone 8.21 statt 1.53 USD, Fixture 16.42 USD, Feeder 1.53 USD auch für die 15 Basic-Typen). Stückkosten
@@ -185,15 +193,11 @@ Kategorien und Gehäuse stimmen mit BOM und Register (`docs/datasheets/INDEX.csv
 
 Nachgeführt 2026-11-08 (Phase 5): JLC verlangt bei gefüllten Vias die Angabe, welche Vias gefüllt werden („leave a note …
 Alternatively, you can specify to fill all vias of a particular diameter“, `docs/references/JLCPCB_ViaCovering_Auszug_2026-11-08.txt`);
-die Auftragsnummer gibt es seit Mai 2026 nicht mehr (Kap. 2, Mark on PCB). Text unverändert ins Feld „Remark“ kopieren:
-
-> Rev C. Via covering: please fill and copper-cap (POFV, flat) ALL plated holes with 0.30 mm drill (146 holes,
-> 145 vias + 1 via-like hole in antenna pad AE1). Via-in-pad by design: 4 vias in QFN exposed pad (U1), 4 vias in pads
-> of the battery compartment (BT1 clip pad, BT1 negative pad, TP1, TP2) - these must be filled and flat.
-> Mark on PCB: Remove Mark (no order number, no barcode). The bottom silkscreen contains an obsolete placeholder text
-> "JLCJLCJLCJLC" (about 20 mm from the board end with the antenna); please delete it (if not possible, print it
-> as normal text).
-> Inner-layer electrodes in the probe section, no outer copper beyond Y -50 mm (intended).
+die Auftragsnummer gibt es seit Mai 2026 nicht mehr (Kap. 2, Mark on PCB). Text unverändert ins Feld „Remark“ kopieren – **aus der Textdatei** `hardware/sensor/out/REMARK_JLC_REV_C.txt`
+(eine Zeile, 563 Zeichen, ohne Markdown; Feldlänge im Formular ist nicht belegt → ANNAHME, bei Kürzung Projektleitung
+fragen). Inhalt: alle 146 Bohrungen 0.30 mm füllen und überkupfern (8 davon Via-in-Pad, flach), Mark on PCB = Remove
+Mark, Sonde (letzte ≈ 109 mm, Ende gegenüber der Antenne) ohne Aussenkupfer beabsichtigt. Der Satz zum Platzhalter
+entfällt, weil der Platzhalter aus dem Layout entfernt wird (W-4).
 
 ## 9 Was sich gegenüber ORDER_JLC_REV_B.md geändert hat (W-1)
 
@@ -217,3 +221,4 @@ die Auftragsnummer gibt es seit Mai 2026 nicht mehr (Kap. 2, Mark on PCB). Text 
 | Versand DHL 23.44 USD | **23.52 USD**, 0.41 kg (20 PCB unbestückt) | Screenshot; `scripts/cost_model.py` nachgeführt |
 | Remark „All vias epoxy filled … Order number at the JLCJLCJLCJLC placeholder“ | Füllung aller 0.30-mm-Bohrungen ausdrücklich, Platzhalter löschen | JLC Via-Covering-Hilfe; Mark on PCB |
 | PCBA-Felder | weiter **ANNAHME** (Schalter „PCB Assembly“ war aus) | Kap. 3 |
+| Red Team Phase 5 (`docs/reviews/phase5_bestellung_kosten_redteam.md`) | Platzhalter aus Layout (W-4, Hashes folgen), Rotationsregel „nie selbst drehen“ + roter Punkt (W-2), Pre-reflow als Stopp (W-3), Kap. 6 Beträge (K-1), Remark als Textdatei ohne Projektkoordinate (K-4) | Antwort Ersteller im Bericht |

@@ -87,16 +87,21 @@ def main():
 
     # --- 3 Gateway
     gw = load_gw()
-    buy = [r for r in gw if r["Status"] in ("kaufen", "Eigenfertigung")]
+    # W-5 (Red Team Phase 5): Kaufbetrag nur fuer kauffertige Zeilen; offene/nicht lieferbare separat
+    buy = [r for r in gw if r["Status"] in ("kauffertig", "Eigenfertigung")]
+    pend = [r for r in gw if r["Status"] in ("Entscheid offen", "nicht an Lager")]
     gw_buy = sum(r["sum"] for r in buy)
-    gw_new = gw_buy + sum(r["sum"] for r in gw if r["Status"] == "vorhanden")
+    gw_pend = sum(r["sum"] for r in pend)
+    gw_plan = gw_buy + gw_pend
+    gw_new = gw_plan + sum(r["sum"] for r in gw if r["Status"] == "vorhanden")
     gw_annahme = sum(r["sum"] for r in buy if "ANNAHME" in r["Preisquelle"])
     gw_open = [r for r in gw if r["Status"] == "offen"]
 
     # --- 4 System
     s4, pr = res["serie4"], res["proto"]
-    sysA = s4["total_chf"] + gw_buy
-    sysB = pr["total_chf"] + s4["total_chf"] + gw_buy
+    sysA = s4["total_chf"] + gw_plan
+    sysB = pr["total_chf"] + s4["total_chf"] + gw_plan
+    unit_pre = pre["serie4"]["unit_chf"]
     sysB_lo, sysB_hi = sysB + PROG_ADAPTER_CHF[0], sysB + PROG_ADAPTER_CHF[1]
 
     md = io.StringIO()
@@ -112,6 +117,15 @@ def main():
       "`docs/references/pi-shop_Gateway-Teile_Auszug_2026-11-08.txt`) |\n")
     w("| Bestellunterlage | `hardware/sensor/out/ORDER_JLC_REV_C.md`, Anleitung `docs/manuals/BESTELLEN_JLC.md` |\n\n")
 
+    w("## 0 Fazit\n\n")
+    w(f"- **Stückkosten nach D-005** (REQ-FAB-04, Grenzkosten pro Sensor ohne Einmalkosten): Serie **{s4['unit_chf']:.2f} CHF** "
+      f"→ < 10 CHF erfüllt, **unter Vorbehalt**: Berechnet JLC „Pre-reflow Soldering“ (0.016 USD/Lötstelle), steigen sie "
+      f"auf **{unit_pre:.2f} CHF** → REQ-FAB-04 **verfehlt** (Kap. 2.1, Stopp-Kriterium im Warenkorb).\n")
+    w(f"- **Vollkosten** (ganze Bestellung inkl. Einmalkosten / Sensoren): Serie **{s4['full_chf']:.2f} CHF/Sensor**; "
+      f"mit Prototyp-Los und Gateway {sysB / 15:.2f} CHF/Sensor (15 Sensoren). Das ist, was ein Sensor real kostet.\n")
+    w("- D-005 (Definition Stückkosten) hat Status „zur Kenntnis“; der Auftraggeber sollte ausdrücklich bestätigen, dass "
+      "REQ-FAB-04 die Stückkosten nach D-005 meint und nicht die Vollkosten.\n")
+    w(f"- Gateway: kauffertig {gw_buy:.2f} CHF, offen/nicht lieferbar {gw_pend:.2f} CHF, geplant total {gw_plan:.2f} CHF.\n\n")
     w("## 1 Abgleich JLC-Screenshot ↔ Modell (Sensor-PCB, 2026-11-08)\n\n")
     w("| Position (Screenshot, 20 Stk) | USD |\n|---|---|\n")
     for k, v in SCREENSHOT_20.items():
@@ -140,7 +154,8 @@ def main():
         w(f"| {n} | {r['mode']} | **{r['unit_chf']:.2f}** | {r['once_chf']:.2f} | {r['total_chf']:.2f} | "
           f"{r['full_chf']:.2f} | {r['goods_usd']:.2f} |\n")
     w(f"\nREQ-FAB-04 (< 10 CHF Stückkosten bei 10–15 Stück, D-005): Serie **{s4['unit_chf']:.2f} CHF** (4 × 100 µF) "
-      f"bzw. **{res['serie2']['unit_chf']:.2f} CHF** (2 × 100 µF) → **erfüllt**; mit Standard-PCBA "
+      f"bzw. **{res['serie2']['unit_chf']:.2f} CHF** (2 × 100 µF) → **erfüllt unter Vorbehalt** „Pre-reflow Soldering“ "
+      f"(falls berechnet: {unit_pre:.2f} CHF, **verfehlt**, Kap. 2.1); mit Standard-PCBA "
       f"{res['std_serie']['unit_chf']:.2f} CHF (erfüllt, Paneelpreis ANNAHME).\n\n")
     w("### 2.1 Versteckte Kosten und Empfindlichkeiten\n\n")
     w("| Punkt | Wirkung | Behandlung |\n|---|---|---|\n")
@@ -151,11 +166,14 @@ def main():
     for k in ("proto", "serie4"):
         d = pre[k]["total_chf"] - res[k]["total_chf"]
         w(f"| „Pre-reflow Soldering“ 0.016 USD/Lötstelle (JLC-Preisseite, Anwendung nicht erklärt) – {scen[k][0]} | "
-          f"+{d:.2f} CHF je Bestellung, falls berechnet | **nicht** im Modell; im Warenkorb prüfen |\n")
+          f"+{d:.2f} CHF je Bestellung, Stückkosten {res[k]['unit_chf']:.2f} → **{pre[k]['unit_chf']:.2f} CHF** (D-005: "
+          f"pro Lötstelle = Stückkosten) | **nicht** im Modell; **Stopp-Kriterium** im Warenkorb (Anleitung Schritt 9, ORDER Kap. 4 Nr. 11) |\n")
     w("| Confirm Production File = Yes | Preis unbekannt | ANNAHME 0 USD, am Bestelltag ablesen |\n")
     w(f"| Coupons 2 × 20 USD | bis −{2 * coupon_chf:.2f} CHF | nicht abgezogen (Bedingungen unbekannt) |\n")
     w("| Lager BT1 C5213768 (629 Stk, sinkend) | Ausfall → Ersatzteil/Layout | Bestand am Bestelltag prüfen |\n")
-    w("| Verzollung DHL | 19 CHF + max(3 CHF; 2 %) je Sendung (K-2) | im Modell |\n\n")
+    w("| Verzollung DHL | 19 CHF + max(3 CHF; 2 %) je Sendung (K-2) | im Modell |\n")
+    w("| Versand mit PCBA | Serie geschätzt ≈ 0.55 kg; DHL-Stufe über 0.5 kg evtl. einige USD teurer (ANNAHME) | pauschal 23.52 USD; im 10-%-Stoppkriterium enthalten |\n")
+    w("| Zahlungsweg | Modell +1.5 % (ANNAHME); PayPal-Umrechnung meist teurer (ANNAHME, < 3 CHF je Bestellung) | Karte ohne Fremdwährungsgebühr empfohlen |\n\n")
 
     w("## 3 Gateway (W-8, REQ-FAB-06 separat ausgewiesen)\n\n")
     w("RTC-Entscheid (Vorschlag, OP-GW-3): **Adafruit PiRTC Precise DS3231** mit CR1220-Primärzelle. Belege: "
@@ -169,16 +187,17 @@ def main():
     for r in gw:
         w(f"| {r['Pos']} | {r['Teil']} | {r['Hersteller_Typ']} | {r['Menge']:g} | {r['Preis_CHF_Stk']:.2f} | "
           f"{r['sum']:.2f} | {r['Status']} | {r['Lager_Abruf']} | {r['Preisquelle'].split(' http')[0]} |\n")
-    w(f"\n- **Kaufbetrag Gateway: {gw_buy:.2f} CHF** (Pi und XIAO vorhanden), davon {gw_annahme:.2f} CHF ANNAHME "
-      f"(CR1220, Schrauben/Einsätze, ASA-Preis).\n")
+    w(f"\n- **Kauffertig: {gw_buy:.2f} CHF** (Netzteil, Schrauben/Einsätze, Gehäusedruck, Versand), davon {gw_annahme:.2f} CHF "
+      f"ANNAHME. **Noch nicht kaufen: {gw_pend:.2f} CHF** (G4/G5 RTC-Montage ohne Buchsenleiste offen, G6 SHT41-Variante "
+      f"a/b/c offen, G3 microSD nicht an Lager). Geplant total {gw_plan:.2f} CHF (Systemsumme rechnet damit).\n")
     w(f"- Neuwert inkl. Pi Zero 2 W: {gw_new:.2f} CHF.\n")
     w(f"- Offen, nicht enthalten: {', '.join(r['Teil'] for r in gw_open)}.\n")
     w("- Nicht an Lager (pi-shop.ch 2026-11-08): Pi Zero 2 W (nicht nötig), microSD Industrial, Grove SHT41.\n\n")
 
     w("## 4 System (15 Sensoren + Gateway)\n\n")
     w("| Weg | Inhalt | CHF |\n|---|---|---|\n")
-    w(f"| A: direkt Serie | Serie 20 PCB / 16 bestückt / 15 Sensoren + Gateway-Kauf | **{sysA:.2f}** |\n")
-    w(f"| B: Prototyp + Serie (geplant) | Prototyp 5 + Serie 15 Sensoren + Gateway-Kauf | **{sysB:.2f}** |\n")
+    w(f"| A: direkt Serie | Serie 20 PCB / 16 bestückt / 15 Sensoren + Gateway (geplant total) | **{sysA:.2f}** |\n")
+    w(f"| B: Prototyp + Serie (geplant) | Prototyp 5 + Serie 15 Sensoren + Gateway (geplant total) | **{sysB:.2f}** |\n")
     w(f"| B + Programmieradapter | wie B + Adapter Rev 1 ({PROG_ADAPTER_CHF[0]:.0f}–{PROG_ADAPTER_CHF[1]:.0f} CHF, ANNAHME) | "
       f"{sysB_lo:.2f} – {sysB_hi:.2f} |\n\n")
     w(f"- Pro Sensor (Weg A, inkl. Gateway-Anteil): {sysA / 15:.2f} CHF; Weg B: {sysB / 15:.2f} CHF "
@@ -212,7 +231,8 @@ def main():
         r = res[k]
         print(f"{n}: Stueck {r['unit_chf']:.2f}, Einmal {r['once_chf']:.2f}, total {r['total_chf']:.2f}, "
               f"voll {r['full_chf']:.2f} CHF")
-    print(f"Gateway Kauf {gw_buy:.2f} CHF (ANNAHME-Anteil {gw_annahme:.2f}), Neuwert {gw_new:.2f} CHF")
+    print(f"Gateway kauffertig {gw_buy:.2f} CHF (ANNAHME-Anteil {gw_annahme:.2f}), offen {gw_pend:.2f}, geplant {gw_plan:.2f}, "
+          f"Neuwert {gw_new:.2f} CHF; Serie mit Pre-reflow {unit_pre:.2f} CHF")
     print(f"System A {sysA:.2f} CHF, B {sysB:.2f} CHF, B+Adapter {sysB_lo:.2f}-{sysB_hi:.2f} CHF")
     print("->", os.path.relpath(OUT, ROOT))
 

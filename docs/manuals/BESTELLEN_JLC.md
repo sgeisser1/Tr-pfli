@@ -22,6 +22,9 @@
 2. „Economic“ ist mit dieser Platine nicht wählbar (B-2) → Ausweichweg Standard-PCBA nach ORDER Kap. 6, braucht Ihre Freigabe.
 3. Eine BOM-Zeile wird nicht erkannt oder ein Teil ist nicht an Lager (v. a. BT1 C5213768).
 4. Gesamtbetrag weicht mehr als 10 % von Schritt 10 ab.
+5. Ein Bauteil liegt in der Vorschau anders als in ORDER Kap. 5 oder die Lage ist unklar (Schritt 8). **Nie selbst drehen.**
+6. Im Warenkorb erscheint der Posten „Pre-reflow Soldering“ (Schritt 9).
+7. `order_check.py` meldet „FEHLER Platzhalter“ oder das Paket ist veraltet (Schritt 1).
 
 ---
 
@@ -30,11 +33,17 @@
 Im Ordner `production/rev-C` (WSL/Linux):
 
 ```
+.venv/bin/python production/make_release_rev_c.py --check     # Paket = aktuelle Quellen und Git-Stand?
+.venv/bin/python hardware/sensor/gen/order_check.py           # Platine/Gerber; muss "Platzhalter ... keiner" melden
 cd production/rev-C && sha256sum -c SHA256SUMS
 ```
 
+`--check` muss „Paket aktuell“ melden und der Git-Stand im `README.md` des Pakets muss dem Commit entsprechen, den die
+Projektleitung freigegeben hat. `sha256sum -c` allein genügt nicht (prüft nur die Kopien gegen sich selbst).
+
 Unter Windows (PowerShell) für die drei Upload-Dateien: `Get-FileHash .\1_jlc_upload\* -Algorithm SHA256`.
-Sollwerte (ORDER Kap. 1):
+Sollwerte: **massgebend ist ORDER Kap. 1.** Die Werte unten gelten für den Stand vor dem Entfernen des Platzhalters
+(W-4); Gerber, evtl. CPL und damit die Hashes ändern sich noch – die Projektleitung führt ORDER Kap. 1 nach:
 
 | Datei | sha256 beginnt mit |
 |---|---|
@@ -87,7 +96,10 @@ Spalte „Screenshot“ = Ihr Stand vom 2026-11-08. **Fett** = dort anders einst
 | 21 | **Mark on PCB** | **Remove Mark** | gleich | Remove Mark | **nicht** „2D barcode“ (würde irgendwo auf die Platine gesetzt, evtl. auf die Sonde) |
 | 22 | Electrical Test | Flying Probe Fully Test | gleich | gleich | |
 | 23 | Gold Fingers, Castellated Holes, Edge Plating, übrige Sonderoptionen | No | No | No | |
-| 24 | Remark | Text aus ORDER Kap. 8 **wörtlich** einfügen | gleich | – | Füllung aller 0.30-mm-Vias, Platzhalter löschen |
+| 24 | Remark | Inhalt von `2_bestellung/REMARK_JLC_REV_C.txt` **wörtlich** einfügen (563 Zeichen) | gleich | – | Füllung aller 0.30-mm-Vias, Remove Mark. Wird der Text gekürzt: Projektleitung fragen |
+
+**Feld nicht in der Tabelle** (z. B. Impedance Control, Package Box, UL Marking, Papier-/Verpackungsoptionen): Vorgabe
+lassen und Screenshot machen; ändert das Feld den Preis oder ist es ein Pflichtfeld ohne Vorgabe → Projektleitung fragen.
 
 Preis ablesen (PCB allein, noch ohne PCBA): Prototyp 5 Stk erwartet **65.21 USD**, Serie 20 Stk **76.30 USD**
 (Engineering 25.00 + Via Covering 18.59 + Surface Finish 18.50 + Deburring 0.50 + Board 10.20 + Via Plating 3.51), jeweils
@@ -106,7 +118,7 @@ Der Schalter liegt unter den PCB-Feldern (Screenshot: aus). **Einschalten.** Dan
 |---|---|---|---|
 | PCBA Type | **Economic** | Economic | Ist „Economic“ ausgegraut oder erscheint „not supported“ → Stopp-Regel 2, ORDER Kap. 4 Nr. 5 „nein“ |
 | Assembly Side | **Top Side** | Top Side | alle Bauteile oben |
-| PCBA Qty | **5** | **16** | Serie: 15 Sensoren + 1 Reserve, 4 Platinen bleiben unbestückt |
+| PCBA Qty | **5** | **16** | Serie: 15 Sensoren + 1 Reserve, 4 Platinen bleiben unbestückt. Ist 16 nicht wählbar: nächstgrössere Menge (z. B. 20), Mehrkosten notieren (≈ 4 × 5.53 USD JLC-Anteil je Board) und vor dem Bezahlen der Projektleitung melden |
 | Tooling holes / Edge rails / Fiducials | nicht hinzufügen bzw. „Added by JLCPCB“, falls Pflichtfeld | gleich | Economic braucht keine (JLC PCBA Capabilities) |
 | Confirm Parts Placement | **Yes** | Yes | 0.45 USD; Sie prüfen die Lage der Teile selbst (Schritt 8) |
 | übrige Optionen (Programmierung, Coating, Paste/Stencil-Optionen, Packaging) | Vorgabe lassen / No | gleich | Programmierung und Coating gibt es nur bei Standard |
@@ -133,9 +145,17 @@ Screenshot dieser Felder ablegen → ORDER Kap. 4 Nr. 5 ankreuzen („ja“ oder
 
 JLC zeigt die Platine mit den Bauteilbildern. **Jetzt die Abhakliste ORDER Kap. 5 vollständig abarbeiten** (U1, U2, U3,
 U4–U6, Q1, Q2, D1, Y1, BT1 einzeln; Kurzschlussfälle fett). Vergleichsbild: `production/rev-C/2_bestellung/fluidi_sensor_bestueckung_F.pdf`.
-Pro Teil einen Screenshot. Liegt ein Teil falsch: in der JLC-Ansicht drehen (falls möglich) und die Drehung notieren,
-**oder** nicht weitermachen und die Projektleitung fragen. Mit „Confirm Parts Placement = Yes“ prüft JLC zusätzlich vor
-der Fertigung und meldet sich per E-Mail. → ORDER Kap. 4 Nr. 10.
+Pro Teil einen Screenshot.
+
+**Feste Regel: nie selbst drehen.** Liegt ein Teil anders als in ORDER Kap. 5 oder ist die Lage unklar: Screenshot,
+**nicht bezahlen**, Projektleitung fragen. Grund: Bei U1, U2, U3 und U4–U6 schliesst eine falsche Drehung die Zelle bzw.
+GPIOs kurz (ORDER Kap. 5, fett).
+
+**Der rote Punkt in der JLC-Vorschau ist nicht Pin 1.** JLC: „we do not call the red dot pin 1, but a marking only“
+(PCBA-FAQ Teil 2, Q1, Stand Sep 09, 2026; `docs/references/JLCPCB_NOTES.md` Kap. 8). Pin 1 am Bauteilbild selbst
+beurteilen: Fase, Kerbe oder Punkt auf dem Gehäuse, Kathodenmarke, Pad-Form.
+
+Mit „Confirm Parts Placement = Yes“ prüft JLC zusätzlich vor der Fertigung und meldet sich per E-Mail. → ORDER Kap. 4 Nr. 10.
 
 Erwartete Warnung (**ANNAHME**): Der Umriss von BT1 schliesst die Knopfzelle ein und ragt über die Platinenkante
 (Clip selbst 1.3 mm innen, Pads ≥ 0.53 mm). Meldet JLC „component outside board“ o. ä. für BT1, ist das kein Fehler.
@@ -147,7 +167,9 @@ Erwartete Warnung (**ANNAHME**): Der Umriss von BT1 schliesst die Knopfzelle ein
 1. Im Warenkorb den Posten aufklappen und kontrollieren: PCB-Parameter wie Schritt 4, PCBA Economic, Menge, Remark.
 2. Posten ablesen und notieren: Setup 8.18 USD, Stencil 1.53 USD, Extended-Gebühr 10 × 3.07 = 30.70 USD, Confirm Parts
    Placement 0.45 USD, X-ray (U1) 1.64 USD/Stk (Prototyp 8.20 USD), Bauteile ≈ 24 USD inkl. Mindestmengen (Prototyp, `phase5_kosten_final.md` Kap. 6).
-   **Gibt es einen Posten „Pre-reflow Soldering“?** Notieren (wäre 145 Lötstellen × 0.016 USD × 5 = 11.60 USD beim Prototyp, nicht im Modell).
+   **Gibt es einen Posten „Pre-reflow Soldering“? → Stopp, nicht bezahlen, Projektleitung fragen.** (145 Lötstellen ×
+   0.016 USD = 2.32 USD je Board; Prototyp +11.60 USD; Serie dann ≈ 10.60 CHF/Sensor statt 8.38 → Kostenziel < 10 CHF
+   verfehlt, `docs/reviews/phase5_kosten_final.md` Kap. 2.1.)
 3. „Secure Checkout“.
 
 ## Schritt 10 – Versand
@@ -155,7 +177,8 @@ Erwartete Warnung (**ANNAHME**): Der Umriss von BT1 schliesst die Knopfzelle ein
 1. Lieferadresse Schweiz wählen.
 2. Versandart **DHL Express** (Screenshot: 23.52 USD, 2–4 Tage). „Global Standard Direct Line“ ist ab 65 USD Warenwert
    nicht zulässig (ORDER Kap. 4 Nr. 12).
-3. Gewicht notieren (ohne Bestückung: 0.41 kg für 20 Stk).
+3. Gewicht und DHL-Preis notieren (ohne Bestückung: 0.41 kg / 23.52 USD für 20 Stk). Mit Bestückung ist die Sendung
+   schwerer (Serie geschätzt ≈ 0.55 kg); liegt sie über 0.5 kg, kann DHL einige USD teurer sein (ANNAHME, nicht abgelesen).
 4. **Gesamtbetrag** vergleichen (ORDER Kap. 4 Nr. 11): Prototyp ≈ **163 USD**, Serie ≈ **220 USD** inkl. DHL.
 5. Bei Ankunft verlangt DHL Express: MWST 8.1 % + 19 CHF Abwicklung + Vorlagegebühr max(3 CHF; 2 %) (ORDER Kap. 4 Nr. 12,
    Quelle DHL lokal). Zoll auf Leiterplatten: 0.
@@ -168,7 +191,9 @@ Erwartete Warnung (**ANNAHME**): Der Umriss von BT1 schliesst die Knopfzelle ein
 2. Zahlungsart: JLC bietet „Pay Directly (recommended)“ und „Review Before Payment“. Empfehlung **Pay Directly**:
    JLC sagt „If your file cannot be approved for production after the review, you will receive a full refund“
    (`…HowToPlaceOrder_Auszug…`), und die Teile sind früher bestellt (**ANNAHME** zur Reservierung, wichtig wegen BT1).
-3. Bezahlen (Karte/PayPal; Kurs der Karte ≈ +1.5 %, ANNAHME). Auftragsnummer notieren → ORDER Kap. 4 Nr. 13.
+3. Bezahlen, wenn möglich mit einer Karte **ohne Fremdwährungsgebühr** in USD (Modell: +1.5 %, ANNAHME). Umrechnung
+   über PayPal ist meist teurer (ANNAHME, nicht geprüft; Wirkung < 3 CHF je Bestellung). Auftragsnummer notieren →
+   ORDER Kap. 4 Nr. 13.
 
 ## Schritt 12 – Nach der Zahlung: Produktionsdatei bestätigen
 
@@ -177,7 +202,7 @@ JLC schickt eine E-Mail „confirm production file“ (`docs/references/JLCPCB_C
 2. ZIP entpacken, Ordner **`ok`** mit einem Gerber-Viewer öffnen (z. B. KiCad Gerbview):
    - Lage **`sk`** (zu füllende Vias): alle 146 Bohrungen 0.30 mm, sicher die 8 Via-in-Pad (4 im U1-Pad, Clip-Pad,
      Minuspad, TP1, TP2).
-   - Lage **`bo`** (Silkscreen unten): keine Auftragsnummer, kein Barcode; `JLCJLCJLCJLC` gelöscht oder als Text.
+   - Lage **`bo`** (Silkscreen unten): keine Auftragsnummer, kein Barcode, kein Text `JLCJLCJLCJLC`.
    - 4 Kupferlagen, Kontur, Sonde ohne Aussenkupfer.
 3. Alles richtig → „Yes, please proceed to production“. Sonst „not good, modification needed“ mit kurzer Beschreibung
    und Projektleitung informieren. → ORDER Kap. 4 Nr. 2 (zweiter Teil).
@@ -187,7 +212,10 @@ JLC schickt eine E-Mail „confirm production file“ (`docs/references/JLCPCB_C
 
 - Rechnung (PDF) und DHL-Abgabenbeleg ablegen, Beträge in `docs/reviews/phase5_kosten_final.md` nachtragen lassen.
 - Bestätigte Rotationen als Projekttabelle festhalten (DFM K-3).
-- Prototyp-Prüfungen: `docs/manuals/PROGRAMMIEREN_SENSOR.md`, Querschliff POFV (Auflage A-3), Verpolschutz.
+- **Vor dem ersten Einsetzen einer Zelle:** Verpoltest **ST-E2** (`docs/reviews/phase5_testplan_beitrag_sicherheit.md`):
+  Labornetzteil 3.0 V, Strombegrenzung 10 mA, an der Dummy-Scheibe; erst richtig gepolt (Strom plausibel, keine
+  Erwärmung), dann verpolt (≤ 1 µA). Erst wenn ST-E2 bestanden ist, eine Zelle einsetzen.
+- Weitere Prototyp-Prüfungen: `docs/manuals/PROGRAMMIEREN_SENSOR.md`, Querschliff POFV (Auflage A-3).
 
 ## Serie (später)
 

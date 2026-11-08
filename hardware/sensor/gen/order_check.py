@@ -4,7 +4,9 @@
 Prueft an der Platine (pcbnew) und an den Fertigungsdaten:
   - Lagen, Dicke, Kontur, Oberflaeche, Lagenaufbau (Platine + Gerber-Job-Datei)
   - Vias: Anzahl, Groesse, Attribut gefuellt/ueberkupfert, Via-in-Pad (jede Via in einem Kupferpad muss gefuellt sein)
-  - Bauteile nur auf der Oberseite (Economic PCBA), Platzhalter "JLCJLCJLCJLC" (Lage, Ebene)
+  - Bauteile nur auf der Oberseite (Economic PCBA)
+  - KEIN Platzhalter "JLCJLCJLCJLC" (JLC seit Mai 2026: "Please DO NOT add", docs/references/
+    JLCPCB_HowToMarkOnPCB_Auszug_2026-11-08.txt; Entscheid Projektleitung zu Red-Team W-4 Phase 5) -> Exit 1, falls vorhanden
   - Gerber-ZIP = Gerber-Ordner (Inhalt), BOM-Designatoren = CPL-Designatoren
   - sha256 von Gerber-ZIP, BOM, CPL
   - optional --live: JLC-Lager/Kategorie aller BOM-Teile (scripts/jlc_price_cache.query, schreibt keinen Cache)
@@ -62,11 +64,20 @@ def board_facts():
     print(f"Via-in-Pad ohne Fuellattribut: {vip_bad}")
     bottom = [fp.GetReference() for fp in b.GetFootprints() if fp.GetLayer() != pcbnew.F_Cu]
     print(f"Footprints auf der Unterseite: {bottom or '-'} (nur bestueckte Teile zaehlen; Testpads sind keine Bauteile)")
-    for d in b.GetDrawings():
-        if isinstance(d, pcbnew.PCB_TEXT) and "JLCJLC" in d.GetText():
+    found = []
+    texts = [d for d in b.GetDrawings() if isinstance(d, pcbnew.PCB_TEXT)]
+    for fp in b.GetFootprints():
+        texts += [fp.Reference(), fp.Value()] + [t for t in fp.GraphicalItems() if isinstance(t, pcbnew.PCB_TEXT)]
+    for d in texts:
+        if "JLCJLC" in d.GetText().upper():
             p = d.GetPosition()
-            print(f"Platzhalter {d.GetText()!r} auf {b.GetLayerName(d.GetLayer())} bei "
-                  f"({mm(p.x - ao.x):.2f}, {mm(p.y - ao.y):.2f}) mm ab Hilfsursprung")
+            found.append(f"{d.GetText()!r} auf {b.GetLayerName(d.GetLayer())} bei "
+                         f"({mm(p.x - ao.x):.2f}, {mm(p.y - ao.y):.2f}) mm ab Hilfsursprung")
+    if found:
+        print("FEHLER Platzhalter Auftragsnummer vorhanden (JLC: DO NOT add, W-4): " + "; ".join(found))
+    else:
+        print("Platzhalter 'JLCJLCJLCJLC': keiner (richtig, Mark on PCB = Remove Mark)")
+    return not found
 
 
 def job_facts():
@@ -107,8 +118,9 @@ def live():
 
 
 if __name__ == "__main__":
-    board_facts()
+    ok = board_facts()
     job_facts()
     files_facts()
     if "--live" in sys.argv:
         live()
+    sys.exit(0 if ok else 1)

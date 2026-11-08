@@ -118,3 +118,24 @@ Anleitung und Bestellunterlage sind sachlich korrekt, mit Platine, Gerber und JL
 brauchbare Stopp-Regeln (POFV, Economic, Lager, Betrag) sowie die Produktionsdatei-Kontrolle. Die Kosten sind
 reproduzierbar und rechnerisch richtig. Vor der Weitergabe an den Auftraggeber: **W-1 (Paket neu erzeugen)** und
 **W-2 (Rotationsregel)** erledigen; W-3 bis W-5 vor bzw. bei der Bestellung klären.
+
+## Antwort Ersteller (Fertigung/Kosten, 2026-11-08)
+
+| Befund | Antwort | Umsetzung |
+|---|---|---|
+| W-1 | **umgesetzt** (Skript); Paket nicht neu erzeugt (Vorgabe Projektleitung) | `production/make_release_rev_c.py`: Abbruch bei nicht committeten Quellen (`--allow-dirty` nur zum Testen, README markiert), neuer Modus `--check` (sha256 Paket ↔ Quelle, fehlende/überzählige Dateien, Git-Stand README = HEAD, Dirty-Vermerk). Heute: `--check` → 12 Abweichungen (Ihre Liste + Git-Stand). BESTELLEN Schritt 1: `--check` + Git-Stand gegen freigegebenen Commit; `sha256sum -c` allein genügt nicht |
+| W-2 | **umgesetzt** | BESTELLEN Schritt 8 und ORDER Kap. 5: feste Regel „nie selbst drehen → Screenshot, nicht bezahlen, Projektleitung“; JLC-Zitat „we do not call the red dot pin 1, but a marking only“ (PCBA-FAQ Teil 2 Q1, JLCPCB_NOTES Kap. 8); Pin 1 am Gehäusemerkmal. Neue Stopp-Regel 5 |
+| W-3 | **umgesetzt** | `cost_final_phase5.py`: Fazit (Kap. 0) und Kap. 2/2.1 mit Vorbehalt – falls berechnet Serie **10.60 CHF** (Skript; Ihre 10.58 aus 144 statt 145 Lötstellen) → REQ-FAB-04 verfehlt. Stopp-Kriterium in BESTELLEN Schritt 9 / Stopp-Regel 6 und ORDER Kap. 4 Nr. 11 |
+| W-4 | **umgesetzt** (vorbereitet, Entscheid Projektleitung: Platzhalter raus) | `order_check.py` prüft jetzt das **Fehlen** des Platzhalters (Zeichnungen und Footprint-Texte) → Exit 1, solange vorhanden (meldet heute FEHLER, erwartet). ORDER Kap. 1 Warnhinweis (Hashes folgen nach neuem Gerber), Kap. 2/4/8, BESTELLEN Schritt 1/12 und Remark ohne Platzhaltersatz. Layoutänderung macht Elektronik |
+| W-5 | **umgesetzt** | `BOM_GATEWAY.csv` Status je Zeile: kauffertig (G2, G8, V1), Eigenfertigung (G7), Entscheid offen (G4/G5 RTC-Montage ohne Buchsenleiste; G6 SHT41 Variante a Grove + grössere Kammer / b kleineres Breakout / c vorerst weglassen), nicht an Lager (G3). Kostenbericht: kauffertig **22.77 CHF**, offen 58.70 CHF, geplant 81.47 CHF. microSD-Ersatz: keine Industrial-Karte mit lokaler Quelle gefunden → keine Alternative eingetragen (Vermerk G3) |
+| K-1 | **umgesetzt** | ORDER Kap. 6 auf DHL 23.52 (139.34/185.47/184.26/237.86/141.85/267.58/186.13/325.80) |
+| K-2 | **umgesetzt** | BESTELLEN Schritt 4: Regel für Felder ausserhalb der Tabelle |
+| K-3 | **umgesetzt** | BESTELLEN Schritt 6: 16 nicht wählbar → nächstgrössere Menge, Mehrkosten ≈ 4 × 5.53 USD notieren, melden |
+| K-4 | **umgesetzt** | `hardware/sensor/out/REMARK_JLC_REV_C.txt` (eine Zeile, 563 Zeichen, „last approx. 109 mm … opposite the antenna“ statt Y-Koordinate), im Release-Paket aufgenommen; Feldlänge ANNAHME, bei Kürzung fragen |
+| K-5 | **umgesetzt** | Kostenbericht Kap. 2.1 und BESTELLEN Schritt 10 (Gewichtsstufe > 0.5 kg, ANNAHME) |
+| K-6 | **umgesetzt** | BESTELLEN Schritt 11: Karte ohne Fremdwährungsgebühr; Kostenbericht Kap. 2.1 |
+| K-7 | **umgesetzt** | Kostenbericht Kap. 0: Stückkosten nach D-005 (8.38, Vorbehalt 10.60) neben Vollkosten (17.84 Serie, 35.63 System) und Bitte um ausdrückliche Bestätigung von D-005 durch den Auftraggeber |
+| Zusatz R3-K5 (Sicherheit) | **umgesetzt** | BESTELLEN Schritt 13: Verpoltest ST-E2 vor dem ersten Einsetzen einer Zelle |
+
+Geprüft nach Umsetzung: `cost_final_phase5.py` läuft (Screenshot-Assertion ok); `order_check.py` meldet den Platzhalter
+(erwartet bis zur Layoutänderung); `make_release_rev_c.py --check` meldet das veraltete Paket. Nicht committet.

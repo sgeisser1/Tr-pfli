@@ -17,7 +17,7 @@ Legende: ✔ erfüllt (Beleg), ✘ nicht erfüllt, ◐ offen / am Bestelltag bzw
 | A2 | Gerber-ZIP = Gerber-Ordner, 14 Dateien, Job „Revision C“ | gleich | `order_check`: identisch, Job Rev C, 4 L, 1.6 mm, ENIG | ✔ |
 | A3 | Lagenaufbau = JLC-Standard (Economic „Standard stack-up only“) | 0.2104/1.065/0.2104 mm | Gerber-Job-Dielektrika = JLC04161H-7628 (JLCPCB_NOTES Kap. 4) | ✔ |
 | A4 | Bohrdaten | eine Werkzeuggrösse 0.30 mm, kein NPTH | `PTH.drl` T1/T2 0.300, 146 Löcher; `NPTH.drl` 0 | ✔ |
-| A5 | Release-Paket nur aus Kopien, Hashes gleich | sha256 Quelle = Kopie | `make_release_rev_c.py` (assert je Datei), `sha256sum -c` 65 OK | ✔ (Arbeitskopie, s. Befund F-10) |
+| A5 | Release-Paket nur aus Kopien, aktuell | sha256 Quelle = Kopie, sauberer Git-Stand | Skript bricht bei nicht committeten Quellen ab; `--check` meldet heute 12 Abweichungen (Paket veraltet, Red Team W-1) → Neuerzeugung durch Projektleitung am Schluss | ◐ |
 
 ## B Leiterplatte gegen JLC-Regeln
 
@@ -33,7 +33,7 @@ Legende: ✔ erfüllt (Beleg), ✘ nicht erfüllt, ◐ offen / am Bestelltag bzw
 | B8 | Dicke / Farbe / Oberfläche für Economic | 0.8–1.6 mm; 1.6 mm ENIG nur grün | 1.6, grün, ENIG 1 U" | ✔ |
 | B9 | Material Type | Default FR4 TG135 | belassen; FEM rechnet mit TG-135-Laminat (KB-6160A: T260 > 10 min, Td 305 °C); Er unbekannt → Kalibrierung | ✔ / ◐ Er am Muster |
 | B10 | Kleinplatinen-Zuschläge | Entgraten 1.5–3 cm: 0.02 USD/Stk; „Small boards“ erst ≥ 500 Stk | Deburring Yes 0.50 USD (Screenshot); kein Zuschlag „Small boards“ | ✔ |
-| B11 | Markierung | keine Auftragsnummer mehr (seit Mai 2026) | Remove Mark; Platzhalter `JLCJLCJLCJLC` noch auf B (Befund F-2) | ◐ |
+| B11 | Markierung | keine Auftragsnummer mehr (seit Mai 2026) | Remove Mark; Platzhalter `JLCJLCJLCJLC` noch auf B, wird entfernt (F-2, W-4) | ◐ |
 
 ## C Bestückung (Economic PCBA)
 
@@ -67,14 +67,14 @@ Legende: ✔ erfüllt (Beleg), ✘ nicht erfüllt, ◐ offen / am Bestelltag bzw
 | E2 | Versand nachgeführt | DHL 23.52 USD (`cost_model.py`), COSTS_REV_B neu erzeugt | ✔ |
 | E3 | REQ-FAB-04 | Serie 8.38 / 8.17 CHF (Economic), 9.31 CHF (Standard-Ausweichweg) | ✔ |
 | E4 | Versteckte Kosten | Extended-Gebühr, Mindestmengen, Ausschuss, Reserveboard, Verzollung im Modell; Pre-reflow, Confirm Production File, Coupons als Empfindlichkeit | ✔ / ◐ |
-| E5 | Gateway separat (REQ-FAB-06) | Kauf 81.47 CHF (5.97 ANNAHME), Neuwert 98.62 CHF | ✔ |
+| E5 | Gateway separat (REQ-FAB-06) | kauffertig 22.77 CHF, offen/nicht lieferbar 58.70 CHF, geplant 81.47 CHF, Neuwert 98.62 CHF (Red Team W-5) | ✔ / ◐ |
 
 ## F Befunde
 
 | Nr | Schwere | Befund | Begründung | Vorschlag |
 |---|---|---|---|---|
 | F-1 | **wichtig** | Economic PCBA mit 4 L + ENIG + POFV ist in keiner JLC-Quelle belegt (B-2 bleibt) | Capability-Seite, PCBA-FAQ, Preisseite und Websuche 2026-11-08 schweigen zu Via Covering; Schalter „PCB Assembly“ war im Screenshot aus | Am Bestelltag prüfen (ORDER Kap. 4 Nr. 5, Anleitung Schritt 6); sonst Standard-PCBA (Serie +58 CHF, Freigabe Auftraggeber) |
-| F-2 | klein | Platzhalter `JLCJLCJLCJLC` auf B.Silkscreen ist überholt; JLC: „DO NOT add“ | Option Order Number seit Mai 2026 weg; Wirkung des Texts nicht dokumentiert. Liegt in Zone Z2 Band B (im Kopf verdeckt), nur Silkscreen | Rev C: Remove Mark + Remark „delete placeholder“ (umgesetzt in ORDER); nächste Layout-Revision: Text entfernen (`pcb_build.py`) |
+| F-2 | klein | Platzhalter `JLCJLCJLCJLC` auf B.Silkscreen ist überholt; JLC: „DO NOT add“ | Option Order Number seit Mai 2026 weg; Wirkung des Texts nicht dokumentiert. Liegt in Zone Z2 Band B (im Kopf verdeckt), nur Silkscreen | **Nachtrag Red Team W-4:** Projektleitung entscheidet Entfernen vor der Bestellung (Elektronik, `pcb_build.py`); `order_check.py` prüft jetzt das Fehlen (Exit 1, solange vorhanden); ORDER-Hashes folgen nach neuem Gerber |
 | F-3 | wichtig | Remark nannte die zu füllenden Vias nicht konkret und verwies auf die Auftragsnummer | JLC verlangt Angabe der zu füllenden Vias oder des Durchmessers | umgesetzt: ORDER Kap. 8 „fill ALL plated holes with 0.30 mm drill (146)“ |
 | F-4 | klein | Preis „Confirm Production File = Yes“ unbekannt | JLC-Hilfe ohne Preis; Screenshot mit „No“ | Am Bestelltag ablesen (ORDER Kap. 4 Nr. 6); Option trotzdem wählen (Kontrolle `sk`/`bo`) |
 | F-5 | **wichtig** | Gateway: RTC-Modul (21.3 × 20.0 × 13.6 mm) und Grove SHT41 (20 × 40 mm) passen nicht in die CAD-Platzhalter (15 × 12 × 4 bzw. max. 24 × 14 mm) | Masse aus Herstellerseite/Händler, CAD-Annahmen `fluidi_gateway_pi.py` | Mechanik: Rahmen/Klimakammer anpassen oder kleinere Module wählen (RTC ohne Ladepfad bleibt Pflicht) |
