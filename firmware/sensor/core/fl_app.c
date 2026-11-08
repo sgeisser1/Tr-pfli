@@ -6,6 +6,7 @@
 #include "fl_meas.h"
 #include "fl_util.h"
 #include "../config/fluidi_board.h"
+#include "fl_testfw.h"
 
 fl_app_t g_fl;
 #define A (&g_fl)
@@ -61,6 +62,9 @@ static void save_counters(void) { if (!s_nv_defer) fl_port_nv_write(FL_NV_COUNTE
 static void save_logmeta(void) { if (!s_nv_defer) fl_port_nv_write(FL_NV_LOGMETA, &A->logmeta, sizeof A->logmeta); }
 static void save_settings(void) { if (!s_nv_defer) fl_port_nv_write(FL_NV_SETTINGS, &A->set, sizeof A->set); }
 static void save_diag(void) { if (!s_nv_defer) fl_port_nv_write(FL_NV_DIAG, &A->diag, sizeof A->diag); }
+#if FLUIDI_TESTFW
+bool fl_app_nv_allowed(void) { return !s_nv_defer; }
+#endif
 
 static void diag_add(uint8_t code, uint8_t detail)
 {
@@ -159,6 +163,9 @@ static void enter_undervoltage(void)
 static void check_battery(uint16_t vload)
 {
     if (!vload) return;
+#if FLUIDI_TESTFW
+    fl_tf_vdd(vload);
+#endif
     A->vbat_load = vload;
     if (vload < UV_HARD_MV || (vload < UV_MV && ++A->uv_count >= 2)) { enter_undervoltage(); return; }
     if (vload >= UV_MV) A->uv_count = 0;
@@ -196,6 +203,9 @@ int fl_app_measure(uint8_t cause, fl_record_t *rec)
     rec->vbat_mv = res.vbat_mv; rec->cause = cause; rec->flags = res.flags;
     check_battery(res.vbat_mv);                          /* N-2: Lastpruefung vor dem Flash-Schreiben */
     if (A->mode == FL_MODE_UNDERVOLTAGE) return FL_E_MEAS_LOW_BATT;
+#if FLUIDI_TESTFW
+    if (s_nv_defer) fl_tf_ready();
+#endif
     s_nv_defer = false;
     int rc = fl_log_append(&A->log, rec, &ow);
     if (rc) diag_add(FL_E_FLASH_FAIL, 0);
@@ -203,6 +213,19 @@ int fl_app_measure(uint8_t cause, fl_record_t *rec)
     A->water = fl_water_needed(res.c_probe, A->set.water_raw);
     return rc;
 }
+
+#if FLUIDI_TESTFW
+/* TF-3: Datensatz (cause FL_CAUSE_TF3) wie eine Messung in den Ringspeicher (Ueberschreiben wie Serie) */
+int fl_app_tf_log(fl_record_t *rec)
+{
+    uint32_t ow = 0;
+    if (A->mode == FL_MODE_UNDERVOLTAGE || s_nv_defer) return FL_E_MEAS_LOW_BATT;
+    int rc = fl_log_append(&A->log, rec, &ow);
+    if (rc) diag_add(FL_E_FLASH_FAIL, 2);
+    if (ow) { diag_add(FL_E_LOG_OVERWRITTEN, ow > 255 ? 255 : (uint8_t)ow); save_logmeta(); }
+    return rc;
+}
+#endif
 
 /* ---------------- Senden ---------------- */
 static uint16_t max_frame(void) { uint16_t m = fl_port_ble_mtu(); return (uint16_t)((m < 23 ? 23 : m) - 3); }
@@ -362,7 +385,12 @@ static void dispatch(uint8_t msg, uint8_t rid, const uint8_t *p, size_t n)
     uint8_t r[230];
     uint32_t now = fl_port_ms();
     switch (msg) {
+#if FLUIDI_TESTFW
+    case FL_MSG_GET_INFO: { size_t ni = fl_app_session_info(r, true); ni += fl_tf_info_tail(r + ni);
+        sec_send(FL_RSP(msg), rid, r, ni); break; }
+#else
     case FL_MSG_GET_INFO: sec_send(FL_RSP(msg), rid, r, fl_app_session_info(r, true)); break;
+#endif
     case FL_MSG_TIME_SET:
         if (n < 10) { err_rsp(rid, FL_E_BAD_LENGTH, 0); break; }
         A->unix_offset_ms = (int64_t)fl_get_u64(p) - now;
@@ -416,6 +444,9 @@ static void dispatch(uint8_t msg, uint8_t rid, const uint8_t *p, size_t n)
         }
         fl_put_u16(r + k, A->cnt.wdt_resets); fl_put_u16(r + k + 2, A->cnt.brownouts);
         fl_put_u16(r + k + 4, A->cnt.auth_fail); fl_put_u16(r + k + 6, A->cnt.button_stuck); k += 8;
+#if FLUIDI_TESTFW
+        k += fl_tf_diag_tail(r + k);                     /* TF-4: Diagnose-Anhang (Testplan Anhang A) */
+#endif
         sec_send(FL_RSP(msg), rid, r, k); break; }
     case FL_MSG_CLEAR_DIAG:
         memset(&A->diag, 0, sizeof A->diag); A->cnt.last_error = 0; A->error_active = false;
@@ -656,6 +687,9 @@ static void button_event(fl_btn_event_t ev, uint32_t now)
     case FL_BTN_EV_SHORT:
         if (A->sess == FL_SESS_PAIR_SHOWING && !A->pair_user_ok) { pair_user_confirm(); break; }
         if (A->mode == FL_MODE_UNDERVOLTAGE) { fl_led_play(&A->led, FL_LED_UV_BTN, now, A->vbat_load, 0); break; }
+#if FLUIDI_TESTFW
+        fl_tf_on_short(now);                             /* Tastersequenz TF-1/TF-2 */
+#endif
         if (A->connected) { A->meas_pending = true; A->meas_pending_cause = FL_CAUSE_BUTTON; break; }   /* F-W5 */
         fl_app_measure(FL_CAUSE_BUTTON, &rec);
         if (A->mode == FL_MODE_UNDERVOLTAGE) break;
@@ -728,6 +762,9 @@ void fl_app_init(void)
     /* 1) Spannung und Neustartgrund ZUERST, vor jedem Flash-Schreiben (F-W3a) */
     A->reset_reason = fl_port_reset_reason();
     uint32_t ret = fl_port_retained_get();
+#if FLUIDI_TESTFW
+    uint32_t tfret = fl_tf_boot(ret, A->reset_reason);
+#endif
     uint32_t abn = ret & FL_RET_ABN_MASK;
     bool planned = (ret & FL_RET_PLANNED) != 0, was_uv = (ret & FL_RET_UV) != 0, was_backoff = (ret & FL_RET_BACKOFF) != 0;
     bool abnormal = A->reset_reason == FL_RR_WATCHDOG || A->reset_reason == FL_RR_BROWNOUT ||
@@ -739,6 +776,9 @@ void fl_app_init(void)
     A->vbat_load = A->vbat_rest;
     if (was_uv) A->reset_reason = FL_RR_UNDERVOLTAGE;
     uint32_t newret = abn;
+#if FLUIDI_TESTFW
+    newret |= tfret;
+#endif
     /* Nach Unterspannung oder Brownout nur mit Erholung weiterlaufen (Ruhewert, Hysterese); nach Power-on ab 2.4 V */
     uint16_t vmin = (was_uv || A->reset_reason == FL_RR_BROWNOUT) ? UV_RECOVER_MV : UV_MV;
     if (A->vbat_rest < vmin) {                                      /* N-4: 0 (Lesefehler) gilt als Unterspannung */
@@ -746,12 +786,18 @@ void fl_app_init(void)
             fl_port_led(FL_COL_RED, 100);
             fl_port_delay_ms(30);
         }
+#if FLUIDI_TESTFW
+        newret = fl_tf_shutdown_boot(newret);
+#endif
         fl_port_retained_set(newret | FL_RET_UV);
         boot_shutdown();
         return;
     }
     /* Reset-Schleife: >= 3 abnormale Neustarts ohne 10 min stabilen Betrieb -> Abschaltung (F-W3a/c) */
     if (abn >= FL_ABN_MAX) {
+#if FLUIDI_TESTFW
+        newret = fl_tf_shutdown_boot(newret);
+#endif
         fl_port_retained_set((newret & ~FL_RET_ABN_MASK) | FL_RET_BACKOFF);
         boot_shutdown();
         return;
@@ -813,13 +859,23 @@ void fl_app_init(void)
 
     /* Selbsttest = erste Messung (L11) */
     fl_record_t rec;
+#if FLUIDI_TESTFW
+    if (fl_tf_point(FL_TF_PT_EARLY)) return;             /* TF-2 (7 x kurz): fatal vor der ersten Lastmessung */
+#endif
     fl_app_measure(FL_CAUSE_AUTO, &rec);                 /* erste Lastmessung (check_battery) */
     if (A->mode == FL_MODE_UNDERVOLTAGE) return;
     s_nv_defer = false;                                  /* N-2: erst jetzt alles Aufgelaufene schreiben */
     save_settings(); save_diag(); save_counters();
+#if FLUIDI_TESTFW
+    if (fl_tf_point(FL_TF_PT_LATE)) return;              /* TF-2 (5/9 x kurz): fatal nach allen Start-Schreibvorgaengen */
+#endif
     now = fl_port_ms();
     A->mode = A->pair.paired ? FL_MODE_NORMAL : FL_MODE_UNPAIRED;
+#if FLUIDI_TESTFW
+    fl_tf_started((A->last_meas_ok && A->tmp_ok) ? FL_LED_L11_START_OK : FL_LED_L11_START_FAIL);   /* Startsignal, dann L11 */
+#else
     fl_led_play(&A->led, (A->last_meas_ok && A->tmp_ok) ? FL_LED_L11_START_OK : FL_LED_L11_START_FAIL, now, A->vbat_load, 0);
+#endif
     if (!A->pair.paired) A->after_disc_led = FL_LED_L11_UNPAIRED;   /* folgt nach L11 */
     schedule_meas(now);
     A->next_minute_ms = now + 60000u;
@@ -916,6 +972,9 @@ uint32_t fl_app_process(void)
 
     /* LED (nach L11 ggf. Folgemuster ohne Verbindung) */
     uint32_t led_dl = fl_led_tick(&A->led, now);
+#if FLUIDI_TESTFW
+    if (fl_tf_led_followup(now)) led_dl = fl_led_tick(&A->led, now);
+#endif
     if (!fl_led_busy(&A->led) && !A->connected && A->after_disc_led != FL_LED_NONE) {
         fl_led_play(&A->led, A->after_disc_led, now, A->vbat_load, 0);
         A->after_disc_led = FL_LED_NONE;
@@ -923,6 +982,10 @@ uint32_t fl_app_process(void)
     }
     fl_port_led(A->led.out, A->set.led_level);
 
+#if FLUIDI_TESTFW
+    uint32_t tf_dl = 0;
+    bool tf_on = fl_tf_process(now, &tf_dl);             /* Testaktionen (Anhang A) vor dem Advertising-Abgleich */
+#endif
     update_adv(now);
 
     /* naechste Frist */
@@ -941,6 +1004,9 @@ uint32_t fl_app_process(void)
     dl_min(&best, now, A->reboot_at, A->reboot_pending);
     dl_min(&best, now, A->test_deadline_ms, A->image_test);
     dl_min(&best, now, FL_STABLE_MS, !A->stable_done);
+#if FLUIDI_TESTFW
+    dl_min(&best, now, tf_dl, tf_on);
+#endif
     if (A->connected) {
         dl_min(&best, now, A->t_conn + HELLO_ABS_MS, A->sess == FL_SESS_WAIT_HELLO);
         dl_min(&best, now, A->t_cccd + HELLO_AFTER_CCCD_MS, A->sess == FL_SESS_WAIT_HELLO && A->cccd_on);

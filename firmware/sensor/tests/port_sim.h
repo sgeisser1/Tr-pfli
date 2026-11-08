@@ -26,6 +26,9 @@ typedef struct {
     uint32_t reboots, shutdowns, wdt_kicks;
     bool pullup, button_level;
     uint32_t flash_writes, flash_erases;
+    /* Testfirmware (FLUIDI_TESTFW) */
+    uint32_t tf_hangs, tf_fatal_series, tf_fatal_hf, tf3_reads;
+    uint8_t tf3_fail_stage;              /* 0 = TMP antwortet, sonst Fehlerstufe 1..3 */
 } sim_t;
 
 extern sim_t sim;

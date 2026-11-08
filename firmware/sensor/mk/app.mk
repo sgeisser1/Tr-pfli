@@ -12,7 +12,7 @@ LIBOPT  := $(BLE)/stack_util/lib_opt/src
 APP_SRC := \
   $(TOP)/core/fl_crypto.c $(TOP)/core/fl_proto.c $(TOP)/core/fl_settings.c $(TOP)/core/fl_meas.c \
   $(TOP)/core/fl_ringlog.c $(TOP)/core/fl_ui.c $(TOP)/core/fl_ota.c $(TOP)/core/fl_nvstore.c $(TOP)/core/fl_app.c \
-  $(TOP)/platform/cc23/fl_ble.c $(TOP)/platform/cc23/fl_hw.c \
+  $(TOP)/platform/cc23/fl_ble.c $(TOP)/platform/cc23/fl_hw.c $(if $(TESTFW),$(TOP)/core/fl_testfw.c) \
   $(MB_SRC)/boot/bootutil/src/bootutil_public.c \
   $(MB_SRC)/boot/ti/source/mcuboot_app/flash_map_backend/flash_map_backend.c \
   $(BLE)/app_util/framework/src/bleapputil_task.c $(BLE)/app_util/framework/src/bleapputil_init.c \
@@ -35,7 +35,7 @@ APP_OBJS := $(addprefix $(APP_B)/obj/,$(addsuffix .obj,$(basename $(notdir $(APP
 HWREV_DEF := -DFLUIDI_HW_REV=$(if $(filter A,$(HW_REV)),0x0A,0x0B)
 
 APP_CFLAGS := -I$(APP_B) -I$(TOP)/core -I$(TOP)/platform/cc23 -I$(TOP)/config -I$(MB_B) \
-  @$(APP_B)/ti_utils_build_compiler.opt $(HWREV_DEF) \
+  @$(APP_B)/ti_utils_build_compiler.opt $(HWREV_DEF) $(TF_DEF) \
   -DICALL_NO_APP_EVENTS -mthumb -mlittle-endian -std=c99 -ffunction-sections -fdata-sections -g -Oz -Wall \
   "-I$(SDK)/source" "-I$(SDK)/source/ti" "-I$(SDK)/source/ti/common/cc26xx" \
   "@$(SDK)/source/ti/ble/stack_util/config/build_components.opt" \

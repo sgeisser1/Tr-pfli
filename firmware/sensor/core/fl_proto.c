@@ -33,7 +33,12 @@ void fl_device_name(const uint8_t addr_le[6], char out[12])
 {
     static const char hex[] = "0123456789ABCDEF";
     /* XXXX = zwei niederwertigste Adressbytes, hoeherwertiges zuerst (Kap. 2.3) */
+#if defined(FLUIDI_TESTFW) && FLUIDI_TESTFW
+    /* Testfirmware: anderer Name gleicher Laenge, damit ein Testmuster nie mit Serienfirmware verwechselt wird */
+    const char p[8] = {'f', 'l', '-', 't', 'f', (char)('0' + FLUIDI_TESTFW), '-', 0};
+#else
     const char *p = "fluidi-";
+#endif
     for (int i = 0; i < 7; i++) out[i] = p[i];
     out[7] = hex[addr_le[1] >> 4]; out[8] = hex[addr_le[1] & 15];
     out[9] = hex[addr_le[0] >> 4]; out[10] = hex[addr_le[0] & 15];

@@ -62,4 +62,13 @@ void     fl_port_wdt_kick(void);
 void     fl_port_button_pullup(bool on);
 bool     fl_port_button_pressed(void);       /* Pegel jetzt (mit kurz eingeschaltetem Pull-up) */
 
+#if defined(FLUIDI_TESTFW) && FLUIDI_TESTFW
+/* ---- nur Testfirmware (core/fl_testfw.h, Testplan Anhang A) ---- */
+uint32_t fl_port_tf_flash_ops(void);         /* Schreib-/Loeschvorgaenge fluidi-NV + Ringspeicher seit Start */
+void     fl_port_tf_hang(void);              /* TF-1: Endlosschleife ohne Watchdog-Bedienung (kehrt nicht zurueck) */
+void     fl_port_tf_fatal(uint8_t kind);     /* TF-2: FL_TF_FATAL_SERIES (Serienpfad) / _HARDFAULT (kehrt nicht zurueck) */
+int      fl_port_tf3_tmp_read(int16_t *t_c100, uint8_t *stage);  /* TF-3: SENS_PWR bleibt high; stage 0 ok,
+                                                                    1 I2C_open, 2 Schreiben, 3 Lesen */
+#endif
+
 #endif

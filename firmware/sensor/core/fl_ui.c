@@ -27,6 +27,11 @@ static const fl_led_step_t S_L16[] = {{FL_COL_GREEN, 200, 0}, {FL_COL_BLUE, 200,
 static const fl_led_step_t S_L17OK[] = {{FL_COL_GREEN, 50, 100}, {FL_COL_GREEN, 50, 100}, {FL_COL_GREEN, 50, 0}};
 static const fl_led_step_t S_L17RV[] = {{FL_COL_RED, 50, 100}, {FL_COL_RED, 50, 100}, {FL_COL_RED, 50, 0}};
 static const fl_led_step_t S_UV[]  = {{FL_COL_RED, 30, 0}};
+#if defined(FLUIDI_TESTFW) && FLUIDI_TESTFW
+/* Testfirmware (Anhang A): Rot/Gruen je 100 ms, 3 x (2 Schritte, 2 Wiederholungen); Quittung 4 x 50 ms */
+static const fl_led_step_t S_TFSTART[] = {{FL_COL_RED, 100, 100}, {FL_COL_GREEN, 100, 100}};
+static const fl_led_step_t S_TFACK[] = {{FL_COL_RED, 50, 50}, {FL_COL_GREEN, 50, 50}, {FL_COL_RED, 50, 50}, {FL_COL_GREEN, 50, 0}};
+#endif
 
 typedef struct { const fl_led_step_t *s; uint8_t n; uint16_t repeats; uint16_t gap; uint16_t limit_s; } pat_t;
 #define P(a, rep, gap, lim) {a, (uint8_t)(sizeof(a) / sizeof(a[0])), rep, gap, lim}
@@ -43,6 +48,9 @@ static const pat_t PATS[FL_LED_COUNT] = {
     [FL_LED_L16_IDENTIFY] = P(S_L16, 0xFFFF, 0, 30), [FL_LED_L17_OTA_OK] = P(S_L17OK, 0, 0, 0),
     [FL_LED_L17_OTA_REVERT] = P(S_L17RV, 0, 0, 0), [FL_LED_UV_BTN] = P(S_UV, 0, 0, 0),
     [FL_LED_UNPAIRED_2Y] = P(S_L11U, 0, 0, 0),
+#if defined(FLUIDI_TESTFW) && FLUIDI_TESTFW
+    [FL_LED_TF_START] = P(S_TFSTART, 2, 0, 0),     [FL_LED_TF_ACK] = P(S_TFACK, 0, 0, 0),
+#endif
 };
 
 void fl_led_init(fl_led_t *l) { memset(l, 0, sizeof *l); }

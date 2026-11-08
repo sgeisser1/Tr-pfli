@@ -37,6 +37,7 @@
 #include "fl_nvstore.h"
 #include "fl_ota.h"
 #include "fl_platform.h"
+#include "fl_testfw.h"
 #include "../../config/fluidi_board.h"
 #include "../../config/fluidi_flash_layout.h"
 
@@ -60,9 +61,17 @@ static void pins_sleep_state(void)
 #if FLUIDI_HAS_OSC_FET
     GPIO_setConfig(FLUIDI_DIO_OSC_EN_N, GPIO_CFG_OUTPUT | GPIO_CFG_OUT_HIGH);
 #endif
+#if FLUIDI_TESTFW == 3
+    /* TESTFIRMWARE TF-3 (Anhang A, PT11.19/ST-W4): SENS_PWR DAUERND high (TMP1075N + R4/R5 versorgt); SDA/SCL
+     * hochohmig ohne Pull (R4/R5 ziehen auf SENS_PWR) statt low, sonst floesse VDD/R4 bzw. VDD/R5 dauernd. */
+    GPIO_setConfig(FLUIDI_DIO_SENS_PWR, GPIO_CFG_OUTPUT | GPIO_CFG_OUT_STR_HIGH | GPIO_CFG_OUT_HIGH);
+    GPIO_setConfig(FLUIDI_DIO_I2C_SDA, GPIO_CFG_NO_DIR);
+    GPIO_setConfig(FLUIDI_DIO_I2C_SCL, GPIO_CFG_NO_DIR);
+#else
     GPIO_setConfig(FLUIDI_DIO_SENS_PWR, GPIO_CFG_OUTPUT | GPIO_CFG_OUT_STR_HIGH | GPIO_CFG_OUT_LOW);
     GPIO_setConfig(FLUIDI_DIO_I2C_SDA, GPIO_CFG_OUTPUT | GPIO_CFG_OUT_LOW);
     GPIO_setConfig(FLUIDI_DIO_I2C_SCL, GPIO_CFG_OUTPUT | GPIO_CFG_OUT_LOW);
+#endif
     GPIO_setConfig(FLUIDI_DIO_CREF1, GPIO_CFG_NO_DIR);
 #if FLUIDI_HAS_CREF2
     GPIO_setConfig(FLUIDI_DIO_CREF2, GPIO_CFG_NO_DIR);
@@ -132,6 +141,42 @@ void fl_platform_conn_vbat_sample(void)
 }
 
 /* ======================= Messkette (FW-1, FW-2, FW-3) ======================= */
+#if FLUIDI_TESTFW == 3
+/* TESTFIRMWARE TF-3: wie tmp1075_read, aber SENS_PWR bleibt high und SDA/SCL werden danach hochohmig (nicht low).
+ * Abweichung von FW-1 gewollt (Anhang A); Feuchtewerte unter TF-3 nur informativ. stage: Fehlerstelle. */
+int fl_port_tf3_tmp_read(int16_t *t_c100, uint8_t *stage)
+{
+    int rc = -1;
+    *stage = 1;
+    GPIO_write(FLUIDI_DIO_SENS_PWR, 1);
+    GPIO_setConfigAndMux(FLUIDI_DIO_I2C_SDA, GPIO_CFG_INPUT, GPIO_MUX_GPIO);
+    GPIO_setConfigAndMux(FLUIDI_DIO_I2C_SCL, GPIO_CFG_INPUT, GPIO_MUX_GPIO);
+    I2C_Params p; I2C_Params_init(&p); p.bitRate = I2C_100kHz;
+    I2C_Handle h = I2C_open(CONFIG_I2C_TMP, &p);
+    if (h) {
+        uint8_t wr[2] = {0x01, 0x81}, ptr = 0x00, rd[2];      /* One-Shot, danach Shutdown (SBOS854F S.21-22) */
+        I2C_Transaction t = {0};
+        t.targetAddress = FLUIDI_TMP1075_I2C_ADDR;
+        t.writeBuf = wr; t.writeCount = 2; t.readBuf = NULL; t.readCount = 0;
+        *stage = 2;
+        if (I2C_transfer(h, &t)) {
+            sleep_ms(FLUIDI_TMP_CONV_MS);
+            t.writeBuf = &ptr; t.writeCount = 1; t.readBuf = rd; t.readCount = 2;
+            *stage = 3;
+            if (I2C_transfer(h, &t)) {
+                int16_t raw = (int16_t)((rd[0] << 8) | rd[1]) >> 4;
+                *t_c100 = (int16_t)((int32_t)raw * 625 / 100);
+                rc = 0; *stage = 0;
+            }
+        }
+        I2C_close(h);
+    }
+    GPIO_setConfig(FLUIDI_DIO_I2C_SDA, GPIO_CFG_NO_DIR);
+    GPIO_setConfig(FLUIDI_DIO_I2C_SCL, GPIO_CFG_NO_DIR);
+    return rc;
+}
+static int tmp1075_read(int16_t *t_c100) { uint8_t st; return fl_port_tf3_tmp_read(t_c100, &st); }
+#else
 static int tmp1075_read(int16_t *t_c100)
 {
     /* FW-1: SENS_PWR an -> One-Shot -> >= 15 ms schlafen -> lesen -> TMP in Shutdown (SD bleibt 1) -> SENS_PWR aus,
@@ -165,6 +210,7 @@ static int tmp1075_read(int16_t *t_c100)
     GPIO_setConfig(FLUIDI_DIO_I2C_SCL, GPIO_CFG_OUTPUT | GPIO_CFG_OUT_LOW);
     return rc;
 }
+#endif
 
 #define LG(o) HWREG(LGPT3_BASE + (o))
 
@@ -325,6 +371,15 @@ int fl_port_ecdh_shared(const uint8_t priv[32], const uint8_t peer[64], uint8_t 
 typedef struct { uint_least8_t idx; NVS_Handle h; } nvs_dev_t;
 static nvs_dev_t d_flnv = {CONFIG_NVS_FLNV, NULL}, d_log = {CONFIG_NVS_LOG, NULL}, d_slot1 = {CONFIG_NVS_SLOT1, NULL};
 
+#if FLUIDI_TESTFW
+static uint32_t s_tf_ops;                                     /* Testfirmware: Schreib-/Loeschvorgaenge NV + Ring */
+uint32_t fl_port_tf_flash_ops(void) { return s_tf_ops; }
+static void tf_count(void *c) { if (c == &d_flnv || c == &d_log) s_tf_ops++; }
+#define TF_COUNT(c) tf_count(c)
+#else
+#define TF_COUNT(c) ((void)0)
+#endif
+
 static NVS_Handle dev(nvs_dev_t *d)
 {
     if (!d->h) { NVS_Params p; NVS_Params_init(&p); d->h = NVS_open(d->idx, &p); }
@@ -334,9 +389,10 @@ static int f_read(void *c, uint32_t off, void *buf, size_t len) { NVS_Handle h =
 static int f_write(void *c, uint32_t off, const void *buf, size_t len)
 {
     NVS_Handle h = dev(c);
+    TF_COUNT(c);
     return h && NVS_write(h, off, (void *)buf, len, NVS_WRITE_POST_VERIFY) == NVS_STATUS_SUCCESS ? 0 : -1;
 }
-static int f_erase(void *c, uint32_t off) { NVS_Handle h = dev(c); return h && NVS_erase(h, off & ~(FL_FLASH_SECTOR - 1u), FL_FLASH_SECTOR) == NVS_STATUS_SUCCESS ? 0 : -1; }
+static int f_erase(void *c, uint32_t off) { NVS_Handle h = dev(c); TF_COUNT(c); return h && NVS_erase(h, off & ~(FL_FLASH_SECTOR - 1u), FL_FLASH_SECTOR) == NVS_STATUS_SUCCESS ? 0 : -1; }
 
 static const fl_flash_t fl_nv_flash = {f_read, f_write, f_erase, &d_flnv, FL_NV_SIZE, FL_FLASH_SECTOR};
 static const fl_flash_t fl_log_dev = {f_read, f_write, f_erase, &d_log, FL_LOG_SIZE, FL_FLASH_SECTOR};
@@ -389,6 +445,11 @@ void fl_port_shutdown(void)
     /* Unterspannung (FW-5) / Reset-Schleife (F-W3): alles aus, Wecken ueber Taster (Shutdown-Wakeup low an DIO21).
      * Ist der Taster JETZT gedrueckt (klemmt), Pull-up aus und kein Wecken -> nur Zellwechsel (F-W3b). */
     pins_sleep_state();
+#if FLUIDI_TESTFW == 3
+    GPIO_write(FLUIDI_DIO_SENS_PWR, 0);                       /* TF-3: im Shutdown wie Serie (FW-8) */
+    GPIO_setConfig(FLUIDI_DIO_I2C_SDA, GPIO_CFG_OUTPUT | GPIO_CFG_OUT_LOW);
+    GPIO_setConfig(FLUIDI_DIO_I2C_SCL, GPIO_CFG_OUTPUT | GPIO_CFG_OUT_LOW);
+#endif
     GPIO_setConfig(FLUIDI_DIO_BUTTON, GPIO_CFG_IN_PU);
     delay_us(200);
     if (GPIO_read(FLUIDI_DIO_BUTTON) == 0) GPIO_setConfig(FLUIDI_DIO_BUTTON, GPIO_CFG_NO_DIR);
@@ -448,3 +509,25 @@ void fl_platform_early_init(void)
 
 /* fataler Fehler: Neustart OHNE 'geplant'-Bit -> zaehlt als abnormal, nach 3 Abschaltung (F-W3c) */
 void fl_platform_fatal(uint8_t code) { (void)code; PMCTLResetSystem(); }
+
+#if FLUIDI_TESTFW
+/* TF-1: Endlosschleife im Anwendungs-Task OHNE Watchdog_clear; BLE-Stack (hoehere Prioritaet) laeuft weiter ->
+ * prueft zugleich, dass nichts ausser fl_app_process den Watchdog bedient. Erwartung: Neustart nach <= 10 min
+ * (CONFIG_WATCHDOG_0 period = 600000 ms, syscfg), reset_reason 2. */
+void fl_port_tf_hang(void)
+{
+    volatile uint32_t spin = 0;
+    fl_port_led(FL_COL_OFF, 0);
+    for (;;) spin++;
+}
+/* TF-2: FL_TF_FATAL_SERIES = Serienpfad fuer fatale Fehler (fl_platform_fatal, wie crit_err des BLE-Stacks);
+ * FL_TF_FATAL_HARDFAULT = undefinierter Befehl -> HardFault -> Serien-Ausnahmebehandlung (SysConfig-Vektortabelle:
+ * Exception_handlerSpin, Interrupts aus, Endlosschleife -> Watchdog). */
+void fl_port_tf_fatal(uint8_t kind)
+{
+    fl_port_led(FL_COL_OFF, 0);
+    if (kind == FL_TF_FATAL_HARDFAULT) __builtin_trap();
+    fl_platform_fatal(0xF2);
+    for (;;) { }
+}
+#endif

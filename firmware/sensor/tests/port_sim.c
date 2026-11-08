@@ -173,3 +173,18 @@ void fl_port_retained_set(uint32_t v) { sim.retained = v & 0x3FFFFu; }
 void fl_port_wdt_kick(void) { sim.wdt_kicks++; }
 void fl_port_button_pullup(bool on) { sim.pullup = on; }
 bool fl_port_button_pressed(void) { return sim.button_level; }
+
+#if defined(FLUIDI_TESTFW) && FLUIDI_TESTFW
+/* ---- Testfirmware ---- */
+uint32_t fl_port_tf_flash_ops(void) { return sim.nv_writes + sim.flash_writes + sim.flash_erases; }
+void fl_port_tf_hang(void) { sim.tf_hangs++; }                  /* Hardware: Endlosschleife -> Watchdog */
+void fl_port_tf_fatal(uint8_t kind) { if (kind) sim.tf_fatal_hf++; else sim.tf_fatal_series++; sim.reboots++; }
+int fl_port_tf3_tmp_read(int16_t *t, uint8_t *stage)
+{
+    sim.tf3_reads++;
+    *stage = sim.tf3_fail_stage;
+    if (sim.tf3_fail_stage) return -1;
+    *t = sim.temp;
+    return 0;
+}
+#endif

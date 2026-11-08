@@ -17,6 +17,10 @@ typedef enum {
     FL_LED_L10B_ERROR_BTN, FL_LED_L11_START_OK, FL_LED_L11_START_FAIL, FL_LED_L11_UNPAIRED,
     FL_LED_L12_3S, FL_LED_L13_ARMED_HOLD, FL_LED_L13_CONFIRM_WIN, FL_LED_L14_RESET, FL_LED_L15_UNPAIRED_BTN,
     FL_LED_L16_IDENTIFY, FL_LED_L17_OTA_OK, FL_LED_L17_OTA_REVERT, FL_LED_UV_BTN, FL_LED_UNPAIRED_2Y,
+#if defined(FLUIDI_TESTFW) && FLUIDI_TESTFW
+    FL_LED_TF_START,      /* Testfirmware: Startsignal Rot/Gruen abwechselnd 3 x (Anhang A, ANNAHME 100 ms) */
+    FL_LED_TF_ACK,        /* Testfirmware: Tastersequenz erkannt, Testaktion folgt */
+#endif
     FL_LED_COUNT
 } fl_led_pattern_t;
 

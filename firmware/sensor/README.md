@@ -15,7 +15,7 @@ Kennzeichnungen wie im Projekt: **ANNAHME**, **PROTOTYP-PRUEFUNG** (erst am Must
 source ~/fluidi-tools/env.sh
 cd firmware/sensor
 make            # MCUboot + Anwendung + signiertes Image + Werks-Hex + Groessenbericht  (~30 s)
-make check      # Flash-Layout- und Pin-Konsistenz + Host-Unit-Tests (C) + Flash-Werkzeug-Tests (Python)
+make check      # Flash-Layout- und Pin-Konsistenz + Host-Unit-Tests (C, Serie + TF-1..TF-4) + Python-Tests
 make clean
 ```
 
@@ -26,6 +26,10 @@ im Repository; gibt den Schluessel-Fingerabdruck aus, den `scripts/flash_sensor.
 verlangt (F-W1).
 
 Images tragen das geschuetzte TLV `0xA0 hw_rev` (PROTOCOL 0.2 Ae-10).
+
+**Testfirmware (Testplan Anhang A, EP-15):** `make TESTFW=1|2|3|4 VERSION=<hoeher als laufend>` → `build-tf<n>/`,
+nur DEV-signiert, Name `fl-tf<n>-XXXX`, Build-Nummer `9<n><bb>`; Code nur mit `FLUIDI_TESTFW` (`core/fl_testfw.c`),
+Serien-Image ohne `TESTFW` bitgleich. Anleitung und Datenformate: `docs/manuals/TESTFIRMWARE.md`.
 
 | Ergebnis (`build/`) | Inhalt |
 |---|---|
