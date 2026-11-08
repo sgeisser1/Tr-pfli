@@ -12,8 +12,8 @@ Protokoll nach docs/datasheets/TI_CC23xx_TechnicalReferenceManual_SWCU193A.pdf K
     (TRM S.465; ein leerer Chip startet den Bootloader ohnehin, TRM S.461). Ablauf: docs/manuals/PROGRAMMIEREN_SENSOR.md.
 
 Sicherheit (CONCEPTS 2.7, Auflagen R2-A1..A4): nur mit Dummy-Zellen-Adapter (keine Zelle im Halter), UART-Pegel
-2.0 V (Programmieradapter hardware/programmer, CH343-VIO an derselben 2.0-V-Speisung; Behelf am offenen Board:
-Labornetzteil 2.0-2.2 V), 2 x 100 kOhm je Pad -> hoechstens 57600 Baud (Werkzeug erzwingt das; SPICE
+2.0 V (Programmieradapter hardware/programmer, VIO/VCCIO des USB-UART (CH343 oder PL2303) an derselben 2.0-V-Speisung;
+Behelf am offenen Board: Labornetzteil 2.0 V, hoechstens 2.1 V; PL2303: VCCIO nie ohne gesteckte USB), 2 x 100 kOhm je Pad -> hoechstens 57600 Baud (Werkzeug erzwingt das; SPICE
 simulation/spice/programmer: Reserve >= 0.22 Bit bei 57600 Baud mit Puffer am Federstift).
 
 Serie (--lock, Befunde F-W1/F-W2 Sicherheitspruefung): nur zusammen mit --expect-key-fp <Fingerabdruck des
@@ -464,7 +464,7 @@ def main(argv=None):
             ap.error("--port fehlt (oder --sim / --dry-run)")
         if not a.yes:
             print("Sicherheit (CONCEPTS 2.7): KEINE Zelle im Halter. Speisung nur ueber den Dummy-Zellen-Adapter 2.0 V")
-            print("(bzw. Behelf: Labornetzteil 2.0-2.2 V, <= 20 mA). CH343-VIO = dieselbe 2.0-V-Speisung.")
+            print("(bzw. Behelf: Labornetzteil 2.0 V, hoechstens 2.1 V, 10 mA). VIO/VCCIO des USB-UART = dieselbe 2.0-V-Speisung.")
             print("Taster beim Einsetzen gedrueckt halten, dann loslassen (ROM-Bootloader). Weiter mit 'ja': ", end="")
             if input().strip().lower() != "ja":
                 return 1

@@ -77,8 +77,8 @@ Baudrate selbst (Autobaud 9600 bis 1.6 MBaud, TRM `SWCU193A` S. 461/464). Dauer 
 ## 4 Weg A: mit Programmieradapter (Normalfall)
 
 1. Adapter prüfen (einmal je Sitzung): USB einstecken, **VDD_DUT und VIO = 1.96–2.04 V** messen
-   (`hardware/programmer/README.md` Kap. 7). PL2303-Board: USB erst am Schluss und erst **nach** dem Herausziehen der
-   Dummy-Zelle (Schritt 7) abziehen (README Kap. 9.4, B5).
+   (`hardware/programmer/README.md` Kap. 7). PL2303-Board: nur mit Adapter mit bestücktem **R2** (470 Ω an VIO,
+   README Kap. 9.4/9.5 B5); dann ist die Reihenfolge beim Ziehen der USB frei.
 2. Sensor: Hülse abziehen, Fachdeckel öffnen, **Zelle entnehmen**. Kontrolle: Clip leer.
 3. **Taster drücken und gedrückt halten**, Dummy-Zelle von der offenen Clip-Seite (+X) einschieben, Federstifte auf
    TP1/TP2 setzen, Gegenhalter unter die Platinenkante. Nach ≈ 1 s den **Taster loslassen**. (Der Bootloader prüft den

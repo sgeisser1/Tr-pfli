@@ -157,7 +157,7 @@ Wert (**ANNAHME** 0/100 µA), Board-LEDs 1 kΩ an VCCIO (Typ **ANNAHME** wie rot
 | Bh DIO20 high bei TXD-High 0.7 × VDD_IO (Datenblattminimum) | 1.37 V | 1.63 V → Messkriterium TXD-High ≥ VCCIO − 0.10 V |
 | Zeitverhalten RX, 57600 Baud, LED 30 pF, TXD-Low 0 / 0.1 / 0.2 V | Reserve 0.300 / 0.284 / 0.205 Bit | ≥ 0.20 Bit |
 | USB einstecken (Weg A) | VDD_IO − VIN ≤ 0.000 V | ≤ 0.3 V (abs. max) |
-| USB ziehen (Weg A), ohne / RB751S-40 / 470 Ω an VIO | bis 1.06 V / 0.41 V / 0.014 V | ≤ 0.3 V → Vorschlag 470 Ω (PA-6) |
+| USB ziehen (Weg A), ohne / RB751S-40 / 470 Ω (475 Ω) an VIO | bis 1.06 V / 0.41 V / 0.014 V (0.015 V) | ≤ 0.3 V → R2 470 Ω im Adapter (D-031) |
 
 ## Offene Punkte
 

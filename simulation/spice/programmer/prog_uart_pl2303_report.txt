@@ -128,7 +128,7 @@ fluidi - prog_uart_pl2303.py (ngspice -b): Waveshare PL2303 USB UART Board (type
 | PL2303-TXD -> DIO20, VDD 2.2 V | DC-Grenze 382 mV | 57600 | schlecht, LED 30 pF | 0->1 min / 1->0 max | 0.440 / 2.200 | 17.49 | 15.57 | ja | 0.139 | NEIN |
 
 (3) USB ein-/ausstecken (Weg A, Adapter Rev 1): Grenze VDD_IO - VIN <= 0.3 V (PL2303 S. 39 Tab. 11-1)
-| Vorgang | Sensor | LDO-Modell | Klemmdiode | max(VDD_IO - VIN) [V] | Dauer > 0.3 V [ms] | VDD_IO bei VIN 0.5 V | ok |
+| Vorgang | Sensor | LDO-Modell | Klemmdiode / Entladewiderstand | max(VDD_IO - VIN) [V] | Dauer > 0.3 V [ms] | VDD_IO bei VIN 0.5 V | ok |
 |---|---|---|---|---|---|---|---|
 | USB einstecken | nein | nur Parasitaerdiode (ungünstig) | keine | 0.000 | 0.00 |  | ja |
 | USB einstecken | ja (410 uF) | nur Parasitaerdiode (ungünstig) | keine | 0.000 | 0.00 |  | ja |
@@ -142,7 +142,9 @@ fluidi - prog_uart_pl2303.py (ngspice -b): Waveshare PL2303 USB UART Board (type
 | USB ziehen | ja (410 uF) | rueckwaerts leitend im Dropout | RB751S-40 VIO->+5V | 0.383 | 2.86 | 0.75 V | NEIN |
 | USB ziehen | nein | nur Parasitaerdiode (ungünstig) | keine, R 1k VIO->GND | 0.448 | 1.12 | 0.56 V | NEIN |
 | USB ziehen | nein | nur Parasitaerdiode (ungünstig) | keine, R 470 VIO->GND | 0.014 | 0.00 | 0.10 V | ja |
+| USB ziehen | nein | nur Parasitaerdiode (ungünstig) | keine, R 475 VIO->GND | 0.015 | 0.00 | 0.10 V | ja |
 | USB ziehen | nein | nur Parasitaerdiode (ungünstig) | RB751S-40 VIO->+5V, R 1k VIO->GND | 0.359 | 0.68 | 0.52 V | NEIN |
 | USB ziehen | ja (410 uF) | nur Parasitaerdiode (ungünstig) | keine, R 1k VIO->GND | 0.179 | 0.00 | 0.00 V | ja |
 | USB ziehen | ja (410 uF) | nur Parasitaerdiode (ungünstig) | keine, R 470 VIO->GND | -0.005 | 0.00 | 0.00 V | ja |
+| USB ziehen | ja (410 uF) | nur Parasitaerdiode (ungünstig) | keine, R 475 VIO->GND | -0.004 | 0.00 | 0.00 V | ja |
 | USB ziehen | ja (410 uF) | nur Parasitaerdiode (ungünstig) | RB751S-40 VIO->+5V, R 1k VIO->GND | 0.179 | 0.00 | 0.00 V | ja |

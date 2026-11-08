@@ -119,8 +119,8 @@ Nur nötig, sobald der USB-UART-Adapter (CH343 oder PL2303) am PC hängt. Das Ga
    `/dev/ttyACM0` (Treiber `cdc_acm`), CH340/CP210x/FTDI und das **PL2303-Board** (VID/PID 067B:23A3, Treiber
    `pl2303`, im WSL-Kernel 6.18.54.1 enthalten, geprüft 2026-11-09) als `/dev/ttyUSB0`.
 5. Lösen: `usbipd detach --busid 2-3` oder Kabel ziehen. Solange das Gerät an WSL hängt, sieht
-   Windows es nicht. `detach` schaltet die USB-Speisung nicht ab. **PL2303-Board:** Kabel erst ziehen, wenn VCCIO
-   spannungslos ist (Netzteil aus bzw. Dummy-Zelle heraus, `hardware/programmer/README.md` Kap. 9.4).
+   Windows es nicht. `detach` schaltet die USB-Speisung nicht ab. **PL2303-Board, Weg B:** Kabel erst ziehen, wenn das
+   Netzteil an VCCIO aus ist (Weg A: R2 am Adapter entlädt VIO, `hardware/programmer/README.md` Kap. 9.4).
 6. Test: `picocom -b 115200 /dev/ttyACM0` (Beenden: Ctrl-A, Ctrl-X).
 
 Rückfall, falls usbipd nicht will: `scripts/flash_sensor.py` läuft auch unter Windows-Python oder auf dem
@@ -156,8 +156,8 @@ Strom-Testbedingung (Tab. 11-2b), RXD-Pull-up ohne Wert (S. 13), RXD-/TXD-LED je
 SPICE `simulation/spice/programmer/prog_uart_pl2303.py`: Puffer → RXD 0.06–0.09 V (Grenze 0.40 V); Weg B an R9 Pad 1
 0.27–0.29 V bei 2.0 V, bei 2.2 V nur +1 mV Reserve → Weg B **höchstens 2.1 V**; ohne Puffer kein Low (wie CH343).
 Freigabe mit Bedingungen: Eingangsprüfung des Boards (VCCIO offen ≤ 0.10 V, RXD → GND ≤ 0.69 mA, TXD high ≥ 1.90 V,
-TXD low ≤ 0.10 V), **VCCIO nie ohne gesteckte USB** (Weg B: USB zuerst ein, zuletzt aus; Weg A: Dummy-Zelle vor dem
-Ziehen der USB heraus), Port `/dev/ttyUSB0`. Einzelheiten `hardware/programmer/README.md` Kap. 9.
+TXD low ≤ 0.10 V), **VCCIO nie ohne gesteckte USB** (Weg B: USB zuerst ein, zuletzt aus; Weg A: Adapter mit
+Entladewiderstand R2 470 Ω an VIO, D-031), Port `/dev/ttyUSB0`. Einzelheiten `hardware/programmer/README.md` Kap. 9.
 
 Nicht nötig: TI-LaunchPad oder XDS110 (keine SWD-Pads, E3), ARM-GCC, IAR, CCS, UniFlash, ESP-IDF.
 Optional für frühe Entwicklung ohne eigene Platine wäre ein LaunchPad LP-EM-CC2340R5 (Preis nicht
@@ -202,7 +202,7 @@ SHA-256 (ti.com, 2026-11-07):
 |---|---|---|
 | FW-T1 | Build-Test mit SysConfig 1.28.2 statt 1.26.x (`basic_ble` für CC2340R5, ticlang) nach der Installation | Firmware |
 | FW-T2 | ~~Puffer am TX-Federstift~~ **entworfen** 2026-11-08: `hardware/programmer` (SN74AUP1G17, 2.0 V, VIO aus eigenem 2.0-V-Regler); Mechanik und Sicherheitsprüfung offen | Elektronik, Mechanik, Sicherheit |
-| FW-T3 | Bezug CH343-Board mit Versand in die Schweiz ≤ 10 CHF bestätigen. **Stand 2026-11-09:** CH343 nur aus dem Ausland (Versand nicht belegt); **PL2303-Board (pi-shop.ch, 8.90 CHF) von der Elektronik freigegeben mit Bedingungen B1–B6** (SPICE `prog_uart_pl2303.py`, J1-Belegung, Eingangsprüfung, Reihenfolge USB/VCCIO; `hardware/programmer/README.md` Kap. 9). Offen: Kaufentscheid; Entladewiderstand 470 Ω an VIO (PA-6) | Auftraggeber (Kauf), Orchestrator (PA-6) |
+| FW-T3 | Bezug CH343-Board mit Versand in die Schweiz ≤ 10 CHF bestätigen. **Stand 2026-11-09:** CH343 nur aus dem Ausland (Versand nicht belegt); **PL2303-Board (pi-shop.ch, 8.90 CHF) von der Elektronik freigegeben mit Bedingungen B1–B6** (SPICE `prog_uart_pl2303.py`, J1-Belegung, Eingangsprüfung, Reihenfolge USB/VCCIO; `hardware/programmer/README.md` Kap. 9). Entladewiderstand R2 470 Ω an VIO im Adapter umgesetzt (D-031). Offen: Kaufentscheid | Auftraggeber (Kauf) |
 | FW-T4 | ~~`scripts/cc23_bsl.py`~~ **erledigt** als `scripts/flash_sensor.py` (Baudrate ≤ 57 600, `--sim`, `--dry-run`, `--lock`) | Firmware |
 
 ## Quellen (Abruf 2026-11-07)

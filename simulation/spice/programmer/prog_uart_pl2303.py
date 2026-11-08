@@ -24,7 +24,7 @@ Was gerechnet wird
 (3) Ein-/Ausstecken der USB (Weg A, Adapter Rev 1): VDD_IO (= VIO aus U3) gegen VIN (= USB 5 V, J1.1),
     Grenze VDD_IO <= VIN + 0.3 V (abs. max). Faelle: Sensor ab/angeschlossen, LDO-Modell ohne/mit Rueckwaertsleitung
     im Dropout, ohne/mit Klemmdiode RB751S-40 von VIO nach +5V, ohne/mit Entladewiderstand 1 kOhm / 470 Ohm von VIO
-    nach GND (beides Vorschlaege, nicht im Schaltplan Rev 1).
+    nach GND. Seit D-031/PA-6 (2026-11-09) ist R2 470 Ohm 0805 im Adapter-Schaltplan (Fall "R 470"; "R 475" = +1 %).
 
 Datenblattwerte (lokale Dateien)
 --------------------------------
@@ -313,7 +313,7 @@ def pwr_cases():
                 rows.append(r)
                 waves[(sensor, bidir, clamp)] = d
     for sensor in (False, True):
-        for clamp, bleed in ((False, "1k"), (False, "470"), (True, "1k")):
+        for clamp, bleed in ((False, "1k"), (False, "470"), (False, "475"), (True, "1k")):
             r, _ = pwr_case("aus", sensor, 0, clamp, bleed)
             rows.append(r)
     return rows, waves
@@ -381,7 +381,7 @@ def main():
                  f"{r['v_high']:.3f} | {r['t_rise_us']:.2f} | {r['t_fall_us']:.2f} | {yn(r['bytes_ok'])} | "
                  f"{r['reserve_bit']:.3f} | {yn(r['ok'])} |")
     L += ["", "(3) USB ein-/ausstecken (Weg A, Adapter Rev 1): Grenze VDD_IO - VIN <= 0.3 V (PL2303 S. 39 Tab. 11-1)",
-          "| Vorgang | Sensor | LDO-Modell | Klemmdiode | max(VDD_IO - VIN) [V] | Dauer > 0.3 V [ms] | VDD_IO bei VIN 0.5 V | "
+          "| Vorgang | Sensor | LDO-Modell | Klemmdiode / Entladewiderstand | max(VDD_IO - VIN) [V] | Dauer > 0.3 V [ms] | VDD_IO bei VIN 0.5 V | "
           "ok |", "|---|---|---|---|---|---|---|---|"]
     for r in pw:
         vv = "" if np.isnan(r["vio_bei_vin_0_5"]) else f"{r['vio_bei_vin_0_5']:.2f} V"

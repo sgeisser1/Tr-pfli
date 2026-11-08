@@ -152,8 +152,8 @@ VDD_IO 1.8 V … VIN + 0.3 V (S. 39 Tab. 11-2a) → 2.0 V zulässig; 6 Mbit/s be
 
 Prüfung Elektronik 2026-11-09 (`hardware/programmer/README.md` Kap. 9, SPICE `simulation/spice/programmer/prog_uart_pl2303.py`):
 1. **Abs. max VDD_IO ≤ VIN + 0.3 V** (S. 39 Tab. 11-1): Einstecken unkritisch (0.000 V); Weg B nur mit Reihenfolge
-   „USB zuerst ein, zuletzt aus“; Weg A beim Ziehen der USB kurzzeitig bis 1.06 V (Ladung der VIO-Kondensatoren) → Dummy-Zelle
-   vorher heraus, Vorschlag Entladewiderstand 470 Ω an VIO (PA-6, ≤ 0.014 V).
+   „USB zuerst ein, zuletzt aus“; Weg A beim Ziehen der USB ohne Gegenmassnahme bis 1.06 V (Ladung der VIO-Kondensatoren)
+   → Entladewiderstand R2 470 Ω an VIO im Adapter (D-031/PA-6): ≤ 0.015 V.
 2. VIL ≤ 0.4 V, RXD-LED 1 kΩ: mit Puffer U4 0.06–0.09 V (+311 mV); Weg B an R9 Pad 1 +113 mV bei 2.0 V, **höchstens 2.1 V**.
    VOL/VOH ohne Stromangabe → Eingangsprüfung des Boards (TXD high ≥ 1.90 V, TXD low ≤ 0.10 V, RXD → GND ≤ 0.69 mA,
    VCCIO offen ≤ 0.10 V).

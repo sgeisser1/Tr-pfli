@@ -5,7 +5,7 @@
 | Stand | 2026-11-08, Rev 1 (Entwurf Elektronik, **Freigabe Orchestrator/Auftraggeber offen**, Mechanik und Sicherheit prüfen) |
 | Anlass | Red-Team Phase 4, B-4 / W-4 (`docs/reviews/phase4_redteam_gesamt.md`) |
 | Schaltplan | `fluidi_programmer.kicad_sch` (Generator `gen/gen_programmer.py`, `bash hardware/programmer/gen/run_all.sh`), PDF `out/fluidi_programmer_schematic.pdf` |
-| Prüfung | ERC KiCad 10.0.8 WSL **und** Windows: **0 Fehler, 0 Warnungen** (`out/erc_wsl.rpt`, `out/erc_win.rpt`); Netzliste gegen Soll (13 Bauteile, 34 Pins, 8 Netze) |
+| Prüfung | ERC KiCad 10.0.8 WSL **und** Windows: **0 Fehler, 0 Warnungen** (`out/erc_wsl.rpt`, `out/erc_win.rpt`); Netzliste gegen Soll (14 Bauteile, 36 Pins, 8 Netze; Stand 2026-11-09 mit R2, D-031) |
 | SPICE | `simulation/spice/programmer/prog_uart.py` (ngspice 42, `-b`), Bericht `prog_uart_report.txt`, Plot `prog_uart_waveforms.png` |
 | Anleitung | `docs/manuals/PROGRAMMIEREN_SENSOR.md` (Ablauf mit `scripts/flash_sensor.py`, Behelf ohne Adapter, Bootloader-Falle W-10) |
 | Sensor | Schaltplan/Layout Rev C (`hardware/sensor/`), Pinplan `docs/interfaces/PINMAP_SENSOR.md` |
@@ -38,6 +38,7 @@ Der Adapter ist ein **Werkzeug**. Er gehört nicht zum Sensor und ändert weder 
 | C1–C4 | Samsung CL21B105KBFNNNE, 1 µF 50 V X7R 0805 | C28323 (Basic) | CIN/CL je LDO | XC6206 DS S. 1 „Typical Application Circuit“ (CIN = CL = 1.0 µF Keramik); Samsung-Katalog `Samsung_CL31A107MQHNNNE_Catalog_2015-11.pdf` (Teilenummernsystem, 21 = 0805) |
 | U4 | TI SN74AUP1G17DBVR | C183012 (Extended, Lager 1 280) | TX_PAD (Federstift TP1) → RXD_HOST; DBV: 1 NC, 2 A, 3 GND, 4 Y, 5 VCC | `TI_SN74AUP1G17_Datasheet_SCES579J.pdf` S. 3; VCC 0.8–3.6 V (S. 4 Kap. 6.3) |
 | C5 | Samsung CL21B104KBCNNNC, 100 nF 0805 | C1711 | Abblock U4 | Samsung-Katalog |
+| R2 | UNI-ROYAL 0805W8F4700T5E, 470 Ω 1 % 1/8 W 0805 | C17710 (Basic, Lager 1 871 834, JLC-Abfrage 2026-11-09) | Entladewiderstand VIO → GND, parallel C4 (D-031/PA-6): VDD_IO ≤ VIN + 0.3 V beim Ziehen der USB (Kap. 9.4); 4.3 mA, 8.9 mW | `UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf` S. 2 (Teilenummer, W8 = 1/8 W), S. 4 Kap. 6 (0805 1 %: 0.1 Ω … < 10 MΩ, 1/8 W bei 70 °C), S. 5 (150 V) |
 | R1 | UNI-ROYAL 0402WGF1005TCE, 10 MΩ 1 % 0402 | C26082 | schwacher Pull-up TX_PAD → VIO | `UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf` (Seriendatenblatt 01005–2512, Kap. 6 „Resistance Range“: 0402 1 % 1 Ω–10 MΩ; 0805 nur bis < 10 MΩ, deshalb 0402) |
 | J2 | Dummy-Zelle (Eigenbau) | – | 1 = Oberseite **+** (Clip), 2 = Mittelinsel **−** (Minuspad) | Kap. 4 |
 | J3 | 2 Federkontaktstifte (Handelsware, **ANNAHME**) | – | 1 = TP1 UART_TX_PAD → U4, 2 = TP2 UART_RX_PAD ← CH343-TXD | Kap. 4 |
@@ -221,6 +222,7 @@ Preise: LCSC/JLC-Teilesuche 2026-11-08 (Stückpreis ab 1, USD), Waveshare/eckste
 | 5 | CL21B105KBFNNNE 1 µF 0805 | 4 | LCSC C28323 | USD 0.03 |
 | 6 | CL21B104KBCNNNC 100 nF 0805 | 1 | LCSC C1711 | USD 0.01 |
 | 7 | 0402WGF1005TCE 10 MΩ | 1 | LCSC C26082 | < USD 0.01 |
+| 7a | 0805W8F4700T5E 470 Ω (R2) | 1 | LCSC C17710 (Basic) | USD 0.0048 (JLC 2026-11-09) |
 | 8 | Federkontaktstifte, Ø ≤ 1.5 mm, Hub ≥ 1 mm | 2 (+ Reserve) | Elektronik-Fachhandel | **ANNAHME** CHF 2–10 |
 | 9 | FR4 einseitig Cu 1.6 mm, Lochraster- oder Kupferplatine für U1–U4, SOT-23-Adapterplatinen | – | Werkstattbestand / Fachhandel | **ANNAHME** CHF 0–10 |
 | 10 | Litze AWG 28–30, Steckbrücken 2.54 mm, ASA für den Bügel | – | Werkstattbestand | **ANNAHME** CHF 0–5 |
@@ -239,7 +241,7 @@ deutlich unter 100 CHF. Die Mindestmengen reichen für 2–5 Adapter.
 4. **Schleifentest mit Prüfstecker:** Zwei 100-kΩ-Widerstände in Serie zwischen Stift TP2 und Stift TP1 (bildet die
    Barriere des Sensors nach). `picocom -b 57600 /dev/ttyACM0`, Zeichen tippen → Echo. Danach mit 19200. Damit sind
    CH343-TXD, 200 kΩ, Puffer und CH343-RXD gemeinsam geprüft.
-5. Ruhestrom ohne Sensor: < 1 mA aus USB (XC6206 IDD typ 1 µA, AUP ICC ≤ 0.5 µA; der Hauptteil ist das Waveshare-Board).
+5. Ruhestrom ohne Sensor: < 6 mA aus USB (R2 ≈ 4.3 mA, XC6206 IDD typ 1 µA, AUP ICC ≤ 0.5 µA, dazu das Waveshare-Board).
 
 ## 8 Offene Punkte
 
@@ -250,7 +252,7 @@ deutlich unter 100 CHF. Die Mindestmengen reichen für 2–5 Adapter.
 | PA-3 | 20 × Flashen bei 57600 und 19200 Baud, Flanke an U4 messen (Kap. 5) | PROTOTYP-PRÜFUNG |
 | PA-4 | VDDS am Sensor während Chip-Erase messen (Erwartung ≥ 1.95 V) | PROTOTYP-PRÜFUNG |
 | PA-5 | Bezug Waveshare-Board mit Versand in die Schweiz (FW-T3); **Alternative PL2303 (pi-shop.ch) elektrisch freigegeben mit Bedingungen** (Kap. 9) | Auftraggeber |
-| PA-6 | Entladewiderstand **470 Ω VIO → GND** (0805, parallel C4) gegen VDD_IO > VIN + 0.3 V beim Ziehen der USB (PL2303, Kap. 9.4). Schaltplanänderung Rev 1 → **Rückmeldung Orchestrator** nötig; bis dahin Ablaufregel Kap. 9.4 | Elektronik, Orchestrator |
+| PA-6 | ~~Entladewiderstand 470 Ω VIO → GND~~ **umgesetzt** 2026-11-09 als R2 (Entscheid Orchestrator, D-031); ERC WSL/Windows 0/0 | erledigt |
 | PA-7 | Eingangsprüfung PL2303-Board (Kap. 9.3) und 20 × Flashen bei 57600/19200 mit dem PL2303 | PROTOTYP-PRÜFUNG |
 
 ## 9 Alternative USB-UART: Waveshare PL2303 USB UART Board (type A) V2 (Prüfung Elektronik 2026-11-09)
@@ -258,8 +260,8 @@ deutlich unter 100 CHF. Die Mindestmengen reichen für 2–5 Adapter.
 Anlass: CH343-Board nur aus dem Ausland (FW-T3); PL2303-Board bei pi-shop.ch Art. 11757, CHF 8.90
 (`docs/manuals/EINKAUFSLISTE.md` Kap. 3). **Ergebnis: freigegeben mit Bedingungen B1–B6 (Kap. 9.5)** für Weg A und
 Weg B. Nachweis: `simulation/spice/programmer/prog_uart_pl2303.py` (ngspice 42, `-b`), Bericht
-`prog_uart_pl2303_report.txt`, Plot `prog_uart_pl2303_pwr.png`. Der Adapter-Schaltplan Rev 1 bleibt unverändert;
-J1 hat dieselben fünf Funktionen, nur die Gegenstifte am Board ändern sich (Tab. 2.1).
+`prog_uart_pl2303_report.txt`, Plot `prog_uart_pl2303_pwr.png`. J1 hat dieselben fünf Funktionen, nur die Gegenstifte
+am Board ändern sich (Tab. 2.1). Einzige Schaltplanänderung: Entladewiderstand **R2 470 Ω** an VIO (D-031/PA-6, Kap. 9.4).
 
 ### 9.1 Datenblatt und Board gegenüber CH343
 
@@ -317,9 +319,10 @@ Werkzeug: Labornetzteil 2.0 V / 10 mA, Multimeter. Kein Sensor angeschlossen.
   Simulationsende 400 ms (Sensor dran; VIO ohne Last). Quelle ist nur die Ladung der VIO-Kondensatoren
   (≈ 2.1 µF × 1 V ≈ 2 µC); kein anderer Pfad speist VIO. Mit Klemmdiode RB751S-40 VIO → +5V: 0.38–0.41 V (VF 0.37 V @
   1 mA, `CJ_RB751S-40_Datasheet.pdf` S. 1) – reicht nicht. Mit **470 Ω VIO → GND: ≤ 0.014 V** in allen Fällen (1 kΩ
-  ohne Sensor: 0.45 V). Mehrlast für U3 4.3 mA, unkritisch (Ishort typ 130 mA). → **PA-6** (Schaltplanänderung, Rückmeldung).
-  Bis dahin: Dummy-Zelle **vor** dem Ziehen der USB entfernen; **PROTOTYP-PRÜFUNG:** VIO und VIN beim Ziehen mit
-  Oszilloskop aufnehmen.
+  ohne Sensor: 0.45 V; 475 Ω = +1 %: 0.015 V). Mehrlast für U3 4.3 mA, unkritisch (Ishort typ 130 mA).
+  **Umgesetzt als R2** (D-031/PA-6, Schaltplan 2026-11-09): Damit darf die USB auch bei eingesetzter Dummy-Zelle gezogen
+  werden (SPICE: −0.005 V mit Sensor, 0.014 V ohne Sensor; Modell ohne Rückwärtsleitung der LDO, 15 mA an VIN).
+  **PROTOTYP-PRÜFUNG:** VIO und VIN beim Ziehen mit Oszilloskop aufnehmen (Erwartung VIO − VIN ≤ 0.3 V).
 - **Weg B:** VCCIO kommt vom Labornetzteil. Ohne USB läge VDD_IO **dauernd** bei 2.0–2.1 V über VIN = 0 V, Strom nur
   durch die 10-mA-Begrenzung begrenzt. Deshalb feste Reihenfolge (PROGRAMMIEREN_SENSOR Kap. 5): **USB zuerst
   einstecken, Netzteil zuletzt ein; Netzteil zuerst aus, USB zuletzt ziehen**; PC während Weg B nicht in den
@@ -338,5 +341,5 @@ Werkzeug: Labornetzteil 2.0 V / 10 mA, Multimeter. Kein Sensor angeschlossen.
 | B2 | Jumper J1 des Boards entfernt; Anschluss J1 nach Tab. 2.1 |
 | B3 | Eingangsprüfung Kap. 9.3 bestanden (VCCIO offen ≤ 0.10 V, RXD-Kurzschlussstrom ≤ 0.69 mA bzw. ≤ 2.1 mA nur Weg A, TXD high ≥ 1.90 V, TXD low ≤ 0.10 V) |
 | B4 | Weg B: Netzteil 2.0 V, **höchstens 2.1 V**, 10 mA; Reihenfolge USB/Netzteil nach Kap. 9.4 |
-| B5 | Weg A: bis zum Entscheid PA-6 Dummy-Zelle vor dem Ziehen der USB entfernen |
+| B5 | Weg A nur mit bestücktem R2 (470 Ω VIO → GND); Kontrolle beim Aufbau: VIO ↔ GND ohne Speisung ≤ 470 Ω (R2 parallel zu U3/U4). Ohne R2: Dummy-Zelle vor dem Ziehen der USB entfernen und Kap. 9.4 gilt nicht |
 | B6 | Port `/dev/ttyUSB0` (Treiber `pl2303`); 20 × Flashen bei 57600 und 19200 (PA-7) |

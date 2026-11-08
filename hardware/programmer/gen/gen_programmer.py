@@ -63,6 +63,8 @@ PARTDB = {
               DS + "Samsung_CL31A107MQHNNNE_Catalog_2015-11.pdf", "MLCC 100 nF 50 V X7R 0805"),
     "R10M": ("UNI-ROYAL", "0402WGF1005TCE", "C26082", DS + "UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf",
              "R 10 MOhm 1 % 0402 (Seriendatenblatt 01005-2512, Kap. 6 Resistance Range: 0402 1 Ohm-10 MOhm)"),
+    "R470": ("UNI-ROYAL", "0805W8F4700T5E", "C17710", DS + "UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf",
+             "R 470 Ohm 1 % 1/8 W 0805 (Seriendatenblatt S. 2 Teilenummer W8 = 1/8 W, S. 4 Kap. 6: 0805 1 % bis 10 MOhm)"),
     "CABLE": ("-", "Litze/Steckbruecken zum Waveshare CH343 oder PL2303 (type A) V2 USB UART Board", "", "", "Kabel <= 20 cm (ANNAHME)"),
     "DUMMY": ("-", "Eigenbau: 2 x FR4 1.6 mm Cu, D 20.0 mm", "", "", "Dummy-Zelle CR2032-Form (README Kap. 4)"),
     "POGO": ("-", "Federkontaktstift, Handelsware", "", "", "Federstifte auf TP1/TP2 (ANNAHME, README Kap. 4)"),
@@ -96,6 +98,9 @@ add("U3", L + "XC6206PxxxMR", "XC6206P202MR", "Package_TO_SOT_SMD:SOT-23", "LDO2
     {"1": "GND", "2": "VIO", "3": "+3V3"}, note="eigene Schiene fuer CH343-VIO und Puffer: Einstecken der Dummy-Zelle "
                                                "(Einschaltstrom in 4 x 100 uF) stoert die USB-Bruecke nicht")
 add("C4", "Device:C", "1u", FP_C, "C1U", 66, 36, 0, {"1": "VIO", "2": "GND"}, note="CL U3")
+add("R2", "Device:R", "470", "Resistor_SMD:R_0805_2012Metric", "R470", 74, 36, 0, {"1": "VIO", "2": "GND"},
+    note="Entladewiderstand VIO (D-031/PA-6): haelt VDD_IO <= VIN + 0.3 V beim Ziehen der USB (PL2303GS S. 39 Tab. 11-1); "
+         "SPICE prog_uart_pl2303.py Fall (3): <= 0.014 V statt 1.06 V; 4.3 mA aus U3")
 add("J2", "Connector_Generic:Conn_01x02", "Dummy-Zelle CR2032", "", "DUMMY", 84, 14, 0,
     {"1": "VDD_DUT", "2": "GND"}, note="1 = Oberseite (+, Clip), 2 = Mittelinsel D 8 mm (-, Minuspad); keine Zelle!")
 # TX-Puffer am Federstiftkopf (<= 3 cm Draht ab Stift TP1)
@@ -266,7 +271,7 @@ NOTES = [
            "Einzelfehler: U2 oder U3 durchlegiert -> hoechstens 3.3 V (VDDS max 3.8 V, abs. max 4.1 V, CC2340 DS S. 18);\n"
            "U1 durchlegiert -> U2/U3 regeln weiter (VIN max 6.0 V). Fuer 5 V am Sensor braucht es zwei Fehler (R2-L02).\n"
            "Waveshare: Jumper H3 (CH343) bzw. J1 (PL2303) ENTFERNEN, VIO kommt von U3. Vor dem Einsetzen VDD_DUT und VIO messen.\n"
-           "PL2303: Eingangspruefung README Kap. 9.3; Dummy-Zelle vor dem Ziehen der USB entfernen (Kap. 9.4)."),
+           "PL2303: Eingangspruefung README Kap. 9.3. R2 470 Ohm entlaedt VIO beim Ziehen der USB (VDD_IO <= VIN + 0.3 V, Kap. 9.4)."),
     (4, 64, "TX-PUFFER  CH343-RXD hat 3-21 uA Pull-up (DS S. 8) + Board-LED 2 kOhm (PL2303: 1 kOhm, VIL 0.4 V):\n"
             "ueber 2 x 100 kOhm kein Low.\n"
             "U4 SN74AUP1G17 (Leck <= 0.5 uA -> <= 0.1 V ueber 200 kOhm) direkt am Federstift TP1, <= 3 cm Draht.\n"

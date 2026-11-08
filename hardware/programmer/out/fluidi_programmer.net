@@ -2,7 +2,7 @@
 	(version "E")
 	(design
 		(source "/home/sgeisser/git/Tr-pfli/hardware/programmer/fluidi_programmer.kicad_sch")
-		(date "2026-11-09T00:29:41")
+		(date "2026-11-09T00:35:54")
 		(tool "Eeschema 10.0.8-10.0.8~ubuntu24.04.1")
 		(textvar
 			(name "REV") "1")
@@ -702,6 +702,78 @@
 				(tstamps "/")
 			)
 			(tstamps "cf829a1d-069d-5d87-9678-c8a0b086fed0")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "R2")
+			(value "470")
+			(footprint "Resistor_SMD:R_0805_2012Metric")
+			(datasheet "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf")
+			(description "R 470 Ohm 1 % 1/8 W 0805 (Seriendatenblatt S. 2 Teilenummer W8 = 1/8 W, S. 4 Kap. 6: 0805 1 % bis 10 MOhm); Entladewiderstand VIO (D-031/PA-6): haelt VDD_IO <= VIN + 0.3 V beim Ziehen der USB (PL2303GS S. 39 Tab. 11-1); SPICE prog_uart_pl2303.py Fall (3): <= 0.014 V statt 1.06 V; 4.3 mA aus U3")
+			(fields
+				(field
+					(name "LCSC") "C17710")
+				(field
+					(name "Hersteller") "UNI-ROYAL")
+				(field
+					(name "MPN") "0805W8F4700T5E")
+				(field
+					(name "Footprint") "Resistor_SMD:R_0805_2012Metric")
+				(field
+					(name "Datasheet") "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf")
+				(field
+					(name "Description") "R 470 Ohm 1 % 1/8 W 0805 (Seriendatenblatt S. 2 Teilenummer W8 = 1/8 W, S. 4 Kap. 6: 0805 1 % bis 10 MOhm); Entladewiderstand VIO (D-031/PA-6): haelt VDD_IO <= VIN + 0.3 V beim Ziehen der USB (PL2303GS S. 39 Tab. 11-1); SPICE prog_uart_pl2303.py Fall (3): <= 0.014 V statt 1.06 V; 4.3 mA aus U3")
+			)
+			(libsource
+				(lib "Device")
+				(part "R")
+				(description "Resistor")
+			)
+			(property
+				(name "LCSC")
+				(value "C17710")
+			)
+			(property
+				(name "Hersteller")
+				(value "UNI-ROYAL")
+			)
+			(property
+				(name "MPN")
+				(value "0805W8F4700T5E")
+			)
+			(property
+				(name "Sheetname")
+				(value "fluidi_programmer")
+			)
+			(property
+				(name "Sheetfile")
+				(value "fluidi_programmer.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "R res resistor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "R_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "fbadf0a1-ca98-5e7d-8451-158e67267b03")
 			(units
 				(unit
 					(name "A")
@@ -1435,6 +1507,11 @@
 				(pintype "passive")
 			)
 			(node
+				(ref "R2")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
 				(ref "U3")
 				(pin "2")
 				(pinfunction "VO_2")
@@ -1486,6 +1563,11 @@
 				(ref "J2")
 				(pin "2")
 				(pinfunction "Pin_2_2")
+				(pintype "passive")
+			)
+			(node
+				(ref "R2")
+				(pin "2")
 				(pintype "passive")
 			)
 			(node

@@ -632,6 +632,130 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "Device:R"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "R"
+				(at 2.032 0 90)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "R"
+				(at 0 0 90)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at -1.778 0 90)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Resistor"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "R res resistor"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "R_*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "R_0_1"
+				(rectangle
+					(start -1.016 -2.54)
+					(end 1.016 2.54)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "R_1_1"
+				(pin passive line
+					(at 0 3.81 270)
+					(length 1.27)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 0 -3.81 90)
+					(length 1.27)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "Connector_Generic:Conn_01x02"
 			(pin_names
 				(offset 1.016)
@@ -757,130 +881,6 @@
 					(at -5.08 -2.54 0)
 					(length 3.81)
 					(name "Pin_2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
-		(symbol "Device:R"
-			(pin_numbers
-				(hide yes)
-			)
-			(pin_names
-				(offset 0)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "R"
-				(at 2.032 0 90)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Value" "R"
-				(at 0 0 90)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" ""
-				(at -1.778 0 90)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" "~"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" "Resistor"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_keywords" "R res resistor"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_fp_filters" "R_*"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "R_0_1"
-				(rectangle
-					(start -1.016 -2.54)
-					(end 1.016 2.54)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "R_1_1"
-				(pin passive line
-					(at 0 3.81 270)
-					(length 1.27)
-					(name "~"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 0 -3.81 90)
-					(length 1.27)
-					(name "~"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -2832,6 +2832,190 @@
 		)
 	)
 	(symbol
+		(lib_id "Device:R")
+		(at 187.96 91.44 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "fbadf0a1-ca98-5e7d-8451-158e67267b03")
+		(property "Reference" "R2"
+			(at 189.46 85.63 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "470"
+			(at 189.46 87.83 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+			(at 187.96 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf"
+			(at 187.96 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "R 470 Ohm 1 % 1/8 W 0805 (Seriendatenblatt S. 2 Teilenummer W8 = 1/8 W, S. 4 Kap. 6: 0805 1 % bis 10 MOhm); Entladewiderstand VIO (D-031/PA-6): haelt VDD_IO <= VIN + 0.3 V beim Ziehen der USB (PL2303GS S. 39 Tab. 11-1); SPICE prog_uart_pl2303.py Fall (3): <= 0.014 V statt 1.06 V; 4.3 mA aus U3"
+			(at 187.96 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C17710"
+			(at 187.96 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Hersteller" "UNI-ROYAL"
+			(at 187.96 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "0805W8F4700T5E"
+			(at 187.96 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "620ba264-966e-5d18-9de1-3d209c2b6772")
+		)
+		(pin "2"
+			(uuid "52e75f12-4bd3-5d8b-a057-287d187fd522")
+		)
+		(instances
+			(project "fluidi_programmer"
+				(path "/0f41590c-de8f-5f25-8f46-626c9dc412b4"
+					(reference "R2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 187.96 87.63)
+			(xy 187.96 85.09)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5a31e8dc-9378-545d-8625-e2007a5be51d")
+	)
+	(label "VIO"
+		(at 187.96 85.09 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "b9608c93-667d-5fa2-88ef-eaec58e41d1a")
+	)
+	(wire
+		(pts
+			(xy 187.96 95.25)
+			(xy 187.96 97.79)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5a9dee67-b659-580a-850d-ec85381f0d11")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 187.96 97.79 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(uuid "59809a6c-d4b9-570a-b338-a67b8c14b92f")
+		(property "Reference" "#PWR009"
+			(at 187.96 97.79 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 187.96 100.79 0)
+			(effects
+				(font
+					(size 1 1)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 187.96 97.79 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 187.96 97.79 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "7459b767-fa96-5f52-85c7-958dce5ba89b")
+		)
+		(instances
+			(project "fluidi_programmer"
+				(path "/0f41590c-de8f-5f25-8f46-626c9dc412b4"
+					(reference "#PWR009")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Connector_Generic:Conn_01x02")
 		(at 213.36 35.56 0)
 		(unit 1)
@@ -2967,8 +3151,8 @@
 		(in_bom no)
 		(on_board yes)
 		(dnp no)
-		(uuid "59809a6c-d4b9-570a-b338-a67b8c14b92f")
-		(property "Reference" "#PWR009"
+		(uuid "a7fc3165-1bff-550e-8401-2f64d30fdd2d")
+		(property "Reference" "#PWR010"
 			(at 205.74 38.1 0)
 			(effects
 				(font
@@ -3004,12 +3188,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "7459b767-fa96-5f52-85c7-958dce5ba89b")
+			(uuid "5eb4a2ba-257c-52ba-8fe3-9312fa3fe612")
 		)
 		(instances
 			(project "fluidi_programmer"
 				(path "/0f41590c-de8f-5f25-8f46-626c9dc412b4"
-					(reference "#PWR009")
+					(reference "#PWR010")
 					(unit 1)
 				)
 			)
@@ -3457,8 +3641,8 @@
 		(in_bom no)
 		(on_board yes)
 		(dnp no)
-		(uuid "a7fc3165-1bff-550e-8401-2f64d30fdd2d")
-		(property "Reference" "#PWR010"
+		(uuid "c6446a54-bed3-520e-9d07-50c6c12b687b")
+		(property "Reference" "#PWR011"
 			(at 106.68 144.78 0)
 			(effects
 				(font
@@ -3494,12 +3678,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "5eb4a2ba-257c-52ba-8fe3-9312fa3fe612")
+			(uuid "9f57134d-2591-5f13-8c69-07f77a542093")
 		)
 		(instances
 			(project "fluidi_programmer"
 				(path "/0f41590c-de8f-5f25-8f46-626c9dc412b4"
-					(reference "#PWR010")
+					(reference "#PWR011")
 					(unit 1)
 				)
 			)
@@ -3662,8 +3846,8 @@
 		(in_bom no)
 		(on_board yes)
 		(dnp no)
-		(uuid "c6446a54-bed3-520e-9d07-50c6c12b687b")
-		(property "Reference" "#PWR011"
+		(uuid "53f3a97d-2d1b-5de0-82bf-1acc2bf8cfe6")
+		(property "Reference" "#PWR012"
 			(at 86.36 118.11 0)
 			(effects
 				(font
@@ -3699,12 +3883,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "9f57134d-2591-5f13-8c69-07f77a542093")
+			(uuid "7a919ba7-7730-5fd1-a3ab-ea6addb98373")
 		)
 		(instances
 			(project "fluidi_programmer"
 				(path "/0f41590c-de8f-5f25-8f46-626c9dc412b4"
-					(reference "#PWR011")
+					(reference "#PWR012")
 					(unit 1)
 				)
 			)
@@ -3718,8 +3902,8 @@
 		(in_bom no)
 		(on_board yes)
 		(dnp no)
-		(uuid "88228322-b705-59f5-8826-5093e6868d6e")
-		(property "Reference" "#FLG12"
+		(uuid "15cd320b-cfba-5bc2-beef-ff75284e114a")
+		(property "Reference" "#FLG13"
 			(at 50.8 81.28 0)
 			(effects
 				(font
@@ -3755,12 +3939,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "63853747-1b13-554a-8ea5-15f52b651ce1")
+			(uuid "306a2b2a-0259-5024-b0e6-6de80180bf94")
 		)
 		(instances
 			(project "fluidi_programmer"
 				(path "/0f41590c-de8f-5f25-8f46-626c9dc412b4"
-					(reference "#FLG12")
+					(reference "#FLG13")
 					(unit 1)
 				)
 			)
@@ -3795,8 +3979,8 @@
 		(in_bom no)
 		(on_board yes)
 		(dnp no)
-		(uuid "15cd320b-cfba-5bc2-beef-ff75284e114a")
-		(property "Reference" "#FLG13"
+		(uuid "5d42dad7-77c6-59ef-b4e5-1a1df6969c88")
+		(property "Reference" "#FLG14"
 			(at 66.04 81.28 0)
 			(effects
 				(font
@@ -3832,12 +4016,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "306a2b2a-0259-5024-b0e6-6de80180bf94")
+			(uuid "f06d7dca-c075-56f6-b980-b308a5e48bbc")
 		)
 		(instances
 			(project "fluidi_programmer"
 				(path "/0f41590c-de8f-5f25-8f46-626c9dc412b4"
-					(reference "#FLG13")
+					(reference "#FLG14")
 					(unit 1)
 				)
 			)
@@ -3862,8 +4046,8 @@
 		(in_bom no)
 		(on_board yes)
 		(dnp no)
-		(uuid "0927c885-9480-5e2c-9f4b-62b763dfa0b2")
-		(property "Reference" "#PWR014"
+		(uuid "6d221ac1-5cd3-517c-b573-3037e48ee01a")
+		(property "Reference" "#PWR015"
 			(at 66.04 83.82 0)
 			(effects
 				(font
@@ -3899,18 +4083,18 @@
 			)
 		)
 		(pin "1"
-			(uuid "a7a448d1-314c-5b95-8b7b-37c106d1a0f3")
+			(uuid "1442fefc-a3c6-54d0-b02f-8da78e8ee4e8")
 		)
 		(instances
 			(project "fluidi_programmer"
 				(path "/0f41590c-de8f-5f25-8f46-626c9dc412b4"
-					(reference "#PWR014")
+					(reference "#PWR015")
 					(unit 1)
 				)
 			)
 		)
 	)
-	(text "VERSORGUNG  USB 5 V (Waveshare H3.3) -> U1 3.3 V -> U2 2.0 V (Dummy-Zelle = Sensor-VDD) und U3 2.0 V (VIO).\nEinzelfehler: U2 oder U3 durchlegiert -> hoechstens 3.3 V (VDDS max 3.8 V, abs. max 4.1 V, CC2340 DS S. 18);\nU1 durchlegiert -> U2/U3 regeln weiter (VIN max 6.0 V). Fuer 5 V am Sensor braucht es zwei Fehler (R2-L02).\nWaveshare: Jumper H3 (CH343) bzw. J1 (PL2303) ENTFERNEN, VIO kommt von U3. Vor dem Einsetzen VDD_DUT und VIO messen.\nPL2303: Eingangspruefung README Kap. 9.3; Dummy-Zelle vor dem Ziehen der USB entfernen (Kap. 9.4)."
+	(text "VERSORGUNG  USB 5 V (Waveshare H3.3) -> U1 3.3 V -> U2 2.0 V (Dummy-Zelle = Sensor-VDD) und U3 2.0 V (VIO).\nEinzelfehler: U2 oder U3 durchlegiert -> hoechstens 3.3 V (VDDS max 3.8 V, abs. max 4.1 V, CC2340 DS S. 18);\nU1 durchlegiert -> U2/U3 regeln weiter (VIN max 6.0 V). Fuer 5 V am Sensor braucht es zwei Fehler (R2-L02).\nWaveshare: Jumper H3 (CH343) bzw. J1 (PL2303) ENTFERNEN, VIO kommt von U3. Vor dem Einsetzen VDD_DUT und VIO messen.\nPL2303: Eingangspruefung README Kap. 9.3. R2 470 Ohm entlaedt VIO beim Ziehen der USB (VDD_IO <= VIN + 0.3 V, Kap. 9.4)."
 		(exclude_from_sim no)
 		(at 10.16 12.7 0)
 		(effects

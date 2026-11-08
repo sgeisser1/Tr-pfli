@@ -11,7 +11,9 @@ USB ziehen,ja (410 uF),rueckwaerts leitend im Dropout,keine,1.0561280000000002,3
 USB ziehen,ja (410 uF),rueckwaerts leitend im Dropout,RB751S-40 VIO->+5V,0.3825989000000001,2.8598486000000007,0.7513750805690178,0.8034576900000001,False
 USB ziehen,nein,nur Parasitaerdiode (ungünstig),"keine, R 1k VIO->GND",0.4480120999999999,1.1199999999999999,0.5631451198612205,0.9408254099999998,False
 USB ziehen,nein,nur Parasitaerdiode (ungünstig),"keine, R 470 VIO->GND",0.014106500000000022,0.0,0.09506848965393552,0.029623650000000043,True
+USB ziehen,nein,nur Parasitaerdiode (ungünstig),"keine, R 475 VIO->GND",0.014940699999999918,0.0,0.09814382621761586,0.03137546999999983,True
 USB ziehen,nein,nur Parasitaerdiode (ungünstig),"RB751S-40 VIO->+5V, R 1k VIO->GND",0.35856559999999993,0.68,0.517260847970661,0.7529877599999998,False
 USB ziehen,ja (410 uF),nur Parasitaerdiode (ungünstig),"keine, R 1k VIO->GND",0.1790138000000001,0.0,2.0566280474811626e-09,0.37592898000000025,True
 USB ziehen,ja (410 uF),nur Parasitaerdiode (ungünstig),"keine, R 470 VIO->GND",-0.004531300000000016,0.0,9.639217810397158e-10,0.0,True
+USB ziehen,ja (410 uF),nur Parasitaerdiode (ungünstig),"keine, R 475 VIO->GND",-0.004198600000000052,0.0,9.742010161330605e-10,0.0,True
 USB ziehen,ja (410 uF),nur Parasitaerdiode (ungünstig),"RB751S-40 VIO->+5V, R 1k VIO->GND",0.1789662999999999,0.0,6.124586975285253e-07,0.3758292299999998,True
