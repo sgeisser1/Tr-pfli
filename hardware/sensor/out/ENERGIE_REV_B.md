@@ -1,4 +1,6 @@
-# fluidi Sensor Rev B - Energiebudget (erzeugt von scripts/energy_budget.py --revb)
+# fluidi Sensor Rev B/C - Energiebudget (erzeugt von scripts/energy_budget.py --revb)
+
+Gilt fuer **Rev C** (Bestellstand, ORDER_JLC_REV_C.md): Schaltung, Netzliste und BOM sind gegenueber Rev B unveraendert (C1-C4 C15008, Q1/Q2 AO3401A, U1-U6 gleich); Rev C aendert nur Layout/Fach (D-023, TP3 entfaellt). Finale Bewertung: `docs/reviews/phase5_energiebudget_final.md`.
 
 | | |
 |---|---|
@@ -80,6 +82,29 @@ Laufzeiten ueber ca. 120 Monate sind rechnerisch; begrenzend ist dann die Lagerf
 | LED | 0.77 | 12.72 | 12.72 |
 | OTA 1/Jahr | 0.56 | 0.59 | 0.59 |
 
+### 3d Reaktionszeit 1 / 2 / 5 min (REQ-ENE-04), 6 + 2 Messungen/Tag, 4 x 100 uF [Monate]
+
+| Reaktionszeit | Advertising-Intervall [s] | real | pess. A | pess. DS | Mittelstrom pess. A [uA] |
+|---|---|---|---|---|---|
+| 1 min | 27.5 | 129.5 | 34.6 | 9.1 | 5.51 |
+| 2 min | 57.5 | 154.0 | 40.9 | 9.5 | 4.58 |
+| 5 min | 147.5 | 172.2 | 45.5 | 9.8 | 4.06 |
+
+Selbstentladung: [RC32] S.1 < 1 %/a bei 23 C (real); pess. 2 %/a (ANNAHME Sonnenprofil). Die bestueckte Zelle Panasonic CR2032 ([PAN] S.1) nennt keinen Wert -> Renata-Wert als Ersatz (ANNAHME). Temperatur: Standby U1 mit Sonnenprofil-Faktor 1.058 (RB-03, [CC] S.35 Fig. 7-7), Q2 IDSS mit 55-C-Grenze; MLCC-Leck nur bei 25 C spezifiziert (Temperaturgang PROTOTYP-PRUEFUNG, Kap. 3e).
+
+### 3e Entscheidungsregel W-6 (2 oder 4 x 100 uF, REQ-ENE-02)
+
+Grenze 12 Monate pess.: nutzbar 547 C, Selbstentladung 0.51 uA -> Tagesladung <= 1454 mC inkl. +20 % = Mittelstrom <= 16.83 uA (vor Zuschlag 14.03 uA). Gemessene Werte gehen mit x1.5 ein (REQ-ENE-08 Typ x1.5).
+
+| Fall (Rest des Budgets) | Puffer | Rest ohne C1-C4 [uA] | zulaessiges Leck gesamt [uA] | je Kondensator [uA] | **Schwelle Messwert je Kondensator (/1.5) [uA]** |
+|---|---|---|---|---|---|
+| pessA | 4 x 100 uF | 4.09 | 9.94 | 2.48 | **1.66** |
+| pessA | 2 x 100 uF | 4.09 | 9.94 | 4.97 | **3.31** |
+| pessDS | 4 x 100 uF | 6.57 | 7.46 | 1.86 | **1.24** |
+| pessDS | 2 x 100 uF | 6.57 | 7.46 | 3.73 | **2.49** |
+
+Gesamt-Ruhestrom (E1, alle Bauteile gemessen, Ereignisse pess. A 1.76 uA): zulaessig pess. 12.27 uA -> **Messwert <= 8.18 uA**. REQ-ENE-09 (Schlaf <= 3 uA gemessen) ist strenger: wer REQ-ENE-09 erfuellt, erfuellt REQ-ENE-02 mit 4 x 100 uF.
+
 ## 4 Pulslast (REQ-ENE-06: <= 0.2 V bei R_int 100 Ohm)
 
 RC-Modell: R_int 100 Ohm, C_eff = 4 x 100 uF x 0.5 (DC-Bias, ANNAHME) x 0.8 (Toleranz) = 160 uF, tau = 16 ms. Vollstaendige Rechnung mit DCDC und Ereignisformen: `simulation/spice/supply/supply_report.txt`.
@@ -88,7 +113,7 @@ RC-Modell: R_int 100 Ohm, C_eff = 4 x 100 uF x 0.5 (DC-Bias, ANNAHME) x 0.8 (Tol
 |---|---|---|---|
 | Messung FW-2: 4 x 0.6 ms, Pause 30 ms (pess.) | 14.5 | 63 | ja |
 | Messung ohne FW-2: 16 x 0.6 ms am Stueck (pess.) | 14.5 | 654 | **nein** |
-| TX 0 dBm GLDO, 3 Kanaele ~0.38 ms (pess.) | 9.0 | 60 | ja |
+| TX 0 dBm GLDO, nur 3 TX-Pulse ~0.38 ms (pess.; ganzes Ereignis siehe SPICE: 143 mV) | 9.0 | 60 | ja |
 | LED 3 mA, 5 ms (L8) | 3.0 | 81 | ja |
 | LED 3 mA, 30 ms am Stueck (ohne FW-4) | 3.0 | 254 | **nein** |
 | LED L1 nach FW-4: 6 x 5 ms, Pause 5 ms | 3.0 | 169 | ja |
@@ -113,7 +138,7 @@ LED nach FW-4 (core/fl_ui.c): Pulse <= 5 ms, Pause >= 5 ms. Schritte <= 50 ms be
 | rb.c10_pa | 5e-08 | A | ANNAHME |
 | rb.c10_ds | 9.6e-07 | A | [S10] S.2 IR >= 50 MOhm*uF -> 5 MOhm je 10 uF; C5 @3.0 V + C9 @VDDR <= 1.8 V (ANNAHME VDDR) |
 | rb.uart_real | 0 | A | Pads offen |
-| rb.uart_pa | 6e-08 | A | ANNAHME Oberflaechenisolation TP1/TP2-TP3 >= 100 MOhm |
+| rb.uart_pa | 6e-08 | A | ANNAHME Oberflaechenisolation TP1/TP2 zu Minuspad/GND >= 100 MOhm (Rev C: TP3 entfaellt, D-023 A-1) |
 | rb.uart_ds | 6e-08 | A | wie pess. A (kein DS-Wert) |
 | rb.board_real | 5e-08 | A | ANNAHME (concept_energy.py BOARD) |
 | rb.board_pa | 2e-07 | A | ANNAHME (concept_energy.py BOARD) |

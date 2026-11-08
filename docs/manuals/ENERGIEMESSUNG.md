@@ -1,8 +1,8 @@
-# fluidi – Energiemessplan Sensor-Prototyp (Rev B)
+# fluidi – Energiemessplan Sensor-Prototyp (Rev B/C)
 
 | | |
 |---|---|
-| Stand | 2026-11-07, Firmware/Energie, Entwurf |
+| Stand | 2026-11-08, Firmware/Energie; gilt fuer Rev C (Schaltung/BOM = Rev B). Ergaenzt um E14 (W-6) und E15 (W-10); Einbettung in den Testplan: `docs/reviews/phase5_testplan_beitrag_firmware.md` |
 | Zweck | Modellwerte aus `scripts/energy_budget.py` / `firmware/PROTOCOL.md` Kap. 12 am Muster ersetzen (REQ-ENE-01…08, OP-K6, FW-P3), Firmware-Regeln FW-2/FW-4/FW-5/FW-8 aus `docs/interfaces/PINMAP_SENSOR.md` nachweisen |
 | Werkstattmittel | Labornetzteil (0–5 V, Strombegrenzung), Oszilloskop ≥ 2 Kanaele (≥ 20 MHz, Mittelwert-/Integralfunktion), Shunts 1 Ω / 10 Ω / 1 kΩ (0.1–1 %, Metallfilm), Digitalmultimeter mit µA-Bereich und Aufzeichnung, CR2032 (frisch und teilentladen), Widerstand 100 Ω (Zell-Innenwiderstand EOL, REQ-ENE-06) |
 | Firmware | Build `firmware/sensor` (Rev B), Zaehler aus `GET_INFO` (meas/adv/conn/led_ms, charge_uc) zur Gegenprobe |
@@ -43,6 +43,8 @@ Gegenprobe: `charge_uc` aus `GET_INFO` zu Beginn/Ende vs. gemessene Ladung (Abwe
 | E11 | Unterspannung: Netzteil langsam 2.6 → 2.3 V, Verbindungen laufen | B (100 Ω) | Abschaltung, wenn VDD unter Last < 2.4 V (FW-5, CONCEPTS E1) | Abschaltschwelle, Shutdown-Strom (Ziel < 0.2 µA, DS Shutdown), Wecken nur per Taster |
 | E12 | Tagesprofil (6 auto + 2 Taster, Giessen-LED 12 h, Reaktionszeit 1 min) | D | real ≈ 0.6 µA Ereignisse + Ruhestrom (PROTOCOL 12; `concept_energy.py` A-32) | Tagesmittel → Laufzeit real/pess neu rechnen (REQ-ENE-01) |
 | E13 | Temperatur 10 / 25 / 35 °C (Kuehlschrank/Waermeschrank) fuer E1, E3 | C, A | Standby steigt mit T (`energy_budget.py` Sonnenprofil) | Temperaturfaktor ersetzen |
+| E14 | **Leckstrom C1–C4 (W-6, D-013):** (a) E1 an allen Mustern; (b) an 2 Mustern C3/C4 abloeten, E1 wiederholen (Differenz = 2 Kondensatoren); (c) die abgeloeteten Kondensatoren einzeln: 3.0 V, **100 kΩ** in Serie (1 mV = 10 nA; τ = 10 s), DMM ueber dem Shunt; Werte nach 1 min, 10 min, 1 h (Auswertung), 24 h; bei 25 °C und 50 °C (Sonnenprofil RB-03; Waermeschrank **ANNAHME**) | C bzw. eigener Aufbau | real 0.05 µA je 100 µF (ANNAHME), Datenblattgrenze 3 µA bei 3 V ([SAM] S.53, 100 MΩ·µF) | I_eff = (20 h · I_25 + 4 h · I_50)/24 h, Maximum aller Kondensatoren: **≤ 1.24 µA → 4 × 100 µF bleibt**; 1.24–2.49 µA → 2 × 100 µF nur mit E3/E5/E6 ≤ 0.2 V (Aufbau B, 2 Kondensatoren); > 2.49 µA → Vorlage Auftraggeber (`ENERGIE_REV_B.md` Kap. 3e) |
+| E15 | **Bootloader-Strom (W-10):** Taster gedrueckt halten, Speisung einschalten, nach 2 s loslassen; Strom 60 s mitteln; bei 3.0 V und 2.0 V; danach Speisung ≥ 10 s weg, ohne Taster einschalten → L11 | A (10 Ω), DMM mA | 0.8–4.1 mA (ANNAHME, DS S.19–20 Idle/CPU) | Wert in `PROGRAMMIEREN_SENSOR.md` Kap. 6 eintragen (Tage bis Zelle leer = 152 mAh / I); L11 nach Neustart ohne Taster muss erscheinen |
 
 Jede Messung bei **3.0 V** (frische Zelle) und **2.4 V** (Abschaltschwelle), E3/E5/E6 zusaetzlich mit 2 statt 4 × 100 µF
 (Entscheid Serie, D-013).

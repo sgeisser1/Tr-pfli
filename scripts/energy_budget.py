@@ -350,7 +350,8 @@ RB_SLEEP = {
         "beide Enden auf VDD: DIO11 high, RSTN high, LED-Kathoden high (FW-8); Taster offen, Pull-up stromlos"),
     "R9-R12 UART-Barriere zu TP1/TP2 (Zellfach)": (
         P("rb.uart_real", 0.0, "A", "Pads offen"),
-        P("rb.uart_pa", 2 * VDD_NOM / 100e6, "A", "ANNAHME Oberflaechenisolation TP1/TP2-TP3 >= 100 MOhm"),
+        P("rb.uart_pa", 2 * VDD_NOM / 100e6, "A",
+          "ANNAHME Oberflaechenisolation TP1/TP2 zu Minuspad/GND >= 100 MOhm (Rev C: TP3 entfaellt, D-023 A-1)"),
         P("rb.uart_ds", 2 * VDD_NOM / 100e6, "A", "wie pess. A (kein DS-Wert)"),
         "Fehlerfall Feuchte im Zellfach: <= 3 V / 200 kOhm = 15 uA je Pad (nicht im Budget, Sicherheit/Dichtung)"),
     "GPIO-Leck U1, Leiterplatte, Flussmittel": (
@@ -432,7 +433,8 @@ CUTOFF_RB = P("rb.cutoff", 0.90, "-", "concept_energy.py CUTOFF_FACTOR: Abschalt
               "[PAN] S.1 Entladekurve abgelesen")
 
 
-def rb_daily(n_auto, case, c_buf=C_BUF_RB):
+def rb_daily(n_auto, case, c_buf=C_BUF_RB, adv_iv=None):
+    adv_iv = ADV_IV if adv_iv is None else adv_iv
     pess = case != "real"
     k = {"real": 0, "pessA": 1, "pessDS": 2}[case]
     s = SOCS["CC2340R5"]
@@ -445,7 +447,7 @@ def rb_daily(n_auto, case, c_buf=C_BUF_RB):
     n_meas = n_auto + N_MAN_RB
     qm, _ = rb_meas_charge(case)
     parts["Messung (TMP, Kette, CPU)"] = n_meas * sum(qm.values())
-    parts["Advertising 27.5 s"] = DAY / ADV_IV * adv_event_charge(s, pess)
+    parts[f"Advertising {adv_iv:.1f} s"] = DAY / adv_iv * adv_event_charge(s, pess)
     parts["Schnelles Advertising nach Taste"] = N_MAN_RB * N_FAST_ADV * adv_event_charge(s, pess)
     parts["Datensitzung je Messung"] = n_meas * conn_charge(s, pess)
     t_led = n_auto * T_LED_AUTO + N_MAN_RB * T_LED_MAN + (T_LED_WATER if pess else 0.0)
@@ -482,7 +484,10 @@ def rb_pulse_drop(i, t, n=1, pause=0.0, r=R_CELL_EOL, c=C_BUF_RB * DCBIAS * 0.8)
 def revb_report():
     L = []
     w = L.append
-    w("# fluidi Sensor Rev B - Energiebudget (erzeugt von scripts/energy_budget.py --revb)\n")
+    w("# fluidi Sensor Rev B/C - Energiebudget (erzeugt von scripts/energy_budget.py --revb)\n")
+    w("Gilt fuer **Rev C** (Bestellstand, ORDER_JLC_REV_C.md): Schaltung, Netzliste und BOM sind gegenueber Rev B "
+      "unveraendert (C1-C4 C15008, Q1/Q2 AO3401A, U1-U6 gleich); Rev C aendert nur Layout/Fach (D-023, TP3 entfaellt). "
+      "Finale Bewertung: `docs/reviews/phase5_energiebudget_final.md`.\n")
     w("| | |\n|---|---|")
     w("| Grundlage | Layout/Netzliste Rev B (`hardware/sensor/out/fluidi_sensor.net`), BOM `fluidi_sensor_bom_jlc.csv`, "
       "PINMAP Rev B (FW-1..10), Firmware `firmware/sensor` (Einstellungen, Burst-Konstanten) |")
@@ -548,6 +553,47 @@ def revb_report():
     for kk in ps[0]:
         w(f"| {kk} | {ps[0][kk]*1e3:.2f} | {ps[1][kk]*1e3:.2f} | {ps[2][kk]*1e3:.2f} |")
     w("")
+    w("### 3d Reaktionszeit 1 / 2 / 5 min (REQ-ENE-04), 6 + 2 Messungen/Tag, 4 x 100 uF [Monate]\n")
+    w("| Reaktionszeit | Advertising-Intervall [s] | real | pess. A | pess. DS | Mittelstrom pess. A [uA] |")
+    w("|---|---|---|---|---|---|")
+    for m in (1, 2, 5):
+        iv = reach_interval(m * 60.0)
+        row = [rb_lifetime_months(rb_daily(6, c, adv_iv=iv)[0], c) for c in ("real", "pessA", "pessDS")]
+        ia = rb_daily(6, "pessA", adv_iv=iv)[0] / DAY * 1e6
+        w(f"| {m} min | {iv:.1f} | {row[0]:.1f} | {row[1]:.1f} | {row[2]:.1f} | {ia:.2f} |")
+    w("")
+    w("Selbstentladung: [RC32] S.1 < 1 %/a bei 23 C (real); pess. 2 %/a (ANNAHME Sonnenprofil). Die bestueckte Zelle "
+      "Panasonic CR2032 ([PAN] S.1) nennt keinen Wert -> Renata-Wert als Ersatz (ANNAHME). Temperatur: Standby U1 mit "
+      f"Sonnenprofil-Faktor {SLEEP_TEMP_FACTOR:.3f} (RB-03, [CC] S.35 Fig. 7-7), Q2 IDSS mit 55-C-Grenze; MLCC-Leck "
+      "nur bei 25 C spezifiziert (Temperaturgang PROTOTYP-PRUEFUNG, Kap. 3e).")
+    w("")
+    w("### 3e Entscheidungsregel W-6 (2 oder 4 x 100 uF, REQ-ENE-02)\n")
+    cell = CELLS["CR2032 (Renata)"]
+    usable = cell["cap"] * cell["util"][1] * CUTOFF_RB * mAh
+    sd_day = cell["cap"] * cell["sd"][1] * mAh / YEAR_D
+    q_lim = usable / (12 * MONTH_D) - sd_day
+    w(f"Grenze 12 Monate pess.: nutzbar {usable:.0f} C, Selbstentladung {sd_day/DAY*1e6:.2f} uA -> Tagesladung "
+      f"<= {q_lim*1e3:.0f} mC inkl. +20 % = Mittelstrom <= {q_lim/DAY*1e6:.2f} uA "
+      f"(vor Zuschlag {q_lim/PESS_TOTAL/DAY*1e6:.2f} uA). Gemessene Werte gehen mit x1.5 ein (REQ-ENE-08 Typ x1.5).\n")
+    w("| Fall (Rest des Budgets) | Puffer | Rest ohne C1-C4 [uA] | zulaessiges Leck gesamt [uA] | je Kondensator [uA] | "
+      "**Schwelle Messwert je Kondensator (/1.5) [uA]** |")
+    w("|---|---|---|---|---|---|")
+    for case in ("pessA", "pessDS"):
+        for nc in (4, 2):
+            tot, p = rb_daily(6, case, nc * 100e-6)
+            mlcc = sum(v for kk, v in p.items() if kk.startswith("Schlaf: C1-C4"))
+            rest = tot / PESS_TOTAL - mlcc
+            allow = (q_lim / PESS_TOTAL - rest) / DAY
+            w(f"| {case} | {nc} x 100 uF | {rest/DAY*1e6:.2f} | {allow*1e6:.2f} | {allow/nc*1e6:.2f} | "
+              f"**{allow/nc/PESS_SLEEP*1e6:.2f}** |")
+    tot, p = rb_daily(6, "pessA")
+    ev = sum(v for kk, v in p.items() if not kk.startswith("Schlaf")) / DAY
+    i_sl = q_lim / PESS_TOTAL / DAY - ev
+    w("")
+    w(f"Gesamt-Ruhestrom (E1, alle Bauteile gemessen, Ereignisse pess. A {ev*1e6:.2f} uA): zulaessig pess. "
+      f"{i_sl*1e6:.2f} uA -> **Messwert <= {i_sl/PESS_SLEEP*1e6:.2f} uA**. REQ-ENE-09 (Schlaf <= 3 uA gemessen) ist "
+      "strenger: wer REQ-ENE-09 erfuellt, erfuellt REQ-ENE-02 mit 4 x 100 uF.")
+    w("")
     w("## 4 Pulslast (REQ-ENE-06: <= 0.2 V bei R_int 100 Ohm)\n")
     c_eff = C_BUF_RB * DCBIAS * 0.8
     w(f"RC-Modell: R_int {R_CELL_EOL:.0f} Ohm, C_eff = 4 x 100 uF x {DCBIAS} (DC-Bias, ANNAHME) x 0.8 (Toleranz) "
@@ -558,7 +604,8 @@ def revb_report():
     rows = [
         ("Messung FW-2: 4 x 0.6 ms, Pause 30 ms (pess.)", i_burst_p, T_BURST, 4, 30e-3),
         ("Messung ohne FW-2: 16 x 0.6 ms am Stueck (pess.)", i_burst_p, 16 * T_BURST, 1, 0.0),
-        ("TX 0 dBm GLDO, 3 Kanaele ~0.38 ms (pess.)", s["tx_ldo"], T_ADV_TX, 3, T_RX_WIN + T_CH),
+        ("TX 0 dBm GLDO, nur 3 TX-Pulse ~0.38 ms (pess.; ganzes Ereignis siehe SPICE: 143 mV)", s["tx_ldo"], T_ADV_TX, 3,
+         T_RX_WIN + T_CH),
         ("LED 3 mA, 5 ms (L8)", I_LED, 5e-3, 1, 0.0),
         ("LED 3 mA, 30 ms am Stueck (ohne FW-4)", I_LED, 30e-3, 1, 0.0),
         ("LED L1 nach FW-4: 6 x 5 ms, Pause 5 ms", I_LED, LED_PULSE, 6, LED_PULSE),
