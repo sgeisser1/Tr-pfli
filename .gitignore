@@ -17,3 +17,4 @@ simulation/field/elmer3d/
 app/docs/concept/
 simulation/fem/*.FCStd
 *.FCBak
+renders/final/mesh/
