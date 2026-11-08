@@ -286,3 +286,11 @@ Format: Nr. · Datum · Entscheid · Alternativen · Begründung · Quelle · St
 - **Alternativen:** ER2221 (gefüllt, Tg unbekannt, Rückfall), MG 832HT (H360), Stycast 2651-40 (≈ 300 CHF), ER2188/832B (Tg zu tief).
 - **Quelle:** `docs/reviews/phase6_vergussmasse_sicherheit.md` (R1, R2), Konzept, MONTAGE_SENSOR Kap. 3a.
 - **Status:** gültig mit Auflagen.
+
+### D-031 · 2026-11-09 · USB-UART Programmierplatz: Waveshare PL2303 (type A) V2 statt CH343 (Orchestrator)
+- **Entscheid:** PL2303-Board (pi-shop.ch 11757, CHF 8.90, gleiche Sendung wie Gateway-Teile) mit Bedingungen B1–B6
+  (`hardware/programmer/README.md` Kap. 9): Weg A nur mit Puffer U4; Weg B 2.0 V, höchstens 2.1 V, 10 mA,
+  USB zuerst ein / zuletzt ab; Eingangsprüfung je Board. PA-6 (470 Ω VIO→GND am Adapter) angenommen.
+- **Alternativen:** Waveshare CH343 (kein CH-Händler, Auslandsversand); Adapter mit festem 3.3-V-Pegel (ungeeignet).
+- **Quelle:** `simulation/spice/programmer/prog_uart_pl2303_report.txt`, `docs/datasheets/Prolific_PL2303GS_Datasheet_Rev1.0.4.pdf` S. 39.
+- **Status:** gültig; Sicherheitsprüfung der Anleitung PROGRAMMIEREN_SENSOR v1.2 folgt in der Phase-6-Prüfrunde.
