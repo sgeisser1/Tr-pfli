@@ -526,8 +526,8 @@ def spice(out, old_ext, band, pr):
     import osc_sim as O
     tmp = tempfile.mkdtemp(prefix="fluidi_leads_")
     O.HERE = tmp                              # osc_last.cir nur im Temp-Ordner, Repo bleibt unveraendert
-    fit_old = dict(O.FIT)
-    c_node_old = O.C_NODE
+    fit_old = dict(O.FIT_REVA)                # Rev-A-Fit (osc_sim nutzt seit Phase 5 selbst den Rev-B/C-Fit)
+    c_node_old = 10.5e-12                     # bisheriger Knoten (U2 4.5 + 5.5 ANNAHME + TP5 0.5)
     # Neuer Knoten: alter Knoten (10.5 pF: U2 Ci 4.5 + Leiterbahn/Durchfuehrung 5.5 ANNAHME + TP5 0.5) ersetzt durch
     # U2 4.5 + TP5 0.5 + Band-Bahnen (2D) + 4 Vias je 0.15 pF (ANNAHME) + Zuleitung ausserhalb des 3D-Modells (2D)
     c_node_new = (4.5 + 0.5 + band["C_traces_pF"] + 0.15 * band["n_via"] + out["node_extra_pF"]["a_kopf_ausserhalb_3d"]

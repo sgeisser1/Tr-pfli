@@ -20,11 +20,11 @@ CPD yint 0 22p
 RY yint y 1m
 COUT y 0 4.5e-12
 R3 y node 10000
-CNODE node 0 1.05e-11
-CP0 node 0 7.049e-12
-CPI node pm 9.9004e-11
-CPS pm 0 1.3751e-10
-RPS pm 0 147.17
+CNODE node 0 9.889e-12
+CP0 node 0 7.2971e-12
+CPI node pm 9.9128e-11
+CPS pm 0 1.3691e-10
+RPS pm 0 147.82
 C22 node p1 22p
 Cp1 p1 0 6e-12
 RLp1 p1 0 100Meg
@@ -33,7 +33,7 @@ RLp1 p1 0 100Meg
 set wr_singlescale
 set wr_vecnames
 option numdgt=7
-tran 0.1n 16u 0 0.1n uic
+tran 1e-10 16u 0 1e-10 uic
 wrdata osc_last.dat v(y) v(node) v(opwr) i(VIS)
 quit
 .endc

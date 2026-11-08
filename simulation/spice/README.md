@@ -5,7 +5,7 @@ Q2 an DIO11, TMP1075N im Kragen, 4 × 100 µF im Prototyp). Alle Läufe per Skri
 
 ```
 .venv/bin/python simulation/spice/supply/supply_burst.py > simulation/spice/supply/supply_report.txt   # (a) ca. 2 min
-.venv/bin/python simulation/spice/osc/osc_sim.py                  # (b) ca. 8 min, schreibt osc/osc_report.txt
+timeout 3600 .venv/bin/python simulation/spice/osc/osc_sim.py     # (b) ca. 10 min, schreibt osc/osc_report.txt
 .venv/bin/python simulation/spice/uart_backfeed/uart_backfeed.py  # (c) < 10 s
 .venv/bin/python simulation/spice/programmer/prog_uart.py          # (d) ca. 15 s, Erstprogrammierung (2026-11-08)
 ```
@@ -60,39 +60,44 @@ Plots: `supply/supply_waveforms.png`, `supply/supply_drop.png`.
 ## (b) Messkette D3: RC-Oszillator SN74LVC1G14 + Teiler ÷8 (3 × SN74LVC1G80), Speisung über Q2
 
 Modell (`osc/osc_sim.py`): Schmitt-Inverter mit Schwellen aus LVC1G14-DS S.7 Tab. 5.5 (5 Ecken), tpd 1.6–5.5 ns (S.8),
-Cpd 22 pF, R_out 40 Ω; OSC_PWR über Q2 (0.1 Ω **ANNAHME**) mit C21 + C25; Knoten 10 pF + TP5 0.5 pF (**ANNAHME**),
+Cpd 22 pF, R_out 40 Ω; OSC_PWR über Q2 (0.1 Ω **ANNAHME**) mit C21 + C25; **Knoten 9.89 pF** (Layout Rev B/C, Feld-REPORT
+Kap. 11.3: U2 4.5 + TP5 0.5 + Bahnen/Vias/Zuleitung; vorher 10.5 pF **ANNAHME**),
 Cref1 22 pF im Aus-Zustand in Serie mit 6 pF Pinkapazität; Ausgang belastet mit U4-CLK 3.5 pF + 1 pF.
-**Sonde nach `docs/interfaces/PROBE_CAPACITANCE.md` Kap. 3** (C0 7.05 pF ‖ Ci 99 pF – (ε'·1.72 pF ‖ Rs)).
+**Sonde nach `docs/interfaces/PROBE_CAPACITANCE.md` Kap. 3**, Werte Layout Rev B/C (C0 7.30 pF ‖ Ci 99.1 pF – (ε'·1.711 pF ‖ Rs),
+`simulation/field/results/leads_revb.json`). Stand Phase 5 (2026-11-08); Zeitlimit 60 s je ngspice-Lauf mit Wiederholung
+(tmax/2, tmax/4), weil ngspice 42 im Mixed-Mode mit dem XSPICE-Teiler in einzelnen Fällen stehen bleibt
+(`docs/reviews/phase5_checkliste_elektronik.md` Kap. 3.1).
 **Teiler in SPICE** als XSPICE `d_dff` (D an /Q, CLK→Q 3 ns **ANNAHME**, DS S.7: 1.3–4.2 ns bei 3.3 V).
 360 Fälle (R3 1 k / 10 k, VDD 3.0 / 2.4 V, 9 Sondenzustände, 5 Ecken, f0/f1), alle schwingen.
 
 | Sonde (typ, VDD 3.0 V) | **R3 1 kΩ** f_osc [MHz] (Ecken 3.0 V) | MEAS_CLK = f/8 max [MHz] | **R3 10 kΩ** f_osc [MHz] (Ecken) |
 |---|---|---|---|
-| Luft | **27.4** (20.3–36.1) | 4.51 | 4.11 (3.21–5.18) |
-| trocken (ε' 4) | **24.2** (18.0–31.7) | 3.96 | 3.46 (2.71–4.36) |
-| Mitte, Leitungswasser | 20.3 (15.1–26.3) | 3.29 | 1.42 (0.92–2.24) |
-| nass, Leitungswasser | **14.9** (10.9–19.5) | 2.44 | 0.94 (0.72–1.24) |
-| nass, gedüngt low / normal | 9.1 / 8.1 | 1.60 / 1.34 | 0.86 / 0.86 |
-| Wasser verlustfrei / Leitungswasser | **10.8 / 9.8** | 1.73 / 1.62 | 1.28 / 0.87 |
+| Luft | **27.7** (20.5–36.4) | 4.55 | 4.17 (3.26–5.26) |
+| trocken (ε' 4) | **24.5** (18.2–32.0) | 4.00 | 3.51 (2.74–4.42) |
+| Mitte, Leitungswasser | 20.4 (15.3–26.6) | 3.32 | 1.43 (0.92–2.27) |
+| nass, Leitungswasser | **15.0** (11.0–19.7) | 2.46 | 0.95 (0.72–1.24) |
+| nass, gedüngt low / normal | 9.2 / 8.2 | 1.61 / 1.35 | 0.87 / 0.86 |
+| Wasser verlustfrei / Leitungswasser | **10.9 / 9.8** | 1.74 / 1.62 | 1.29 / 0.87 |
 
-- **Zählgrenze:** MEAS_CLK ≤ **4.51 MHz** in allen Fällen (1 kΩ), Grenze ≈ 10–12 MHz (**ANNAHME**, CONCEPTS 2.3)
-  → Faktor ≥ 2.2 Reserve. Minimum 0.59 MHz (nass gedüngt, Ecke, 2.4 V). Mit 10 kΩ ≤ 0.65 MHz.
-- **Teiler:** SPICE-Teilerausgang = f_osc/8 auf ≤ 0.34 % (Mittelungsfehler über wenige Perioden) in 180 Fällen;
-  fclock ≤ 36.1 MHz ≪ 160 MHz, kürzester Puls OSZ_OUT 12.4 ns ≥ tw 2.5 ns (LVC1G80 S.6 Tab. 5.6).
+- **Zählgrenze:** MEAS_CLK ≤ **4.55 MHz** in allen Fällen (1 kΩ), Grenze ≈ 10–12 MHz (**ANNAHME**, CONCEPTS 2.3)
+  → Faktor ≥ 2.2 Reserve. Minimum 0.595 MHz (f_osc 4.76 MHz, nass gedüngt, Ecke, 2.4 V). Mit 10 kΩ ≤ 0.66 MHz.
+- **Teiler:** SPICE-Teilerausgang = f_osc/8 auf ≤ 0.35 % (Mittelungsfehler über wenige Perioden) in 180 Fällen;
+  fclock ≤ 36.4 MHz ≪ 160 MHz, kürzester Puls OSZ_OUT 12.3 ns ≥ tw 2.5 ns (LVC1G80 S.6 Tab. 5.6).
+  Gleich wie Feld-REPORT 11.3 (4.76–36.44 MHz).
 - **Abweichung zur Entscheidungsvorlage:** MESSKETTE_SALZ (D3) rechnet 36.1 / 17.4 MHz (Luft / nass). Mit den
-  Rev-B-Parasitics (Cref1-Aus-Kapazität 4.7 pF, Cpd, Ausgangslast) liegt typ **27.4 / 14.9 MHz** (−24 / −14 %).
+  Rev-B-Parasitics (Cref1-Aus-Kapazität 4.7 pF, Cpd, Ausgangslast) liegt typ **27.7 / 15.0 MHz** (−23 / −14 %).
   Die Salzbewertung dort ist damit etwas zu günstig (tiefere Frequenz = mehr Leitfähigkeitseinfluss) → am Muster
   im Becherversuch prüfen (OP-K3, **PROTOTYP-PRÜFUNG**). Option R3 kleiner (0.68 kΩ, MESSKETTE Kap. 5) erst
   nach dem Becherversuch; Zählgrenze und tw dann neu rechnen.
 - **tpd-Einfluss** (typ, f0): df/f je ns = −8.3 % (Luft) … −4.2 % (nass) bei 1 kΩ, −1.3 … −0.3 % bei 10 kΩ.
-  Ohne Ratiometrie verschiebt +1 ns den Index in der Mitte um **+12.6 %-Punkte** (1 kΩ) bzw. +0.3 (10 kΩ).
-- **Ratiometrie** C_x = dC·T0/(T1−T0) − C_basis (dC 17.29 pF, C_basis 15.21 pF): Die Spanne trocken→nass bleibt
-  23.4–24.3 pF über alle Ecken (wahr 23.0 pF), aber ein Offset von ≈ +19 pF (Laufzeit) und **VDD 3.0 → 2.4 V
-  verschiebt C_x um −3.2 pF ≈ 13 % der Spanne** (10 kΩ: −0.27 pF). Exemplarstreuung (Ecken 7 pF) kalibriert die
+  Ohne Ratiometrie verschiebt +1 ns den Index in der Mitte um **+12.7 %-Punkte** (1 kΩ) bzw. +0.3 (10 kΩ).
+- **Ratiometrie** C_x = dC·T0/(T1−T0) − C_basis (dC 17.29 pF, C_basis 14.60 pF): Die Spanne trocken→nass bleibt
+  23.3–24.2 pF über alle Ecken (wahr 23.0 pF), aber ein Offset von ≈ +19 pF (Laufzeit) und **VDD 3.0 → 2.4 V
+  verschiebt C_x um −3.0…−3.2 pF ≈ 13 % der Spanne** (10 kΩ: −0.20…−0.28 pF). Exemplarstreuung (Ecken 7 pF) kalibriert die
   Zwei-Punkt-Kalibrierung weg; der **VDD-Gang muss korrigiert werden** (FW-3, Batteriemonitor), Temperatur ebenso
   (tpd-Drift im Modell nicht über VDD/T variiert → **PROTOTYP-PRÜFUNG**).
-- **Strom:** Oszillator ≤ 3.4 mA (SPICE) + Teiler ≤ 5.2 mA (Cpd 25 pF je FF, LVC1G80 S.8) = **≤ 8.6 mA** bei 3.0 V
-  (1 kΩ); OSC_PWR sinkt ≤ 0.5 mV (Q2). Mit 10 kΩ ≤ 1.2 mA.
+- **Strom:** Oszillator ≤ 3.4 mA (SPICE) + Teiler ≤ 5.3 mA (Cpd 25 pF je FF, LVC1G80 S.8) = **≤ 8.7 mA** bei 3.0 V
+  (1 kΩ); OSC_PWR sinkt ≤ 0.5 mV (Q2). Mit 10 kΩ ≤ 1.3 mA.
 
 Plots: `osc/osc_waveforms.png` (OSZ_OUT, PROBE_SENSE, MEAS_CLK), `osc/osc_freq.png` (Frequenz je Sonde, beide R3).
 

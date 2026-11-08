@@ -303,7 +303,7 @@ NOTES = [
              "Antenne AN043 oben, Keepout nach AN043 (FLOORPLAN_OPTIONS Kap. 1)."),
     (104, 30, "PROGRAMMIERUNG (REQ-SAF-CC-03, Auflagen R2-A1...A4)\n"
               "Barriere 1: Dummy-Zellen-Adapter einteilig, statt der Zelle im Halter,\n"
-              "  Speisung nur ueber die Halterkontakte, VDD 1.8-2.0 V, 1.8-V-UART (R2-A2).\n"
+              "  Speisung nur ueber die Halterkontakte, VDD 2.0 V, UART-Pegel 2.0 V (D-024).\n"
               "Barriere 2: je Pad 2 x 100 k, beide im Elektronikraum, getrennte\n"
               "  Loetstoppoeffnungen, Abstand gegen Loetbruecke/Wasserfilm (R2-A3).\n"
               "Grenze (R2-A1): Fehlerfall <= 10 mA, Ladung <= 1 % C = 2.25 mAh\n"

@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Stand | 2026-11-07, Schaltplan **Rev B** (`hardware/sensor/fluidi_sensor.kicad_sch`), ersetzt Rev A |
+| Stand | 2026-11-07, Schaltplan **Rev B** (`hardware/sensor/fluidi_sensor.kicad_sch`), ersetzt Rev A. **Gilt unverändert für Rev C** (Pins/Netze gleich; Rev C: TP3 entfällt, Programmierpegel 2.0 V nach D-024; nachgeführt 2026-11-08, Phase 5) |
 | Quelle der Netze | `hardware/sensor/gen/parts.py` (Generator), geprüft mit `check_netlist.py` gegen die KiCad-Netzliste |
 | Grundlagen | D-018 (Messkette D3), D-019 / FLOORPLAN_OPTIONS Option (f) (TMP1075N im Sondenkragen, TS-1088), `docs/concepts/MESSKETTE_SALZ.md` Kap. 5, CONCEPTS 2.2/2.3/2.7, Phase-3-Review RGB 1.6, E3 (keine SWD-Pads) |
 | Datenblatt | `docs/datasheets/TI_CC2340R5_Datasheet_SWRS272F.pdf` (DS), TRM `docs/datasheets/TI_CC23xx_TechnicalReferenceManual_SWCU193A.pdf` |
@@ -32,7 +32,7 @@ Firmware-Namen sind Vorschläge für `board.h`/SysConfig (`FLUIDI_PIN_*`). Ände
 | 8 | DIO17 | `I2C_SCL` | I²C SCL | `FLUIDI_PIN_I2C_SCL` | I2C0SCL (Mux 3); sonst wie SDA | Nach Reset SWDCK mit Pull-down (TRM S.22) → abschalten (E3). I²C max. 400 kHz (DS S.31). Leitung ≈ 30 mm über die Innenlagen bis in den Kragen → 100 kHz empfohlen (**ANNAHME**, Kapazität im Layout prüfen) |
 | 19 | DIO6 | `LED_R_UART_TX` | LED rot (Kathode über R6 470 Ω) | `FLUIDI_PIN_LED_R` | Ausgang; **low = an**, high = aus | Im ROM-Bootloader **UART TX** (TRM S.464 Tab. 8-38). Pad TP1 über R9+R10 (2 × 100 kΩ). PWM: T1C2 (Mux 3); UART0TXD (Mux 5) für Log |
 | 6 | DIO13 | `LED_G` | LED grün (R7 200 Ω) | `FLUIDI_PIN_LED_G` | Ausgang, low = an | PWM: T0C0N (Mux 4). Im ROM-Bootloader SPI-PICO-Eingang |
-| 9 | DIO20 | `LED_B_UART_RX` | LED blau (R8 100 Ω) | `FLUIDI_PIN_LED_B` | Ausgang, low = an | Im ROM-Bootloader **UART RX** (TRM S.464). Pad TP2 über R11+R12. Programmieren nur mit **VDD 1.8–2.0 V / 1.8-V-UART** (Phase-3-Review 1.6). PWM: T1C0 (Mux 4) |
+| 9 | DIO20 | `LED_B_UART_RX` | LED blau (R8 100 Ω) | `FLUIDI_PIN_LED_B` | Ausgang, low = an | Im ROM-Bootloader **UART RX** (TRM S.464). Pad TP2 über R11+R12. Programmieren nur **ohne Zelle mit VDD 2.0 V und UART-Pegel 2.0 V** (D-024, `docs/manuals/PROGRAMMIEREN_SENSOR.md`; Behelf Labornetzteil höchstens 2.2 V; ersetzt „1.8 V“ aus Phase-3-Review 1.6). PWM: T1C0 (Mux 4) |
 | 10 | DIO21 | `BTN_BOOT_N` | Taster SW1 (TS-1088) nach GND | `FLUIDI_PIN_BUTTON` | Eingang, **interner Pull-up**, Flanken-Wakeup | Bootloader-Trigger aktiv low (TRM S.465). Pull-up-Strom bei gedrücktem Taster bis **393 µA** (GPIO-Pull-up-Strom (Vpad = 0 V): 39–109 µA bei VDDS 1.8 V (`TI_CC2340R5_Datasheet_SWRS272F.pdf` S.31), **170–393 µA bei VDDS 3.8 V** (S.32, Tab. 7.21.4.1 Fortsetzung); Rechenwert = Wert bei 3.8 V) → nach > 30 s Dauerdruck Pull-up aus, zyklisch prüfen |
 | 14 | DIO3_X32P | `X32P` | 32.768-kHz-Quarz Y2 | – | LFXT (Mux 6) | Last 2 × 15 pF (C14/C15), CL ≈ 9 pF (**ANNAHME** C_par 1.5 pF) |
 | 15 | DIO4_X32N | `X32N` | 32.768-kHz-Quarz Y2 | – | LFXT (Mux 6) | – |
@@ -75,6 +75,6 @@ Freie DIO: **keine** (QFN24).
 | Pad | Netz | Lage | Zweck |
 |---|---|---|---|
 | TP1 / TP2 | `UART_TX_PAD` / `UART_RX_PAD` | Zellfach, ausserhalb der Zellfläche | Programmierung (Barriere 2 × 100 kΩ, R2-A3) |
-| TP3 | `GND` | Zellfach | Bezug |
+| ~~TP3~~ | – | – | **entfällt ab Rev C** (D-023, Auflage A-1); Adapter-/Mess-GND über das Minuspad von BT1 |
 | TP4 | `MEAS_CLK` (f_osc/8) | **B-Seite Elektronikband** | Oszilloskop/Zähler, nur vor dem Einschieben zugänglich |
 | TP5 | `PROBE_SENSE` | **B-Seite Elektronikband**, nahe der Durchführung | VNA-Messung der Sonde 1–150 MHz (MESSKETTE_SALZ Kap. 6), ≈ +0.5 pF Cpar (**ANNAHME**) |

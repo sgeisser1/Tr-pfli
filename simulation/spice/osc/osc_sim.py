@@ -2,7 +2,7 @@
 """fluidi Sensor Rev B - SPICE (b): Messkette D3 = RC-Schmitt-Oszillator SN74LVC1G14 + Teiler /8 (3 x SN74LVC1G80),
 Speisung OSC_PWR ueber P-FET Q2 (AO3401A, Gate DIO11). Sonde nach docs/interfaces/PROBE_CAPACITANCE.md Kap. 3.
 
-Aufruf: .venv/bin/python simulation/spice/osc/osc_sim.py          (ca. 3-4 min)
+Aufruf: timeout 3600 .venv/bin/python simulation/spice/osc/osc_sim.py          (ca. 10-15 min, je Lauf Zeitlimit 60 s)
 Ausgabe: osc_results.csv, osc_report.txt, osc_waveforms.png, osc_freq.png, osc_last.cir (in diesem Ordner)
 
 Schaltung wie Schaltplan Rev B (hardware/sensor/gen/parts.py: Q2, U2, R3, C21, C22, U4-U6, C25, TP4, TP5, E1):
@@ -15,14 +15,15 @@ Schaltung wie Schaltplan Rev B (hardware/sensor/gen/parts.py: Q2, U2, R3, C21, C
   Schwellen S.7 Tab. 5.5 (DCK): VCC 2.3 V: VT+ 1.11-1.56, VT- 0.58-0.87, dVT 0.48-0.77; 3 V: VT+ 1.5-1.87,
             VT- 0.84-1.14, dVT 0.56-0.87; dazwischen linear (ANNAHME). 5 Ecken innerhalb der Grenzen (wie Rev A).
   Ausgang   OSZ_OUT: R3 + U4-CLK Ci 3.5 pF (TI_SN74LVC1G80_Datasheet_SCES221T.pdf S.6) + Leiterbahn 1 pF (ANNAHME).
-  Knoten    PROBE_SENSE: Ci LVC1G14 4.5 pF + Leiterbahn/Durchfuehrung 5.5 pF (ANNAHME, CONCEPTS 2.3) + TP5 0.5 pF (ANNAHME).
+  Knoten    PROBE_SENSE 9.89 pF: Ci LVC1G14 4.5 pF + TP5 0.5 pF (ANNAHME) + Band-Bahnen 0.89 + 4 Vias 0.6 (ANNAHME)
+            + Zuleitung ausserhalb 3D 3.25 + 0.16 pF (REPORT Kap. 11.3; vorher 10.5 pF mit 5.5 pF ANNAHME).
   Cref1     22 pF C0G nach DIO8: "zu" = GPIO low ueber 100 Ohm (VOL <= 0.2 V @ 2 mA, CC2340 DS S.31);
             "auf" = Serie mit Pinkapazitaet 6 pF (DS S.32), Eingangspuffer aus. Cref2 entfaellt (Rev B).
   Teiler    3 x XSPICE d_dff (D an /Q), CLK->Q 1.5-6 ns bei 2.5 V / 1.3-4.2 ns bei 3.3 V (SN74LVC1G80 S.7 Tab. 5.8),
             Modell 3 ns (ANNAHME), Schwelle 0.5 VCC. Pruefung: MEAS_CLK = f_osc/8, Pulsbreite OSZ_OUT >= tw 2.5 ns
             (S.6 Tab. 5.6), fclock <= 160 MHz (S.6).
-  Sonde     PROBE_CAPACITANCE.md Kap. 3: C0 7.05 pF || (Ci 99.0 pF in Serie mit (eps'*Cg || Rs)), Cg 1.719 pF,
-            Rs = eps0/(sigma_b*Cg) (simulation/field/results/probe_lumped_3d_extrap.json). sigma_b nach
+  Sonde     PROBE_CAPACITANCE.md Kap. 3: C0 || (Ci in Serie mit (eps'*Cg || Rs)), Rs = eps0/(sigma_b*Cg); Werte Layout
+            Rev B/C C0 7.30 / Ci 99.1 / Cg 1.711 pF (simulation/field/results/leads_revb.json, REPORT Kap. 11.3). sigma_b nach
             simulation/field/params.py (Hilhorst, eps_off 4). Wasser: sigma_b = sigma_Wasser (ANNAHME freies Wasser).
 Kriterien: MEAS_CLK <= Zaehlgrenze 10 MHz (CONCEPTS 2.3: LGPT sicher ca. 10-12 MHz, ANNAHME), tw, Ratiometrie,
            tpd-Einfluss (Kalibrierung absorbiert den Konstantanteil, Drift ueber VDD/T bleibt).
@@ -44,8 +45,17 @@ import spicetools  # noqa: E402
 import params as P  # noqa: E402
 
 EPS0 = 8.8541878128e-12
-FIT = json.load(open(os.path.join(ROOT, "simulation", "field", "results", "probe_lumped_3d_extrap.json")))
-C_NODE = 9.9e-12           # Layout Rev B/C: U2 4.5 + TP5 0.5 + Bahnen/Vias/Zuleitung (field REPORT Kap. 11.3); vorher 10.5
+# Sonde: Ersatzschaltbild Layout Rev B/C (simulation/field/leads_revb.py -> results/leads_revb.json "lumped_new",
+# REPORT Kap. 11.3: C0 7.30 / Ci 99.1 / Cg 1.711 pF) statt Rev-A-Fit probe_lumped_3d_extrap.json (7.05 / 99.0 / 1.719).
+_RES = os.path.join(ROOT, "simulation", "field", "results")
+FIT_REVA = json.load(open(os.path.join(_RES, "probe_lumped_3d_extrap.json")))
+LEADS = json.load(open(os.path.join(_RES, "leads_revb.json")))
+FIT = dict(FIT_REVA, **LEADS["lumped_new"])
+FIT.update({f"C_{k}": v for k, v in LEADS["probe_new_extrap_pF"].items()})   # C_air/C_dry/C_wet/C_water Rev B/C
+# Knoten PROBE_SENSE: U2 4.5 + TP5 0.5 + Band-Bahnen + 4 Vias (ANNAHME 0.15 je Via) + Zuleitung ausserhalb 3D
+# (REPORT Kap. 11.3: 9.9 pF; exakt 9.889 pF aus leads_revb.json); vorher 10.5 pF (5.5 pF ANNAHME)
+C_NODE = LEADS["spice"]["c_node_new_pF"] * 1e-12
+SIM_TIMEOUT = 60           # s je ngspice-Lauf (normal 0.5-4 s); siehe sim() und Bericht Kap. 0
 C_PIN = 6e-12
 C_REF1 = 22e-12
 C_OUT = 4.5e-12            # U4 CLK 3.5 pF + 1 pF
@@ -154,15 +164,32 @@ def measure(d, vdd):
     return r
 
 
+RETRIES = []                # (Fall, Versuch, Ergebnis) fuer den Bericht
+
+
 def sim(vdd, probe, cref, corner, rfb, tpd=None):
+    """Ein Fall. ngspice 42 bleibt in einzelnen Faellen mit Teiler (XSPICE d_dff) in der Zeitschrittsteuerung stehen
+    (Zeit steht, Ausgabe 'Reference value' wiederholt, kein 'timestep too small'). Deshalb Zeitlimit SIM_TIMEOUT und
+    Wiederholung mit halbem Maximalschritt tmax (gleiche Netzliste, nur feinere Zeitschritte)."""
     fast = rfb < 5e3
     divider = fast
     tstop = "4u" if fast else "16u"
-    step = "0.02n" if fast else "0.1n"
+    step = 0.02e-9 if fast else 0.1e-9
     net = netlist(vdd, probe, cref, corner, rfb, tpd, divider)
     sig = ["v(y)", "v(node)", "v(opwr)", "i(VIS)"] + (["v(meas)"] if divider else [])
-    d = spicetools.run(net, os.path.join(HERE, "osc_last.cir"), sig, f"tran {step} {tstop} 0 {step} uic")
-    return measure(d, vdd), d
+    case = f"R3 {rfb:g}, VDD {vdd}, {probe}, {corner}, {cref}, tpd {tpd}"
+    for k, tmax in enumerate((step, step / 2, step / 4)):
+        try:
+            d = spicetools.run(net, os.path.join(HERE, "osc_last.cir"), sig,
+                               f"tran {step:.4g} {tstop} 0 {tmax:.4g} uic", timeout=SIM_TIMEOUT)
+        except spicetools.SpiceTimeout:
+            RETRIES.append((case, f"tmax {tmax * 1e9:.4g} ns", f"Zeitlimit {SIM_TIMEOUT} s"))
+            print(f"  Zeitlimit: {case}, tmax {tmax * 1e9:.4g} ns -> Wiederholung", file=sys.stderr, flush=True)
+            continue
+        if k:
+            RETRIES.append((case, f"tmax {tmax * 1e9:.4g} ns", "ok"))
+        return measure(d, vdd), d
+    raise RuntimeError(f"ngspice haengt auch mit tmax {step / 4 * 1e9:.4g} ns: {case}")
 
 
 def i_divider(f, vdd):
@@ -217,6 +244,18 @@ def main():
 def report(rows, tpdrows):
     ok = [r for r in rows if not isinstance(r["f_MHz"], str)]
     bad = [r for r in rows if isinstance(r["f_MHz"], str)]
+    print("## 0 Parameter und Laufprotokoll\n")
+    print(f"Sonde Rev B/C (leads_revb.json lumped_new): C0 {FIT['C0_pF']:.3f} pF, Ci {FIT['Ci_pF']:.2f} pF, "
+          f"Cg {FIT['Cg_pF']:.4f} pF; Knoten PROBE_SENSE {C_NODE * 1e12:.3f} pF (REPORT Kap. 11.3: 9.9 pF)")
+    print(f"Faelle {len(rows)} + tpd-Sweep {len(tpdrows) * len(TPD_SWEEP)}; Zeitlimit je ngspice-Lauf {SIM_TIMEOUT} s, "
+          f"bei Zeitlimit Wiederholung mit tmax/2, tmax/4")
+    if RETRIES:
+        print("\n| Fall | Versuch | Ergebnis |\n|---|---|---|")
+        for c, t, e in RETRIES:
+            print(f"| {c} | {t} | {e} |")
+    else:
+        print("Keine Wiederholung noetig.")
+    print()
     for rfb in R3S:
         print(f"## R3 = {rfb/1e3:g} kOhm: f_osc (Cref aus) [MHz], min-max ueber 5 Schwellen-/tpd-Ecken (typ); "
               f"MEAS_CLK = f/8\n")

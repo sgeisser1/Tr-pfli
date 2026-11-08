@@ -157,6 +157,7 @@ Nachgeprüft in der gespeicherten Platine (pcbnew): BT1 (3.000, 34.800) 90°, Pl
 | `pdf/fluidi_sensor-PTH-drl_map.pdf`, `…NPTH…` | Bohrplan |
 | `pdf/fluidi_sensor_layout_lagen.pdf` | alle Lagen (Cu, Silk, Mask, Fab, Elektrodenumriss User.2), je Seite |
 | `pdf/fluidi_sensor_bestueckung_F.pdf` / `_B.pdf` | Bestückungsplan F, Testpads B |
+| `pdf/fluidi_sensor_masszeichnung.pdf` | Masszeichnung (Phase 5): Blatt 1 Kontur/Masse/Bohrungen 1:1, Blatt 2 Höhenzonen Kopf 3:1, Blatt 3 Bestückung Kopf 5:1 (`gen/gen_dimension_drawing.py`, liest die Platine nur) |
 | `fluidi_sensor_cpl_jlc.csv` (+ `_rotationen.csv`), `fluidi_sensor_pos_kicad.csv` | CPL JLC-Format (ohne DNP, ohne Antenne/Testpads) |
 | `fluidi_sensor_bom_jlc.csv` | BOM (aus dem Schaltplan, `run_all.sh`) |
 | `fluidi_sensor.step` | 3D für die Kollisionsprüfung; Ersatzmodelle U1 (TI RGE0024H), BT1 (KiCad 3034), L1 (Murata DFE201610P); **D1 ohne Modell** (0.6 mm) |
@@ -240,7 +241,7 @@ flächen nach Rev C, DRC-Regeln, Silkscreen, Fertigungsattribute, CPL-Regel, Reg
 | K-5 | *umgesetzt*: Titelblock Revision C → Gerber-Job „Revision: C“ |
 | K-6 | *umgesetzt* über K-1 (0.20 mm) |
 | K-7 | *abgelehnt (keine Änderung)*: Ursprung oben Mitte bleibt (Schnittstelle PCB_OUTLINE Kap. 1); bei Versatz in der Vorschau Hilfsursprung verschieben |
-| Feld (REPORT Kap. 11.5) | *umgesetzt*: PROBE_CAPACITANCE C0 7.0 → 7.3 pF, Cg 1.71, Knoten ≈ 9.9 pF; `simulation/spice/osc/osc_sim.py` C_NODE 10.5 → 9.9 pF. Neulauf abgebrochen: ein ngspice-Fall (Mitte, Leitungswasser, mit Cref1) stand nach 22 min noch (Konvergenz), `osc_report.txt` daher noch Stand 2026-11-07; Frequenzen mit Knoten 9.9 pF hat die Feldsimulation gerechnet (REPORT Kap. 11.3: Luft 27.72 … Wasser 9.80 MHz, MEAS_CLK 0.595 … 4.56 MHz); Tabelle Kap. 8 (S-Zuleitung) nachgeführt. Option dünnere Zuleitungen (11.4) nicht umgesetzt (nicht nötig laut 11.5) |
+| Feld (REPORT Kap. 11.5) | *umgesetzt*: PROBE_CAPACITANCE C0 7.0 → 7.3 pF, Cg 1.71, Knoten ≈ 9.9 pF; `simulation/spice/osc/osc_sim.py` C_NODE 10.5 → 9.9 pF. Neulauf abgebrochen: ein ngspice-Fall (Mitte, Leitungswasser, mit Cref1) stand nach 22 min noch (Konvergenz), `osc_report.txt` daher noch Stand 2026-11-07; Frequenzen mit Knoten 9.9 pF hat die Feldsimulation gerechnet (REPORT Kap. 11.3: Luft 27.72 … Wasser 9.80 MHz, MEAS_CLK 0.595 … 4.56 MHz); Tabelle Kap. 8 (S-Zuleitung) nachgeführt. Option dünnere Zuleitungen (11.4) nicht umgesetzt (nicht nötig laut 11.5). **Nachtrag Phase 5 (2026-11-08):** Hänger = Stillstand der ngspice-Zeitschrittsteuerung mit XSPICE-Teiler (kein Skriptfehler); Zeitlimit + Wiederholung eingebaut, Fit Rev B/C übernommen, Neulauf `osc_report.txt` = REPORT 11.3 (4.76–36.44 MHz), siehe `docs/reviews/phase5_checkliste_elektronik.md` Kap. 3.1 |
 
 Weitere Rev-C-Punkte: Platinenanschlag X −8.0…−3.0 / Y 0…1.5 als Regelfläche ohne Bauteile; DRC jetzt auch ohne
 `--refill-zones` in `run_pcb.sh`; Fach-Zonenpolygon 1.05 mm (Korrektur Projektleitung) beibehalten; STEP neu erzeugt.

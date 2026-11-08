@@ -68,4 +68,5 @@ for side in top bottom; do
 done
 kicad-cli pcb render --side top --quality high -w 1600 -h 1100 --zoom 4 --pan "0,-6.15,0" --background opaque \
   -o "$OUT/render/fluidi_sensor_kopf_top.png" "$PCB" 2>&1 | tail -1 || true
+$PY hardware/sensor/gen/gen_dimension_drawing.py   # Masszeichnung + Bestueckung Kopf 5:1 (nur lesen)
 echo "fertig"
