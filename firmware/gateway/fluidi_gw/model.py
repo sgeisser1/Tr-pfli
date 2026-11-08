@@ -22,6 +22,7 @@ from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
 from . import protocol as P
+from . import sensordiag as SD
 from . import timesync, timesvc
 from .shared import AN, C
 
@@ -482,7 +483,42 @@ class Model:
             "pending_config": bool(s.get("pending_config")), "buffered_records": s.get("buffered_records"),
             "error": s.get("error"), "unpairing": bool(s.get("unpairing")), "address": s["addr"],
             "lost_records": s.get("lost_records", 0), "reset_reason": s.get("reset_reason"),
+            "fw_build": s.get("fw_build"), "testfw": self.testfw_of(s), "adv_name": s.get("adv_name"),
+            "diag_last": s.get("diag_last"),
         }
+
+    @staticmethod
+    def testfw_of(s) -> int:
+        """Testfirmware TF-n (0 = Serie): Gerätename fl-tf<n>-, fw_build 9<n>xx oder Anhang der letzten Diagnose
+        (TESTFIRMWARE.md Kap. 3). Die Merkmale stammen aus verschiedenen Quellen; eines genügt (nie verwechseln)."""
+        return (SD.testfw_from_name(s.get("adv_name")) or SD.testfw_from_build(s.get("fw_build"))
+                or int(s.get("diag_testfw") or 0))
+
+    # ================================================================== Diagnose (GET_INFO + GET_DIAG)
+    def diag_received(self, addr, info_hex, diag_hex, job_id=None) -> dict:
+        """Rohdaten speichern (immer), dekodieren (sensordiag.py, wie scripts/testfw_eval.py) -> SensorDiag."""
+        with self.lock:
+            s = self.sensor_by_addr(addr)
+            t = now()
+            dec = SD.decode(info_hex, diag_hex, s.get("adv_name") if s else None)
+            doc = {"sensor_id": s["id"] if s else P.sensor_name(addr), "address": addr, "t": iso(t), "job_id": job_id,
+                   "info_hex": info_hex, "diag_hex": diag_hex, "info": dec["info"], "diag": dec["diag"],
+                   "testfw": dec["testfw"], "testfw_sources": dec["testfw_sources"], "fw_build": dec["fw_build"],
+                   "fw_version": dec["info"]["fw"] if dec["info"] else (s or {}).get("fw_version"),
+                   "adv_name": (s or {}).get("adv_name"), "decode_errors": dec["errors"], "decoder": dec["decoder"]}
+            rid = self.store.add_diag(addr, t, info_hex, diag_hex, doc)
+            doc["id"] = rid
+            if s:
+                s["diag_last"] = iso(t)
+                s["diag_testfw"] = dec["testfw"]
+                if dec["fw_build"] is not None:
+                    s["fw_build"] = dec["fw_build"]
+                self.save_sensor(s)
+            tf = f" – Testfirmware TF-{dec['testfw']}" if dec["testfw"] else ""
+            self.log("warn" if dec["errors"] else "info", "sensor_diag",
+                     f"{doc['sensor_id']}: Diagnose gelesen{tf}" + (f" ({'; '.join(dec['errors'])})" if dec["errors"] else ""),
+                     s["id"] if s else None)
+            return doc
 
     # ================================================================== Jobs
     def new_job(self, kind, sensor_id=None, plant_id=None, timeout_s=None):
@@ -550,6 +586,8 @@ class Model:
                 self.pairing["candidates"][adv.addr] = {
                     "device": P.sensor_name(adv.addr), "address": adv.addr, "rssi_dbm": int(adv.rssi or -99),
                     "fw_version": c.get("fw_version") if c else None, "hw_rev": "A-32 rev A",
+                    "adv_name": adv.name or (c.get("adv_name") if c else None),
+                    "testfw": SD.testfw_from_name(adv.name or (c.get("adv_name") if c else None)),
                     "first_seen": c["first_seen"] if c else iso(t), "known": known, "_seen": t}
                 if new:
                     self.emit("pairing", self.pairing_out())
@@ -557,6 +595,8 @@ class Model:
             if not s:
                 return False
             s["last_seen"] = t
+            if adv.name and adv.name != s.get("adv_name"):
+                s["adv_name"] = adv.name          # Serie fluidi-XXXX, Testfirmware fl-tf<n>-XXXX (TESTFIRMWARE Kap. 3)
             if adv.rssi is not None:
                 s["rssi"] = int(adv.rssi) if s.get("rssi") is None else int(round(0.7 * s["rssi"] + 0.3 * adv.rssi))
             self._count_adv(s, t)
@@ -631,7 +671,12 @@ class Model:
             t = now()
             self.store.add_syncpoint(addr, si.boot_id, si.uptime, self.time.now(), self.time.valid)
             prev_boot = s.get("boot_id")
-            s.update(last_seen=t, fw_version=si.fw_version, hw_rev=f"rev 0x{si.hw_rev:02X}", boot_id=si.boot_id,
+            if si.fw_build != s.get("fw_build") and SD.testfw_from_build(si.fw_build):
+                self.log("warn", "testfw", f"{s['id']}: läuft mit TESTFIRMWARE TF-{SD.testfw_from_build(si.fw_build)} "
+                                           f"({si.fw_version}+{si.fw_build}) – nicht für den Betrieb", s["id"])
+            if si.fw_build != s.get("fw_build") or si.fw_version != s.get("fw_version"):
+                s["diag_testfw"] = 0          # andere Firmware: TF-Kennung der alten Diagnose gilt nicht mehr
+            s.update(last_seen=t, fw_version=si.fw_version, fw_build=si.fw_build, hw_rev=f"rev 0x{si.hw_rev:02X}", boot_id=si.boot_id,
                      lost_records=si.lost_records, reset_reason=P.RESET_REASONS[si.reset_reason] if si.reset_reason < 7 else str(si.reset_reason),
                      slot_confirmed=bool(si.slot & 1), ota_result=si.ota_result, sec_cnt=si.sec_cnt)
             pend = 0 if si.seq_last == 0xFFFFFFFF else max(0, si.seq_last - si.seq_oldest_unacked + 1)
@@ -794,7 +839,8 @@ class Model:
                                            "led_enabled": True}
             s.update(paired=iso(t), last_seen=t, fw_version="%d.%d.%d" % (rsp.fw_ver[0], rsp.fw_ver[1], struct.unpack("<H", rsp.fw_ver[2:4])[0]),
                      hw_rev=f"rev 0x{rsp.hw_rev:02X}", battery=s.get("battery"), rssi=s.get("rssi"), error=None,
-                     unpairing=False, pending_config=True, settings_ver=0, settings_applied=None, buffered_records=None)
+                     unpairing=False, pending_config=True, settings_ver=0, settings_applied=None, buffered_records=None,
+                     fw_build=None, diag_testfw=0)
             self.sensors[sid] = s
             self.by_addr[addr] = sid
             self.store.save_sensor(addr, sid, {k: v for k, v in s.items() if k not in ("id", "addr")}, k_link=k_link, keep_key=False)

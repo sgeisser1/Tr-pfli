@@ -1,9 +1,52 @@
 // Sensoren & Firmware (REQ-FW-02/04/08, REQ-ENE-05, UC-08): Liste mit Batterie/Funk/Fehlern, signierte Abbilder
-// hochladen (Signatur prüft das Gateway), Verteilung mit Fortschritt, Entkoppeln.
-import { h, toast, fmt, fill } from './dom.js';
+// hochladen (Signatur prüft das Gateway), Verteilung mit Fortschritt, Entkoppeln. Diagnose (GET_INFO/GET_DIAG),
+// Build-Nummer und Testfirmware-Kennung (TESTFIRMWARE.md Kap. 3, GATEWAY_API 5.10).
+import { h, toast, fmt, fill, sheet } from './dom.js';
 import { icon, batteryIcon, signalIcon } from './art.js';
 import { card, toggle } from './comp.js';
 import { watchJob } from './api.js';
+import { testfwOf, fwLabel, diagRows, diagFileName, evalCommand } from './diag.js';
+
+/** Kennzeichnung Testfirmware (nie mit Serie verwechseln): Pill + Gerätename. null bei Serie. */
+export function testfwBadge(s) {
+  const n = testfwOf(s);
+  return n ? h('span.pill.p-ext', { title: `Gerätename ${s.adv_name || '?'} – nur für Prüfungen, nicht für den Betrieb` }, `TESTFIRMWARE TF-${n}`) : null;
+}
+
+function diagView(d) {
+  if (!d) return h('p.muted', null, 'Noch keine Diagnose gespeichert.');
+  const url = URL.createObjectURL(new Blob([JSON.stringify(d, null, 1)], { type: 'application/json' }));
+  return h('div.diag', null,
+    h('p.small.muted', null, `Stand ${fmt.dateTime(d.t)}${d.adv_name ? ` · ${d.adv_name}` : ''}`),
+    d.testfw ? h('p.err', null, `TESTFIRMWARE TF-${d.testfw} – nur für Prüfungen. Nach dem Test Serienfirmware einspielen (TESTFIRMWARE.md Kap. 4).`) : null,
+    h('dl.kv', null, diagRows(d).map(([k, v]) => h('div', null, h('dt', null, k), h('dd', null, v)))),
+    h('div.actions', null, h('a.btn.ghost.sm', { href: url, download: diagFileName(d) }, icon('download'), 'JSON herunterladen')),
+    h('p.small.muted', null, 'Auswertung am PC: ', h('code.cmd', null, evalCommand(d))));
+}
+
+/** Bottom-Sheet: letzte gespeicherte Diagnose zeigen, neue abrufen (Job wie „Jetzt messen“). */
+export async function openDiag(ctx, s) {
+  let last = null;
+  try { last = (await ctx.api.get(`/sensors/${s.id}/diag`, { limit: 1 }))[0] || null; } catch (e) { toast(e.message, 'err'); return; }
+  await sheet((close) => {
+    const body = h('div', null, diagView(last));
+    const msg = h('p.status');
+    const btn = h('button.btn.primary', { type: 'button' }, icon('pulse'), 'Diagnose abrufen');
+    btn.addEventListener('click', async () => {
+      btn.disabled = true;
+      try {
+        const j = await ctx.api.post(`/sensors/${s.id}/diag`);
+        msg.textContent = j.message || 'Warte auf Sensor';
+        const fin = await watchJob(j, (x) => { msg.textContent = x.message || ''; }, ctx.live);
+        if (fin.state === 'done' && fin.result) fill(body, diagView(fin.result));
+        msg.textContent = fin.state === 'done' ? fin.message : (fin.message || 'Sensor hat nicht geantwortet');
+      } catch (e) { msg.textContent = e.message; } finally { btn.disabled = false; }
+    });
+    return h('div.stack', null, h('h2', null, `Diagnose ${s.id}`), testfwBadge(s),
+      h('p.small.muted', null, 'Liest Firmwarestand, Zähler und Fehlerprotokoll beim nächsten Funkkontakt. Nur lesen – der Sensor ändert nichts.'),
+      body, msg, h('div.actions', null, btn, h('button.btn.ghost', { type: 'button', onclick: () => close() }, 'Schliessen')));
+  }, 'diag-sheet');
+}
 
 const RO = { pending: 'wartet', waiting_for_sensor: 'wartet auf Sensor', transferring: 'überträgt', verifying: 'prüft', rebooting: 'Neustart', done: 'fertig', failed: 'fehlgeschlagen', skipped: 'übersprungen' };
 
@@ -28,10 +71,11 @@ export default async function sensors(el, ctx) {
       } catch (e) { toast(e.message, 'err'); unpair.disabled = false; }
     });
     return h(`div.srow${b.state !== 'ok' || s.error ? '.warn' : ''}`, null,
-      h('div.sr-name', null, h('strong', null, pname(s.plant_id)), h('span.small.muted', null, `${s.id} · ${s.address || ''}`)),
+      h('div.sr-name', null, h('strong', null, pname(s.plant_id)), h('span.small.muted', null, `${s.id}${s.adv_name && s.adv_name !== s.id ? ` „${s.adv_name}“` : ''} · ${s.address || ''}`)),
       h('div.sr-batt', null, batteryIcon(b.pct, b.state !== 'ok'), h('span', null, `${b.pct} %`), h('span.small.muted', null, `${fmt.n1(b.mv / 1000)} V · ~${b.days_left ?? '–'} T.`)),
       h('div.sr-radio', null, signalIcon(sig.quality), h('span.small', null, sig.rssi_dbm != null ? `${sig.rssi_dbm} dBm` : '–'), h('span.small.muted', null, s.last_seen ? fmt.ago(s.last_seen) : 'nie')),
-      h('div.sr-fw', null, h('span.small', null, `Firmware ${s.fw_version}`), s.pending_config ? h('span.pill', null, 'Änderung wartet') : null,
+      h('div.sr-fw', null, h('span.small', null, `Firmware ${fwLabel(s)}`), testfwBadge(s),
+        h('button.linkbtn.small', { type: 'button', onclick: () => openDiag(ctx, s), title: 'Firmwarestand, Zähler und Fehlerprotokoll vom Sensor lesen' }, 'Diagnose'), s.pending_config ? h('span.pill', null, 'Änderung wartet') : null,
         s.buffered_records ? h('span.pill', null, `${s.buffered_records} Werte im Puffer`) : null, s.lost_records ? h('span.pill.p-ext', null, `${s.lost_records} verloren`) : null),
       s.error ? h('div.sr-err.small', null, icon('alert'), ` ${s.error.text}`) : null,
       h('div.sr-act', null,

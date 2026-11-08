@@ -359,6 +359,32 @@ def sensor_identify(h, sensor_id, **_):
     h.send_json(202, M.job_public(j))
 
 
+@route("POST", "/sensors/{sensor_id}/diag")
+def sensor_diag_start(h, sensor_id, **_):
+    """GET_INFO + GET_DIAG beim nächsten Kontakt (Job wie „Jetzt messen“). W: Sitzung + CSRF + Origin; kein elevate,
+    weil nur gelesen wird (Sensor ändert nichts, Kosten = eine Verbindung). Läuft schon ein Abruf, kommt derselbe Job."""
+    M = h.M
+    s = _sensor(M, sensor_id)
+    busy = [j for j in M.jobs.values() if j["sensor_id"] == sensor_id and j["kind"] == "diag" and M.job_active(j)]
+    if busy:
+        h.send_json(202, M.job_public(busy[0]))
+        return
+    _need_radio(M)
+    j = M.new_job("diag", sensor_id, s.get("plant_id"))
+    M.job_update(j, state="waiting_for_sensor", message="Warte auf Sensor (nächstes Funksignal)")
+    M.central.submit(s["addr"], {"kind": "diag", "job": j,
+                                 "on_done": lambda res: M.diag_received(s["addr"], res.get("info_hex"), res.get("diag_hex"), j["id"])})
+    h.send_json(202, M.job_public(j))
+
+
+@route("GET", "/sensors/{sensor_id}/diag", auth="session")
+def sensor_diag_list(h, sensor_id, q, **_):
+    """Gespeicherte Diagnosen, neueste zuerst (nie öffentlich: Zähler wie auth_fail, GATEWAY_API 3.4)."""
+    M = h.M
+    s = _sensor(M, sensor_id)
+    h.send_json(200, M.store.diags(s["addr"], _int(q, "limit", 10, 1, 50)))
+
+
 @route("GET", "/sensors/{sensor_id}/calibration", auth="read")
 def cal_get(h, sensor_id, **_):
     s = _sensor(h.M, sensor_id)

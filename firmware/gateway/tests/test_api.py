@@ -139,6 +139,41 @@ class GatewayApi(unittest.TestCase):
         self.assertEqual(fin["state"], "done", fin["message"])
         self.assertEqual(fin["result"]["reading"]["source"], "manual")
 
+    def test_sensor_diag(self):
+        """O-1: GET_INFO + GET_DIAG als Job, Rohdaten + dekodiert gespeichert, nur mit Sitzung/CSRF lesbar/auslösbar."""
+        st, sensors = self.c.json("GET", "/api/v1/sensors")
+        sid = sensors[0]["id"]
+        self.assertIn("fw_build", sensors[0])
+        self.assertEqual(sensors[0]["testfw"], 0)
+        anon = Client(self.base)
+        self.assertEqual(anon.json("POST", f"/api/v1/sensors/{sid}/diag")[0], 401)
+        self.assertEqual(anon.json("GET", f"/api/v1/sensors/{sid}/diag")[0], 401)
+        st, e = self.c.json("POST", f"/api/v1/sensors/{sid}/diag", headers={"X-CSRF-Token": "falsch"})
+        self.assertEqual((st, e["error"]["code"]), (403, "csrf"))
+        st, e = self.c.json("POST", f"/api/v1/sensors/{sid}/diag", headers={"Origin": "https://evil.example"})
+        self.assertEqual(st, 403)
+        st, j = self.c.json("POST", f"/api/v1/sensors/{sid}/diag")
+        self.assertEqual(st, 202)
+        self.check("/sensors/{sensor_id}/diag", "post", 202, j)
+        st, j2 = self.c.json("POST", f"/api/v1/sensors/{sid}/diag")
+        self.assertEqual(j2["id"], j["id"])                       # kein Doppelauftrag
+        fin = self.c.job(j)
+        self.assertEqual(fin["state"], "done", fin["message"])
+        r = fin["result"]
+        self.assertEqual(len(bytes.fromhex(r["info_hex"])), 68)   # Serie: 68 Byte (PROTOCOL 5.5)
+        self.assertEqual(r["info"]["fw_build"], 100)
+        self.assertEqual((r["testfw"], r["decode_errors"]), (0, []))
+        self.assertIsNone(r["diag"]["tf"])
+        st, lst = self.c.json("GET", f"/api/v1/sensors/{sid}/diag?limit=5")
+        self.assertEqual(st, 200)
+        self.check("/sensors/{sensor_id}/diag", "get", 200, lst)
+        self.assertEqual(lst[0]["info_hex"], r["info_hex"])
+        st, s = self.c.json("GET", f"/api/v1/sensors/{sid}")
+        self.check("/sensors/{sensor_id}", "get", 200, s)
+        self.assertEqual(s["fw_build"], 100)
+        self.assertIsNotNone(s["diag_last"])
+        self.assertEqual(self.c.json("GET", "/api/v1/sensors/fluidi-0000/diag")[0], 404)
+
     def test_pairing_with_sas(self):
         st, p = self.c.json("POST", "/api/v1/pairing/start", {"duration_s": 60})
         self.assertEqual(st, 200)

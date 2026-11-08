@@ -1,6 +1,6 @@
 // fluidi Service Worker: Offline-App-Shell (strikt lokal, keine fremden Ressourcen).
 // Version erhöhen, wenn sich die Shell ändert (ein Gateway-Update liefert eine neue sw.js aus).
-const VERSION = 'fluidi-frost-v3';
+const VERSION = 'fluidi-frost-v4';
 const DATA = 'fluidi-data-v1';
 const SHELL = [
   './',
@@ -28,6 +28,7 @@ const SHELL = [
   'js/data.js',
   'js/system.js',
   'js/calc.js',
+  'js/diag.js',
   'js/dashboard.js',
   'dashboard.html',
   'img/logo.svg',

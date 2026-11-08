@@ -52,7 +52,13 @@ CREATE TABLE IF NOT EXISTS event_log (id INTEGER PRIMARY KEY AUTOINCREMENT, t RE
 CREATE TABLE IF NOT EXISTS session (token_hash TEXT PRIMARY KEY, doc TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS climate (t INTEGER PRIMARY KEY, temp REAL, rh REAL) WITHOUT ROWID;
 CREATE TABLE IF NOT EXISTS sensor_image (version TEXT PRIMARY KEY, doc TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS sensor_diag (           -- GET_INFO/GET_DIAG-Abrufe (POST /sensors/{id}/diag), bleibt nach Entkoppeln
+  id INTEGER PRIMARY KEY AUTOINCREMENT, sensor TEXT NOT NULL, t REAL NOT NULL,
+  info_hex TEXT, diag_hex TEXT,                     -- Rohdaten (Nutzlast der Antworten 0x90/0x98) als Hex
+  doc TEXT NOT NULL);                               -- JSON: dekodiert (fluidi_gw/sensordiag.py), Kennung, Firmware
+CREATE INDEX IF NOT EXISTS sensor_diag_s ON sensor_diag(sensor, id);
 """
+DIAG_KEEP = 50   # gespeicherte Diagnosen je Sensor (älteste fallen weg)
 EVENT_LOG_MAX = 2000
 
 
@@ -288,6 +294,20 @@ class Store:
         return self.q("SELECT t, temp, rh FROM climate WHERE t>=? AND t<=? ORDER BY t", (int(t0), int(t1)))
 
     # -------------------------------------------------------------------- Firmware-Abbilder
+    def add_diag(self, addr, t, info_hex, diag_hex, doc) -> int:
+        def f(c):
+            c.execute("INSERT INTO sensor_diag(sensor, t, info_hex, diag_hex, doc) VALUES (?, ?, ?, ?, ?)",
+                      (addr, t, info_hex, diag_hex, json.dumps(doc)))
+            rid = c.lastrowid
+            c.execute("DELETE FROM sensor_diag WHERE sensor=? AND id NOT IN "
+                      "(SELECT id FROM sensor_diag WHERE sensor=? ORDER BY id DESC LIMIT ?)", (addr, addr, DIAG_KEEP))
+            return rid
+        return self.tx(f)
+
+    def diags(self, addr, limit=10):
+        return [dict(json.loads(r["doc"]), id=r["id"]) for r in
+                self.q("SELECT id, doc FROM sensor_diag WHERE sensor=? ORDER BY id DESC LIMIT ?", (addr, limit))]
+
     def images(self):
         return [json.loads(r["doc"]) for r in self.q("SELECT doc FROM sensor_image ORDER BY version")]
 

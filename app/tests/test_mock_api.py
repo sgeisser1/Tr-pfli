@@ -221,6 +221,43 @@ class MockApiTest(unittest.TestCase):
         st, j = c.json("POST", "/api/v1/plants/7/measure")
         self.assertEqual(self.wait_job(c, j)["state"], "timeout")
 
+    def test_sensor_diag(self):
+        """Diagnose (GET_INFO + GET_DIAG) als Job; Lesen nur mit Sitzung; Testfirmware gekennzeichnet."""
+        anon = Client(self.base)
+        st, p = anon.json("GET", "/api/v1/plants/2")
+        sid = p["sensor_id"]
+        self.assertEqual(anon.json("POST", f"/api/v1/sensors/{sid}/diag")[0], 401)
+        self.assertEqual(anon.json("GET", f"/api/v1/sensors/{sid}/diag")[0], 401)   # nie öffentlich
+        c = Client(self.base)
+        c.login()
+        self.assertEqual(c.json("POST", f"/api/v1/sensors/{sid}/diag", csrf=False)[0], 403)
+        st, j = c.json("POST", f"/api/v1/sensors/{sid}/diag")
+        self.assertEqual(st, 202)
+        self.check("/sensors/{sensor_id}/diag", "post", 202, j)
+        fin = self.wait_job(c, j)
+        self.assertEqual(fin["state"], "done", fin["message"])
+        r = fin["result"]
+        self.assertEqual((r["testfw"], r["decode_errors"], r["diag"]["tf"]), (0, [], None))
+        self.assertEqual(len(bytes.fromhex(r["info_hex"])), 68)
+        st, lst = c.json("GET", f"/api/v1/sensors/{sid}/diag")
+        self.check("/sensors/{sensor_id}/diag", "get", 200, lst)
+        self.assertEqual(lst[0]["info_hex"], r["info_hex"])
+        # Testfirmware: Name fl-tf<n>-XXXX + Build 9<n>01 -> Kennung, Anhänge in INFO/DIAG
+        s = M.Handler.S.sensors[sid]
+        old = dict(s)
+        s.update(adv_name=f"fl-tf3-{sid[-4:]}", fw_build=9301)
+        try:
+            st, so = c.json("GET", f"/api/v1/sensors/{sid}")
+            self.check("/sensors/{sensor_id}", "get", 200, so)
+            self.assertEqual((so["testfw"], so["fw_build"]), (3, 9301))
+            st, j = c.json("POST", f"/api/v1/sensors/{sid}/diag")
+            r = self.wait_job(c, j)["result"]
+            self.assertEqual((r["testfw"], r["diag"]["tf"]["variant"], len(bytes.fromhex(r["info_hex"]))), (3, 3, 72))
+            self.assertEqual(r["decode_errors"], [])
+        finally:
+            s.clear()
+            s.update(old)
+
     def test_calibration_run(self):
         c = Client(self.base)
         c.login()

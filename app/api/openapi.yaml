@@ -331,6 +331,38 @@ paths:
             application/json:
               schema: {$ref: '#/components/schemas/Job'}
         '404': {$ref: '#/components/responses/Error'}
+  /sensors/{sensor_id}/diag:
+    parameters: [{$ref: '#/components/parameters/SensorIdParam'}]
+    post:
+      tags: [sensors]
+      summary: Diagnose abrufen (GET_INFO + GET_DIAG beim nächsten Kontakt, PROTOCOL 5.4/5.5/5.7)
+      description: |
+        Job `diag` wie „Jetzt messen“: `waiting_for_sensor` → `running` → `done` mit `result` = SensorDiag
+        (Rohdaten hex + dekodiert, gespeichert). Nur lesend auf dem Sensor; Sitzung + CSRF (+ Origin), kein elevate.
+        Läuft für den Sensor schon ein Abruf, kommt derselbe Job zurück. Dekodierung `firmware/gateway/fluidi_gw/sensordiag.py`
+        (dieselbe wie `scripts/testfw_eval.py`).
+      responses:
+        '202':
+          description: Auftrag angenommen
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Job'}
+        '404': {$ref: '#/components/responses/Error'}
+        '409': {$ref: '#/components/responses/Error'}
+    get:
+      tags: [sensors]
+      summary: Gespeicherte Diagnosen (neueste zuerst; nur mit Sitzung, nie öffentlich)
+      parameters:
+        - {name: limit, in: query, schema: {type: integer, minimum: 1, maximum: 50, default: 10}}
+      responses:
+        '200':
+          description: neueste zuerst (das Gateway behält 50 je Sensor, auch nach dem Entkoppeln)
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: '#/components/schemas/SensorDiag'}
+        '404': {$ref: '#/components/responses/Error'}
   /sensors/{sensor_id}/calibration:
     parameters: [{$ref: '#/components/parameters/SensorIdParam'}]
     get:
@@ -1569,6 +1601,73 @@ components:
         address: {type: string, description: 'BLE-Adresse (48 bit) = eindeutige Identität (PROTOCOL 2.3); fluidi-XXXX ist nur 16 bit'}
         lost_records: {type: integer, description: 'im Sensor überschriebene, nie quittierte Werte'}
         reset_reason: {type: ['string', 'null']}
+        fw_build: {type: ['integer', 'null'], description: 'Build-Nummer (SESSION_INFO fw_build, PROTOCOL 5.5); Testfirmware 9<n><bb>'}
+        testfw: {type: integer, minimum: 0, maximum: 9, description: '0 = Serie; n = TESTFIRMWARE TF-n (Gerätename fl-tf<n>-, fw_build 9<n>xx oder TF-Anhang der Diagnose). Nie im Betrieb'}
+        adv_name: {type: ['string', 'null'], description: 'Gerätename im Advertising (Serie fluidi-XXXX, Testfirmware fl-tf<n>-XXXX)'}
+        diag_last: {oneOf: [{$ref: '#/components/schemas/Timestamp'}, {type: 'null'}], description: letzte gespeicherte Diagnose}
+    SensorDiag:
+      type: object
+      description: |
+        Ergebnis eines Diagnoseabrufs. Rohdaten = Nutzlast der Antworten INFO (0x90) und DIAG (0x98) als Hex;
+        `info`/`diag` dekodiert (null, wenn die Antwort fehlt oder nicht dekodierbar ist – Grund in `decode_errors`).
+        Feldnamen wie `scripts/testfw_eval.py --json`; Format TESTFIRMWARE.md Kap. 6.
+      required: [sensor_id, address, t, info_hex, diag_hex, info, diag, testfw, decode_errors, decoder]
+      properties:
+        id: {type: integer}
+        sensor_id: {$ref: '#/components/schemas/SensorId'}
+        address: {type: string}
+        t: {$ref: '#/components/schemas/Timestamp'}
+        job_id: {type: ['string', 'null']}
+        info_hex: {type: ['string', 'null'], pattern: '^([0-9a-f]{2})*$'}
+        diag_hex: {type: ['string', 'null'], pattern: '^([0-9a-f]{2})*$'}
+        info:
+          type: ['object', 'null']
+          description: 'PROTOCOL 5.5 (68 Byte) + Testfirmware-Anhang: testfw, tf_fmt, build_marks_testfw'
+          required: [fw, fw_build, hw_rev, boot_id, reset_reason, testfw]
+          properties:
+            fw: {type: string}
+            fw_build: {type: integer}
+            hw_rev: {type: integer}
+            boot_id: {type: integer}
+            uptime_s: {type: integer}
+            reset_reason: {type: [string, integer]}
+            last_error: {type: integer}
+            charge_uc: {type: integer}
+            meas: {type: integer}
+            adv: {type: integer}
+            conn: {type: integer}
+            led_ms: {type: integer}
+            testfw: {type: integer}
+            build_marks_testfw: {type: boolean}
+        diag:
+          type: ['object', 'null']
+          description: 'PROTOCOL 5.7 (Fehlerprotokoll + Zähler) + `tf` = TF-4-Anhang (68 Byte) oder null bei Serie'
+          required: [entries, wdt_resets, brownouts, auth_fail, button_stuck, tf]
+          properties:
+            entries:
+              type: array
+              maxItems: 16
+              items:
+                type: object
+                required: [code, name, detail, boot_id, uptime_s]
+                properties:
+                  code: {type: integer}
+                  name: {type: string}
+                  detail: {type: integer}
+                  boot_id: {type: integer}
+                  uptime_s: {type: integer}
+            wdt_resets: {type: integer}
+            brownouts: {type: integer}
+            auth_fail: {type: integer}
+            button_stuck: {type: integer}
+            tf: {type: ['object', 'null']}
+        testfw: {type: integer, description: '0 = Serie, n = TF-n'}
+        testfw_sources: {type: array, items: {type: string, enum: [info_tail, diag_tail, fw_build, name]}}
+        fw_build: {type: ['integer', 'null']}
+        fw_version: {type: ['string', 'null']}
+        adv_name: {type: ['string', 'null']}
+        decode_errors: {type: array, items: {type: string}}
+        decoder: {type: string}
     SensorPatch:
       type: object
       additionalProperties: false
@@ -1623,7 +1722,7 @@ components:
       required: [id, kind, state, created]
       properties:
         id: {type: string}
-        kind: {type: string, enum: [measure, calibration_capture, pair, unpair, identify, config]}
+        kind: {type: string, enum: [measure, calibration_capture, pair, unpair, identify, config, diag]}
         state: {type: string, enum: [queued, waiting_for_sensor, running, awaiting_confirmation, done, failed, timeout, cancelled], description: 'awaiting_confirmation nur bei pair (SAS-Vergleich, result.sas)'}
         sensor_id: {oneOf: [{$ref: '#/components/schemas/SensorId'}, {type: 'null'}]}
         plant_id: {type: ['integer', 'null']}
@@ -1643,6 +1742,8 @@ components:
         first_seen: {$ref: '#/components/schemas/Timestamp'}
         known: {type: boolean, description: 'war früher gekoppelt (Neukopplung)'}
         address: {type: string}
+        adv_name: {type: ['string', 'null'], description: 'Gerätename im Advertising (fl-tf<n>-XXXX = Testfirmware)'}
+        testfw: {type: integer, description: '0 = Serie, n = Testfirmware TF-n (aus dem Gerätenamen)'}
     PairingState:
       type: object
       required: [active, candidates]

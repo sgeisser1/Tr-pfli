@@ -38,6 +38,7 @@ class Config:
     sim_speed: float = 0.002                 # Zeitraffer der simulierten Sensoren
     sim_history_days: int = 30
     sim_autopair: bool = True
+    sim_testfw: int = 0                      # 1..4: letzter gekoppelter Sim-Sensor läuft mit Testfirmware TF-n
     climate: str = "auto"                    # auto | sht4x | sim | off
     i2c_bus: int = 1
     climate_addr: int = 0x44                 # SHT4x-AD1B (Datenblatt V7.3 S. 1)

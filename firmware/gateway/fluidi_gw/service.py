@@ -73,7 +73,8 @@ class Gateway:
             if addr in self.model.by_addr:
                 continue
             s = SimSensor(addr, speed=self.cfg.sim_speed, moisture=35 + 6 * i, drying_per_day=0.08 + 0.03 * (i % 4),
-                          history_days=self.cfg.sim_history_days if i < n else 0, seed=i)
+                          history_days=self.cfg.sim_history_days if i < n else 0, seed=i,
+                          testfw=self.cfg.sim_testfw if i == n - 1 else 0)
             self.radio.add(s)
             self.sims.append(s)
 
@@ -86,7 +87,7 @@ class Gateway:
                 continue
             s.press_button_long()
             M.pairing.update(active=True, until=timesvc.wall() + 60, candidates={})
-            j = M.new_job("pair", s.name, None, 60)
+            j = M.new_job("pair", model.P.sensor_name(s.addr), None, 60)
             name, sp = SIM_PLANTS[i % len(SIM_PLANTS)]
             spec = next((x for x in M.species() if x["key"] == sp), None)
             plant = {"name": name, "substrate": "erde", "species": sp}

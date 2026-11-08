@@ -131,6 +131,7 @@ Legende Zugriff: **L** = lesen (öffentlich, wenn `public_read`), **S** = Sitzun
 | PATCH | `/sensors/{sid}` | W | Intervall-Übersteuerung, LED | SYS-04 |
 | DELETE | `/sensors/{sid}` | W | entkoppeln → Job | GW-03 |
 | POST | `/sensors/{sid}/identify` | W | LED blinken (Sensor finden) | |
+| POST / GET | `/sensors/{sid}/diag` | W / S | Diagnose (GET_INFO + GET_DIAG) abrufen → Job / gespeicherte Diagnosen | FW-07, Testplan Anhang A |
 | GET | `/sensors/{sid}/calibration` | L | Kalibrierung je Substrat | MES-09 |
 | PUT/DELETE | `/sensors/{sid}/calibration/{substrate}` | W | Fachmodus / zurück auf Startkalibrierung | |
 | POST | `/sensors/{sid}/calibration-runs` | W | geführte Kalibrierung starten | APP-07 |
@@ -232,6 +233,27 @@ Winterfaktor; D-021). `Plant.care` liefert die wirksame Schwelle (Winterfaktor),
 Dünger-/Salzhinweis aus der Zeitreihe (D-018). `PlantCreate/PlantPatch` akzeptieren `regime`, `winter_factor`,
 `winter`. Journal-Typ `fertilizing` = Taste „Gedüngt“.
 
+### 5.10 Sensor-Diagnose und Firmware-Kennung – neu (2026-11-09, TESTFIRMWARE O-1/O-3)
+- `POST /sensors/{sid}/diag` (W: Sitzung + CSRF + Origin-Prüfung) → `202 Job{kind: diag}`. Beim nächsten Kontakt fragt das
+  Gateway `GET_INFO` (0x10 → 0x90, PROTOCOL 5.5) und `GET_DIAG` (0x18 → 0x98, 5.7) ab, nach der Nachlieferung und vor
+  OTA/MEASURE. Kein elevate: nur lesend, der Sensor ändert nichts (Kosten: eine Verbindung). Läuft schon ein Abruf, kommt
+  derselbe Job zurück. Lehnt der Sensor eine Anfrage ab (ERR_RSP), wird die andere trotzdem gespeichert; beide abgelehnt → `failed`.
+- `done` → `result` = `SensorDiag`: Rohdaten `info_hex`/`diag_hex` (Nutzlast der Antworten), dekodiert `info`/`diag`
+  (Feldnamen wie `scripts/testfw_eval.py --json`, TF-4-Anhang unter `diag.tf`), `testfw`, `decode_errors`. Rohdaten werden
+  immer gespeichert, auch wenn die Dekodierung scheitert.
+- Dekodierung: **eine** Implementierung, `firmware/gateway/fluidi_gw/sensordiag.py` (nur Standardbibliothek); Gateway,
+  Mock und `scripts/testfw_eval.py` importieren sie.
+- Ablage: SQLite-Tabelle `sensor_diag` (50 je Sensor, Schlüssel = BLE-Adresse, bleibt nach dem Entkoppeln erhalten, im
+  Backup enthalten). `GET /sensors/{sid}/diag?limit=` (S, nie öffentlich: enthält u. a. `auth_fail`) liefert neueste zuerst.
+  `testfw_eval.py diag --db fluidi.sqlite --sensor <id>` liest dieselbe Tabelle (nur lesend).
+- `Sensor` hat neu `fw_build` (aus SESSION_INFO, jede Sitzung), `adv_name` (Gerätename im Advertising), `testfw`
+  (0 = Serie, n = Testfirmware TF-n) und `diag_last`. `testfw` > 0, sobald **ein** Merkmal zutrifft: Name `fl-tf<n>-XXXX`,
+  `fw_build` 9<n>xx (n = 1…4) oder TF-Anhang der letzten Diagnose (gilt nur bis zum nächsten Firmwarewechsel). Das Gateway
+  protokolliert eine Testfirmware im Ereignisprotokoll (`testfw`). Kopplungskandidaten haben ebenfalls `adv_name`/`testfw`.
+  Die Kennung `fluidi-XXXX` bleibt auch für Testfirmware gleich (aus der Adresse gebildet).
+- PWA: Sensoren & Firmware bzw. Pflanze → Sensor: „Firmware x.y.z · Build n“, rote Marke „TESTFIRMWARE TF-n“, Textknopf
+  „Diagnose“ (Bottom-Sheet: letzte Diagnose, „Diagnose abrufen“, „JSON herunterladen“ = SensorDiag als Datei).
+
 ## 6 Server-Sent Events (`GET /stream`)
 
 `text/event-stream`, `retry: 5000`, Kommentar-Ping alle 15 s. Ereignisse (`data` = JSON):
@@ -241,7 +263,7 @@ Dünger-/Salzhinweis aus der Zeitreihe (D-018). `PlantCreate/PlantPatch` akzepti
 | `measurement` | `{plant_id, sensor_id, reading}` | neuer Messwert (auch nachgeliefert, dann nur der neueste je Sensor) |
 | `plant` | `Plant` | Änderung an Pflanze, Status oder letztem Wert |
 | `plant_deleted` | `{id}` | Pflanze gelöscht |
-| `job` | `Job` | jeder Zustandswechsel eines Jobs |
+| `job` | `Job` | jeder Zustandswechsel eines Jobs (auch `diag`) |
 | `calibration` | `CalibrationRun` | Kalibrierlauf geändert |
 | `pairing` | `PairingState` | Kandidaten geändert |
 | `rollout` | `Rollout` | Fortschritt Verteilung |

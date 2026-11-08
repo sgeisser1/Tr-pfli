@@ -42,6 +42,14 @@ class Synthetic(unittest.TestCase):
         bad = T.parse_diag(T.sim_diag(2, tf2_mode=2, tf2_cycles=2, tf2_max_ops=4, backoffs=1))
         self.assertFalse(all(ok for ok, _ in T.check_diag(bad, "tf2-early")))
 
+    def test_diag_tf2_hf(self):
+        # O-5: HardFault -> fl_fault_handler -> Grund hardfault (0x52, detail = abn 1/2), nicht mehr Watchdog (0x50)
+        kw = dict(tf2_mode=3, tf2_cycles=3, tf2_max_ops=4, backoffs=1)
+        ok = T.parse_diag(T.sim_diag(2, entries=[(0x52, 1, 2, 3), (0x52, 2, 3, 3), (0x52, 0xBF, 5, 1)], **kw))
+        self.assertTrue(all(o for o, _ in T.check_diag(ok, "tf2-hf")), T.check_diag(ok, "tf2-hf"))
+        old = T.parse_diag(T.sim_diag(2, entries=[(0x50, 1, 2, 600), (0x50, 2, 3, 600), (0x52, 0xBF, 5, 1)], wdt=2, **kw))
+        self.assertFalse(T.check_diag(old, "tf2-hf")[-1][0])
+
     def test_serial_diag_has_no_tail(self):
         p = bytes([0]) + bytes(8)
         self.assertIsNone(T.parse_diag(p)["tf"])
@@ -115,6 +123,34 @@ class GatewayDb(unittest.TestCase):
             con.commit(); con.close()
             r = T.eval_tf3(T.records_from_db(db, "fluidi-ABCD"))
             self.assertEqual((r["n"], r["ok"], len(r["gaps"])), (5, True, 1))
+
+
+class GatewayDiag(unittest.TestCase):
+    """Diagnose aus dem Gateway: echte Store-Tabelle sensor_diag (fluidi_gw/store.py) und JSON-Download der PWA."""
+
+    def test_db_and_json(self):
+        import json
+        from fluidi_gw import store
+        p = T.sim_diag(1, entries=[(0x50, 0, 3, 5)], wdt=1, tf1_trig=1, reset_reason=2)
+        info = T.sim_info(1, 9101)
+        with tempfile.TemporaryDirectory() as td:
+            db = os.path.join(td, "fluidi.sqlite")
+            st = store.Store(db)
+            st.save_sensor("80:6F:B0:12:AB:CD", "fluidi-ABCD", {})
+            st.add_diag("80:6F:B0:12:AB:CD", 1.0, info.hex(), p.hex(), {"sensor_id": "fluidi-ABCD"})
+            st.close()
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                self.assertEqual(T.main(["diag", "--db", db, "--sensor", "fl-tf1-ABCD", "--expect", "tf1"]), 0)
+                self.assertEqual(T.main(["info", "--db", db, "--sensor", "fluidi-ABCD"]), 0)
+            self.assertIn("Testfirmware: TF-1", out.getvalue())
+            js = os.path.join(td, "d.json")
+            with open(js, "w") as f:
+                json.dump({"sensor_id": "fluidi-ABCD", "info_hex": info.hex(), "diag_hex": p.hex()}, f)
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(T.main(["diag", "--file", js, "--expect", "tf1"]), 0)
+            with contextlib.redirect_stderr(io.StringIO()):
+                self.assertEqual(T.main(["diag", "--db", db, "--sensor", "fluidi-0000"]), 2)
 
 
 if __name__ == "__main__":

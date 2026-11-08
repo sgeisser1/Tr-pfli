@@ -9,111 +9,94 @@ Dekodiert die Rohdaten, die die Testfirmware liefert, und prueft die Kriterien d
   tf3     TF-3-Datensaetze (cause 0x83) aus der Gateway-Datenbank (--db fluidi.sqlite --sensor <addr|id>)
           oder als Hex (20-Byte-Datensaetze, PROTOCOL 5.6, --hex)
 
-Woher die Hex-Daten kommen: Gateway `central.execute({"kind": "diag"})` liefert die GET_DIAG-Nutzlast als Hex;
-ein API-Aufruf dafuer fehlt noch (offen, Software). Die Host-Tests (`make -C firmware/sensor/tests`) legen echte
-Nutzlasten der simulierten Testfirmware unter firmware/sensor/tests/build/tf<n>_*.hex ab.
+Woher die Daten kommen: PWA Sensoren > "Diagnose abrufen" bzw. `POST /api/v1/sensors/{id}/diag` (Gateway fragt beim
+naechsten Kontakt GET_INFO + GET_DIAG ab und speichert die Rohdaten in der Tabelle `sensor_diag`). Eingabe dann
+  --db fluidi.sqlite --sensor <addr|fluidi-XXXX|fl-tf<n>-XXXX>   (neueste gespeicherte Diagnose, nur lesend)
+  --file diagnose.json                                          (JSON-Download der PWA / GET /sensors/{id}/diag)
+  --file x.hex | <hex>                                          (Rohdaten als Hex)
+Die Host-Tests (`make -C firmware/sensor/tests`) legen echte Nutzlasten der simulierten Testfirmware unter
+firmware/sensor/tests/build/tf<n>_*.hex ab.
+
+Dekodierung: firmware/gateway/fluidi_gw/sensordiag.py (dieselbe wie im Gateway, hier nur importiert).
 
 Ohne Hardware: `--sim` erzeugt synthetische Nutzlasten (Python-Nachbildung) und wertet sie aus.
 Aufruf: .venv/bin/python scripts/testfw_eval.py diag --file tf2.hex --expect tf2-late
+       .venv/bin/python scripts/testfw_eval.py diag --db /var/lib/fluidi/fluidi.sqlite --sensor fl-tf2-ABCD --expect tf2-late
 """
 import argparse
 import json
+import os
 import sqlite3
-import struct
 import sys
 
-RESET = {0: "power_on", 1: "pin", 2: "watchdog", 3: "software", 4: "brownout", 5: "hardfault", 6: "undervoltage"}
-ERR = {0x09: "TIMEOUT", 0x22: "TEMP_FAIL", 0x30: "FLASH_FAIL", 0x31: "LOG_OVERWRITTEN", 0x32: "NVS_RESTORED",
-       0x50: "WDT_RESET", 0x51: "BROWNOUT", 0x52: "HARDFAULT", 0x53: "BUTTON_STUCK", 0x55: "UNDERVOLTAGE"}
-TF2_MODE = {0: "aus", 1: "spaet (5 x)", 2: "frueh vor Lastmessung (7 x)", 3: "HardFault (9 x)"}
-TF3_STAGE = {0: "-", 1: "I2C_open", 2: "Schreiben (Konfig)", 3: "Lesen (Temperatur)"}
-CAUSE_TF3 = 0x83
-TAIL_LEN = 68
-INFO_LEN = 68
+# Dekodierung NICHT hier duplizieren: einzige Quelle ist das Gateway-Modul fluidi_gw/sensordiag.py (nur stdlib)
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "firmware", "gateway"))
+from fluidi_gw import sensordiag as D  # noqa: E402
 
-# TF-4-Anhang (fl_testfw.c fl_tf_diag_tail, little-endian)
-_TAIL = struct.Struct("<2sBBIIIIIBBIHHHHHHHHHBBBBIIhhhBB")
-_TAIL_FIELDS = ("magic variant fmt meas adv conn led_ms charge_uc reset_reason abn_now ret_boot vdd_min vbat_rest "
-                "vdd_min_ever boot_id flash_ops_boot flash_ops_ready backoffs tf1_trig tf2_trig tf2_mode tf2_cycles "
-                "tf2_max_ops tf2_sd_ops tf3_reads tf3_err tf3_last tf3_min tf3_max tf3_stage sens_pwr_hold").split()
-assert _TAIL.size == TAIL_LEN
+RESET, ERR, TF2_MODE, TF3_STAGE = D.RESET, D.ERR, D.TF2_MODE, D.TF3_STAGE
+TF2_MAX_SAT = 15   # fl_testfw.h FL_TF_RET_MAX_SAT (4 bit; Bit 13 = FL_RET_FAULT, O-5)
+CAUSE_TF3, TAIL_LEN, INFO_LEN = D.CAUSE_TF3, D.TAIL_LEN, D.INFO_LEN
+EvalError = D.DecodeError
+_hex = D.from_hex
+parse_info, parse_diag, parse_records = D.parse_info, D.parse_diag, D.parse_records
+sim_diag, sim_info, sim_records = D.sim_diag, D.sim_info, D.sim_records
 
 
-class EvalError(Exception):
-    pass
+def _sensor_key(sensor: str) -> str:
+    """fl-tf<n>-XXXX (Name der Testfirmware) -> fluidi-XXXX (Kennung im Gateway, aus der Adresse gebildet)."""
+    return "fluidi-" + sensor[-4:].upper() if D.testfw_from_name(sensor) else sensor
 
 
-def _hex(s: str) -> bytes:
-    s = "".join(s.split())
+def _addr(con, sensor: str) -> str:
+    key = _sensor_key(sensor)
+    row = con.execute("SELECT addr FROM sensor WHERE addr=? OR id=?", (key.upper(), key)).fetchone()
+    if row:
+        return row[0]
+    # entkoppelter Sensor: Kennung aus den gespeicherten Diagnosen
+    row = con.execute("SELECT sensor FROM sensor_diag WHERE sensor=? OR json_extract(doc, '$.sensor_id')=? "
+                      "ORDER BY id DESC LIMIT 1", (key.upper(), key)).fetchone() if _has_table(con, "sensor_diag") else None
+    return row[0] if row else key
+
+
+def _has_table(con, name) -> bool:
+    return con.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name=?", (name,)).fetchone() is not None
+
+
+def diag_from_db(db: str, sensor: str, nth: int = 0) -> dict:
+    """Gespeicherte Diagnose (POST /sensors/{id}/diag) aus der Gateway-Datenbank, nth = 0 neueste."""
+    con = sqlite3.connect(f"file:{db}?mode=ro", uri=True)
     try:
-        return bytes.fromhex(s)
+        if not _has_table(con, "sensor_diag"):
+            raise EvalError("Datenbank ohne Tabelle sensor_diag (Gateway zu alt?)")
+        addr = _addr(con, sensor)
+        row = con.execute("SELECT info_hex, diag_hex, t FROM sensor_diag WHERE sensor=? ORDER BY id DESC LIMIT 1 OFFSET ?",
+                          (addr, nth)).fetchone()
+        if not row:
+            raise EvalError(f"keine Diagnose fuer {sensor} gespeichert (PWA: Sensoren > Diagnose abrufen)")
+        return {"info_hex": row[0], "diag_hex": row[1], "t": row[2]}
+    finally:
+        con.close()
+
+
+def diag_from_json(text: str) -> dict:
+    """JSON-Download der PWA bzw. GET /sensors/{id}/diag (Objekt oder Liste, neueste zuerst)."""
+    try:
+        js = json.loads(text)
     except ValueError as e:
-        raise EvalError(f"kein gueltiges Hex: {e}") from e
-
-
-# ----------------------------------------------------------------------------------------------- Dekodieren
-def parse_info(p: bytes) -> dict:
-    if len(p) < INFO_LEN:
-        raise EvalError(f"INFO zu kurz ({len(p)} < {INFO_LEN})")
-    d = {"fw": "%d.%d.%d" % (p[1], p[2], struct.unpack_from("<H", p, 3)[0]),
-         "fw_build": struct.unpack_from("<I", p, 5)[0], "hw_rev": p[9], "state": p[10],
-         "boot_id": struct.unpack_from("<H", p, 11)[0], "uptime_s": struct.unpack_from("<I", p, 13)[0],
-         "vbat_load_mv": struct.unpack_from("<H", p, 27)[0], "vbat_rest_mv": struct.unpack_from("<H", p, 29)[0],
-         "charge_uc": struct.unpack_from("<I", p, 31)[0], "reset_reason": RESET.get(p[37], p[37]),
-         "last_error": p[38], "sec_cnt": struct.unpack_from("<I", p, 48)[0]}
-    d["meas"], d["adv"], d["conn"], d["led_ms"] = struct.unpack_from("<IIII", p, 52)
-    d["testfw"] = 0
-    if len(p) >= INFO_LEN + 4 and p[68:70] == b"TF":
-        d["testfw"], d["tf_fmt"] = p[70], p[71]
-    b = d["fw_build"]
-    d["build_marks_testfw"] = 9000 <= b <= 9999 and (b // 100) % 10 == d["testfw"]
-    return d
-
-
-def parse_diag(p: bytes) -> dict:
-    if not p:
-        raise EvalError("GET_DIAG leer")
-    n = p[0]
-    if n > 16 or len(p) < 1 + 8 * n + 8:
-        raise EvalError(f"GET_DIAG: {n} Eintraege, aber nur {len(p)} Byte")
-    entries = []
-    for i in range(n):
-        code, detail, boot, up = struct.unpack_from("<BBHI", p, 1 + 8 * i)
-        entries.append({"code": code, "name": ERR.get(code, f"0x{code:02X}"), "detail": detail, "boot_id": boot, "uptime_s": up})
-    k = 1 + 8 * n
-    wdt, bo, auth, stuck = struct.unpack_from("<HHHH", p, k)
-    d = {"entries": entries, "wdt_resets": wdt, "brownouts": bo, "auth_fail": auth, "button_stuck": stuck, "tf": None}
-    k += 8
-    if len(p) >= k + TAIL_LEN and p[k:k + 2] == b"TF":
-        t = dict(zip(_TAIL_FIELDS, _TAIL.unpack_from(p, k)))
-        t["reset_reason_txt"] = RESET.get(t["reset_reason"], t["reset_reason"])
-        t["tf2_mode_txt"] = TF2_MODE.get(t["tf2_mode"], t["tf2_mode"])
-        t["tf3_stage_txt"] = TF3_STAGE.get(t["tf3_stage"], t["tf3_stage"])
-        for f in ("tf3_last", "tf3_min", "tf3_max"):
-            t[f + "_c"] = None if t[f] in (-32768, 32767) else t[f] / 100.0
-        t["magic"] = t["magic"].decode()
-        d["tf"] = t
-    elif len(p) > k:
-        raise EvalError(f"GET_DIAG: {len(p) - k} Byte Anhang ohne Kennung 'TF' (Serienfirmware liefert keinen)")
-    return d
-
-
-def parse_records(p: bytes) -> list:
-    if len(p) % 20:
-        raise EvalError(f"Datensaetze: Laenge {len(p)} kein Vielfaches von 20")
-    out = []
-    for i in range(0, len(p), 20):
-        seq, boot, up, c, cd, temp, vb, cause, fl = struct.unpack_from("<IHIHHhHBB", p, i)
-        out.append({"seq": seq, "boot_id": boot, "uptime": up, "raw": None if c == 0xFFFF else c, "c_diag": cd,
-                    "temp": None if temp == -32768 or fl & 0x10 else temp / 100.0, "vbat": vb, "cause": cause, "sflags": fl})
-    return out
+        raise EvalError(f"kein JSON: {e}") from e
+    if isinstance(js, list):
+        if not js:
+            raise EvalError("JSON-Liste leer")
+        js = js[0]
+    if not isinstance(js, dict) or not ("info_hex" in js or "diag_hex" in js):
+        raise EvalError("JSON ohne info_hex/diag_hex (Format SensorDiag, app/api/openapi.yaml)")
+    return js
 
 
 def records_from_db(db: str, sensor: str) -> list:
     con = sqlite3.connect(f"file:{db}?mode=ro", uri=True)
     try:
-        row = con.execute("SELECT addr FROM sensor WHERE addr=? OR id=?", (sensor, sensor)).fetchone()
-        addr = row[0] if row else sensor
+        addr = _addr(con, sensor)
         q = ("SELECT seq, boot_id, uptime, raw, c_diag, temp, vbat, cause, sflags, t FROM reading "
              "WHERE sensor=? AND cause=? ORDER BY seq")
         cols = ("seq", "boot_id", "uptime", "raw", "c_diag", "temp", "vbat", "cause", "sflags", "t")
@@ -147,9 +130,13 @@ def check_diag(d: dict, expect: str) -> list:
         if want == 2:
             res.append((t["tf2_max_ops"] == 0, f"Flash-Ops je Zyklus (frueh) = {t['tf2_max_ops']} (Soll 0, N-2)"))
         else:
-            res.append((True, f"Flash-Ops je Zyklus (spaet) max. = {t['tf2_max_ops']}{'+' if t['tf2_max_ops'] == 31 else ''} (Information, PP-11)"))
+            res.append((True, f"Flash-Ops je Zyklus (spaet) max. = {t['tf2_max_ops']}{'+' if t['tf2_max_ops'] == TF2_MAX_SAT else ''} (Information, PP-11)"))
         if want == 3:
-            res.append((d["wdt_resets"] >= 2, f"HardFault -> Watchdog-Neustarts = {d['wdt_resets']} (Serie: Exception_handlerSpin)"))
+            # O-5: fl_fault_handler -> Systemreset, Grund hardfault -> Eintraege 0x52 mit detail = abn (1, 2);
+            # 0x52/0xBF = Abschaltung wegen Reset-Schleife, zaehlt nicht. Alter Watchdog-Umweg haette 0x50 erzeugt.
+            hf = [e for e in d["entries"] if e["code"] == 0x52 and e["detail"] != 0xBF]
+            res.append((len(hf) >= 2, f"HardFault-Neustarts mit Grund hardfault (0x52) = {len(hf)} (Soll >= 2, O-5: "
+                                      f"sofortiger Neustart statt Watchdog; wdt_resets gesamt = {d['wdt_resets']})"))
     elif expect == "tf3":
         res.append((t["variant"] == 3 and t["sens_pwr_hold"] == 1, "Variante TF-3, SENS_PWR dauernd high"))
         res.append((t["tf3_reads"] > 0, f"TMP1075N-Lesungen = {t['tf3_reads']}"))
@@ -174,36 +161,6 @@ def eval_tf3(recs: list, period_s: int = 60) -> dict:
             "ok": len(temps) == len(recs) and max(r["c_diag"] or 0 for r in recs) == 0}
 
 
-# ----------------------------------------------------------------------------------------------- Simulation
-def sim_diag(variant: int, **kw) -> bytes:
-    """Synthetische GET_DIAG-Nutzlast wie fl_testfw.c (fuer --sim und Tests)."""
-    entries = kw.get("entries", [])
-    p = bytes([len(entries)]) + b"".join(struct.pack("<BBHI", *e) for e in entries)
-    p += struct.pack("<HHHH", kw.get("wdt", 0), 0, 0, 0)
-    t = {f: 0 for f in _TAIL_FIELDS}
-    t.update(magic=b"TF", variant=variant, fmt=1, vdd_min=2950, vbat_rest=2980, vdd_min_ever=2950, boot_id=3,
-             tf3_last=-32768, tf3_min=32767, tf3_max=-32768, sens_pwr_hold=1 if variant == 3 else 0)
-    t.update({k: v for k, v in kw.items() if k in t})
-    return p + _TAIL.pack(*(t[f] for f in _TAIL_FIELDS))
-
-
-def sim_info(variant: int, build: int) -> bytes:
-    p = bytearray(68)
-    p[0] = 1; p[1:5] = bytes([0, 1]) + struct.pack("<H", 1); p[5:9] = struct.pack("<I", build); p[9] = 0x0B
-    return bytes(p) + b"TF" + bytes([variant, 1])
-
-
-def sim_records(n: int, err_at: int = -1) -> bytes:
-    out = b""
-    err = 0
-    for i in range(n):
-        bad = i == err_at
-        err += bad
-        out += struct.pack("<IHIHHhHBB", 100 + i, 3, 60 * (i + 1), 0xFFFF, err, -32768 if bad else 2150 + i,
-                           2950, CAUSE_TF3, 0x10 if bad else 0)
-    return out
-
-
 # ----------------------------------------------------------------------------------------------- Ausgabe
 def _print_checks(checks) -> bool:
     ok = True
@@ -221,7 +178,9 @@ def main(argv=None) -> int:
     for name in ("info", "diag"):
         s = sp.add_parser(name)
         s.add_argument("hex", nargs="?", help="Nutzlast als Hex")
-        s.add_argument("--file", help="Datei mit Hex")
+        s.add_argument("--file", help="Datei mit Hex oder JSON (Download der PWA)")
+        s.add_argument("--db", help="Gateway-Datenbank fluidi.sqlite (nur lesend): neueste gespeicherte Diagnose")
+        s.add_argument("--sensor", help="mit --db: Adresse AA:BB:.., fluidi-XXXX oder fl-tf<n>-XXXX")
         if name == "diag":
             s.add_argument("--expect", choices=["tf1", "tf2-late", "tf2-early", "tf2-hf", "tf3"])
     s = sp.add_parser("tf3")
@@ -234,16 +193,28 @@ def main(argv=None) -> int:
         if not a.cmd:
             ap.print_help()
             return 2
-        a.hex = a.file = None
+        a.hex = a.file = a.db = a.sensor = None
         a.expect = "tf2-late"
 
     def payload():
-        if a.file:
+        key = "info_hex" if a.cmd == "info" else "diag_hex"
+        if a.db:
+            if not a.sensor:
+                raise EvalError("--sensor angeben")
+            hx = diag_from_db(a.db, a.sensor)[key]
+        elif a.file:
             with open(a.file) as f:
-                return _hex(f.read())
-        if a.hex:
+                text = f.read()
+            if not text.lstrip().startswith(("{", "[")):
+                return _hex(text)
+            hx = diag_from_json(text).get(key)
+        elif a.hex:
             return _hex(a.hex)
-        raise EvalError("Hex oder --file angeben (oder --sim)")
+        else:
+            raise EvalError("Hex, --file oder --db/--sensor angeben (oder --sim)")
+        if not hx:
+            raise EvalError(f"{key} fehlt (Sensor hat {'GET_INFO' if a.cmd == 'info' else 'GET_DIAG'} nicht beantwortet)")
+        return _hex(hx)
 
     try:
         if a.cmd == "info":

@@ -4,6 +4,7 @@ import { h, toast, fill } from './dom.js';
 import { icon, dropChar } from './art.js';
 import { pageHead, seg, card } from './comp.js';
 import { watchJob } from './api.js';
+import { testfwBadge } from './sensors.js';
 
 const SAS = { rot: 'sas-r', 'grün': 'sas-g', gelb: 'sas-y' };
 
@@ -88,7 +89,7 @@ export default async function pair(el, ctx) {
       },
     },
     h('div.cand-head', null, dropChar('ok', { pct: 50, state: 'ok', size: 44, animate: true }),
-      h('div', null, h('h2', null, c.device), h('p.small.muted', null, `${c.rssi_dbm} dBm${c.known ? ' · war schon gekoppelt' : ''}`))),
+      h('div', null, h('h2', null, c.device, testfwBadge(c)), h('p.small.muted', null, `${c.rssi_dbm} dBm${c.known ? ' · war schon gekoppelt' : ''}${c.adv_name && c.adv_name !== c.device ? ` · meldet sich als ${c.adv_name}` : ''}`))),
     h('p.small.muted', null, 'Kennung mit dem Aufkleber am Sensor vergleichen.'),
     free.length ? seg([['new', 'Neue Pflanze'], ['ex', 'Bestehende Pflanze']], mode, (v) => { mode = v; newBox.hidden = v !== 'new'; exBox.hidden = v !== 'ex'; }, 'Pflanze') : null,
     newBox, exBox, msg, sasBox, h('div.actions', null, btn));

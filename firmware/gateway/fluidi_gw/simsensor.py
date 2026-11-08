@@ -20,6 +20,7 @@ import time
 
 from . import crypto
 from . import protocol as P
+from . import sensordiag as SD
 
 CAPACITY = 840                # PROTOCOL 6.3 v2: garantiert 840 Datensätze
 SLOT_MAX = 226 * 1024         # PROTOCOL 6.4
@@ -33,10 +34,11 @@ SIM_DRY, SIM_WET = 1330, 4000
 
 class SimSensor:
     def __init__(self, addr: str, *, seed=None, speed=1.0, moisture=55.0, drying_per_day=0.12, history_days=0,
-                 auto_confirm=True, fw=(1, 0, 3), clock=time.time, rssi=-62, vbat=2980):
+                 auto_confirm=True, fw=(1, 0, 3), clock=time.time, rssi=-62, vbat=2980, testfw=0):
         self.addr = addr.upper()
         self.addr_b = P.addr_to_bytes(self.addr)
-        self.name = P.sensor_name(self.addr)
+        self.testfw = testfw                       # 1..4 = Testfirmware TF-n (TESTFIRMWARE.md Kap. 3), 0 = Serie
+        self.name = P.sensor_name(self.addr) if not testfw else f"fl-tf{testfw}-{self.addr.replace(':', '')[-4:]}"
         self.rng = random.Random(seed if seed is not None else self.addr)
         self.speed = speed
         self.clock = clock
@@ -56,7 +58,8 @@ class SimSensor:
         self.acked = -1
         self.lost = 0
         self.fw = fw
-        self.fw_build = 100
+        self.fw_build = 9001 + 100 * testfw if testfw else 100
+        self.diag_counters = {"wdt": 0, "brownouts": 0, "auth_fail": 0, "button_stuck": 0}
         self.slot_confirmed = True
         self.ota_result = 0xFF
         self.reset_reason = 0
@@ -303,7 +306,8 @@ class SimSensor:
         R = msg | P.RSP
         try:
             if msg == P.M_GET_INFO:
-                self._send(link, R, rid, self.session_info(counters=True))
+                tail = b"TF" + bytes([self.testfw, 1]) if self.testfw else b""   # TESTFIRMWARE Kap. 3
+                self._send(link, R, rid, self.session_info(counters=True) + tail)
             elif msg == P.M_TIME_SET:
                 unix_ms, tz = struct.unpack_from("<Qh", pl)
                 self.time_known, self.tz_min = True, tz
@@ -342,7 +346,7 @@ class SimSensor:
                 self.identify_until = self.clock() + (pl[0] if pl else 5)
                 self._send(link, R, rid, b"\x00")
             elif msg == P.M_GET_DIAG:
-                self._send(link, R, rid, b"\x00" + struct.pack("<HHHH", 0, 0, 0, 0))
+                self._send(link, R, rid, SD.sim_diag(self.testfw, boot_id=self.boot_id, **self.diag_counters))
             elif msg == P.M_CLEAR_DIAG:
                 self._send(link, R, rid, b"\x00")
             elif msg == P.M_OTA_BEGIN:

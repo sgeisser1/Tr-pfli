@@ -3,6 +3,8 @@ import { h, fmt, toast, sheet, fill } from './dom.js';
 import { icon, dropChar, plantArt, batteryIcon, signalIcon, MOOD_TEXT } from './art.js';
 import { stateOf, stateBadge, rangeBar, fcText, waterNow, seg, card } from './comp.js';
 import { moistureChart } from './chart.js';
+import { fwLabel } from './diag.js';
+import { openDiag, testfwBadge } from './sensors.js';
 
 const DAY = 86400;
 const RANGES = { tag: [DAY, 'Tag'], woche: [7 * DAY, 'Woche'], monat: [30 * DAY, 'Monat'], jahr: [365 * DAY, 'Jahr'] };
@@ -133,9 +135,10 @@ export default async function plant(el, ctx) {
       kv('Batterie', sensor.battery ? h('span.inl', null, batteryIcon(sensor.battery.pct, sensor.battery.state !== 'ok'), `${sensor.battery.pct} % · ${fmt.n1(sensor.battery.mv / 1000)} V · noch ca. ${sensor.battery.days_left} Tage`) : 'noch unbekannt'),
       kv('Funk', sensor.signal ? h('span.inl', null, signalIcon(sensor.signal.quality), `${sensor.signal.rssi_dbm} dBm`) : '–'),
       kv('Kalibrierung', p.calibration === 'calibrated' ? 'kalibriert (2 Punkte)' : 'Startkalibrierung'),
-      kv('Firmware', sensor.fw_version),
+      kv('Firmware', h('span', null, fwLabel(sensor), testfwBadge(sensor))),
       kv('Zuletzt gesehen', fmt.ago(sensor.last_seen))),
-    h('button.btn.ghost.sm', { type: 'button', onclick: () => identify(ctx, sensor.id) }, icon('sparkle'), 'Sensor finden (LED blinkt)')) : card('Sensor', h('p.muted', null, 'Kein Sensor zugeordnet.'), h('a.btn.ghost.sm', { href: '#/koppeln' }, icon('plus'), 'Sensor koppeln'));
+    h('div.actions', null, h('button.btn.ghost.sm', { type: 'button', onclick: () => identify(ctx, sensor.id) }, icon('sparkle'), 'Sensor finden (LED blinkt)'),
+      h('button.linkbtn.small', { type: 'button', onclick: () => openDiag(ctx, sensor) }, 'Diagnose'))) : card('Sensor', h('p.muted', null, 'Kein Sensor zugeordnet.'), h('a.btn.ghost.sm', { href: '#/koppeln' }, icon('plus'), 'Sensor koppeln'));
 
   const careC = careCard(p, sp);
   el.append(h('div.detail', null, h('div.col-a', null, hero, careC, chartCard, jCard), h('div.col-b', null, fcCard, prof, sens)));

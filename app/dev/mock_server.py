@@ -41,6 +41,9 @@ from zoneinfo import ZoneInfo
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import fluidi_calc as C  # noqa: E402
 import fluidi_analysis as AN  # noqa: E402
+# Diagnose-Dekodierung: dasselbe Modul wie Gateway und scripts/testfw_eval.py (nur Standardbibliothek)
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "firmware" / "gateway"))
+from fluidi_gw import sensordiag as SD  # noqa: E402
 
 APP_DIR = Path(__file__).resolve().parent.parent
 OPENAPI = APP_DIR / "api" / "openapi.yaml"
@@ -183,6 +186,7 @@ class State:
         self.sensors: dict[str, dict] = {}
         self.cal: dict[str, dict] = {}
         self.records: dict[str, list] = {}
+        self.diags: dict[str, list] = {}      # Sensor-ID -> SensorDiag, neueste zuerst
         self.assign: list[dict] = []
         self.next_plant = 1
         self.water_truth: dict[int, list] = {}
@@ -247,7 +251,7 @@ class State:
             mv, pct, days = ex.get("battery", (2950 - r.randint(0, 120), r.randint(55, 92), r.randint(180, 420)))
             last_offset = ex.get("stale_h", 0) * 3600
             self.sensors[sid] = {
-                "id": sid, "plant_id": pid, "hw_rev": "A-32 rev A", "fw_version": "1.0.2",
+                "id": sid, "plant_id": pid, "hw_rev": "A-32 rev A", "fw_version": "1.0.2", "fw_build": 12,
                 "paired": C.iso(t_end - 365 * 86400), "last_seen": t_end - last_offset - r.randint(60, 2400),
                 "battery": {"mv": mv, "pct": pct, "days_left": days,
                             "state": "critical" if days < 7 else "low" if days < 30 else "ok"},
@@ -528,7 +532,31 @@ class State:
             "interval_per_day": s["interval_per_day"], "effective_interval_per_day": self.per_day(s["id"]),
             "led_enabled": s["led_enabled"], "pending_config": s["pending_config"],
             "buffered_records": s["buffered_records"], "error": s["error"], "unpairing": s["unpairing"],
+            "fw_build": s.get("fw_build"), "adv_name": s.get("adv_name", s["id"]),
+            "testfw": SD.testfw_from_name(s.get("adv_name")) or SD.testfw_from_build(s.get("fw_build")),
+            "diag_last": self.diags[s["id"]][0]["t"] if self.diags.get(s["id"]) else None,
         }
+
+    def make_diag(self, sid, job_id):
+        """Diagnose wie das Gateway: synthetische INFO/DIAG-Nutzlast -> sensordiag.decode (gleiche Felder)."""
+        s = self.sensors[sid]
+        n = SD.testfw_from_name(s.get("adv_name")) or SD.testfw_from_build(s.get("fw_build"))
+        fw = tuple(int(x) for x in s["fw_version"].split("."))
+        up = 1_036_800 + int(now()) % 3600          # ≈ 12 Tage seit Start (Demo)
+        info = SD.sim_info(n, s.get("fw_build") or 0, fw=fw, hw_rev=0x0A, boot_id=4, uptime_s=up,
+                           vbat_load_mv=s["battery"]["mv"], vbat_rest_mv=s["battery"]["mv"] + 40, charge_uc=812_000,
+                           meas=up // 14400 + 3, adv=up // 2, conn=up // 1800, led_ms=4200).hex()
+        diag = SD.sim_diag(n, entries=[(0x31, 4, 2, 86400)] if sid.endswith("7D94") else [], wdt=1 if n else 0,
+                           boot_id=4, meas=7, adv=3100, conn=12, led_ms=900, flash_ops_boot=5).hex()
+        dec = SD.decode(info, diag, s.get("adv_name"))
+        doc = {"id": sum(len(v) for v in self.diags.values()) + 1, "sensor_id": sid, "address": s.get("address", "80:6F:B0:00:" + sid[-4:-2] + ":" + sid[-2:]),
+               "t": C.iso(now()), "job_id": job_id, "info_hex": info, "diag_hex": diag, "info": dec["info"], "diag": dec["diag"],
+               "testfw": dec["testfw"], "testfw_sources": dec["testfw_sources"], "fw_build": dec["fw_build"],
+               "fw_version": s["fw_version"], "adv_name": s.get("adv_name", sid), "decode_errors": dec["errors"],
+               "decoder": dec["decoder"]}
+        self.diags.setdefault(sid, []).insert(0, doc)
+        del self.diags[sid][50:]
+        return doc
 
     def reachable(self, sid):
         s = self.sensors.get(sid)
@@ -549,7 +577,7 @@ class State:
             j.update(kw)
             self.emit("job", j)
 
-    def run_measure(self, j, pid, sid, source="manual", on_done=None, samples=1):
+    def run_measure(self, j, pid, sid, source="manual", on_done=None, samples=1, done_message="Messung abgeschlossen"):
         def step1():
             self.job_update(j, state="waiting_for_sensor", message="Warte auf Sensor (nächstes Funksignal)")
             if not self.reachable(sid):
@@ -571,7 +599,7 @@ class State:
                     return
                 if on_done:
                     res = on_done()
-                    self.job_update(j, state="done", progress=1.0, message="Messung abgeschlossen", result=res)
+                    self.job_update(j, state="done", progress=1.0, message=done_message, result=res)
                     return
                 last = self.records[sid][-1]
                 if p and p["name"] == "Zitronenbaum":
@@ -1190,6 +1218,26 @@ def sensor_identify(h: Handler, sensor_id, **_):
     h.send_json(202, j)
 
 
+@route("POST", "/sensors/{sensor_id}/diag")
+def sensor_diag_start(h: Handler, sensor_id, **_):
+    S = h.S
+    _sensor(S, sensor_id)
+    busy = [j for j in S.jobs.values() if j["sensor_id"] == sensor_id and j["kind"] == "diag"
+            and j["state"] in ("queued", "waiting_for_sensor", "running")]
+    if busy:
+        h.send_json(202, busy[0])
+        return
+    j = S.new_job("diag", sensor_id)
+    S.run_measure(j, None, sensor_id, on_done=lambda: S.make_diag(sensor_id, j["id"]), done_message="Diagnose gelesen")
+    h.send_json(202, j)
+
+
+@route("GET", "/sensors/{sensor_id}/diag", auth="session")
+def sensor_diag_list(h: Handler, sensor_id, q, **_):
+    _sensor(h.S, sensor_id)
+    h.send_json(200, h.S.diags.get(sensor_id, [])[:_int(q, "limit", 10, 1, 50)])
+
+
 @route("GET", "/sensors/{sensor_id}/calibration", auth="read")
 def cal_get(h: Handler, sensor_id, **_):
     _sensor(h.S, sensor_id)
@@ -1347,7 +1395,8 @@ def pairing_start(h: Handler, body, **_):
             if not S.pairing["active"] or "fluidi-8E05" in S.sensors:
                 return
             S.pairing["candidates"] = [{"device": "fluidi-8E05", "rssi_dbm": -52, "fw_version": "1.0.3",
-                                        "hw_rev": "A-32 rev A", "first_seen": C.iso(now()), "known": False}]
+                                        "hw_rev": "A-32 rev A", "first_seen": C.iso(now()), "known": False,
+                                        "adv_name": "fluidi-8E05", "testfw": 0}]
             S.emit("pairing", _pairing_out(S))
     threading.Timer(3.0, found).start()
     S.log("info", "pairing", "Kopplungsmodus geöffnet")
@@ -1378,7 +1427,7 @@ def pairing_accept(h: Handler, device, body, **_):
         with S.lock:
             t = now()
             S.sensors[device] = {
-                "id": device, "plant_id": None, "hw_rev": "A-32 rev A", "fw_version": "1.0.3",
+                "id": device, "plant_id": None, "hw_rev": "A-32 rev A", "fw_version": "1.0.3", "fw_build": 14,
                 "paired": C.iso(t), "last_seen": t,
                 "battery": {"mv": 3010, "pct": 98, "days_left": 480, "state": "ok"}, "rssi": -52,
                 "interval_per_day": None, "led_enabled": True, "pending_config": False, "error": None,
@@ -2183,8 +2232,11 @@ def stream(h: Handler, **_):
 
 
 def make_server(host="127.0.0.1", port=8080, seed=42, fresh=False, password="fluidi-demo-2026", quiet=False,
-                demo=False):
+                demo=False, testfw=0):
     Handler.S = State(seed, fresh, password)
+    if testfw:  # letzter Sensor mit Testfirmware TF-n (TESTFIRMWARE.md Kap. 3: Name fl-tf<n>-XXXX, Build 9<n>01)
+        s = Handler.S.sensors[sorted(Handler.S.sensors)[-1]]
+        s.update(adv_name=f"fl-tf{testfw}-{s['id'][-4:]}", fw_build=9001 + 100 * testfw, fw_version="0.1.1")
     Handler.DEMO = demo
     Handler.CHECK = SchemaCheck()
     Handler.QUIET = quiet
@@ -2201,6 +2253,8 @@ def main():
     ap.add_argument("--fresh", action="store_true", help="Ersteinrichtung (Einrichtungscode) simulieren")
     ap.add_argument("--password", default="fluidi-demo-2026")
     ap.add_argument("--quiet", action="store_true")
+    ap.add_argument("--testfw", type=int, choices=[0, 1, 2, 3, 4], default=0,
+                    help="letzter Sensor läuft mit Testfirmware TF-n (Anzeige/Diagnose prüfen)")
     ap.add_argument("--allow-framing", action="store_true",
                     help="CSP frame-ancestors * (nur für Screenshots im Geräterahmen)")
     ap.add_argument("--demo-session", action="store_true",
@@ -2210,7 +2264,7 @@ def main():
         ap.error("--demo-session nur mit --host 127.0.0.1")
     global CSP_FRAME_ANY
     CSP_FRAME_ANY = a.allow_framing
-    srv = make_server(a.host, a.port, a.seed, a.fresh, a.password, a.quiet, a.demo_session)
+    srv = make_server(a.host, a.port, a.seed, a.fresh, a.password, a.quiet, a.demo_session, a.testfw)
     S = Handler.S
     print(f"fluidi Mock-Gateway: http://{'localhost' if a.host in ('127.0.0.1', '0.0.0.0') else a.host}:{a.port}/")
     if S.setup_code:

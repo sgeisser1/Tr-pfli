@@ -243,5 +243,68 @@ class DataPath(unittest.TestCase):
         self.assertIsNone(self.s.k_link)
 
 
+class Diagnosis(unittest.TestCase):
+    """O-1/O-3: Diagnose über das echte Protokoll, Testfirmware-Kennung (TESTFIRMWARE.md Kap. 3)."""
+
+    def setUp(self):
+        self.gw, _ = make_gateway(sensors=2, history_days=1, http=False, speed=0.001, sim_testfw=2)
+        self.gw._autopair()
+        self.M = self.gw.model
+        self.serial, self.tf = self.gw.sims[0], self.gw.sims[1]
+
+    def tearDown(self):
+        self.gw.stop()
+
+    def _diag(self, sim):
+        sid = P.sensor_name(sim.addr)
+        j = self.M.new_job("diag", sid)
+        self.M.central.submit(sim.addr, {"kind": "diag", "job": j,
+                                         "on_done": lambda r: self.M.diag_received(sim.addr, r.get("info_hex"), r.get("diag_hex"), j["id"])})
+        self.assertTrue(wait(lambda: j["state"] in ("done", "failed"), 15), j["message"])
+        self.assertEqual(j["state"], "done", j["message"])
+        return sid, j["result"]
+
+    def test_testfw_marked(self):
+        self.assertEqual(self.tf.name[:7], "fl-tf2-")
+        sid, r = self._diag(self.tf)
+        self.assertEqual(r["testfw"], 2)
+        self.assertEqual(set(r["testfw_sources"]), {"info_tail", "diag_tail", "fw_build", "name"})
+        self.assertEqual(len(bytes.fromhex(r["info_hex"])), 72)          # 68 + 'T' 'F' n 1
+        self.assertEqual((r["info"]["fw_build"], r["info"]["build_marks_testfw"]), (9201, True))
+        self.assertEqual(r["diag"]["tf"]["variant"], 2)
+        self.assertEqual(r["decode_errors"], [])
+        out = self.M.sensor_out(self.M.sensors[sid])
+        self.assertEqual((out["testfw"], out["fw_build"], out["adv_name"]), (2, 9201, self.tf.name))
+        self.assertTrue(any(e["code"] == "testfw" for e in self.gw.store.events(50)))
+        # gespeichert wie testfw_eval sie liest (Tabelle sensor_diag)
+        row = self.gw.store.q1("SELECT info_hex, diag_hex FROM sensor_diag WHERE sensor=? ORDER BY id DESC", (self.tf.addr,))
+        self.assertEqual((row["info_hex"], row["diag_hex"]), (r["info_hex"], r["diag_hex"]))
+
+    def test_serial_and_counters(self):
+        self.serial.diag_counters.update(wdt=2, brownouts=1)
+        sid, r = self._diag(self.serial)
+        self.assertEqual((r["testfw"], r["diag"]["wdt_resets"], r["diag"]["brownouts"], r["diag"]["tf"]), (0, 2, 1, None))
+        self.assertEqual(self.M.sensor_out(self.M.sensors[sid])["testfw"], 0)
+
+    def test_partial_when_info_rejected(self):
+        orig = self.serial._dispatch
+
+        async def no_info(link, msg, rid, pl):
+            if msg == P.M_GET_INFO:
+                self.serial._send(link, P.M_ERR_RSP, rid, bytes([0x01, msg]))
+                return
+            await orig(link, msg, rid, pl)
+        self.serial._dispatch = no_info
+        _sid, r = self._diag(self.serial)
+        self.assertIsNone(r["info_hex"])
+        self.assertIsNotNone(r["diag"])
+
+    def test_history_kept_after_unpair(self):
+        sid, r = self._diag(self.serial)
+        from fluidi_gw import api
+        api.remove_sensor(self.M, self.M.sensors[sid])
+        self.assertEqual(self.gw.store.diags(self.serial.addr)[0]["info_hex"], r["info_hex"])
+
+
 if __name__ == "__main__":
     unittest.main()

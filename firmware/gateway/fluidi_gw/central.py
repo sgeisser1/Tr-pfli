@@ -448,8 +448,23 @@ class Session:
             await self.request(P.M_UNPAIR)
             return {"_message": "Sensor entkoppelt"}
         if k == "diag":
-            _, pl = await self.request(P.M_GET_DIAG)
-            return {"diag": pl.hex()}
+            # GET_INFO (0x10 -> 0x90, PROTOCOL 5.5) und GET_DIAG (0x18 -> 0x98, 5.7): nur lesen, Sensor ändert nichts.
+            # Lehnt der Sensor eine der beiden ab (ERR_RSP), bleibt die andere erhalten; beide abgelehnt -> Fehler.
+            out, why = {"info_hex": None, "diag_hex": None}, []
+            for key, msg, rsp in (("info_hex", P.M_GET_INFO, P.M_GET_INFO | P.RSP), ("diag_hex", P.M_GET_DIAG, P.M_GET_DIAG | P.RSP)):
+                try:
+                    rmsg, pl = await self.request(msg)
+                except SessionError as e:
+                    why.append(str(e))
+                    continue
+                if rmsg != rsp:
+                    why.append(f"Antwort {rmsg:#04x} statt {rsp:#04x}")
+                    continue
+                out[key] = pl.hex()
+            if out["info_hex"] is None and out["diag_hex"] is None:
+                raise SessionError("Diagnose abgelehnt: " + "; ".join(why))
+            out["_message"] = "Diagnose gelesen" + (f" (unvollständig: {'; '.join(why)})" if why else "")
+            return out
         if k == "reboot":
             await self.request(P.M_REBOOT, b"\x01")
             return {"_message": "Neustart"}

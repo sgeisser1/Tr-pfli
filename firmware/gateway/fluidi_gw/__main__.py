@@ -32,6 +32,8 @@ def main(argv=None):
             p.add_argument("--sensors", type=int, default=6)
             p.add_argument("--speed", type=float, default=0.002)
             p.add_argument("--history-days", type=int, default=45)
+            p.add_argument("--testfw", type=int, choices=[0, 1, 2, 3, 4], default=0,
+                           help="letzter Sim-Sensor mit Testfirmware TF-n (Diagnose-Anzeige prüfen)")
         if name == "pki-init":
             p.add_argument("--force", action="store_true")
     ti = sub.add_parser("test-image")
@@ -54,7 +56,7 @@ def main(argv=None):
     ov = {"data_dir": Path(a.data_dir) if getattr(a, "data_dir", None) else None}
     if cmd == "sim":
         ov.update(radio="sim", tls=False, https_port=a.port or 8080, http_port=0, host=a.host or "127.0.0.1",
-                  sim_sensors=a.sensors, sim_speed=a.speed, sim_history_days=a.history_days, time_mode="sim",
+                  sim_sensors=a.sensors, sim_speed=a.speed, sim_history_days=a.history_days, sim_testfw=a.testfw, time_mode="sim",
                   data_dir=ov["data_dir"] or Path.home() / ".cache" / "fluidi-sim", quiet=a.quiet, dashboard_port=(a.port or 8080) + 1)
     elif cmd == "serve":
         ov.update(https_port=a.port, host=a.host, quiet=a.quiet or None)
