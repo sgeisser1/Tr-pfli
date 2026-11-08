@@ -273,3 +273,159 @@ Kap. 7): Den Beutel einmal ohne Mischen in zwei dicht schliessende, etikettierte
 Ansätze wägen (3.45 g A + 1.00 g B, Waage 0.01 g, TDS S. 3 „Bulk Mixing“). Sie gilt erst, wenn Electrolube keine Einwände hat
 (Anhang A) und die Sicherheit den Abfüllschritt geprüft hat (zusätzlicher Umgang mit dem ätzenden Härter, Visier, Lagerung
 unter Verschluss). Bis dahin gilt M-B (ganzer Beutel).
+
+---
+
+## Runde 2 (Sicherheits-Agent, 2026-11-09)
+
+Geprüft: Commit 11aa3e3, selbst gelesen:
+- `MONTAGE_SENSOR.md` Kap. 0, 1, 3a, 4, 5, 5a, 6, 8
+- `PROGRAMMIEREN_SENSOR.md` Kap. 5 Schritt 9
+- Konzept Kap. 7, 9a, 12 (V-6), Anhang A/B
+- `phase5_testplan_prototyp.md` PT11.19/PT11.23
+- `phase5_fmea_light.md` F-60/F-63
+
+**Ergebnis: kein Veto.** Alle Befunde aus Runde 1 sind richtig umgesetzt. Variante M-A ist **zulässig unter den
+Bedingungen MA-1…MA-3 (wichtig)**. Neu: 0 kritisch, 2 wichtig, 4 klein.
+
+### R2.1 Kontrolle der Umsetzung Runde 1
+
+| Befund | Stelle | Urteil |
+|---|---|---|
+| W-1 | MONTAGE 3a „Vorbedingung jeder Vergusssitzung: Clip leer … abgehakt“; Kap. 4 Schritt 0; Kap. 5 Schritt 0 (mit Verweis auf Weg B); Kap. 5a Schritt 1; V-4 „Zelle entnehmen, Clip leer, erst danach Masse auftragen“; Kap. 6 „Zelle wieder entnehmen“; Kap. 8 Nacharbeit als eigener Absatz nach Zellentnahme, nur nach Rücksprache; PROGRAMMIEREN Kap. 5 Schritt 9 „danach die Zelle wieder entnehmen … mit leerem Clip vergiessen“ | **erledigt**. Der Widerspruch Weg B ↔ 3a ist aufgelöst |
+| W-2 | Konzept Kap. 6/10 „Tg nach 60-°C-Härtung offen“; Anhang A Frage 1 (a)/(b); V-6 | **erledigt**. V-6 nachgerechnet: σ = 3·1.0·50/(2·10·4²) = 0.47 MPa, elastische Durchbiegung F·L³/(48·E·I) mit I = 53.3 mm⁴: 0.016 mm bei E = 3 GPa bzw. 1.6 mm bei E = 30 MPa. Die Probe trennt glasig von gummielastisch sicher. Offener Punkt 7 (Ofen ≥ 80 °C) ist richtig ausgewiesen |
+| W-3 | 3a: Voraussetzung SDB B in DE/EN/FR/IT vor dem ersten Beutel; Erste Hilfe (≥ 15 min, Lider, immer Arzt; Kleidung und Schuhe; Lungenödem; Verschlucken); Visier, Schürze, Augenspülflasche; Lagerung unter Verschluss; Notruf 145/144; Anhang B | **erledigt**, deckt sich mit SDB B Abschn. 4.1/7/8 |
+| W-4 | 3a „Arbeitsplatz und Lüftung“ 1–5 | **erledigt** |
+| W-5 / A-1…A-3 | PT11.19 (≥ 2 vollständige Muster, V-4 nicht an S4/S5), PT11.23 (Prüfstellen, Kriterium ≤ 0.5 mm, A-3 keine Serie), Konzept Kap. 9a | **erledigt**. Kap. 9a ER2221: Die Begründung „13.91 : 1 nur als ganzer Beutel, ± 3.7 % Wägefehler“ ist richtig (0.01/0.27) |
+| A-4 | FMEA F-60 erledigt-Vermerk, F-63 Massnahmentext | **erledigt** (Text). O/D-Neubewertung siehe R2.3 |
+| A-5 / K-6 | O-1 trägt wieder den vollen K-4-Wortlaut, Abweichung daneben; PCB_OUTLINE unverändert; INDEX REF-VG4 | **erledigt** |
+| K-1 | M-B Schritt 2: Schale ≥ 20 × 15 cm, nicht brennbare Unterlage, nicht in den Trockner, TDS S. 3 zitiert | **erledigt** |
+| K-2, K-3, K-4, K-5 | 3a „Geltung“; Handschuhe; „ungefüllt (ANNAHME)“; Prüfung 5a „nicht klebrig“ | **erledigt** |
+
+Keine Abschwächung bestehender Regeln gefunden. Kap. 6 und PROGRAMMIEREN Kap. 5 erlauben eine geprüfte Zelle ≥ 3.0 V
+wieder einzusetzen. Das passt zu PROGRAMMIEREN Kap. 6 (< 2.6 V entsorgen) und betrifft die Sicherheit nicht.
+
+### R2.2 Variante M-A (Abfüllen, Wägen kleiner Ansätze)
+
+**Grundsätzliche Bewertung:**
+- **Grundlage:** Das TDS beschreibt „Bulk Mixing“ im richtigen Verhältnis und verlangt dicht verschlossene Gebinde
+  „to prevent the ingress of moisture“ (`Electrolube_ER2223_TDS_Rev4-2019-03.pdf` S. 3).
+- **Was M-A mehr kostet:** einmal je Beutel das Umfüllen des ätzenden Härters B (H314) und je Sitzung das Entnehmen von
+  ≈ 1 g B aus einer Flasche. Gefährdet sind dabei Augen und Haut.
+- **Lagerung:** Statt eines verschweissten Beutels steht eine angebrochene Flasche mit ätzendem, farblosem Härter
+  (SDB B Abschn. 9: farblos, S. 6) über Monate im Haushalt. Das bringt Verwechslungsgefahr und Kinderzugang.
+- **Was M-A spart:**
+  - Kein 227-ml-Rest mehr je Sitzung: weniger Exothermie und Ausgasung (W-4), weniger Abfall.
+  - Weniger Beutel, die über 8 Wochen Lieferzeit gelagert werden.
+  - Die Ansätze sind ≥ 4 g klein, ihre Exothermie ist vernachlässigbar.
+- **Mischfehler:** Ein falsches Verhältnis gibt eine unvollständige Härtung (TDS S. 3 „erratic or partial curing“), mit
+  den Folgen K-5 (Auslaugung im Topf) und W-2 (Tg). Das fangen V-3 je Ansatz und Prüfung 5a ab.
+
+**Urteil:** Sicherheitlich etwa gleichwertig mit M-B, wenn die folgenden Bedingungen erfüllt sind. Kein Veto.
+
+#### MA-1 · wichtig · Gebinde: kindergesichert, nicht verwechselbar, Sekundärbehälter
+
+**Befund:** MONTAGE 3a M-A Schritt 1 nennt „Weithalsflasche HDPE oder Glas mit dicht schliessendem Deckel“. Teil B ist
+farblos und ätzend (H314, H302). In einer unauffälligen Flasche im Haushalt kann er mit Wasser oder Getränken verwechselt
+oder von Kindern geöffnet werden. Der Beutel hatte diesen Schutz durch die Kappen, den Clip und die Herstelleretikette.
+
+**Vorschlag (in Kap. 3a M-A Schritt 1 und Kap. 1 aufnehmen):**
+- **Nie Lebensmittel- oder Getränkeflaschen** verwenden, auch nicht gereinigt. Nur Laborflaschen.
+- **Flasche B: HDPE** mit **kindergesichertem Verschluss** (Drück-Dreh-Verschluss), kein Glas (Bruch bei ätzendem Inhalt).
+  Flasche A: HDPE oder Glas, ebenfalls mit kindergesichertem Verschluss (**ANNAHME** Verfügbarkeit im Laborhandel;
+  HDPE-Beständigkeit gegen das Amin anhand der Beständigkeitsliste des Flaschenherstellers prüfen).
+- Beide Flaschen stehen in einem **dicht schliessenden Kunststoff-Sekundärbehälter** mit etwas Saugmaterial (z. B.
+  Vermiculit oder Katzenstreu, SDB B Abschn. 6.3 „mechanisch aufnehmen“). Der Behälter ist **abgeschlossen** (Vorhängeschloss
+  oder abschliessbarer Schrank) und steht nicht bei Lebensmitteln und nicht im Kühlschrank.
+- Gleichzeitig nur **ein** angebrochener Satz A/B.
+
+#### MA-2 · wichtig · Etikettierung und Verwechslung A/B
+
+**Befund:** Schritt 1 verlangt nur „Produkt, Piktogramme und H-Sätze wie oben, Abfülldatum, Ablaufdatum“. Es fehlen das
+Signalwort, die P-Sätze, die Unterscheidung der Deckel und ein Hinweis für Dritte. Vertauschte Deckel verkleben das Gewinde
+(Härtung im Gewinde), und die Flasche lässt sich dann nur noch mit Kraft öffnen.
+
+**Vorschlag:** Etikett je Flasche:
+- Inhalt: „ER2223 Teil A – Harz“ bzw. „ER2223 Teil B – Härter“.
+- Signalwort (A „Achtung“, B „**Gefahr**“), GHS-Piktogramme und H-Sätze nach SDB Abschn. 2.2.
+- P-Sätze P280, P305+P351+P338, P301+P330+P331 (B) und P303+P361+P353 (B).
+- „**Kein Lebensmittel – nicht trinken**“, „Unter Verschluss, für Kinder unzugänglich“.
+- Abfülldatum und Ablaufdatum des Beutels, Name und Telefon des Verantwortlichen, Notruf 145.
+
+Dazu:
+- Deckel und Flaschen **farblich unterschiedlich markieren** (z. B. A rot, B blau) und Deckel nie tauschen.
+- **Je Komponente eine eigene, beschriftete Einweg-Pipette oder Spritze** zum Entnehmen, nicht aus der Flasche giessen.
+- Reihenfolge: A wägen, Flasche A schliessen; dann B wägen, Flasche B schliessen. Nie beide Flaschen gleichzeitig offen.
+
+#### MA-3 · klein · Haltbarkeit der angebrochenen Komponenten, kristallisierter Härter
+
+SDB B Abschn. 10.4 nennt als zu vermeidende Bedingung, „längere Zeit Luft und Feuchte ausgesetzt“ (S. 7). Laut Abschn. 9
+liegt der Schmelzbereich bei 17.7–65.4 °C (S. 6). Die Haltbarkeit nach dem Öffnen ist unbekannt; sie ist in Anhang A
+erfragt (richtig).
+
+**Vorschlag:** Bis zur Antwort höchstens **3 Monate** nach dem Abfüllen verwenden (**ANNAHME**), das Kriterium „trüb oder
+Kruste“ bleibt. Kristallisierten Härter in der **geschlossenen** Flasche im Wasserbad bei 40 °C anwärmen (TDS S. 3), mit
+Visier öffnen, nie in der Mikrowelle und nie im Trockner zusammen mit Sensoren.
+
+#### MA-4 · klein · Waage: Auflösung ist nicht Genauigkeit
+
+0.01 g ist die Anzeigeauflösung. Die Genauigkeit einfacher Feinwaagen liegt oft bei ± 0.02–0.05 g (**ANNAHME**). Damit ist
+die ± 1 %-Aussage bei 1.00 g Härter nicht gesichert.
+
+**Vorschlag:**
+- Vor jeder Sitzung mit einem **Prüfgewicht** (z. B. 1 g und 5 g, Klasse F oder M1, **ANNAHME** Kosten) kontrollieren
+  und den Messwert in die Musterliste schreiben.
+- Mindestansatz auf **8 g (6.90 g A + 2.00 g B)** anheben, solange die Toleranz von Electrolube fehlt. Die Kosten sind
+  vernachlässigbar (≈ 0.66 CHF Masse je Ansatz).
+- V-3 an jedem Ansatz bleibt Pflicht (bereits so).
+
+#### MA-5 · klein · Abfüllschritt: Auffangen und Restbeutel
+
+**Vorschlag:**
+- Abfüllen in einer **Auffangwanne** (Schale ≥ 20 × 15 cm), mit PE-Trichter, **zuerst A, dann B**, B langsam
+  ausdrücken (der Beutel kann an der Clip-Kante platzen).
+- Danach am leeren Beutel den Clip entfernen und die Reste von A und B im Beutel verkneten, damit sie aushärten. Erst dann
+  in den Kehricht (**ANNAHME** wie Kap. 3a „Entsorgung“). So bleibt kein flüssiger Härter im Abfall.
+- Saugmaterial für Verschüttetes bereithalten (SDB B Abschn. 6.3).
+
+#### MA-6 · klein · Verfahren M-A erst nach Electrolube-Antwort
+
+Die Bedingung (1) im Konzept Kap. 7 („Electrolube hat keine Einwände“) ist richtig. Ergänzung: Kommt keine Antwort, ist
+M-A **trotzdem zulässig**, wenn MA-1, MA-2 und MA-4 umgesetzt sind und V-3 an jedem Ansatz sowie V-6 einmal mit einem
+gewogenen Ansatz bestanden sind. Das TDS deckt „Bulk Mixing“ ab (S. 3). Diese Regel entscheidet der Orchestrator.
+
+### R2.3 FMEA F-63 – Neubewertung O/D (A-4)
+
+Skala der FMEA 1–10 (wie in `phase5_fmea_light.md`).
+
+| | alt | neu | Begründung |
+|---|---|---|---|
+| S | 6 | **6** | unverändert: Wasserpfad zum Zellfach, kein Energiepfad im Kragen (Runde 1 Kap. 1) |
+| O | 3 | **4** | ungefüllt, CTE 70 statt ≈ 30. Dehnungsdifferenz zu FR4 ≈ 3.9 ‰ bei −10 °C, Spannung an der Kragenunterkante im Bereich der Haftfestigkeit (**ANNAHME**). Tg nach 60-°C-Härtung nicht belegt. Mit belegtem Tg ≥ 80 °C (Electrolube oder V-6) → O 3 |
+| D | 6 | **4** | gezielter Nachweis vor der Serie: K-7 an ≥ 2 vollständigen Mustern (PT11.19), Schliff bzw. Farbeindringprüfung genau an der kritischen Grenzfläche (PT11.23), V-6. Nur 2 Muster, also statistisch schwach → nicht besser als 4 |
+| **RPZ** | 108 | **96** (nach Tg-Nachweis 72) | |
+
+Vorschlag Eintrag F-63: „S 6 / O 4 / D 4 / RPZ 96 (Sicherheit Runde 2, 2026-11-09); O → 3 nach Tg-Nachweis (W-2)“.
+Eintragen soll der Ersteller bzw. Orchestrator; ich ändere die FMEA hier nicht (Auftrag: nur dieser Bericht).
+
+F-60 (Lunker, RPZ 180): Masse mit Datenblatt, 800 mPa·s und V-1 im Schnitt senken O plausibel von 5 auf 3. Vorschlag
+S 6 / O 3 / D 6 = **108**, neu bewerten nach V-1.
+
+### R2.4 Freigabebedingungen D-030 (aktualisiert)
+
+**Kein Veto.** D-030 (ER2223 für Schott, Kragen und Kantenversiegelung, Flächen frei, 24 h RT + 4 h 60 °C) ist aus Sicht
+der Sicherheit **freigabefähig**. Bedingungen:
+
+1. **Vor dem Öffnen des ersten Beutels** (auch V-1…V-3):
+   - SDB Teil B in DE/EN/FR/IT liegt vor und ist abgelegt.
+   - Die Beständigkeitsliste der Handschuhe ist abgelegt (K-3).
+   - Die Schutzausrüstung nach MONTAGE Kap. 1/3a ist vorhanden.
+2. **Variante M-A** nur mit MA-1 und MA-2 (wichtig) sowie MA-3…MA-5. Bis dahin M-B.
+3. **Vor dem Musterverguss:** V-1…V-3 bestanden.
+4. **Vor der Serie:**
+   - PT11.19 an ≥ 2 Mustern und PT11.23 bestanden (A-1/A-2), sonst Rückfall Kap. 9a (A-3).
+   - Tg-Nachweis (Electrolube schriftlich oder V-6) erbracht (W-2).
+5. FMEA F-63 (und F-60) mit den Werten aus R2.3 nachführen.
+
+Bitte je Befund MA-1…MA-6 *umgesetzt* / *abgelehnt (Grund)*. Ist MA-1/MA-2 umgesetzt, genügt eine Sichtprüfung durch den
+Orchestrator; eine Runde 3 der Sicherheit ist dafür nicht nötig.
