@@ -126,8 +126,8 @@ Zonen Rev C (KiCad-Y): Z3 20.8…23.2, Z4 23.2…46.7, Z5B 46.7…50.0, Z5A 50.0
 F: Wortmarke „fluidi“ v3a (10 mm breit, Strich 0.52 mm) und „rev C“ in Z6, Stecktiefenlinie Y 58.5 (z −5) mit
 „max“ und Pfeil, TX/RX an den Pads; Pin-1-/Polaritätsmarken aus den Bibliotheks-Footprints (auf 0.15 mm).
 B: „fluidi rev C“, Linie und „max“; **im Fach (Rev C, LS-K3/S3-W4) Warndreieck 9 × 8 mm mit „!“, „CR2032“,
-„Verschluckgefahr“, „keep away from children“** (X −7.5…7.5, Y 26…40.7); **„JLCJLCJLCJLC“** als Platzhalter für die
-JLC-Auftragsnummer auf B im Band (X 2…10, Y 19.7; im Formular „Specify a location“ wählen, K-4).
+„Verschluckgefahr“, „keep away from children“** (X −7.5…7.5, Y 26…40.7). Der Platzhalter „JLCJLCJLCJLC“ (K-4) ist
+seit 2026-11-08 **entfernt** (JLC: „Please DO NOT add“, Kap. 11 Nachtrag); Bestellung mit „Remove Mark“.
 Referenzen nur auf F.Fab/B.Fab (Band zu dicht), Bestückungsplan daraus.
 
 ## 7 DRC-Ergebnis Rev C (2026-11-08, `run_pcb.sh`, `--schematic-parity --severity-all`)
@@ -237,7 +237,7 @@ flächen nach Rev C, DRC-Regeln, Silkscreen, Fertigungsattribute, CPL-Regel, Reg
 | K-1 | *umgesetzt*: DRC-Regel Pad–Pad ≥ 0.15. U3 mit TI-Landmuster DRL0006A (Pads 0.67 × 0.30, Reihen 1.48, `TI_TMP1075_Datasheet_SBOS854F.pdf` S. 37) → **0.20 mm** statt 0.150 |
 | K-2 | *abgelehnt (keine Änderung)*: AE1-Pad 2 ist Teil der AN043-Kopie (Masse-Via der IFA, Lage bestimmt die Abstimmung). Restring 0.10 mm liegt über dem JLC-Via-Minimum (0.05) und unter dem PTH-Minimum (0.15). Ersetzen würde die Antennengeometrie ändern. BESTELL-PRÜFUNG: in der Gerber-Vorschau muss die Bohrung als Via erscheinen; sonst Pad durch Via 0.45/0.30 an gleicher Stelle ersetzen |
 | K-3 | *akzeptiert, keine Änderung*: nach der ersten Bestellung bestätigte Rotationen als Projekttabelle ablegen |
-| K-4 | *umgesetzt*: „JLCJLCJLCJLC“ auf B im Band |
+| K-4 | *umgesetzt*, am 2026-11-08 wieder **entfernt** (Nachtrag unten) |
 | K-5 | *umgesetzt*: Titelblock Revision C → Gerber-Job „Revision: C“ |
 | K-6 | *umgesetzt* über K-1 (0.20 mm) |
 | K-7 | *abgelehnt (keine Änderung)*: Ursprung oben Mitte bleibt (Schnittstelle PCB_OUTLINE Kap. 1); bei Versatz in der Vorschau Hilfsursprung verschieben |
@@ -245,3 +245,22 @@ flächen nach Rev C, DRC-Regeln, Silkscreen, Fertigungsattribute, CPL-Regel, Reg
 
 Weitere Rev-C-Punkte: Platinenanschlag X −8.0…−3.0 / Y 0…1.5 als Regelfläche ohne Bauteile; DRC jetzt auch ohne
 `--refill-zones` in `run_pcb.sh`; Fach-Zonenpolygon 1.05 mm (Korrektur Projektleitung) beibehalten; STEP neu erzeugt.
+
+**Nachtrag Phase 5 (2026-11-08): Platzhalter „JLCJLCJLCJLC“ entfernt** (Entscheid Projektleitung, Ausnahme von „Rev C
+nicht ändern“ nur für diesen Text). Grund: JLC „Order Number is not available since May 2026. Please DO NOT add
+"JLCJLCJLCJLC" in your silkscreen layer“ (`docs/references/JLCPCB_HowToMarkOnPCB_Auszug_2026-11-08.txt` Z. 48).
+Änderung nur `gen/pcb_build.py` (Zeile `silk_text("JLCJLCJLCJLC", …)` durch Kommentar ersetzt). **Revision bleibt C.**
+Neu erzeugt mit `run_pcb.sh` (Füllung per kicad-cli) und Prüfungen:
+- DRC WSL mit `--refill-zones` und auf der gespeicherten Füllung, je `--schematic-parity --severity-all`: **0 / 0 / 0**
+  (Verletzungen / nicht verbunden / Footprint). Windows: unverändert 4 Warnungen `lib_footprint_mismatch` (Kap. 7).
+- ERC WSL und Windows: 0 Fehler, 1 Warnung (unverändert, gleicher Bericht ohne Kopfzeilen).
+- Gerber geometrisch verglichen mit `scripts/gerber_geom_diff.py` (alt = Stand 10:07, neu): **nur B.Silkscreen
+  verschieden** (88 Striche weniger, alle in X 2.78…9.25 / Y −20.15…−19.15 = Lage des Platzhalters). Alle anderen
+  Lagen, Bohrdaten und Kontur gleich; in F.Cu (2) und B.Cu (1) sind Füllflächen nur anders in Polygone zerlegt
+  (gleiche Fläche < 1e-6 mm², alle abweichenden Ecken liegen auf Kanten des Gegenstücks). Gerber-Job gleich bis auf
+  das Erstellungsdatum. Die Gerber-Dateien selbst sind nicht bytegleich (Aperturnummern, Reihenfolge, Datum).
+- BOM (`bom_jlc.py` neu) und CPL **bytegleich**; `order_check.py`: kein Platzhalter, Exit 0.
+- sha256 neu: Gerber-ZIP `bf1902ea4bab83d96f385f557575d8311886acf2bacee7aa743d88eef47883d0`
+  (vorher `7da2269d…`), BOM `3d99ffca7b79abe550a57de4ff7d3228eabe4f532bc46f602e6bcec53f456ea9`, CPL
+  `b01ba1477406d8c305693567ca70011ccb60892215ccc055ee17d99f6329213f` (beide unverändert), Platine
+  `27f7a6d95131f48e0f11947d07d69d360caac332e854ced05b451bbfbd7ff7a7`.

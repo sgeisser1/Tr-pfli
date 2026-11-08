@@ -42,12 +42,11 @@ cd production/rev-C && sha256sum -c SHA256SUMS
 Projektleitung freigegeben hat. `sha256sum -c` allein genügt nicht (prüft nur die Kopien gegen sich selbst).
 
 Unter Windows (PowerShell) für die drei Upload-Dateien: `Get-FileHash .\1_jlc_upload\* -Algorithm SHA256`.
-Sollwerte: **massgebend ist ORDER Kap. 1.** Die Werte unten gelten für den Stand vor dem Entfernen des Platzhalters
-(W-4); Gerber, evtl. CPL und damit die Hashes ändern sich noch – die Projektleitung führt ORDER Kap. 1 nach:
+Sollwerte (massgebend ist ORDER Kap. 1; Stand ohne Platzhalter, W-4):
 
 | Datei | sha256 beginnt mit |
 |---|---|
-| `fluidi_sensor_gerber_jlc.zip` | `7da2269d…` |
+| `fluidi_sensor_gerber_jlc.zip` | `bf1902ea…` |
 | `fluidi_sensor_bom_jlc.csv` | `3d99ffca…` |
 | `fluidi_sensor_cpl_jlc.csv` | `b01ba147…` |
 

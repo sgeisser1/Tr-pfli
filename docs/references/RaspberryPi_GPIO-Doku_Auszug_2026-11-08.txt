@@ -1,0 +1,305 @@
+Auszug Raspberry Pi Dokumentation (GPIO) und Overlay-README (gpio-led), abgerufen 2026-11-08
+Quellen:
+  https://raw.githubusercontent.com/raspberrypi/documentation/master/documentation/asciidoc/computers/raspberry-pi/gpio-on-raspberry-pi.adoc  sha256 2c6d14324ae8e4972b63e93d7e653c7117189ec9f061d033631a99bf3ca2519f
+  https://raw.githubusercontent.com/raspberrypi/documentation/master/documentation/asciidoc/computers/raspberry-pi/gpio-pad-controls.adoc  sha256 554693c0f722404414ba93ab713c5a24799ea844d1bac91662a7a78806cbbe2b
+  https://raw.githubusercontent.com/raspberrypi/linux/rpi-6.12.y/arch/arm/boot/dts/overlays/README  sha256 9e0cf69918d6ae167b4971ccf1a605a44fba4e6341621a1f350ba7fc0dc8fed5
+(raspberrypi.com selbst liefert eine Cloudflare-Abfrage; Inhalt identisch mit der Doku-Quelle im GitHub-Repo raspberrypi/documentation)
+
+=== gpio-on-raspberry-pi.adoc, Z. 92-96, 180-190, 353-470 (Zeilennummern der Quelle) ===
+92: A GPIO pin designated as an input is read as high when connected to 3.3 V, and low when connected to 0 V. Internal pull-up or pull-down resistors help establish a defined input state when no external signal is being applied.
+93: 
+94: WARNING: Raspberry Pi GPIO pins operate at 3.3 V and aren't 5 V tolerant. Only the 5 V power pins are designed to supply 5 V power. Never apply 5 V directly to a GPIO pin because this can cause permanent damage to your Raspberry Pi's SoC.
+95: 
+96: `GP2` (SDA) and `GP3` (SCL) have fixed 1.8 kΩ resistors. You can control pull-up or pull-down configuration for other pins through software.
+180: | 10
+181: | `GP15`
+182: | GPIO
+183: | Receive Data (RXD); receives serial (*UART*) data from a connected device
+184: 
+185: | 11
+186: | `GP17`
+187: | GPIO
+188: | *SPI* chip enable (`CE1`)
+189: 
+190: | 12
+353: The GPIO pads include configurable CMOS push-pull output drivers and input buffers. Register-based settings can control the following:
+354: 
+355: * Internal pull-up and pull-down resistors (enable or disable).
+356: * Output xref:raspberry-pi.adoc#gpio-pads-control[drive strength].
+357: * Input Schmitt-trigger filtering.
+358: 
+359: ==== Power-on states
+360: 
+361: Following a power-on reset, GPIO pins are generally configured as inputs. The default pull states are also applied, which are detailed in the *Alternative Function Assignments* table in the https://pip.raspberrypi.com/documents/RP-008249-DS[BCM2835 peripherals datasheet]. Most GPIOs have a default pull applied.
+362: 
+363: ==== Interrupts
+364: 
+365: Each GPIO pin configured as a general-purpose input can be configured as an interrupt source for the Arm processor. The following interrupt-generation modes are available:
+366: 
+367: * *Level-sensitive interrupts*, initiated when the input signal is high or low. These interrupts maintain the interrupted state until the level has been cleared by system software, for example, by servicing the attached peripheral generating the interrupt.
+368: * *Edge-sensitive interrupts*, initiated with rising or falling signal transitions. Rising and falling edge detection has some synchronisation built into the detection. At the system clock frequency, the input is sampled, and an interrupt is generated when the transition meets the detection criteria within a three-cycle window. For example, `1, 0, 0` (high, low, low) and `0, 1, 1` (low, high, high) represent qualifying transitions.
+369: * *Asynchronous edge detection*, which bypasses the synchronisation involved in edge-sensitive interrupts, allowing the hardware to detect narrower input events.
+370: 
+371: === Voltage specifications
+372: 
+373: There are two 5 V pins and two 3.3 V pins in the 40-pin GPIO header, as well as a number of ground (`GND`) pins. These pins can't be reconfigured. The remaining pins are general-purpose 3.3 V pins, high outputs are set to 3.3 V and inputs are 3.3 V-tolerant.
+374: 
+375: ==== BCM2835, BCM2836, BCM2837, and RP3A0
+376: 
+377: The following table gives the voltage specifications for the GPIO pins for BCM2835, BCM2836, BCM2837, and RP3A0 products (for example, Raspberry Pi Zero or Raspberry Pi 3B+). For information about Compute Modules, see the xref:compute-module.adoc#specifications[relevant Compute Module datasheets].
+378: 
+379: .Voltage specifications for GPIO pins on BCM2835, BCM2836, BCM2837, and RP3A0 products
+380: |===
+381: | Symbol | Parameter | Conditions| Min | Typical | Max | Unit
+382: 
+383: | V~IL~
+384: | Input low voltage
+385: | -
+386: | -
+387: | -
+388: | 0.9
+389: | V
+390: 
+391: | V~IH~
+392: | Input high voltage^a^
+393: | -
+394: | 1.6
+395: | -
+396: | -
+397: | V
+398: 
+399: | I~IL~
+400: | Input leakage current
+401: | TA = +85◦C
+402: | -
+403: | -
+404: | 5
+405: | µA
+406: 
+407: | C~IN~
+408: | Input capacitance
+409: | -
+410: | -
+411: | 5
+412: | -
+413: | pF
+414: 
+415: | V~OL~
+416: | Output low voltage^b^
+417: | IOL = -2 mA
+418: | -
+419: | -
+420: | 0.14
+421: | V
+422: 
+423: | V~OH~
+424: | Output high voltage^b^
+425: | IOH = 2 mA
+426: | 3.0
+427: | -
+428: | -
+429: | V
+430: 
+431: | I~OL~
+432: | Output low current^c^
+433: | VO = 0.4 V
+434: | 18
+435: | -
+436: | -
+437: | mA
+438: 
+439: | I~OH~
+440: | Output high current^c^
+441: | VO = 2.3 V
+442: | 17
+443: | -
+444: | -
+445: | mA
+446: 
+447: | R~PU~
+448: | Pullup resistor
+449: | -
+450: | 50
+451: | -
+452: | 65
+453: | kΩ
+454: 
+455: | R~PD~
+456: | Pulldown resistor
+457: | -
+458: | 50
+459: | -
+460: | 65
+461: | kΩ
+462: |===
+463: 
+464: ^a^ Hysteresis enabled +
+465: ^b^ Default drive strength (8 mA) +
+466: ^c^ Maximum drive strength (16 mA)
+467: 
+468: ==== BCM2711 products
+469: 
+470: The following table gives the voltage specifications for the GPIO pins on BCM2711 products (Raspberry Pi 4 and 400). For information about Compute Module 4, see the xref:compute-module.adoc#specifications[relevant Compute Module datasheet].
+
+=== gpio-pad-controls.adoc (ganz) ===
+1: == GPIO pads control
+2: 
+3: GPIO drive strengths do not indicate a maximum current, but a maximum current under which the pad will still meet the specification. You should set the GPIO drive strengths to match the device being attached in order for the device to work correctly.
+4: 
+5: === Control drive strength
+6: 
+7: Inside the pad are a number of drivers in parallel. If the drive strength is set low (`0b000`), most of these are tri-stated so they do not add anything to the output current. If the drive strength is increased, more and more drivers are put in parallel. The diagram shows that behaviour.
+8: 
+9: WARNING: On 4-series devices, the current level is half the value shown in the diagram.
+10: 
+11: image::images/pi_gpio_drive_strength_diagram.png[GPIO drive strength diagram]
+12: 
+13: === Current value
+14: 
+15: The current value specifies the maximum current under which the pad will still meet the specification.
+16: 
+17: Current value is _not_ the current that the pad will deliver, and is _not_ a current limit.
+18: 
+19: The pad output is a voltage source:
+20: 
+21: * If set high, the pad will try to drive the output to the rail voltage (3.3 V)
+22: * If set low, the pad will try to drive the output to ground (0V)
+23: 
+24: The pad will try to drive the output high or low. Success will depend on the requirements of what is connected. If the pad is shorted to ground, it will not be able to drive high. It will try to deliver as much current as it can, and the current is only limited by the internal resistance.
+25: 
+26: If the pad is driven high and it is shorted to ground, in due time it will fail. The same holds true if you connect it to 3.3 V and drive it low.
+27: 
+28: Meeting the specification is determined by the guaranteed voltage levels. Because the pads are digital, there are two voltage levels, high and low. The I/O ports have two parameters which deal with the output level:
+29: 
+30: * V~OL~, the maximum low-level voltage (0.14 V at 3.3 V VDD IO)
+31: * V~OH~, the minimum high-level voltage (3.0 V at 3.3 V VDD IO)
+32: 
+33: V~OL~=0.14V means that if the output is Low, it will be \<= 0.14 V.
+34: V~OH~=3.0V means that if the output is High, it will be >= 3.0 V.
+35: 
+36: As an example, a drive strength of 16mA means that if you set the pad high, you can draw up to 16 mA, and the output voltage is guaranteed to be >=V~OH~. This also means that if you set a drive strength of 2mA and you draw 16mA, the voltage will *not* be V~OH~ but lower. In fact, it might not be high enough to be seen as high by an external device.
+37: 
+38: There is more information on the xref:raspberry-pi.adoc#gpio[physical characteristics] of the GPIO pins.
+39: 
+40: NOTE: On the Compute Module devices, it is possible to change the VDD IO from the standard 3.3 V. In this case, V~OL~ and V~OH~ will change according to the table in the xref:raspberry-pi.adoc#gpio[GPIO] section.
+41: 
+42: The Raspberry Pi 3.3 V supply was designed with a maximum current of ~3mA per GPIO pin. If you load each pin with 16mA, the total current is 272 mA. The 3.3 V supply will collapse under that level of load. Big current spikes will happen, especially if you have a capacitive load. Spikes will bounce around all the other pins near them. This is likely to cause interference with the SD card, or even the SDRAM behaviour.
+43: 
+44: === Safe current
+45: 
+46: All the electronics of the pads are designed for 16 mA. This is a safe value under which you will not damage the device. Even if you set the drive strength to 2 mA and then load it so 16 mA comes out, this will not damage the device. Other than that, there is no guaranteed maximum safe current.
+47: 
+48: === GPIO addresses
+49: 
+50: * 0x 7e10 002c PADS (GPIO 0-27)
+51: * 0x 7e10 0030 PADS (GPIO 28-45)
+52: * 0x 7e10 0034 PADS (GPIO 46-53)
+53: 
+54: |===
+55: | Bits | Field name | Description | Type | Reset
+56: 
+57: | 31:24
+58: | PASSWRD
+59: | Must be 0x5A when writing; accidental write protect password
+60: | W
+61: | 0
+62: 
+63: | 23:5
+64: |
+65: | *Reserved* – Write as 0, read as don't care
+66: |
+67: |
+68: 
+69: | 4
+70: | SLEW
+71: | Slew rate; 0 = slew rate limited; 1 = slew rate not limited
+72: | RW
+73: | 0x1
+74: 
+75: | 3
+76: | HYST
+77: | Enable input hysteresis; 0 = disabled; 1 = enabled
+78: | RW
+79: | 0x1
+80: 
+81: | 2:0
+82: | DRIVE
+83: | Drive strength, see breakdown list below
+84: | RW
+85: | 0x3
+86: |===
+87: 
+88: Beware of Simultaneous Switching Outputs (SSO) limitations which are device-dependent as well as dependent on the quality and layout of the PCB, the amount and quality of the decoupling capacitors, the type of load on the pads (resistance, capacitance), and other factors beyond the control of Raspberry Pi.
+89: 
+90: === Drive strength list
+91: 
+92: * 0 = 2mA
+93: * 1 = 4mA
+94: * 2 = 6mA
+95: * 3 = 8mA
+96: * 4 = 10mA
+97: * 5 = 12mA
+98: * 6 = 14mA
+99: * 7 = 16mA
+
+=== overlays/README, Abschnitt gpio-led ===
+1606: Name:   gpio-led
+1607: Info:   This is a generic overlay for activating LEDs (or any other component)
+1608:         by a GPIO pin. Multiple LEDs can be set up using multiple calls to the
+1609:         overlay. While there are many existing methods to activate LEDs on the
+1610:         RPi, this method offers some advantages:
+1611:         1) Does not require any userspace programs.
+1612:         2) LEDs can be connected to the kernel's led-trigger framework,
+1613:            and drive the LED based on triggers such as cpu load, heartbeat,
+1614:            kernel panic, key input, timers and others.
+1615:         3) LED can be tied to the input state of another GPIO pin.
+1616:         4) The LED is setup early during the kernel boot process (useful
+1617:            for cpu/heartbeat/panic triggers).
+1618: 
+1619:         Typical electrical connection is:
+1620:            RPI-GPIO.19  ->  LED  -> 300ohm resister  -> RPI-GND
+1621:         The GPIO pin number can be changed with the 'gpio=' parameter.
+1622: 
+1623:         To control an LED from userspace, write a 0 or 1 value:
+1624:            echo 1 > /sys/class/leds/myled1/brightness
+1625:         The 'myled1' name can be changed with the 'label=' parameter.
+1626: 
+1627:         To connect the LED to a kernel trigger from userspace:
+1628:            echo cpu > /sys/class/leds/myled1/trigger
+1629:            echo heartbeat > /sys/class/leds/myled1/trigger
+1630:            echo none > /sys/class/leds/myled1/trigger
+1631:         To connect the LED to GPIO.26 pin (physical pin 37):
+1632:            echo gpio > /sys/class/leds/myled1/trigger
+1633:            echo 26 > /sys/class/leds/myled1/gpio
+1634:         Available triggers:
+1635:            cat /sys/class/leds/myled1/trigger
+1636: 
+1637:         More information about the Linux kernel LED/Trigger system:
+1638:            https://www.kernel.org/doc/Documentation/leds/leds-class.rst
+1639:            https://www.kernel.org/doc/Documentation/leds/ledtrig-oneshot.rst
+1640: Load:   dtoverlay=gpio-led,<param>=<val>
+1641: Params: gpio                    GPIO pin connected to the LED (default 19)
+1642:         label                   The label for this LED. It will appear under
+1643:                                 /sys/class/leds/<label> . Default 'myled1'.
+1644:         trigger                 Set the led-trigger to connect to this LED.
+1645:                                 default 'none' (LED is user-controlled).
+1646:                                 Some possible triggers:
+1647:                                  cpu - CPU load (all CPUs)
+1648:                                  cpu0 - CPU load of first CPU.
+1649:                                  mmc - disk activity (all disks)
+1650:                                  panic - turn on on kernel panic
+1651:                                  heartbeat - indicate system health
+1652:                                  gpio - connect to a GPIO input pin (note:
+1653:                                         currently the GPIO PIN can not be set
+1654:                                         using overlay parameters, must be
+1655:                                         done in userspace, see examples above.
+1656:         active_low              Set to 1 to turn invert the LED control
+1657:                                 (writing 0 to /sys/class/leds/XXX/brightness
+1658:                                 will turn on the GPIO/LED). Default '0'.
+1659: 
+1660: 
+1661: Name:   gpio-no-bank0-irq
+1662: Info:   Use this overlay to disable GPIO interrupts for GPIOs in bank 0 (0-27),
+1663:         which can be useful for UIO drivers.
+1664:         N.B. Using this overlay will trigger a kernel WARN during booting, but
+1665:         this can safely be ignored - the system should work as expected.

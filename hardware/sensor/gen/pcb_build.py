@@ -684,8 +684,8 @@ def _finish(board, fps, nets, place, args, rt, nid, st):
     silk_text(board, "CR2032", 0.0, 36.0, 1.5, "B.SilkS", thick=0.25, mirror=True)
     silk_text(board, "Verschluckgefahr", 0.0, 38.2, 1.2, "B.SilkS", thick=0.2, mirror=True, wf=0.8)
     silk_text(board, "keep away from children", 0.0, 40.2, 1.0, "B.SilkS", thick=0.17, mirror=True, wf=0.65)
-    # DFM K-4: Platzhalter JLC-Auftragsnummer (B, Band, ohne Pads darunter)
-    silk_text(board, "JLCJLCJLCJLC", 6.0, 19.7, 1.0, "B.SilkS", thick=0.17, mirror=True, wf=0.65)
+    # DFM K-4 (Platzhalter JLC-Auftragsnummer) entfernt 2026-11-08: JLC "Order Number is not available since May 2026.
+    # Please DO NOT add JLCJLCJLCJLC" (docs/references/JLCPCB_HowToMarkOnPCB_Auszug_2026-11-08.txt); Rev bleibt C.
     for tp, lab in (("TP1", "TX"), ("TP2", "RX")):
         x, y = [pcbnew.ToMM(v) for v in (fps[tp].GetPosition().x, fps[tp].GetPosition().y)]
         silk_text(board, lab, x - G.OX + 1.2, y - G.OY, 1.0, "F.SilkS", thick=0.15, just="left")

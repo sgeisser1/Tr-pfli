@@ -11,13 +11,13 @@
 
 ## 1 Dateien für den Upload
 
-Erzeugt mit `hardware/sensor/gen/run_pcb.sh` aus Commit `03341e8`. Vor dem Upload mit `sha256sum` vergleichen.
+Erzeugt mit `hardware/sensor/gen/run_pcb.sh` (Layout Rev C ohne Platzhalter, Phase 5 W-4). Vor dem Upload mit `sha256sum` vergleichen.
 
-**Achtung (Red Team W-4, Entscheid Projektleitung 2026-11-08):** Der Platzhalter `JLCJLCJLCJLC` wird aus dem Layout entfernt (Elektronik, `pcb_build.py`). Danach entstehen neue Gerber; die sha256 dieser Tabelle werden **erst dann** nachgeführt. Bis dahin meldet `order_check.py` „FEHLER Platzhalter … vorhanden“ (Exit 1) – **mit diesem Stand nicht bestellen**.
+**Nachtrag W-4 (2026-11-08):** Der Platzhalter `JLCJLCJLCJLC` ist aus dem Layout entfernt (nur B.Silkscreen, Revision bleibt C). Gerber geometrisch verglichen mit `scripts/gerber_geom_diff.py`: einzige Änderung B.Silkscreen (88 Elemente weniger), alle anderen Lagen/Bohrdaten/Kontur gleich; BOM und CPL bytegleich; DRC 0, Parität 0; `order_check.py` Exit 0. Die sha256 unten sind der gültige Stand.
 
 | Datei | Inhalt | sha256 |
 |---|---|---|
-| `hardware/sensor/out/fluidi_sensor_gerber_jlc.zip` | 11 Gerber (F/In1/In2/B Cu, F/B Mask, F/B Paste, F/B Silkscreen, Edge.Cuts), `PTH.drl`, `NPTH.drl`, Job-Datei | `7da2269dff8755c042cce6fa71d2a57f487c33a3f83389d7f70775ff34791bc0` |
+| `hardware/sensor/out/fluidi_sensor_gerber_jlc.zip` | 11 Gerber (F/In1/In2/B Cu, F/B Mask, F/B Paste, F/B Silkscreen, Edge.Cuts), `PTH.drl`, `NPTH.drl`, Job-Datei | `bf1902ea4bab83d96f385f557575d8311886acf2bacee7aa743d88eef47883d0` |
 | `hardware/sensor/out/fluidi_sensor_bom_jlc.csv` | BOM, 26 Zeilen / 50 Bauteile (Comment, Designator, Footprint, LCSC Part #) | `3d99ffca7b79abe550a57de4ff7d3228eabe4f532bc46f602e6bcec53f456ea9` |
 | `hardware/sensor/out/fluidi_sensor_cpl_jlc.csv` | CPL, 50 Zeilen, alle `Top` (Designator, Mid X, Mid Y, Layer, Rotation) | `b01ba1477406d8c305693567ca70011ccb60892215ccc055ee17d99f6329213f` |
 

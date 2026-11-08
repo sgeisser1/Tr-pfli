@@ -1,0 +1,32 @@
+Netz: 43920 Knoten, 86994 Dreiecke
+Leiterpfad AN043 (Tab. 1) L = 33.80 mm; ueberdeckt s = 4.90 ... 7.76 mm; Energieanteil w = 0.014 (ANNAHME sin^2)
+
+ASA eps_r = 2.5 (ANNAHME)
+  ohne Kunststoff                               C' =   25.391 pF/m  dC'/C'(ohne) =  0.000 %
+  Rev C Block (0.70 vor F, 1.00 ueber Kante)    C' =   29.055 pF/m  dC'/C'(ohne) = 14.428 %
+  P5 Mantel (0.70 bis v +0.28)                  C' =   29.305 pF/m  dC'/C'(ohne) = 15.413 %
+  Halbraum ab 0.76                              C' =   29.541 pF/m  dC'/C'(ohne) = 16.342 %
+  Halbraum ab 0.70                              C' =   29.767 pF/m  dC'/C'(ohne) = 17.234 %
+  Aenderung Rev C Block (0.70 vor F, 1.00 ueber Kante) -> P5 Mantel (0.70 bis v +0.28): dC'/C' = 0.861 %; df lokal (w=1, obere Schranke) = -10.51 MHz; mit w: -0.151 MHz
+  Aenderung Halbraum ab 0.76 -> Halbraum ab 0.70: dC'/C' = 0.767 %; df lokal (w=1, obere Schranke) = -9.36 MHz; mit w: -0.135 MHz
+  Vergleich: ganzer L3-Querschnitt ASA ab 0.70 gegen ohne: dC'/C' = 17.23 %, w=1 -> -210.3 MHz
+
+ASA eps_r = 3.0 (ANNAHME)
+  ohne Kunststoff                               C' =   25.391 pF/m  dC'/C'(ohne) =  0.000 %
+  Rev C Block (0.70 vor F, 1.00 ueber Kante)    C' =   29.820 pF/m  dC'/C'(ohne) = 17.442 %
+  P5 Mantel (0.70 bis v +0.28)                  C' =   30.153 pF/m  dC'/C'(ohne) = 18.755 %
+  Halbraum ab 0.76                              C' =   30.449 pF/m  dC'/C'(ohne) = 19.920 %
+  Halbraum ab 0.70                              C' =   30.742 pF/m  dC'/C'(ohne) = 21.073 %
+  Aenderung Rev C Block (0.70 vor F, 1.00 ueber Kante) -> P5 Mantel (0.70 bis v +0.28): dC'/C' = 1.118 %; df lokal (w=1, obere Schranke) = -13.64 MHz; mit w: -0.196 MHz
+  Aenderung Halbraum ab 0.76 -> Halbraum ab 0.70: dC'/C' = 0.962 %; df lokal (w=1, obere Schranke) = -11.74 MHz; mit w: -0.169 MHz
+  Vergleich: ganzer L3-Querschnitt ASA ab 0.70 gegen ohne: dC'/C' = 21.07 %, w=1 -> -257.1 MHz
+
+ASA eps_r = 3.7 (ANNAHME)
+  ohne Kunststoff                               C' =   25.391 pF/m  dC'/C'(ohne) =  0.000 %
+  Rev C Block (0.70 vor F, 1.00 ueber Kante)    C' =   30.680 pF/m  dC'/C'(ohne) = 20.829 %
+  P5 Mantel (0.70 bis v +0.28)                  C' =   31.121 pF/m  dC'/C'(ohne) = 22.567 %
+  Halbraum ab 0.76                              C' =   31.488 pF/m  dC'/C'(ohne) = 24.011 %
+  Halbraum ab 0.70                              C' =   31.864 pF/m  dC'/C'(ohne) = 25.493 %
+  Aenderung Rev C Block (0.70 vor F, 1.00 ueber Kante) -> P5 Mantel (0.70 bis v +0.28): dC'/C' = 1.438 %; df lokal (w=1, obere Schranke) = -17.55 MHz; mit w: -0.253 MHz
+  Aenderung Halbraum ab 0.76 -> Halbraum ab 0.70: dC'/C' = 1.195 %; df lokal (w=1, obere Schranke) = -14.58 MHz; mit w: -0.210 MHz
+  Vergleich: ganzer L3-Querschnitt ASA ab 0.70 gegen ohne: dC'/C' = 25.49 %, w=1 -> -311.0 MHz
