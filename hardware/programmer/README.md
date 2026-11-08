@@ -162,9 +162,19 @@ Stifte mit einem Hub ≥ 5 mm gibt es in dieser Bauform kaum (**ANNAHME**). Daru
    klein wie möglich (≤ 1 N je Stift, **ANNAHME**), Hub ≥ 1 mm. Kein Löten auf TP1/TP2/Minuspad/VBAT-Pad.
 5. U4/R1/C5 auf dem Stiftträger, Draht Stift TP1 → U4-Pin 2 ≤ 3 cm (Kap. 3/5).
 
-Ob „Bügel + unverlierbare Schwinge“ die Auflage PS-W1 („EIN starres Teil“) erfüllt, entscheidet die Sicherheit: Dummy
-und Bügel sind starr, nur der Stiftträger bewegt sich und ist ohne Werkzeug nicht abnehmbar. Alternative ohne bewegtes
-Teil: Stiftträger erst nach dem Einschieben auf einen Zapfen des Dummys stecken (zweiteilig, verletzt PS-W1 wörtlich).
+**Entscheid Sicherheit (`docs/reviews/phase5_sicherheit_runde3.md` Kap. 2):** „Bügel + unverlierbare Schwinge“ erfüllt
+PS-W1 / R2-A2 unter den Auflagen A1–A5; die zweiteilige Alternative (Stiftträger aufstecken) ist **abgelehnt**. Die
+Konstruktion (PA-1) setzt um:
+
+| Auflage | Umsetzung in der Konstruktion (Konzept, Prüfung ST-P1) |
+|---|---|
+| A1 | Bügel mit dem Dummy verklebt **und** verstiftet; Schwingenachse eingepresst oder verklebt, keine Rast-/Schnappverbindung |
+| A2 | Gegenhalter unverlierbar an Schwinge bzw. Bügel (kein loses Teil) |
+| A3 | Zwangsfolge: Schwinge schliesst erst, wenn der Bügelanschlag an der Platinenkante liegt (Dummy in Endlage); Feder hält die Schwinge offen; offen ≥ 1 mm Luft Stift ↔ Clip, Schwinge an der Clipseite isolierend |
+| A4 | Mit eingesetzter CR2032 stösst der Bügel an die Zelle: Stifte erreichen TP1/TP2 nicht, Dummy berührt Zelle/Clip nicht |
+| A5 | Litzen von Dummy und Stiften gemeinsam an der Baugruppe zugentlastet; keine Steckverbindung zwischen Dummy und Stiftträger |
+
+Weg A bleibt bis zum Bestehen von ST-P1 (a)–(g) **nicht freigegeben**.
 
 **Warum noch kein Druckteil:** Für die Federstifte liegt **kein Datenblatt lokal** (`docs/datasheets/INDEX.csv` Zeile
 P-J3). Für Bohrung/Presssitz, Einbaulänge, Hub und Kraft werden Aussen- und Kopfdurchmesser, Länge, Hub, Federkraft

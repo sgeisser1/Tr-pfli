@@ -164,7 +164,7 @@ def build():
     funnel = Part.makeLoft([w0, w1], True, True).common(prism(P(CAP['CAV_OFF']), H['SLOT_TOP'], H['SLOT_TOP'] + fu))
     cap = cap.cut(funnel).cut(prism(P(CAP['CAV_OFF']), H['SLOT_TOP'] + fu - 0.01, H['H'] - H['CEIL']))
     # Zungentasche durch den Trichter verlaengern (Zunge muss frei biegen, Bauteile werden erst danach angefuegt)
-    ny0 = T_['Y0'] - FP.NOSE['P'] - 0.3                                # P5-M2: Platz fuer Nase und Finger im Trichter
+    ny0 = min(FP.NOSE['YC'], FP.FINGER['Y0']) - 0.3                    # P5-M2: Platz fuer Nase und Finger im Trichter
     cap = cap.cut(box(T_['COL_X0'], T_['COL_X1'], min(ny0, T_['Y0'] - 0.3), FP.SP_IN['Y0'] + 0.1, H['SLOT_TOP'] - 0.01,
                       H['SLOT_TOP'] + fu + 0.01))
     bs = CAP['BULK_SLOT']
@@ -182,17 +182,25 @@ def build():
     # P5-M3 (Phase 5): Mantel um die Membran-Senkung (Wand 0.8). Rev C: Senkung Ø6.4 ragte 0.2 mm seitlich aus dem Block
     # (x 0.8 ... 1.0, z 54.2 ... 55.5) und ihr Boden war fuer y > 6.2 offen -> Leckweg am Membranrand vorbei in den
     # Elektronikraum. Pruefung: checks() Punkt 12.
-    blk = blk.fuse(cyl(BTN['CB_D'] / 2 + 0.8, BTN['BLOCK_Z0'], H['H'] - H['CEIL'] + 0.01, ax, ay))
+    mant = cyl(BTN['CB_D'] / 2 + 0.8, BTN['BLOCK_Z0'], H['H'] - H['CEIL'] + 0.01, ax, ay)
+    # W-1 (Red Team): Boden unter dem Membransitz 0.3 -> 0.8 mm, wo weder Antennennaehe (x > -3.2) noch die
+    # Platinenoberkante (y > 6.3, z 53.5) im Weg sind. K-1: Mantel nicht ueber die Aussenkontur (keine Beule an der Front).
+    mant = mant.fuse(cyl(BTN['CB_D'] / 2 + 0.8, BTN['BLOCK_Z0'] - 0.5, BTN['BLOCK_Z0'] + 0.01, ax, ay).common(
+        box(-30, -3.2, -5, 6.3, 0, 80).fuse(box(-30, 30, -5, 5.6, 0, 80))))   # >= 1 mm vom Antennenkupfer (x >= -2.2, y 6.6)
+    blk = blk.fuse(mant.common(prism(P(0), 0, 80)))
     tg = box(FP.TONGUE['X0'], FP.TONGUE['X1'], FP.TONGUE['Y0'], FP.TONGUE['Y1'], FP.TONGUE['Z_TIP'], BTN['BLOCK_Z0'] + 0.01)
-    # P5-M2: Nase mit 45-Grad-Flanke (oben) und 45-Grad-Fase (unten) an der Zungenvorderseite
-    N_ = FP.NOSE
+    # P5-M2 (Runde 2): Nase an der Zungenvorderseite, Oberseite parallel zur 60-Grad-Keilflaeche des Fingers
+    N_, F_, GD = FP.NOSE, FP.FINGER, FP.GUIDE
     ty0 = FP.TONGUE['Y0']
-    k45 = math.tan(math.radians(N_['ANG']))
-    zt_, zf_ = N_['Z_TOP'], N_['Z_TOP'] - N_['P'] / k45
-    nose = prism_yz([(ty0 + 0.01, zt_), (ty0 - N_['P'], zf_), (ty0 - N_['P'], zf_ - N_['H_VERT']),
-                     (ty0 + 0.01, zf_ - N_['H_VERT'] - N_['P'])], N_['X0'], N_['X1'])
+    tA = math.tan(math.radians(F_['ANG']))
+    nose = prism_yz([(N_['YC'], N_['ZC']), (ty0 + 0.01, N_['ZC'] + (ty0 + 0.01 - N_['YC']) / tA),
+                     (ty0 + 0.01, N_['ZC'] - N_['H_FRONT']), (N_['YC'], N_['ZC'] - N_['H_FRONT'])], N_['X0'], N_['X1'])
     tg = tg.fuse(nose).removeSplitter()
     RIBS['Nase'] = nose
+    # Fuehrungsrippe vor dem Finger (C-1 Verdrehsicherung, W-2 Querkraft), an der Kappenfront bzw. im Trichter verankert
+    guide = box(GD['X0'], GD['X1'], GD['Y0'], GD['Y1'], GD['Z0'], GD['Z1'])
+    RIBS['Fuehrung'] = guide
+    tg = tg.fuse(guide)
     # Rev C: Anschlag + Gabel fuer die Platinenoberkante (links der Antenne), definiert die Lage der Platine in z und y.
     # M-4: vordere Wange = F-Referenz (Luft 0, Einlauffase), hintere Wange mit Quetschrippe (drueckt F an die vordere Wange)
     ps = FP.PSTOP
@@ -220,7 +228,8 @@ def build():
     cap = cap.cut(prism(pocket, z_pf, H['H'] + 1))
     z_cb = z_pf - 2.3                                                # Senkungsgrund 54.2
     cap = cap.cut(cyl(BTN['CB_D'] / 2, z_cb, z_pf + 0.01, ax, ay))
-    cap = cap.cut(cyl(BTN['BORE_D'] / 2, BTN['TUBE_Z0'] - 1, z_cb + 0.01, ax, ay))
+    # C-1: Fuehrungsbohrung mit D-Profil (Flaeche y BORE_FLAT, Spiel 0.1 zur D-Flaeche des Schafts)
+    cap = cap.cut(cyl(BTN['BORE_D'] / 2, BTN['TUBE_Z0'] - 1, z_cb + 0.01, ax, ay).common(box(-30, 30, BTN['BORE_FLAT'], 30, 0, 80)))
     RIBS['Kappe_ohne_Rippen'] = cap
     ribs = rib_f.fuse(rib_s[0]).fuse(rib_s[1])
     RIBS['Rippen'] = ribs
@@ -234,8 +243,10 @@ def build():
     # ------------------------------------------------------------------ Taste, Membran, Klemmring, Stoessel
     z_m0, z_m1 = z_cb, z_cb + BTN['MEMB_T']
     S['Membran_Silikon'] = cyl(BTN['CB_D'] / 2 - 0.02, z_m0, z_m1, ax, ay)
-    ring = cyl(BTN['CB_D'] / 2 - 0.05, z_m1 + 1.0, z_pf, ax, ay).cut(cyl(BTN['RING_ID'] / 2, z_m1, z_pf + 1, ax, ay))
-    ring = ring.fuse(cyl(BTN['CB_D'] / 2 - 0.05, z_m1, z_m1 + 1.0, ax, ay).cut(cyl(BTN['SKIRT_ID'] / 2, z_m1 - 1, z_m1 + 2, ax, ay)))
+    # R3-W2/O-4: Klemmring als Presssitz (Uebermass RING_OVER je Seite), Schuerze verpresst die Membran um MEMB_SQ
+    r_ring = BTN['CB_D'] / 2 + BTN['RING_OVER']
+    ring = cyl(r_ring, z_m1 + 1.0, z_pf, ax, ay).cut(cyl(BTN['RING_ID'] / 2, z_m1, z_pf + 1, ax, ay))
+    ring = ring.fuse(cyl(r_ring, z_m1 - BTN['MEMB_SQ'], z_m1 + 1.0, ax, ay).cut(cyl(BTN['SKIRT_ID'] / 2, z_m1 - 1, z_m1 + 2, ax, ay)))
     S['Klemmring'] = ring.removeSplitter()
     z_bt0 = z_pf + BTN['STROKE']                                     # Taste unten in Ruhe
     taste = prism(btn_poly, z_bt0, H['H'] + BTN['PROUD'])
@@ -244,11 +255,16 @@ def build():
     z_w1 = z_m1 + 1.0                                                # Teller liegt in Ruhe am Ring an
     S['Tastenteller'] = cyl(BTN['WASHER_D'] / 2, z_w1 - BTN['WASHER_T'], z_w1, ax, ay).cut(
         cyl(BTN['NECK_D'] / 2, z_w1 - 1, z_w1 + 1, ax, ay))
-    st = cyl(BTN['STEM_D'] / 2, BTN['TUBE_Z0'], z_m0 - 0.05, ax, ay).common(box(-20, 20, ay - 1.0, 20, 0, 80))  # D-Profil
-    fy1 = FP.TONGUE['Y0'] - FP.TONGUE['WEDGE_GAP']
-    fy0 = fy1 - 1.15
-    st = st.fuse(box(-5.8, ax, fy0, fy1, BTN['TUBE_Z0'] - 0.8, BTN['TUBE_Z0']))       # Arm
-    st = st.fuse(box(-5.8, -4.6, fy0, fy1, FP.TONGUE['Z_CONTACT'] - 0.4, BTN['TUBE_Z0'] - 0.8 + 0.01))  # Finger, Kante auf Nasenflanke (P5-M2)
+    F_, N_ = FP.FINGER, FP.NOSE
+    st = cyl(BTN['STEM_D'] / 2, BTN['TUBE_Z0'], z_m0 - 0.05, ax, ay).common(box(-20, 20, BTN['D_FLAT'], 20, 0, 80))  # D-Profil
+    fy0, fy1 = F_['Y0'], F_['Y1']
+    za0 = BTN['TUBE_Z0'] - F_['ARM_H']
+    st = st.fuse(box(F_['X0'], ax, fy0, fy1, za0, BTN['TUBE_Z0']))                     # Arm 1.5 hoch (W-2)
+    tA = math.tan(math.radians(F_['ANG']))
+    gz = FP.TONGUE['WEDGE_GAP'] / tA                                   # Vorspalt senkrecht ueber der Nasenoberseite
+    zf0 = N_['ZC'] + gz - (N_['YC'] - fy0) / tA
+    st = st.fuse(prism_yz([(fy0, zf0), (fy1, zf0 + (fy1 - fy0) / tA), (fy1, za0 + 0.01), (fy0, za0 + 0.01)],
+                          F_['X0'], F_['X1']))                         # Finger mit 60-Grad-Keil (P5-M2 Runde 2)
     S['Stoessel'] = st.removeSplitter()
 
     # ------------------------------------------------------------------ Tropfenfenster transluzent
@@ -299,7 +315,8 @@ def checks(S, sl_plain):
                ('Schraube_M2', 'Huelse_grau'),
                ('Mutter_M2', 'Verguss_Kragen'),
                ('Band_Huelle_F', 'U3_TMP_Kragen'),        # Mutter eingegossen, Furchlippe Ø1.7 im Boden (unverlierbar)
-               ('PCB', 'Kappe_blau')}                    # Quetschrippen (M-4), unten getrennt geprueft
+               ('PCB', 'Kappe_blau'),                    # Quetschrippen (M-4), unten getrennt geprueft
+               ('Klemmring', 'Kappe_blau'), ('Klemmring', 'Membran_Silikon')}   # Presssitz + Membranverpressung (2e)
     log('1 Kollisionen montiert (Ruhe):')
     hits = collide(S, allowed)
     log('  -> %s' % ('keine' if not hits else '%d Kollisionen' % len(hits)))
@@ -310,16 +327,17 @@ def checks(S, sl_plain):
     log('   Platine / Kappe: ohne Quetschrippen %.4f mm3; Rippen-Ueberdeckung %.3f mm3 (gewollt, 3 Rippen, Dicke 1.6: je '
         '%.2f mm gequetscht)' % (v_rest, v_rib, PCB['Y_B'] - FP.PSTOP['RIB_Y']))
     # 2 Taste gedrueckt: Taste/Teller/Stoessel um Hub nach unten, Membran nicht modelliert (elastisch).
-    #   P5-M2: Ueberdeckung Stoessel-Finger / Zungennase ist gewollt (Zunge biegt aus) -> Kinematik 2a, Rest muss 0 sein.
+    #   P5-M2: Ueberdeckung Finger / Zungennase ist gewollt (Zunge biegt aus) -> Kinematik 2a, Rest muss 0 sein.
     st = BTN['STROKE']
-    T, N_ = FP.TONGUE, FP.NOSE
+    T, N_, F_ = FP.TONGUE, FP.NOSE, FP.FINGER
+    ax_, ay_ = BTN['AX_X'], BTN['AX_Y']
     tongue_cad = S['Kappe_blau'].common(box(T['X0'], T['X1'], T['Y0'], T['Y1'] + 0.01, T['Z_TIP'], BTN['BLOCK_Z0']))
     zg = S['SW1_Taster'].distToShape(tongue_cad)[0]                            # Spalt Zunge -> SW1 aus dem CAD
+    zone = box(N_['X0'] - 0.01, N_['X1'] + 0.01, N_['YC'] - 0.01, T['Y1'], 40, 52)   # Nase + Zunge
     moved = {}
     for k in ('Taste_blau', 'Tastenteller', 'Stoessel'):
         m = S[k].copy(); m.translate(V(0, 0, -st)); moved[k] = m
     fixed = {k: S[k] for k in S if k not in moved and k not in ('Membran_Silikon',)}
-    zone = box(N_['X0'] - 0.01, N_['X1'] + 0.01, T['Y0'] - N_['P'] - 0.01, T['Y1'], 40, 52)   # Nase + Zunge
     hits2 = []
     for a, A in moved.items():
         for b, B in fixed.items():
@@ -327,18 +345,22 @@ def checks(S, sl_plain):
                 c_ = A.common(B)
                 if a == 'Stoessel' and b == 'Kappe_blau':
                     c_ = c_.cut(zone)
+                if a in ('Taste_blau', 'Tastenteller') and b == 'Klemmring':
+                    continue                                           # Teller/Taste gleiten im Ring (Presssitz-Ring)
                 if c_.Volume > 1e-3:
                     hits2.append((a, b, c_.Volume))
     log('2 Taste gedrueckt (Hub %.1f): Ueberdeckungen ausser Finger/Zungennase: %s' % (st, ', '.join('%s/%s %.3f' % h for h in hits2) or 'keine'))
-    # 2a Kinematik aus dem CAD: Finger um d absenken, kleinste Verschiebung der Nase in +y ohne Ueberdeckung = Auslenkung
-    #    der Zunge am Kontakt; Uebertragung auf den Betaetiger mit Kragbalken (Einspannung Tastenblock, Last bei z_c).
-    finger = S['Stoessel'].common(box(-20, 20, -5, 20, 0, T['Z_CONTACT'] - 0.4 + 1.2))
+    # 2a Kinematik aus dem CAD (Finger absenken, kleinste Verschiebung der Nase in +y ohne Ueberdeckung), Kragbalken auf SW1
+    finger = S['Stoessel'].common(box(F_['X0'] - 0.01, F_['X1'] + 0.01, -5, 20, 0, BTN['TUBE_Z0'] - F_['ARM_H']))
     nose = RIBS['Nase']
-    def defl(d, dy=0.0):
-        f = finger.copy(); f.translate(V(0, dy, -d))
+    def defl(d, dy=0.0, rot=0.0):
+        f = finger.copy()
+        if rot:
+            f.rotate(V(ax_, ay_, 0), V(0, 0, 1), rot)
+        f.translate(V(0, dy, -d))
         if f.common(nose).Volume < 1e-5:
             return 0.0
-        lo, hi = 0.0, 2.0
+        lo, hi = 0.0, 2.5
         for _ in range(22):
             mid = (lo + hi) / 2
             n2 = nose.copy(); n2.translate(V(0, mid, 0))
@@ -349,51 +371,91 @@ def checks(S, sl_plain):
         return hi
     root = BTN['BLOCK_Z0']
     xs = root - FP.SW['Z']
-    z_fb = T['Z_CONTACT'] - 0.4
-    def ratio(zc):
-        a_ = root - zc
-        return 1 + 1.5 * (xs - a_) / a_
+    tA = math.tan(math.radians(F_['ANG']))
+    zc = N_['ZC'] + (T['Y0'] - N_['YC']) / tA / 2                     # Lastmitte auf der Nasenoberseite
+    a_ = root - zc
+    ratio = 1 + 1.5 * (xs - a_) / a_ if a_ < xs else 1.0
     need = zg + FP.SW['TRAVEL']
     rows, d_sw = [], None
     for i in range(0, 9):
         d = st * i / 8
         da = defl(d)
-        dsw = da * ratio(z_fb - d)
-        rows.append('d %.2f: Zunge %.3f -> Betaetiger %.3f' % (d, da, dsw))
-        if d_sw is None and dsw >= need - 1e-9 and da > 0:
+        rows.append('d %.1f: %.3f/%.3f' % (d, da, da * ratio))
+        if d_sw is None and da * ratio >= need - 1e-9 and da > 0:
             d_sw = d
-    log('2a Kinematik (CAD, Nase 45 Grad, Zunge %.1f): %s' % (T['Y1'] - T['Y0'], '; '.join(rows)))
-    da_full = defl(st)
-    r_full = ratio(z_fb - st)
-    have = da_full * r_full
-    log('   Spalt Zunge-SW1 (CAD) %.2f + Schaltweg %.2f = %.2f noetig; SW1 schaltet nominal bei Tastenhub %s; voller Hub: Zunge %.2f x Hebel %.2f = %.2f'
-        % (zg, FP.SW['TRAVEL'], need, ('%.2f mm' % d_sw) if d_sw is not None else 'NICHT ERREICHT', da_full, r_full, have))
-    # 2b Toleranzkette: F +-0.1 (FDM), Tasterhoehe 2.0 +-0.1 (XUNPU S.1), Zunge +-0.1 (FDM) -> Spalt +-0.3 worst;
-    #    Schaltweg 0.2 +-0.1 (XUNPU S.1); Vorspalt Finger-Flanke +-0.1 (FDM) -> geometrisch: Finger 0.1 weiter vorn
-    da_min = defl(st, dy=-0.1)
-    have_min = da_min * r_full
-    need_max = zg + 0.3 + FP.SW['TRAVEL'] + 0.1
-    rss_need = math.sqrt(3 * 0.1 ** 2 + 0.1 ** 2)
-    rss = math.sqrt(rss_need ** 2 + ((have - have_min)) ** 2)
-    log('2b Toleranzkette Taster (P5-M2): voller Hub nominal %.2f, noetig %.2f -> Reserve %.2f; RSS +-%.2f -> %.2f; '
-        'worst: verfuegbar %.2f (Vorspalt +0.1, CAD) gegen noetig %.2f (Spalt +0.3, Schaltweg +0.1) -> Reserve %+.2f (Rev C: -0.20)'
-        % (have, need, have - need, rss, have - need - rss, have_min, need_max, have_min - need_max))
-    # 2c Festigkeit/Kraft (Kragbalken, Last bei z_c, Auslenkung am Betaetiger begrenzt durch SW1-Anschlag)
-    tt = T['Y1'] - T['Y0']
-    wt = T['X1'] - T['X0']
-    E, RZ = 2120.0, 35.0      # BambuLab_ASA_TechnicalDataSheet_V2.0.pdf S.2: Modul Z 2120 MPa, Zugfestigkeit Z 35 MPa
-    a_ = root - (z_fb - st)
-    def sig(dsw):
-        return 6 * E * dsw * (tt / 2) / (a_ * (3 * xs - a_))
+    log('2a Kinematik (CAD; Keil %.0f Grad am Finger, Nase in Hoehe SW1, Lastmitte z %.2f, Hebel %.2f): Hub: Zunge/Betaetiger %s'
+        % (F_['ANG'], zc, ratio, '; '.join(rows)))
+    # Verdrehung des Stoessels (C-1): freier Winkel mit D-Bohrung + Fuehrungsrippe, bei Ruhelage
+    others = Part.makeCompound([S['Kappe_blau'].cut(RIBS['Nase']), S['Membran_Silikon'], S['SW1_Taster'], S['PCB']])
+    def free_rot(sign):
+        ang = 0.0
+        for i in range(1, 81):
+            a = sign * 0.25 * i
+            m = S['Stoessel'].copy(); m.rotate(V(ax_, ay_, 0), V(0, 0, 1), a)
+            if m.common(others).Volume > 1e-4:
+                break
+            ang = a
+        return ang
+    rp, rn = free_rot(1), free_rot(-1)
+    da_rot = min(defl(st, rot=rp), defl(st, rot=rn))
+    dy_play = -(F_['Y0'] - FP.GUIDE['Y1'])                             # Spiel zur Fuehrungsrippe (Finger nach vorn)
+    log('2a Verdrehung (C-1): frei %+.2f (Finger nach vorn, Rippe) / %+.2f Grad (Finger zur Zunge); Zunge bei vollem Hub nominal %.3f, '
+        'verdreht %.3f, Finger an der Rippe (dy %.2f) %.3f mm' % (rp, rn, defl(st), da_rot, dy_play, defl(st, dy=dy_play)))
+    log('   Spalt Zunge-SW1 (CAD) %.2f + Schaltweg %.2f = %.2f noetig; SW1 schaltet nominal bei Tastenhub %s'
+        % (zg, FP.SW['TRAVEL'], need, ('%.1f mm' % d_sw) if d_sw is not None else 'NICHT ERREICHT'))
+    # 2b Toleranzkette (W-2): Spalt F/H/Zunge je +-0.1 -> +-0.3; Schaltweg 0.2 +-0.1 (XUNPU S.1); Vorspalt Keil +-0.1 (FDM,
+    #    geometrisch als Finger 0.1 weiter vorn); Spiel Finger-Rippe 0.1 (geometrisch); Verdrehung (geometrisch, schlechtere
+    #    Richtung); Stoessel-Nachgiebigkeit: Arm z-Biegung unter der Schaltkraft (Handrechnung, Hubverlust).
+    E, RZ_B = 2120.0, 42.0    # BambuLab_ASA_TechnicalDataSheet_V2.0.pdf S.2: Modul Z 2120 MPa, Biegefestigkeit Z 42 MPa
+    F_sw_max = 0.160 * 9.81 + 0.050 * 9.81                              # 160 + 50 gf (XUNPU S.1)
+    tt, wt = T['Y1'] - T['Y0'], T['X1'] - T['X0']
     I_ = wt * tt ** 3 / 12
-    k_a = 3 * E * I_ / a_ ** 3
-    F_lat = k_a * (zg / r_full) + FP.SW['FORCE_N'] * xs / a_
-    mu = 0.3                  # ANNAHME Reibung ASA/ASA
-    F_v = F_lat * math.tan(math.radians(N_['ANG']) + math.atan(mu))
-    log('2c Zunge %.1f x %.1f, Kontakt %.1f mm unter der Einspannung: Biegespannung (quer zu den Schichten) nominal %.1f MPa '
-        '(SF %.1f), worst %.1f MPa (SF %.2f) gegen ASA Z %.0f MPa; Querkraft beim Schalten ~%.1f N -> Tastenkraft ~%.1f N '
-        '(+ Membran; mu %.1f ANNAHME); PROTOTYP-PRUEFUNG M-T1/M-T4'
-        % (wt, tt, a_, sig(need), RZ / sig(need), sig(need_max), RZ / sig(need_max), RZ, F_lat, F_v, mu))
+    k_t = 3 * E * I_ / a_ ** 3
+    mu = 0.3                  # ANNAHME Reibung ASA/ASA (Schalten: hoeherer Reibwert = hoehere Tastenkraft)
+    F_lat_sw = F_sw_max * xs / a_ + k_t * (zg + 0.3) / ratio            # worst: groesster Spalt
+    F_v_sw = F_lat_sw * math.tan(math.radians(F_['ANG']) + math.atan(mu))
+    arm_l = abs((F_['X0'] + F_['X1']) / 2 - (ax_ - BTN['STEM_D'] / 2))
+    I_arm = (F_['Y1'] - F_['Y0']) * F_['ARM_H'] ** 3 / 12
+    loss = F_v_sw * arm_l ** 3 / (3 * E * I_arm)
+    def worst_have(dd):
+        return defl(dd - loss, dy=dy_play - 0.1, rot=(rp if defl(st, rot=rp) < defl(st, rot=rn) else rn)) * ratio
+    have = defl(st) * ratio
+    have_min = worst_have(st)
+    need_max = zg + 0.3 + FP.SW['TRAVEL'] + 0.1
+    d_worst = None
+    for i in range(0, 17):
+        dd = st * i / 16
+        if worst_have(dd) >= need_max:
+            d_worst = dd; break
+    log('2b Toleranzkette (W-2): voller Hub nominal %.2f gegen noetig %.2f; worst (Spalt +0.3, Schaltweg +0.1, Vorspalt +0.1, '
+        'Rippenspiel %.2f, Verdrehung, Hubverlust Arm %.3f bei %.1f N) verfuegbar %.2f gegen %.2f -> Reserve %+.2f; '
+        'Schaltpunkt worst bei Tastenhub %s (Rev C: -0.20)'
+        % (have, need, -dy_play, loss, F_v_sw, have_min, need_max, have_min - need_max,
+           ('%.2f mm' % d_worst) if d_worst is not None else '> Hub'))
+    # 2c Tastenkraft beim Schalten
+    F_lat_nom = 0.160 * 9.81 * xs / a_ + k_t * zg / ratio
+    log('2c Tastenkraft beim Schalten (+ Membran, mu %.1f ANNAHME): nominal %.1f N, worst %.1f N (SW1 160 +50 gf, Zunge %.1f x %.1f)'
+        % (mu, F_lat_nom * math.tan(math.radians(F_['ANG']) + math.atan(mu)), F_v_sw, wt, tt))
+    # 2d Ueberlast (C-2): Daumendruck 20 N, SW1 am Anschlag (Kette blockiert). Zunge = Kragbalken mit Stuetze in SW1-Hoehe:
+    #    Vorspannung aus der Auslenkung bis zum Anschlag + Querkraft P aus dem Keil (gestuetzter Kragbalken, Last bei a).
+    L_ = xs
+    b_ = max(L_ - a_, 0.0)
+    W_ = wt * tt ** 2 / 6
+    def sig_pre(dsw):
+        return 6 * E * dsw * (tt / 2) / (a_ * (3 * L_ - a_))
+    out = []
+    for mu_ in (0.3, 0.2, 0.0):
+        P_ = 20.0 / math.tan(math.radians(F_['ANG']) + math.atan(mu_))
+        M_root = P_ * a_ * b_ * (L_ + b_) / (2 * L_ ** 2)
+        for lab, dsw in (('nom', need), ('worst', need_max)):
+            sg = sig_pre(dsw) + M_root / W_
+            out.append('mu %.1f %s: SW1 %.1f N, Zunge %.1f MPa (SF %.2f)' % (mu_, lab, P_, sg, RZ_B / sg))
+    log('2d Ueberlast 20 N auf die Taste, SW1 am Anschlag (C-2): Lastpunkt %.2f mm ueber SW1; %s; gegen Biegefestigkeit Z %.0f MPa. '
+        'SW1-Grenzlast nicht im Datenblatt (PROTOTYP-PRUEFUNG M-T2)' % (b_, '; '.join(out), RZ_B))
+    # 2e Klemmring (R3-W2, O-4): Presssitz und Membranverpressung
+    log('2e Klemmring Presssitz %.2f je Seite (Ueberdeckung mit Kappe %.2f mm3), Membranverpressung %.2f mm = %.0f %% '
+        '(Ueberdeckung %.2f mm3)' % (BTN['RING_OVER'], S['Klemmring'].common(S['Kappe_blau']).Volume, BTN['MEMB_SQ'],
+                                     100 * BTN['MEMB_SQ'] / BTN['MEMB_T'], S['Klemmring'].common(S['Membran_Silikon']).Volume))
     # 3 Huelse abziehen (vereinfacht ohne Logo/Text), O-Ringe gleiten (nicht geprueft)
     kern = ['PCB', 'Kragen', 'CR2032', 'Keystone3034', 'Kappe_blau', 'Mutter_M2', 'Fenster_transluzent',
             'Verguss_Kragen', 'Band_Huelle_F', 'U3_TMP_Kragen']
@@ -579,6 +641,24 @@ def main():
     frac = S['Kappe_blau'].common(ring).Volume / ring.Volume
     log('12 Membran-Senkung Ø%.1f: Wand + Boden 0.3 mm rundum zu %.1f %% Kunststoff (Soll 100 %%) -> %s'
         % (BTN['CB_D'], frac * 100, 'dicht' if frac > 0.999 else 'OFFEN'))
+    # 12b Boden unter dem Membransitz (W-1): Materialdicke senkrecht unter z_cb auf dem Ring r 2.1 ... 3.1, alle 30 Grad
+    kap = S['Kappe_blau']
+    thick = []
+    for ang in range(0, 360, 30):
+        tmin = 99
+        for rr in (2.1, 2.6, 3.1):
+            px_, py_ = ax_ + rr * math.cos(math.radians(ang)), ay_ + rr * math.sin(math.radians(ang))
+            seg = Part.LineSegment(V(px_, py_, zcb - 0.001), V(px_, py_, zcb - 3.0)).toShape()
+            c_ = kap.common(seg)
+            ln = c_.Edges[0].Length if c_.Edges and c_.Edges[0].Vertexes[0].Point.z > zcb - 0.01 or (
+                c_.Edges and max(v.Point.z for v in c_.Edges[0].Vertexes) > zcb - 0.01) else 0.0
+            tmin = min(tmin, ln)
+        thick.append((ang, tmin))
+    log('12b Boden unter dem Membransitz (W-1), min. Dicke je Richtung (0 Grad = +x, 90 Grad = +y): %s'
+        % ', '.join('%d: %.2f' % t for t in thick))
+    # 12c Kappe innerhalb der Aussenkontur P(0) (K-1, keine Beule)
+    outside = kap.cut(prism(P(0), -10, 100)).Volume
+    log('12c Kappe ausserhalb der Aussenkontur: %.4f mm3 (Soll 0)' % outside)
     # 11 Zusammenhang der Druckteile (P5-M1): jedes Druckteil genau 1 Koerper (Rev C: Kappe 2 Koerper, Zapfen lose)
     nsol = ['%s %d' % (k, len(S[k].Solids)) for k in PRINT]
     log('11 Druckteile, Anzahl Koerper (Soll je 1): %s -> %s' % (', '.join(nsol),

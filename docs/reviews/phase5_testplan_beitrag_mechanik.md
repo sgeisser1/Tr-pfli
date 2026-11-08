@@ -24,8 +24,10 @@
 
 | ID | Testfall | Methode | Mittel | Abnahmekriterium | Quelle |
 |---|---|---|---|---|---|
-| M-T1 | Schaltfunktion | Taste mittig und an den 4 Ecken drücken, je 20 × | LED/Firmware-Rückmeldung, Kraftmesser | jede Betätigung erkannt; Betätigungskraft ≤ 5 N (**ANNAHME** Bedienbarkeit, REQ-UI-05) | REQ-UI-04/05; Soll aus CAD: Schaltpunkt ≈ 0.4 mm Hub, Kraft ≈ 4.7 N + Membran (`check_sensor.txt` 2a/2c) |
+| M-T1 | Schaltfunktion | Taste mittig und an den 4 Ecken drücken, je 20 × | LED/Firmware-Rückmeldung, Kraftmesser | jede Betätigung erkannt; Betätigungskraft ≤ 5 N (**ANNAHME** Bedienbarkeit, REQ-UI-05) | REQ-UI-04/05; Soll aus CAD: Schaltpunkt nominal 0.3 mm, worst 0.65 mm Hub; Kraft nominal ≈ 8 N, worst ≈ 12 N + Membran (`check_sensor.txt` 2a–2c) |
 | M-T2 | Kraftfluss, Überlast | 100 × mit 20 N (**ANNAHME** Fehlbedienung) drücken, danach Sicht auf Zunge/Nase/Finger, SW1 und Lötstellen | Kraftmesser, Lupe | kein Weissbruch an Zunge (Schichtgrenzen!), SW1 schaltet weiter, Zelle unbelastet | M-4, `check_sensor.txt` 2b (Überhub 0.45), ST-M2 |
+| M-T5 | Verdrehsicherung Stössel (C-1) | Stössel vor dem Verguss von Hand verdrehen; danach 200 × drücken, Lage des Fingers zur Rippe prüfen | Lupe | Verdrehung ≤ ±1.5° (CAD), Finger bleibt zwischen Rippe und Nase, Schaltfunktion unverändert | Red Team C-1, `check_sensor.txt` 2a |
+| M-T6 | Nasen-Oberseite (60° Überhang) | Kappe drucken, Nase unter Lupe | Lupe | keine Durchhänge > 0.1 mm an der Gleitfläche, sonst nacharbeiten | PRINT_SETTINGS Kap. 3 |
 | M-T3 | Fehlbetätigung Giesswasser | während M-W1 Tasterereignisse protokollieren | Firmware-Log | kein Tastenereignis durch Wasser, keine Werkseinstellung | REQ-UI-06 |
 | M-T4 | Dauerhaltbarkeit | 1000 Betätigungen (**ANNAHME** Lebensdauer-Stichprobe) | Zähler | Funktion wie M-T1, Membran dicht (danach M-W1) | REQ-UI-05 |
 
@@ -35,7 +37,7 @@
 |---|---|---|---|---|---|
 | M-W1 | Spritzwasser Kopf | 1 l aus 20 cm über den Kopf, 10 Wiederholungen, **mit Zelle**; Feuchteindikator im Fach und (Opfermuster) im Elektronikraum | Giesskanne, Indikator | kein Wasser/Kondensat in Fach und Elektronikraum; Ablauf aus den 4 Schlitzen beobachtet | REQ-MECH-13 (= ST-W1) |
 | M-W2 | Spritzwasser nach Wechseln | M-W1 nach 10 Batteriewechseln (M-B1) | wie M-W1 | wie M-W1 | S3-W3 |
-| M-W3 | Membran/Senkung | Opfermuster M0: Kappe mit Taste, 5 mm Wassersäule über der Taste 1 h, Innenraum mit Indikator | Indikator | trocken (Nachweis P5-M3) | REQ-MECH-13, P5-M3 |
+| M-W3 | Membran/Senkung | Opfermuster M0: Kappe mit Taste, 5 mm Wassersäule über der Taste 1 h, Innenraum mit Indikator; danach Farbeindringprüfung am Membransitz und am Klemmring-Presssitz, Auszugskraft Klemmring | Indikator, Farbe, Kraftmesser | trocken; keine Farbe unter der Membran (Nachweis P5-M3, W-1, R3-W2) | REQ-MECH-13, P5-M3, ST-W6 |
 | M-W4 | Kragen / Sondenübergang | Kragen bis z +3 tauchen 24 h, nach 50 Zyklen −10/+65 °C; M0: Schliff durch den Kragen | Indikator, Säge, Lupe | trocken; keine Lunker, keine Ablösung an Platine/Tasche | REQ-MECH-08, K-7 (= ST-W4) |
 | M-W5 | Fenster-Klebung | 65 °C / 7 d, danach M-W1 | Wärmeschrank | keine Verformung, dicht | REQ-MECH-12 (PETG-Nachweis), PRINT_SETTINGS Kap. 1 |
 

@@ -31,8 +31,19 @@ OUT = os.path.join(REPO, 'mechanical', 'drawings')
 PNGD = os.environ.get('FLUIDI_DRAW_PNG')
 ONLY = [s for s in os.environ.get('FLUIDI_DRAW_ONLY', '').split(',') if s]
 H, Z, PCB, CAP, BTN = FP.HEAD, FP.Z, FP.PCB, FP.CAP, FP.BTN
-STAND = 'Rev %s (%s), V-K/M-4 (D-019, D-023), P5-M1/M2/M3; git %s' % (
-    FP.REV, FP.REV_DATE, git_stand(REPO, ['mechanical/gen', 'mechanical/sensor', 'mechanical/gateway_pi']))
+def _gen_hash():
+    import hashlib
+    h = hashlib.sha256()
+    for fn in ('fluidi_params.py', 'fluidi_cadlib.py', 'fluidi_sensor.py', 'fluidi_gateway_pi.py', 'fluidi_drawings.py',
+               'fluidi_drawing_lib.py'):
+        h.update(open(os.path.join(HERE, fn), 'rb').read())
+    return h.hexdigest()[:10]
+
+
+GEN_HASH = _gen_hash()
+# K-5: eindeutiger Stand = SHA-256 der Generatorquellen (unabhaengig vom Commit-Zeitpunkt); git-Basis nur zur Information
+STAND = 'Rev %s, V-K/M-4, P5-M1..M3 R2; Generator-SHA256 %s (git-Basis %s)' % (
+    FP.REV, GEN_HASH, git_stand(REPO, ['mechanical/gen']).replace(' + Arbeitsstand', '+'))
 DATE = datetime.date.today().isoformat()
 ALL_CHECKS = []
 
@@ -171,7 +182,7 @@ def d_kappe(S):
                'kopfüber (Decke auf dem Bett), stützenfrei; Trichter 45° (P5-M1); O-Ring-Nutflanke 1.15 Überhang',
                notes=['6  Tropfenausschnitt r %s, Spitze %s über Mitte (drop2, k %s), Mitte x 0 / z %s; Fenster FL-S-04 eingeklebt (Spalt 0.1).'
                       % (fmt(FP.DROP['R']), fmt(FP.DROP['K'] * FP.DROP['R']), fmt(FP.DROP['K']), fmt(FP.DROP['ZC'])),
-                      '7  Biegezunge 0.6 mit Nase, Flanke 45° (P5-M2); Fingerkante des Stössels FL-S-08 gleitet darauf. Nachweis check_sensor.txt 2a–2c.'])
+                      '7  Zunge 0.6 mit Nase (Oberseite 30°, kopfüber 60° Überhang 1.2 mm), Führungsrippe, D-Bohrung Ø3.2/Fläche y 2.3 (P5-M2, check_sensor 2a–2e).'])
     s = 2.0
     fr = View(sh, k, 'front', s).place(85, 200).draw('Vorderansicht', 16)
     aa = View(sh, k, 'left', s, section=(0, 0, 0)).place(178, 200).draw('A–A', 16)
@@ -213,24 +224,27 @@ def d_kappe(S):
     zpf = H['H'] - BTN['POCKET_D']
     zcb = zpf - 2.3
     bb.dim((ax_, ay_ - BTN['CB_D'] / 2, 55.0), (ax_, ay_ + BTN['CB_D'] / 2, 55.0), 'h', bb.top(1, 5), 'Senkung Membran', k, pre='Ø', frame=True)
-    bb.dim((ax_, ay_ - BTN['BORE_D'] / 2, 53.0), (ax_, ay_ + BTN['BORE_D'] / 2, 53.0), 'h', bb.bottom(1), 'Fuehrung Stoessel', k, pre='Ø', frame=True)
+    bb.dim((ax_, BTN['BORE_FLAT'], 53.0), (ax_, ay_ + BTN['BORE_D'] / 2, 53.0), 'h', bb.bottom(1), 'D-Bohrung Stoessel (Flaeche bis Gegenseite, Ø3.2)', k, frame=True)
     bb.dim((ax_, ay_ + 2.2, zcb), (ax_, ay_ + 3.7, zpf), 'v', bb.right(1), 'Senkung Tiefe', k, tside=1)
     bb.dim((ax_, ay_ + 1.8, BTN['TUBE_Z0']), (ax_, ay_ + 2.2, zcb), 'v', bb.left(1), 'Rohr bis Senkung', k)
     bb.centerline((ax_, ay_, BTN['TUBE_Z0'] - 2), (ax_, ay_, H['H'] + 1))
     # C-C: Zunge + Platinenanschlag
     T_, ps = FP.TONGUE, FP.PSTOP
-    N_ = FP.NOSE
-    zf_ = N_['Z_TOP'] - N_['P']
+    N_, GD = FP.NOSE, FP.GUIDE
     cc.dim((XC, T_['Y0'], 50), (XC, T_['Y1'], 50), 'h', cc.bottom(1), 'Zunge Dicke', k, tside=1, frame=True)
-    cc.dim((XC, T_['Y0'] - N_['P'], zf_ - 0.25), (XC, T_['Y0'], 50), 'h', cc.bottom(2), 'Nase Ueberstand', k, tside=1, frame=True)
-    cc.dim((XC, 4.0, T_['Z_TIP']), (XC, T_['Y0'], N_['Z_TOP']), 'v', cc.left(1), 'Zungenspitze bis Nasenflanke oben', k, frame=True)
+    cc.dim((XC, N_['YC'], N_['ZC'] - 0.3), (XC, T_['Y0'], 50), 'h', cc.bottom(2), 'Nase Ueberstand', k, tside=1, frame=True)
+    cc.dim((XC, 4.0, T_['Z_TIP']), (XC, N_['YC'], N_['ZC']), 'v', cc.left(1), 'Zungenspitze bis Nasenkante', k, frame=True)
+    cc.dim((XC, 0, 50.5), (XC, GD['Y1'], 49.0), 'h', cc.bottom(4), 'Fuehrungsrippe ab Front', k, frame=True)
     cc.dim((XC, 4.0, T_['Z_TIP']), (XC, 7.4, PCB['Z_TOP']), 'v', cc.left(2), 'Zungenspitze bis Platinenanschlag', k)
     cc.dim((XC, PCB['Y_F'], 52.8), (XC, PCB['Y_B'] + ps['CLR_B'], 52.8), 'h', cc.top(1, 5), 'Gabel Weite (ohne Rippe)', k, tside=1)
     cc.dim((XC, 6.0, PCB['Z_TOP'] - ps['FORK']), (XC, 7.4, PCB['Z_TOP']), 'v', cc.right(1), 'Gabel Tiefe', k, tside=1)
     cc.dim((XC, 7.4, PCB['Z_TOP']), (XC, 10, H['H']), 'v', cc.right(2), 'Anschlag unter Oberseite', k, frame=True)
     cc.dim((XC, 0, 50.5), (XC, PCB['Y_F'], 52.8), 'h', cc.bottom(3), 'F-Referenz ab Front (Gabelwange vorn)', k, frame=True,
            chk=[(XC, 0, 50.5), (XC, PCB['Y_F'], 52.8)])
-    cc.note((XC, T_['Y0'] - N_['P'] / 2, N_['Z_TOP'] - N_['P'] / 2), 'Flanke 45° (P5-M2)', -18, 8, shape=k, what='Nasenflanke auf Geometrie')
+    tA = math.tan(math.radians(FP.FINGER['ANG']))
+    cc.note((XC, 3.1, N_['ZC'] + (3.1 - N_['YC']) / tA), 'Nase: Oberseite 30° zur\nWaagrechten (= Keil FL-S-08)', 22, 14, shape=k,
+            what='Nasenoberseite auf Geometrie')
+    cc.note((XC, GD['Y1'], 47.5), 'Führungsrippe (C-1)', 24, -26, shape=k, what='Fuehrungsrippe auf Geometrie')
     cc.note((XC, T_['Y1'], 45.5), 'SW1-Betätiger: Spalt %s\n(check_sensor.txt 2a/2b)' % fmt(FP.SW['GAP']), 18, -6)
     # Draufsicht
     bw, bd = BTN['W'] + 2 * BTN['POCKET_GAP'], BTN['D'] + 2 * BTN['POCKET_GAP']
@@ -376,9 +390,9 @@ def d_taste(S):
 
 def d_klemmring(S):
     ax_, ay_ = BTN['AX_X'], BTN['AX_Y']
-    zm1 = H['H'] - BTN['POCKET_D'] - 2.3 + BTN['MEMB_T']
+    zm1 = H['H'] - BTN['POCKET_D'] - 2.3 + BTN['MEMB_T'] - BTN['MEMB_SQ']     # Schuerzenunterkante (verpresst Membran)
     zpf = H['H'] - BTN['POCKET_D']
-    ro = BTN['CB_D'] / 2 - 0.05
+    ro = BTN['CB_D'] / 2 + BTN['RING_OVER']                                    # Presssitz (R3-W2)
 
     def dims(v, k):
         a = v['a']
@@ -386,11 +400,12 @@ def d_klemmring(S):
         a.dim((ax_, ay_ - BTN['RING_ID'] / 2, 56.0), (ax_, ay_ + BTN['RING_ID'] / 2, 56.0), 'h', a.top(2, 5), 'Bohrung', k, pre='Ø')
         a.dim((ax_, ay_ - BTN['SKIRT_ID'] / 2, zm1 + 0.5), (ax_, ay_ + BTN['SKIRT_ID'] / 2, zm1 + 0.5), 'h', a.bottom(1), 'Schuerze innen', k, pre='Ø')
         a.dim((ax_, ay_ + ro, zm1), (ax_, ay_ + ro, zpf), 'v', a.right(1), 'Hoehe', k)
-        a.dim((ax_, ay_ + 2.0, zm1 + 1.0), (ax_, ay_ + 2.0, zpf), 'v', a.left(1), 'Platte', k, tside=-1)
+        a.dim((ax_, ay_ + 2.0, zm1 + 1.0 + BTN['MEMB_SQ']), (ax_, ay_ + 2.0, zpf), 'v', a.left(1), 'Platte', k, tside=-1)
         a.centerline((ax_, ay_, zm1 - 0.5), (ax_, ay_, zpf + 0.5))
     small(S, 'Klemmring', 'FL-S-06', 'FL-S-06_klemmring', 'Klemmring Membran', 'klemmt Silikonmembran Ø6.4 × 0.5 in der Senkung der Kappe',
           'ASA (Bambu, TDS V2.0), Hellblau', 10, 'Platte auf dem Bett, 0.12 mm',
-          [('a', 'left', (ax_, 0, 0), (110, 150), 'A–A (durch Achse)')], dims)
+          [('a', 'left', (ax_, 0, 0), (110, 150), 'A–A (durch Achse)')], dims,
+          notes=['6  Presssitz in Senkung Ø6.4 (Übermass 0.05 je Seite), Schürze verpresst die Membran 0.1 mm (R3-W2); Schürzen-Unterseite = Dichtfläche.'])
 
 
 def d_teller(S):
@@ -410,25 +425,32 @@ def d_teller(S):
 
 def d_stoessel(S):
     ax_, ay_ = BTN['AX_X'], BTN['AX_Y']
-    T_ = FP.TONGUE
-    fy1 = T_['Y0'] - T_['WEDGE_GAP']
-    fy0 = fy1 - 1.15
+    F_, N_ = FP.FINGER, FP.NOSE
+    tA = math.tan(math.radians(F_['ANG']))
+    zf0 = N_['ZC'] + FP.TONGUE['WEDGE_GAP'] / tA - (N_['YC'] - F_['Y0']) / tA
     z0, z1 = BTN['TUBE_Z0'], H['H'] - BTN['POCKET_D'] - 2.3 - 0.05
+    za0 = z0 - F_['ARM_H']
+    xm = (F_['X0'] + F_['X1']) / 2
 
     def dims(v, k):
-        f, t = v['f'], v['t']
+        f, t, a = v['f'], v['t'], v['a']
         f.dim((ax_ + 1.0, ay_, z0), (ax_ + 1.0, ay_, z1), 'v', f.right(1), 'Schaft Laenge', k, chk=[(ax_ + 1.0, ay_ + 1.118, z0 + 0.5), (ax_ + 1.0, ay_ + 1.118, z1)])
-        f.dim((-5.8, fy1, T_['Z_CONTACT'] - 0.4), (-5.8, fy1, z0), 'v', f.left(1), 'Finger + Arm', k)
-        f.dim((-5.8, fy1, 50.0), (-4.6, fy1, 50.0), 'h', f.bottom(1), 'Finger Breite', k)
-        f.dim((-5.8, fy1, z0), (ax_ + 1.5, ay_, 52.0), 'h', f.top(1, 5), 'Finger bis Achse', k,
-              chk=[(-5.8, fy1, z0 - 0.4), (ax_ + 1.5, ay_, 52.0)], text=fmt(ax_ + 5.8))
-        t.dim((-5.8, fy0, 50.0), (-5.8, fy1, 50.0), 'v', t.left(1), 'Finger Dicke', k, tside=-1)
+        f.dim((F_['X0'], F_['Y0'], zf0), (F_['X0'], F_['Y0'], z0), 'v', f.left(1), 'Finger + Arm', k)
+        f.dim((-3.0, F_['Y0'], za0), (-3.0, F_['Y0'], z0), 'v', f.right(2), 'Arm Hoehe', k)
+        f.dim((F_['X0'], F_['Y0'], 48.0), (F_['X1'], F_['Y0'], 48.0), 'h', f.bottom(1), 'Finger Breite', k)
+        f.dim((F_['X0'], F_['Y0'], z0), (ax_ + 1.5, ay_, 52.0), 'h', f.top(1, 5), 'Finger bis Achse', k,
+              chk=[(F_['X0'], F_['Y0'], z0 - 0.4), (ax_ + 1.5, ay_, 52.0)], text=fmt(ax_ - F_['X0']))
+        t.dim((F_['X0'], F_['Y0'], 50.0), (F_['X0'], F_['Y1'], 50.0), 'v', t.left(1), 'Finger Dicke', k, tside=-1)
         t.dim((ax_ - 1.5, ay_, 52.0), (ax_ + 1.5, ay_, 52.0), 'h', t.top(1, 5), 'Schaft', k, pre='Ø', frame=True)
-        t.dim((ax_, ay_ - 1.0, 52.0), (ax_, ay_ + 1.5, 52.0), 'v', t.right(1), 'D-Flaeche', k)
-    small(S, 'Stoessel', 'FL-S-08', 'FL-S-08_stoessel', 'Stössel mit Finger', 'überträgt den Tastenhub auf die Biegezunge der Kappe',
-          'ASA (Bambu, TDS V2.0), Farbe beliebig', 10, 'flach auf der D-Fläche, 0.12 mm',
-          [('f', 'front', None, (80, 165), 'Vorderansicht'), ('t', 'bottom', None, (80, 112), 'Ansicht von unten')], dims,
-          notes=['6  Untere hintere Fingerkante = Gleitkante auf der 45°-Nasenflanke der Zunge (P5-M2), scharfkantig drucken, nicht verrunden.'])
+        t.dim((ax_, BTN['D_FLAT'], 52.0), (ax_, ay_ + 1.5, 52.0), 'v', t.right(1), 'D-Flaeche (buendig Arm/Finger)', k, frame=True)
+        a.dim((xm, F_['Y0'], zf0), (xm, F_['Y1'], zf0 + (F_['Y1'] - F_['Y0']) / tA), 'v', a.right(1), 'Keil Hoehe', k)
+        a.note((xm, 3.0, zf0 + (3.0 - F_['Y0']) / tA), 'Keil 60° zur Senkrechten\n(scharfkantig, nicht verrunden)', 14, -10, shape=k,
+               what='Keilflaeche auf Geometrie')
+    small(S, 'Stoessel', 'FL-S-08', 'FL-S-08_stoessel', 'Stössel mit Finger', 'überträgt den Tastenhub über einen 60°-Keil auf die Nase der Biegezunge',
+          'ASA (Bambu, TDS V2.0), Farbe beliebig', 5, 'flach auf der D-Fläche (Arm/Finger bündig, stützenfrei), 0.12 mm',
+          [('f', 'front', None, (80, 160), 'Vorderansicht'), ('t', 'bottom', None, (80, 112), 'Ansicht von unten'),
+           ('a', 'left', (xm, 0, 0), (170, 160), 'A–A (Finger)')], dims,
+          notes=['6  Finger läuft vorn an der Führungsrippe der Kappe (Spiel 0.1), Schaft in D-Bohrung (Spiel 0.1): Verdrehsicherung (C-1).'])
 
 
 def d_schottkeil(S):
@@ -706,6 +728,7 @@ def main():
                 continue
             fn(GN, GS)
     lines = ['fluidi Fertigungszeichnungen - Pruefprotokoll der Masse (erzeugt von mechanical/gen/fluidi_drawings.py, %s)' % DATE,
+             'Generator-SHA256 (fluidi_params, fluidi_cadlib, fluidi_sensor, fluidi_gateway_pi, fluidi_drawings, fluidi_drawing_lib): %s' % GEN_HASH,
              'Stand: %s' % STAND,
              'Jede Masszahl ist der Abstand zweier Modellpunkte; Spalte "max d" = groesster Abstand der Messpunkte zur',
              'Geometrie des Teils (Soll < 0.005 mm, sonst FEHLER).', '']

@@ -84,9 +84,9 @@ C Kollisionen in Endlage (Schnittvolumen > 1e-04 mm3) und kleinster Abstand je B
    C3           0.60 Kappe_blau, 1.50 Schottkeil, 1.58 Verguss_Schott
    C4           0.60 Kappe_blau, 1.50 Schottkeil, 1.58 Verguss_Schott
    Q1           0.76 Kappe_blau, 2.95 Huelse_grau
-   Q2           1.00 Kappe_blau, 3.80 Huelse_grau
+   Q2           1.00 Kappe_blau, 3.80 Huelse_grau, 4.15 Stoessel
    R10          0.80 Kappe_blau, 3.00 Huelse_grau, 3.12 ORing_Zapfen
-   SW1          0.25 Kappe_blau, 2.51 Stoessel, 2.78 Fenster_transluzent
+   SW1          0.25 Kappe_blau, 1.13 Stoessel, 2.78 Fenster_transluzent
    U3           0.40 Kragen, 2.81 Huelse_grau, 3.02 ORing_Kragen
    (alle anderen Bauteile >= 1.0 mm zum Gehaeuse)
 
@@ -142,7 +142,7 @@ H Antenne AE1
    Abstand Antennenkupfer - Stoessel             1.26 mm
    Abstand Antennenkupfer - Fenster_transluzent  3.51 mm
    Abstand Antennenkupfer - Taste_blau           2.00 mm
-   Abstand Antennenkupfer - Klemmring            1.50 mm
+   Abstand Antennenkupfer - Klemmring            1.40 mm
    Abstand Antennenkupfer - Tastenteller         2.12 mm
    Abstand Antennenkupfer - Membran_Silikon      1.00 mm
    Abstand Antennenkupfer - ORing_Zapfen         14.76 mm
@@ -166,7 +166,7 @@ I Kragen und Kragenverguss (Z5A/Z5B)
 
 J Schott (Verguss z 30.8 ... 32.0, Z3 z 30.3 ... 32.7)
    Pads in Z3: keine
-   tiefstes Bauteil im Band: C3 Unterkante z 33.50 -> 1.50 mm ueber Schott-Oberkante (Verguss, Keil)
+   tiefstes Bauteil im Band: C4 Unterkante z 33.50 -> 1.50 mm ueber Schott-Oberkante (Verguss, Keil)
 
 K Platine (STEP, mit Clip, ohne Zelle) 60 mm von unten durch das Schott einschieben
    frei

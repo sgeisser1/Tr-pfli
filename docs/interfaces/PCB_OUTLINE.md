@@ -105,9 +105,9 @@ Antennenspeisung, UART R9–R12 links unten (kurzer Weg zum Testpad-Streifen).
 
 | Teil | Lage | Abstand |
 |---|---|---|
-| Biegezunge (Kappe) | x −7.6 … −4.4, y 3.55 … 4.35, z 43.5 … 53.9 | **0.25 mm** zu SW1 (M-4); Betätiger Ø 1.8 liegt 0.7 mm innerhalb der Zunge (x und unten). Tastenhub 0.8, Keil-Vorspalt 0.10, Hebel 2.5 → 0.90 mm Weg am Betätiger, nötig 0.45 (Spalt + Hub); Toleranzkette `check_sensor.txt` 2b |
+| Biegezunge (Kappe), P5-M2 | x −7.6 … −4.4, **y 3.75 … 4.35 (0.6)**, z 43.5 … 53.9; Nase x −6.0 … −4.4, Vorderkante y 2.55 / z 45.9, Oberseite 30° | **0.25 mm** zu SW1. Stössel-Finger mit 60°-Keil auf der Nase, Führungsrippe der Kappe vor dem Finger (y ≤ 2.3), D-Bohrung. SW1 schaltet nominal bei 0.3 mm Tastenhub, worst 0.65 (Reserve +0.17 am Betätiger); Kinematik, Toleranzkette, Überlast `check_sensor.txt` 2a–2e |
 | **Platinenanschlag + Gabel (Kappe, Rev C)** | x −8.0 … −3.0; Anschlagfläche z 53.5; Gabel z 52.0 … 53.5, vordere Wange y 5.8 … 6.6 (F-Referenz, Einlauffase 0.5), hintere Wange y 8.35 … 9.15 mit Quetschrippe 0.6 breit bis y 7.95 | Platinenoberkante liegt an (beim Schott-Verguss kopfüber durch das Eigengewicht). 0.8 mm neben dem Antennenkupfer (x −2.2) |
-| Stössel Ø 3 / Rohr Ø 4, Finger, Tastenblock | Achse (−2.2, 3.8), z 49.1 … 56 | zum echten Antennenkupfer (STEP): Stössel **1.26 mm**, Kappe 0.76 mm, Membran 1.00, Klemmring 1.50, Taste 2.00 |
+| Stössel Ø 3 (D-Fläche y 2.4) / Rohr Ø 4, Finger, Tastenblock, Senkungsmantel Ø 8 | Achse (−2.2, 3.8), Finger z 45.9 … 51.5 | zum echten Antennenkupfer (STEP, Phase 5): Kappe **0.70 mm** (Mantel über dem Speisepunkt; von `elektronik` bestätigt, d8dfac7), Stössel 1.26, Membran 1.00, Klemmring 1.50, Taste 2.00 |
 | Fenster-Lichtschaft Ø 3.0 | x 0, z 42.4 … 45.4, bis y 4.0 | 3.5 mm zum Antennenkupfer |
 | Zapfen innen | x ± 13.2, y 4.4 … 8.4 (z 32 … 44.9) | 0.2 mm zur Bauteilhülle 2.0 und zur B-Seite |
 | Schott-Durchführung | x ± 13.2, y 4.4 … 8.4 | danach mit Schottkeil (Rückseite y 6.6 = F-Referenz) + Epoxid verschlossen; 2 Quetschrippen an der Rückwand bei x ± 9 (bis y 7.95, Einlauffase) |
@@ -171,7 +171,7 @@ liegt also auf der sicheren Seite.
 1. **Elektronik (D-023):** Layout auf V-K nachführen: BT1 (3.000, 34.800), Plus-Pads Spanne 23.1 (Kap. 5), U3/C24 +0.70 in Y,
    Zonen/Regelflächen Z4/Z5A/Z5B/Z6 (Kap. 3), DRC-Regel Pad-Rand ≥ 0.5 mm zu den Vergusskanten Y 22.7 / Y 46.9, TP3 streichen (A-1).
    Herleitung LS-W1: Fach 24.2, Pads 23.1 → 0.55 je Seite; Lage ± 0.22 (Schott) / ± 0.25 (Kragen) RSS → ≥ 0.30.
-2. **Elektronik:** Kunststoff vor der Antenne (Kappe 0.76, Membran 1.0, Stössel 1.26 mm) bestätigen; S11/RSSI im Gehäuse (**PROTOTYP-PRÜFUNG**).
+2. **Elektronik:** Kunststoff vor der Antenne (Kappe 0.70 – bestätigt d8dfac7, Membran 1.0, Stössel 1.26 mm); S11/RSSI im Gehäuse (**PROTOTYP-PRÜFUNG**).
 3. **Mechanik/FEM:** Hülsenboden 1.3 und Vergusskante z 1.3 nachgerechnet (`simulation/fem/REPORT.md` Kap. 5).
 4. **Mechanik:** Abfluss an der Sichtfuge und Kragen-Verguss mit Tasche am Muster prüfen (REQ-MECH-13, **PROTOTYP-PRÜFUNG**);
    dünnste Zapfenwand 0.54 mm hinter den hinteren Nutecken (FDM: 2 Linien 0.42 mit Überlappung, Passprobe oben drucken).

@@ -132,3 +132,12 @@ Bedingungen (alle Pflicht):
 
 Textvorschlag für Regel 1 (Projektleitung): „… keine Speisung über TP1/TP2. Einzige Ausnahme: Sicherheitstest
 PT11.06/ST-Z5 nach den Bedingungen Z5-1…Z5-7 in `docs/reviews/phase5_sicherheit_runde3.md`.“
+
+## Antwort Ersteller (Mechanik, 2026-11-08)
+
+| Befund | Antwort | Umsetzung / Nachweis |
+|---|---|---|
+| R3-W2 Klemmring/Membran (O-4) | **umgesetzt** | Klemmring als Presssitz 0.05 je Seite, Schürze verpresst die Membran 0.1 mm = 20 % (`check_sensor.txt` 2e). Boden unter dem Sitz 0.8 mm ausser Sektor zur Platine/Antenne 0.3 mm (12b, W-1). `MONTAGE_SENSOR.md` O-4, Schritt 3.4, Prüfung 3 „Membran rundum geklemmt“; Test M-W3/ST-W6 (a) mit Farbeindringprüfung und Auszugskraft |
+| R3-W3 Zapfenwand 0.54 | **Druckvorgabe statt Geometrie** | ≥ 0.8 mm ist in Rev C nicht ohne Folgeprobleme möglich: Die Wand liegt zwischen Nutgrund-Ecke (R 3.0) und Platinenecke (x 13.0 / y 8.2); grössere Zapfen-Innenradien schneiden die Platinenecke (max. ≈ 0.64 mm Wand bei 0.1 Spiel). `PRINT_SETTINGS.md` Kap. 3 „Druckvorgabe Zapfenwand“: 4 Wände, 100 %, Lücken füllen, Naht hinten-Mitte, Durchleuchtprüfung; ST-W6 (b); Rev D ≥ 0.8 |
+| G-R2 RTC-Zelle | **umgesetzt** | `fluidi_gateway_pi.py` / `check_gateway_pi.txt` 13: Modul mit der Platinenrückseite an die Deckeldecke geklebt (Randstreifen), CR1220-Halter zum Pi, nach Abnehmen des Deckels ohne Lösen der Klebung wechselbar, nicht gegen den Deckel gepresst (≥ 0.5 mm Luft zur Haube) |
+| A1–A5 (PA-1) | **umgesetzt im Konzept** | `hardware/programmer/README.md` Kap. 4, Tabelle A1–A5; Druckteil weiter blockiert durch fehlendes Federstift-Datenblatt (INDEX P-J3) |

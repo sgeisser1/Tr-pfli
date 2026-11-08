@@ -20,8 +20,8 @@ sondern die Projektleitung fragen.
 | O-1 | **Vergussmasse** (Kragen, Schott): Epoxid 2K, mineralisch gefüllt, Tg ≥ 80 °C, niedriger CTE, *ein* Material für den ganzen Kragen (K-4) | Typ **offen** (`docs/datasheets/INDEX.csv` EP-K), damit auch Topfzeit, Mischverhältnis, Aushärtung, Primer. **Ohne Datenblatt kein Verguss am Serienteil.** |
 | O-2 | **Kantenversiegelung/Beschichtung der Sonde** (REQ-MECH-07) | Verfahren nicht gewählt (Red-Team W-5) |
 | O-3 | Klebstoff Lichtfenster | **ANNAHME** transparentes 2K-Epoxid oder UV-Kleber (PRINT_SETTINGS Kap. 5) |
-| O-4 | Befestigung Klemmring (Pos. 6) in der Senkung: Spiel 0.05 je Seite im CAD, Befestigung (Presssitz/Kleber) nicht festgelegt | am Muster festlegen (PROTOTYP-PRÜFUNG) |
-| O-5 | Tastermechanik (P5-M2): Zunge 0.6 mm mit Nase (Flanke 45°), Fingerkante des Stössels gleitet darauf; SW1 schaltet im CAD nominal bei 0.40 mm Tastenhub, Toleranzkette worst +0.14 mm (`check_sensor.txt` 2a–2c) | Betätigungskraft (≈ 4.7 N + Membran, μ ANNAHME), Biegespannung worst SF 1.34 (quer zu den Schichten), Last auf SW1 nach dem Durchschalten: PROTOTYP-PRÜFUNG M-T1/M-T4 |
+| O-4 | Klemmring (Pos. 6): **Presssitz** 0.05 je Seite in der Senkung Ø 6.4, Schürze verpresst die Membran um 0.1 mm (20 %) – Phase 5 R3-W2 (`check_sensor.txt` 2e) | Auszugskraft und Dichtheit am Muster: PROTOTYP-PRÜFUNG ST-W6 (a), M-W3; Klebung nur, wenn ein Kleber mit Datenblatt gewählt ist |
+| O-5 | Tastermechanik (P5-M2, Runde 2): 60°-Keil am Finger auf einer Nase der Zunge in Höhe SW1, Führungsrippe und D-Bohrung gegen Verdrehen. SW1 schaltet im CAD nominal bei 0.3 mm Tastenhub, worst bei 0.65 mm (Reserve +0.17); Tastenkraft nominal ≈ 8 N, worst ≈ 12 N (+ Membran, μ 0.3 ANNAHME) (`check_sensor.txt` 2a–2e) | **Überlast:** nach dem Schalten trägt SW1 die Tastenkraft; bei 20 N und μ ≥ 0.3 Zunge SF ≥ 1.15, bei kleinerer Reibung < 1 → PROTOTYP-PRÜFUNG M-T2; Taste nicht mit Kraft drücken |
 | O-6 | Anzugsmoment Schraube M2 × 3 in ASA/Mutter | nicht festgelegt; „handfest mit PH1“ (**ANNAHME**), am Muster prüfen (ST-K1) |
 
 ## 1 Teile, Werkzeuge, Hilfsstoffe
@@ -62,16 +62,16 @@ Geometrie.
 
 1. **Lichtfenster (Pos. 4)** von aussen in den Tropfenausschnitt kleben, Lichtschaft nach innen (Spalt 0.1 je Seite).
    Klebstoff nur auf den Rand, nicht auf die Sichtfläche und nicht in den Innenraum (O-3).
-2. **Stössel (Pos. 8)** von unten in das Führungsrohr Ø 3.2 stecken, D-Fläche nach vorne, Finger links vor der Zunge,
-   Fingerkante über der Nasenflanke (die Zunge dabei nicht nach hinten biegen).
+2. **Stössel (Pos. 8)** von unten in die D-Bohrung des Führungsrohrs stecken (D-Fläche nach vorne, passt nur so),
+   Finger links zwischen Führungsrippe (vorne) und Zungennase (hinten).
 3. **Membran (Pos. 10)** flach auf den Grund der Senkung Ø 6.4 legen.
 4. **Taste (Pos. 5)** mit dem Hals von oben durch den Klemmring (Pos. 6) stecken, **Tastenteller (Pos. 7)** von unten
-   auf den Hals pressen. Die Einheit Taste + Klemmring + Teller in die Senkung setzen, Klemmring auf die Membran drücken
-   (Befestigung O-4).
+   auf den Hals pressen. Die Einheit Taste + Klemmring + Teller in die Senkung setzen und den Klemmring (Presssitz) bis
+   auf die Membran einpressen (flaches Werkzeug, gleichmässig, O-4).
 
-**Prüfung 3:** Taste federt zurück (Membran), Stössel gleitet ohne Klemmen. Ohne Platine: beim Drücken bewegt sich die
-Zunge sichtbar nach hinten (Nase, P5-M2), in Ruhe liegt die Fingerkante ≈ 0.1 mm vor der Flanke (Zunge nicht vorgespannt).
-Fenster sitzt bündig, keine Kleberspuren auf der Sichtfläche.
+**Prüfung 3:** Taste federt zurück (Membran), Stössel gleitet ohne Klemmen und lässt sich **nicht verdrehen** (C-1).
+Membran rundum unter dem Klemmring geklemmt, Klemmring sitzt bündig und fest (R3-W2). Ohne Platine: beim Drücken bewegt
+sich die Zunge sichtbar nach hinten (Nase), in Ruhe ist sie nicht vorgespannt. Fenster bündig, keine Kleberspuren.
 
 ## 4 Platine einsetzen und Schott vergiessen (Pos. 9, 15, 16)
 
@@ -140,8 +140,8 @@ dieser Anleitung ausführen (R3-K4).
 - Hülse lässt sich von Hand nicht abziehen, Sichtfuge rundum gleich (0.3 mm), Kerbe um den Tropfen gleichmässig.
 - O-Ringe sichtbar verpresst bzw. nicht aus der Nut gequetscht (vor dem Aufschieben kontrollieren).
 - Ablaufschlitze hinten frei.
-- Funktion: kurzer Tastendruck → Messung/Statusanzeige (REQ-UI-04); die Taste stoppt nach dem Klick (SW1 am Anschlag,
-  nominal ≈ 0.4 mm Hub), nicht erst am Taschenboden; L11 war nach dem Einsetzen sichtbar.
+- Funktion: Taste **mit normaler Fingerkraft** kurz drücken (≈ 8 N, klickt nach ≈ 0.3 mm) → Messung/Statusanzeige
+  (REQ-UI-04). Nicht mit Kraft nachdrücken: nach dem Klick trägt SW1 die Tastenkraft (O-5). L11 war nach dem Einsetzen sichtbar.
 - Eintrag in der Musterliste: Seriennummer `fluidi-XXXX`, Prüfungen 2–7, Datum.
 
 ## 8 Batteriewechsel (Werkstatt / Muster)

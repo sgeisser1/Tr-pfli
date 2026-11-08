@@ -81,6 +81,9 @@ TUBE = dict(R=2.8, INS_D=3.2, INS_L=4.6, HOLE_D=2.8, CB_D=5.4, CB_H=1.6, SCREW_L
 # Stiftleiste, Bauraum ueber dem Pi < 13.6). Variante mit RTC: Modul OHNE Buchsenleiste, Litzen in die Loetaugen (wie Klima),
 # flach unter die Deckeldecke geklebt. H = Grenzhoehe des Bauraums (0.5 Luft ueber Haube/SiP), KEIN Modulmass -> am Modul
 # messen. Variante ohne RTC: Rahmen bleibt leer. Lage: zwischen Haube/SiP und HDMI, vor dem Steg, neben den Klima-Litzen.
+# G-R2 (Sicherheit R3): Modul mit der Platinenrueckseite an die Decke kleben, nur auf zwei Randstreifen der Platine; CR1220-Halter
+# zeigt zum Gehaeuseinneren (zum Pi), ist nach Abnehmen des Deckels ohne Loesen der Klebung zugaenglich und wird nicht gegen den
+# Deckel gepresst (Luft zur Haube >= 0.5, Pruefung 13).
 RTC = dict(LX=21.3, LY=20.0, H=9.7, H_SRC=13.6, X=29.0, Y=15.4)   # Lage (Mitte) in Pi-Koordinaten
 LEDB = dict(S=8.0, V0=-5.0, V1=3.2, T=1.0, DIST=1.6)   # Platine 8 breit, entlang Facette V0..V1 um Fensterachse
 LOG = []
@@ -349,7 +352,8 @@ def checks(S):
     log('13 RTC Adafruit 4282 (21.3 x 20.0 x 13.6 inkl. Buchsenleiste, Produktseite Z. 130): Grundriss im Rahmen %.1f x %.1f '
         'unter der Decke z %.1f; hoechstes Pi-Bauteil darunter z %.1f -> Bauraum %.1f mm. Mit Buchsenleiste (13.6) passt es NICHT '
         '(und der Pi hat keine Stiftleiste); ohne Leiste zulaessig bis %.1f mm Modulhoehe (am Modul messen, ANNAHME bis dahin). '
-        'Abstand zu Klima-Litzen %.1f, HDMI %.1f mm'
+        'Abstand zu Klima-Litzen %.1f, HDMI %.1f mm. G-R2: Modul mit der Rueckseite an die Decke geklebt (Randstreifen), Zelle zum Pi, '
+        'wechselbar ohne Loesen der Klebung, nicht gegen den Deckel gepresst'
         % (R['LX'] + 0.4, R['LY'] + 0.4, ztop, zpi, ztop - zpi, R['H'], S['RTC_Modul_Option'].distToShape(S['Leitungen_Klima'])[0],
            S['RTC_Modul_Option'].distToShape(pbox(*PARTS['HDMI'][:4], ZP, ZP + PARTS['HDMI'][4]))[0]))
     C = CLIMA

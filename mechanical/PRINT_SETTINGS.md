@@ -47,13 +47,13 @@ freecadcmd mechanical/gen/fluidi_gateway.py          # mechanical/gateway/print/
 | Datei | Teil | Farbe | Ausrichtung (wie exportiert) | Kritische Stellen | g |
 |---|---|---|---|---|---|
 | `huelse_grau` | Hülse | Warmgrau | stehend, Boden auf dem Bett | Logo-Relief 0.25 auf senkrechter Wand (19.4 mm); Warnsymbol innen vertieft 0.3; Kerbe oben offen; 4 Ablaufschlitze 3 × 1.2 hinten (Brücke 3 mm); Furchlippe Ø 1.7 in den ersten 3 Schichten; Höhe 44.7 | 7.5 |
-| `kappe_blau` | Kappe mit Zapfen, Schott, Biegezunge | Hellblau | **kopfüber** (Decke auf dem Bett) | Tastentasche im Bett; Schott = Brücke 5.5 mm; O-Ring-Nut-Flanke 1.35 mm Überhang (ohne Stütze druckbar, Probedruck); Zunge 0.6 mm (P5-M2, 1–2 Bahnen, Arachne) mit Nase 45° (kopfüber stützenfrei), wächst vom Block; Ablaufstufe am Zapfen = 0.5 mm Überhang (kopfüber ohne Stütze); dünnste Zapfenwand 0.54 mm hinter den hinteren Nutecken; **Phase 5: 45°-Trichter verbindet Zapfen und Kappenwand (P5-M1, vorher 2 getrennte Körper), Mantel 0.8 um die Membran-Senkung (P5-M3)**; Massbild `mechanical/drawings/FL-S-02_kappe_blau.pdf` | 4.7 |
+| `kappe_blau` | Kappe mit Zapfen, Schott, Biegezunge | Hellblau | **kopfüber** (Decke auf dem Bett) | Tastentasche im Bett; Schott = Brücke 5.5 mm; O-Ring-Nut-Flanke 1.35 mm Überhang (ohne Stütze druckbar, Probedruck); Zunge 0.6 mm (P5-M2, 1–2 Bahnen, Arachne) mit Nase; **Nasen-Oberseite 30° zur Waagrechten = kopfüber 60° Überhang auf 1.2 mm** (ohne Stütze, Probedruck; hängt sie durch, Fläche mit 600er nacharbeiten); Führungsrippe vor dem Finger; D-Bohrung Stössel; Boden unter dem Membransitz 0.8 (Sektor zur Platine 0.3, W-1); Ablaufstufe am Zapfen = 0.5 mm Überhang (kopfüber ohne Stütze); dünnste Zapfenwand 0.54 mm hinter den hinteren Nutecken; **Phase 5: 45°-Trichter verbindet Zapfen und Kappenwand (P5-M1, vorher 2 getrennte Körper), Mantel 0.8 um die Membran-Senkung (P5-M3)**; Massbild `mechanical/drawings/FL-S-02_kappe_blau.pdf` | 4.7 |
 | `kragen` | Kragen (Vergussform) | beliebig | stehend | Mutterntasche von vorne = Brücke 4.6 mm; Nutflanke 1.35 mm | 0.8 |
 | `fenster_tropfen` | Lichtfenster Sensor | natur transluzent | Tropfenfläche auf dem Bett, Schaft nach oben | Aussenfläche matt (Bettstruktur Engineering Plate = Diffusor) | 0.1 |
 | `taste_blau` | Taste 9 × 6 | Hellblau | Oberseite auf dem Bett | Hals Ø 3.0 | 0.1 |
-| `klemmring` | Klemmring Membran | Hellblau | Platte auf dem Bett | Rand 0.4 | < 0.1 |
+| `klemmring` | Klemmring Membran, **Presssitz 0.05 je Seite** in der Senkung, verpresst die Membran 0.1 mm (R3-W2) | Hellblau | Platte auf dem Bett | Rand 0.4; Unterseite der Schürze = Dichtfläche zur Membran (oberste Lage, nicht nacharbeiten) | < 0.1 |
 | `tastenteller` | Teller (auf den Tastenhals gepresst) | Hellblau | flach | 0.4 mm dick = 3 Schichten | < 0.1 |
-| `stoessel` | Stössel mit Finger (untere hintere Kante gleitet auf der 45°-Nase der Zunge, P5-M2) | beliebig | flach auf der D-Fläche | Finger 1.15 × 1.2 mm, Gleitkante scharf | < 0.1 |
+| `stoessel` | Stössel mit Finger, 60°-Keil unten (P5-M2 Runde 2) | beliebig | flach auf der D-Fläche; Arm und Finger bündig mit der D-Fläche → vollflächig auf dem Bett, stützenfrei (W-3) | Finger 1.25 × 1.2 mm, Keil scharfkantig; Schaft Ø3 D-Profil | < 0.1 |
 | `schottkeil` | Schottkeil | beliebig | flach | | < 0.1 |
 | `distanzlehre_24p2` | Montage-Lehre Kragen–Schott 24.2 mm (2 Stück, wiederverwendbar; V-K, D-023) | beliebig | stehend | | |
 | `passprobe_huelse_unten/_oben` | Passungsproben (vor der ersten Hülse) | Warmgrau | stehend | Gleitsitz Kragen/Zapfen, O-Ring-Verpressung, Furchlippe | |
@@ -91,6 +91,16 @@ Stahlschrauben schlechter ist (PROTOTYP-PRÜFUNG). microSD bleibt innen (Zugang 
 **Vor dem ersten Druck am vorhandenen Pi messen** und in `PI`/`PARTS` des Generators eintragen: Platinendicke
 (ANNAHME 1.0), Höhen HDMI/Micro-USB/microSD-Halter/Kamerabuchse, Überstand der microSD-Karte (ANNAHME 2.5),
 Umspritzung des Netzteilsteckers (ANNAHME ≤ 10.6 × 7.0).
+
+### Druckvorgabe Zapfenwand an den hinteren Nutecken (Sicherheit R3-W3)
+
+Zwischen O-Ring-Nut (Zapfen, z 31.3 … 33.7) und Elektronikraum bleiben an den hinteren Nutecken nur **0.54 mm** Wand
+(`check_sensor.txt` 9). Geometrisch ist ≥ 0.8 mm in Rev C nicht möglich: Die Wand liegt zwischen Nutgrund-Ecke (R 3.0,
+O-Ring-Dehnung 2.1 %) und der Platinenecke (x 13.0, y 8.2); ein grösserer Innenradius des Zapfens würde die Platinenecke
+schneiden (Ecke darf höchstens R 0.68 haben → Wand ≤ 0.64 mm). Darum für die Kappe:
+- Wände 4, Füllung 100 %, „Lücken füllen“ **ein**, Linienbreite Wand 0.42, keine Naht an den hinteren Ecken (Naht hinten-Mitte).
+- Nach dem Druck: Kappe gegen eine Lampe halten, die Ecken dürfen kein Licht durchlassen; Prüfung ST-W6 (b).
+- Rev D: Wand ≥ 0.8 mm (Platine oder Nut ändern).
 
 ## 4 Toleranzen (FDM P1S, 0.4 mm) – im CAD umgesetzt
 

@@ -142,13 +142,25 @@ PSTOP = dict(X0=-8.0, X1=-3.0, FORK=1.5, T=0.8, CLR_F=0.0, CLR_B=0.15, LEAD=0.5,
 SW['GAP'] = 0.25                                   # M-4: Zunge 0.25 vor dem Betaetiger (Toleranzkette check_sensor.txt 2b)
 _ty1 = PCB['Y_F'] - SW['H'] - SW['GAP']
 # P5-M2 (Phase 5): Bis Rev C waren Finger und Zunge Quader, der "30-Grad-Keil" fehlte im CAD (Finger beruehrte die Zunge nie).
-# Jetzt: Nase an der Zunge mit 45-Grad-Flanke (kopfueber ohne Stuetze druckbar), Fingerkante gleitet auf der Flanke.
-# Zunge 0.8 -> 0.6 (Biegespannung quer zu den Schichten, ASA Z 35 MPa), Kontakt tiefer (Hebel 1.66 statt 2.5).
-# Auslegung: check_sensor.txt Punkt 2 (Kinematik aus dem CAD) und 2b (Toleranzkette).
+# Runde 2 (Red Team C-1/C-2/W-2/W-3, 2026-11-08):
+#  - Keil 60 Grad (zur Senkrechten) an der Unterseite des Fingers, parallel dazu die Oberseite einer Nase der Zunge
+#    (Flaechenkontakt). Nase in Hoehe SW1 (Kante 0.8 ueber der Betaetigerachse): Kraft nach dem Durchschalten geht fast
+#    direkt in SW1, kaum zusaetzliche Biegung der Zunge (C-2). Nasen-Oberseite 30 Grad zur Waagrechten = kopfueber 60 Grad
+#    Ueberhang auf 1.2 mm Laenge (Probedruck, PRINT_SETTINGS).
+#  - Fuehrungsrippe an der Kappenfront vor dem Finger (Spiel 0.1) + D-Bohrung im Rohr: Verdrehsicherung (C-1),
+#    Querkraft der Nase geht in die Rippe statt in Arm/Schaft (W-2).
+#  - D-Flaeche des Schafts buendig mit Arm-/Fingerfront (y 2.4): Stoessel liegt beim Druck vollflaechig auf (W-3).
+#  - Arm 1.5 hoch (z-Steifigkeit, W-2).
 TONGUE = dict(X0=-7.6, X1=-4.4, Y0=_ty1 - 0.6, Y1=_ty1, Z_TIP=SW['Z'] - 1.6,   # Biegezunge (Kappe), Dicke 0.6
-              COL_X0=-7.8, COL_X1=-4.2, WEDGE_GAP=0.10,   # Vorspalt Fingerkante -> Flanke (quer)
-              Z_CONTACT=48.6 + 0.4)                         # Fingerunterkante in Ruhe = Z_CONTACT - 0.4 = 48.6
-NOSE = dict(X0=-6.0, X1=-4.4, Z_TOP=48.6, P=1.0, ANG=45.0, H_VERT=0.5)   # Nase: Flanke 45 Grad von (Y0, Z_TOP) nach vorn
+              COL_X0=-7.8, COL_X1=-4.2, WEDGE_GAP=0.10)    # Vorspalt Keil -> Nasenkante (quer gerechnet)
+NOSE = dict(X0=-6.0, X1=-4.4, ZC=45.9, YC=2.55, H_FRONT=0.65)   # vordere Kante (YC, ZC), Oberseite parallel Keil
+FINGER = dict(X0=-5.8, X1=-4.6, Y0=round(BTN['AX_Y'] - 1.4, 3), Y1=round(TONGUE['Y0'] - 0.1, 3), ANG=60.0,
+              ARM_H=1.5)                                    # Keilflaeche 60 Grad zur Senkrechten, steigt nach hinten
+GUIDE = dict(X0=-6.0, X1=-4.4, Y0=1.55, Y1=round(FINGER['Y0'] - 0.1, 3), Z0=45.3, Z1=51.4)   # Fuehrungsrippe Kappe
+BTN['D_FLAT'] = FINGER['Y0']                               # D-Flaeche Schaft (W-3) = Fingerfront
+BTN['BORE_FLAT'] = round(FINGER['Y0'] - 0.1, 3)            # D-Bohrung im Rohr, Spiel 0.1 (C-1)
+BTN['RING_OVER'] = 0.05                                    # Klemmring Presssitz je Seite (R3-W2, O-4)
+BTN['MEMB_SQ'] = 0.10                                      # Membranverpressung durch den Klemmring (20 %)
 SCREW = dict(X=0.0, D=2.0, L=3.0,                  # V-K: M2x3 (M2x4 stuende 0.8 ueber der Mutter, 0.05 neben der O-Ring-Nut)
              HEAD_D=3.8, HEAD_H=1.3, HOLE_D=2.4, LIP_D=1.7, LIP_H=0.5,
              NUT_S=4.0, NUT_M=1.6)                 # ISO 7045 M2x3 A2 PH1, ISO 4032 M2 A2 (Nennmasse, ANNAHME bis Bestellung)

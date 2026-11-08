@@ -32,7 +32,7 @@ Für alle, die den Sensor benutzen. Dauer etwa 5 Minuten. Bild: `renders/final/f
 ## Was Sie brauchen
 
 - 1 neue Knopfzelle **CR2032** (Panasonic, Originalverpackung)
-- **Kreuzschlitz-Schraubenzieher PH1** (für die Schraube unten am Kopf)
+- **Kreuzschlitz-Schraubenzieher PH1** (für die Schraube an der Kopfunterseite, neben der Sonde)
 - Weiches Tuch, Wasser; eine **Schale** als Unterlage (falls die Zelle herausfällt, rollt sie nicht weg)
 - Zahnstocher oder Kunststoffspatel (kein Metall)
 
@@ -40,11 +40,11 @@ Für alle, die den Sensor benutzen. Dauer etwa 5 Minuten. Bild: `renders/final/f
 
 1. **Sensor herausziehen** am Kopf, gerade nach oben. **Sonde reinigen** und trocknen (Erde würde beim Abziehen der
    Hülse an der Dichtung schleifen).
-2. Über der Schale arbeiten. Sensor mit der Spitze nach oben halten. **Schraube unten am Kopf lösen** (PH1, gegen den
-   Uhrzeigersinn), **etwa 4 Umdrehungen, bis sich die Hülse abziehen lässt – nicht weiter drehen**, sonst fällt die
-   Schraube heraus (R3-W1). Eine Ersatzschraube M2×3 bereithalten.
-3. **Graue Hülse nach unten über die Sonde abziehen** (wie im Bild). Nicht an der blauen Kappe drücken.
-   Innen an der Rückwand sehen Sie das Warnsymbol „CR2032 Verschluckgefahr“.
+2. Über der Schale arbeiten. Sensor mit der **Sondenspitze nach oben** halten. Die Schraube sitzt an der Kopfunterseite
+   **neben der Sonde** (zeigt jetzt nach oben). **Schraube lösen** (PH1, gegen den Uhrzeigersinn), bis sie frei dreht. Sie
+   bleibt in der Hülse und fällt nicht heraus.
+3. **Graue Hülse Richtung Sondenspitze von der Kappe wegziehen und über die Sonde abziehen** (wie im Bild). Nicht an der
+   blauen Kappe drücken. Innen an der Rückwand sehen Sie das Warnsymbol „CR2032 Verschluckgefahr“.
 4. **Alte Zelle herausschieben:** Sensor wieder normal halten (Kopf oben, Tropfenfenster zu Ihnen). Von vorne gesehen sitzt die Zelle rechts offen im Halter. Mit dem Fingernagel oder
    einem Zahnstocher **nach rechts** aus dem Halter schieben. Nicht hebeln. Altzelle sofort abkleben (siehe oben).
    **Taste oben am Kopf jetzt nicht drücken.**
