@@ -146,3 +146,107 @@ Nachweise: `freecadcmd mechanical/gen/fluidi_sensor.py` → `mechanical/sensor/c
 | K-3 BATTERIEWECHSEL Haltung | **umgesetzt** | Schritt 2/3: „Schraube an der Kopfunterseite neben der Sonde“, „Hülse Richtung Sondenspitze abziehen“ |
 | K-4 PCB_OUTLINE Kap. 6 | **umgesetzt** | Zunge 0.6, Nase, Rippe, D-Bohrung, Schaltpunkt; Kappe–Antenne 0.70 (bestätigt d8dfac7) |
 | K-5 Schriftfeld-Stand | **umgesetzt** | Schriftfeld nennt die SHA-256 der Generatorquellen (10 Stellen, auch in `drawings_check.txt`), unabhängig vom Commit-Zeitpunkt; git-Basis nur informativ |
+
+## Runde 3 (Red Team, 2026-11-08, Stand git `842f670`)
+
+Selbst nachgeprüft mit freecadcmd auf `build()` von HEAD (Skripte im Scratchpad).
+- **Verdrehung:** Stössel um die eigene Achse gedreht, Kollision mit Kappe ohne Nase, PCB, SW1 und Fenster; bei Hub 0 / 0.4 / 0.8.
+- **Spiel:** Verschiebung in x und y, Kippung um x.
+- **Kinematik:** Nasenauslenkung per Bisektion bei Hub 0.3–0.8, auch mit +1.5° Drehung und dy −0.1/−0.2.
+- **Membransitz:** Bodendicke in 12 Richtungen gemessen.
+- **Druckdateien:** wieder gegen den Generator verglichen.
+- **Rechnung 2d:** von Hand nachgerechnet.
+
+### Status je Befund
+
+| Befund | Status | Nachweis / Begründung |
+|---|---|---|
+| C-1 Verdrehung | **erledigt** | Frei drehbar ±1.6° (Schritt 0.1°) bei jedem Hub, gemessen. Verschiebung −y: 0.1 frei, ab 0.15 Kollision; x ±0.1 frei. Kippung ≥ 1° kollidiert. Nase bei vollem Hub: 1.100 nominal, 0.935 bei (+1.5°, −0.1), 0.835 bei (+1.5°, −0.2; doppelt gezählt, konservativ). Am Betätiger mit Hebel 1.22 ergibt das ≥ 1.02 mm gegen nötig 0.85 → **SW1 schaltet auch im Worst Case inkl. Verdrehung** |
+| W-2 Toleranzkette | **erledigt** | Eigene konservative Rechnung (Rotation und Rippenspiel addiert) Reserve ≥ +0.17 mm, deckt sich mit 2b |
+| W-3 Drucklage Stössel | **erledigt** | `stoessel.step`: eine Bettfläche 13.2 mm² (D-Fläche bündig mit Arm/Finger), keine Fläche knapp über dem Bett |
+| K-1 Beule | **erledigt** | Kappe Bounding Box y 0…13.00; Druckdatei 34 × 13.00 × 26.7 |
+| K-2 | **abgelehnt, akzeptiert** | Begründung trägt (Platz für Nase/Finger/Rippe) |
+| K-3 Haltung | **erledigt, aber mit Regression** → N-1 | |
+| K-4 PCB_OUTLINE | **erledigt** | Z. 108/174 nachgeführt |
+| K-5 Schriftfeld | **erledigt** | FL-S-02: „Generator-SHA256 c1f9424b99“ |
+| W-1 Membransitz | **teilweise, bleibt wichtig** | Gemessen bei r 2.6: 0.80 / 0.80 / **0.30** / **0.30** / 2.2 / 0.8 / 3.0 … (0°…330°). Der Sektor 60–90° bleibt 0.3 mm; die Begründung (Platine z 53.5, Antennenabstand) ist plausibel. Die Dichtung über die Klemmring-Schürze (Membranverpressung 0.10 mm) drückt die Membran aber weiterhin auf die **gebrückte** Sitzfläche. FDM-Durchhang an Brücken liegt in derselben Grössenordnung wie die Verpressung. Presssitz 0.05 je Seite gegen FDM ±0.1 heisst: zwischen lose und Riss ist alles möglich. **Auflage:** Membran am Sitz zusätzlich rundum kleben oder mit Silikon abdichten (Typ mit Datenblatt). Passprobe Klemmring vor den Mustern. M-W3 Farbeindringprüfung an jedem der ersten 3 Muster |
+| C-2 Überlast | **Ablehnung des Tastenanschlags stichhaltig; Befund bleibt offen.** Herabgestuft auf **wichtig** für den Musterdruck, **kritisch für die Serienfreigabe** | siehe unten |
+
+**C-2 im Einzelnen**
+
+1. **Die Ablehnung ist richtig.** Nach der Kopplung der Nase an SW1 ist der Kraftpfad kraftgesteuert: Nach dem Durchschalten
+   blockiert SW1 die Nase, und die Querkraft ist F_Taste · tan(30° − φ). Ein fester Tastenanschlag hinter dem
+   Worst-Case-Schaltpunkt (0.65) schützt das Nominalteil (Schaltpunkt ≈ 0.3) nicht.
+2. **2d stimmt.** Eigene Rechnung, gestützter Balken, Last 1.15 mm über SW1: Moment an der Laststelle ≈ 0.93 · P, an der
+   Einspannung ≈ 0.57 · P, dazu die Vorspannung aus 0.45/0.85 mm Auslenkung (11/21 MPa an der Wurzel).
+   - μ 0.3, worst: ≈ 35 MPa
+   - μ 0, worst: ≈ 55 MPa
+   - Abweichung zu 2d (36.5 / 56.5) unter 5 %.
+3. **20 N ist aber nicht der grösste Lastfall.** Die Taste steht 0.6 mm über der Kappe (Oberkante z 58.1 bei H 57.5,
+   gemessen). REQ-MECH-10 verlangt **50 N axial beim Einstecken**, und dafür drückt man auf den Kopf. Dazu kommt **Fall aus
+   1 m Kopf voran**. Bei 50 N und μ 0.3 ergibt sich eine Querkraft von ≈ 11.8 N, an der Zunge ≈ 56–59 MPa (SF ≈ 0.7). Bei
+   μ 0 sind es 29 N. Beide Lastfälle laufen zuerst über die Taste.
+4. **Keine einfache Lösung für Rev C gefunden.**
+   - Ein nachgiebiges Element im Stössel müsste quer ≥ 2.4 N liefern (Schalten worst) und dürfte ≤ 2.3 N (worst)
+     bzw. ≤ 5.6 N (nominal) nicht überschreiten, damit die Zunge 28 MPa (SF 1.5) einhält. Das geht nur mit einer
+     vorgespannten Feder, und die ist in FDM nicht prozesssicher.
+   - Eine versenkte Taste bräuchte eine um ≥ 0.6 mm tiefere Tasche. Rechts vom Tastenblock (x 0.8…4.9) blieben dann nur
+     ≈ 0.4 mm Decke über dem Elektronikraum. Abgelehnt.
+   - Lösung für Rev D: Taster mit Betätiger in z unter dem Stössel (Kap. 3) oder ein Taster mit Überhub
+     (Datenblatt mit Grenzlast).
+5. **Auflagen für die Muster:**
+   - (a) Anleitung: „Beim Einstecken den Kopf seitlich greifen bzw. an der Kappenkante drücken, nicht auf die Taste“
+     (BATTERIEWECHSEL Schritt 11 und Nutzeranleitung).
+   - (b) M-T2 erweitern: 20 N und **50 N statisch** auf die Taste, danach Funktion und Sichtprüfung der Zunge;
+     **Fall 1 m Kopf voran** (REQ-MECH-10) mit Funktionsprüfung.
+   - (c) Reibwert bzw. Tastenkraft am unvergossenen Kern messen, bevor das erste Muster vergossen wird (siehe N-2).
+
+### Neue Befunde
+
+**N-1 · wichtig (Regression eines Sicherheitsbefunds) · R3-W1 – BATTERIEWECHSEL Schritt 2 wieder auf „bis sie frei dreht.
+Sie bleibt in der Hülse und fällt nicht heraus“.**
+Mit der Umsetzung von K-3 (842f670) wurde der Text aus a579a7c überschrieben: „etwa 4 Umdrehungen … nicht weiter drehen“
+und „Ersatzschraube bereithalten“ (`git diff a579a7c HEAD -- docs/manuals/BATTERIEWECHSEL.md`). Das ist genau der Wortlaut,
+den der Sicherheits-Agent in R3-W1 verworfen hat (Schraube fällt nach ≈ 4 weiteren Umdrehungen heraus, F-21/F-28).
+*Vorschlag:* Den Wortlaut aus a579a7c wiederherstellen und mit der neuen Lageangabe aus K-3 verbinden. Den Sicherheits-Agenten
+informieren. Muss vor dem ersten Batteriewechsel durch Dritte erledigt sein.
+
+**N-2 · wichtig · 60°-Keil arbeitet nahe der Selbsthemmung; Tastenkraft hängt stark vom Reibwert ab (ANNAHME μ 0.3).**
+F_Taste = F_quer / tan(30° − φ). Ab φ = 30° (μ ≥ 0.58) hemmt der Keil selbst. Eigene Rechnung mit F_quer worst
+≈ 2.6 N, ohne Reibung an der Führungsrippe (die erhöht die Kraft zusätzlich um μ · F_quer):
+
+| μ | Tastenkraft beim Schalten |
+|---|---|
+| 0.2 | ≈ 7.7 N |
+| 0.3 | ≈ 11.6 N (2c) |
+| 0.4 | ≈ 19 N |
+| 0.5 | ≈ 45 N |
+
+Für FDM-ASA auf ASA mit Schichtrillen quer zur Gleitrichtung liegt μ eher bei 0.3–0.5 (**ANNAHME**, keine lokale Quelle).
+Derselbe Reibwert, der die Zunge im Überlastfall schützt, macht die Taste schwergängig. Wer stark drücken muss, belastet
+die Zunge stärker. Das Verhältnis Überlast/Schaltkraft bestimmt die Querkraft unabhängig von μ:
+F_quer,Überlast ≈ 2.4 N · F_Druck / F_Schalt.
+*Ergonomie:* 8–12 N sind für einen kurzen Druck mit dem Daumen noch tragbar. Für den 10-s-Langdruck (REQ-UI-04) sind sie
+unangenehm, aber erfüllbar. Ab etwa 15 N ist REQ-UI-05 („mit einem Finger bedienbar“) gefährdet.
+*Vorschlag:* Vor dem Verguss am Kern mit eingeschobener Platine die Kraft bis zum Klick messen (Federwaage). Bei > 15 N
+Gleitflächen glätten bzw. mit einem Tropfen Silikonfett schmieren und neu messen. Für Rev D Keilwinkel und Reibpaarung
+gemeinsam auslegen. Testplan M-T1 um μ bzw. Tastenkraft an 3 Mustern ergänzen.
+
+**N-3 · klein · Nasenoberseite 30° zur Waagrechten (kopfüber Überhang 60° zur Senkrechten, 2.2 mm², 1.2 mm lang).**
+Das liegt unter „Max Overhang ~70°“ (TDS S. 1), ist aber die **Gleitfläche** des Keils. Rauigkeit und Durchhang verschieben
+den Schaltpunkt und erhöhen μ (N-2).
+*Vorschlag:* Probedruck ist bereits vorgesehen (PRINT_SETTINGS); die Fläche nach dem Druck glätten und in Prüfung 3 aufnehmen.
+
+### Gesamturteil Runde 3
+
+**Muster drucken: ja, mit Auflagen.** Druckdateien = Generator (9 Teile, symmetrische Differenz 0, je 1 Körper), Kappe und
+Stössel stützenfrei bis auf bekannte kurze Überhänge, C-1/W-2/W-3/K-1 wirksam behoben.
+
+Auflagen:
+1. **N-1** vor der Weitergabe der Anleitung beheben.
+2. **Vor dem ersten Kappenverguss:** Tastenkraft bzw. Klick am unvergossenen Kern messen (N-2); Klemmring-Passprobe und
+   Membran zusätzlich abdichten (W-1).
+3. **M-T2** mit 20 N und 50 N sowie Fall 1 m Kopf voran; Einsteckhinweis „nicht auf die Taste“ in die Anleitung (C-2).
+
+C-2 bleibt bis zum Nachweis M-T2 bzw. bis Rev D ein **offenes Risiko für die Serienfreigabe** (Folge: Ausfall der Taste,
+keine Gefährdung). Die Entscheidung über Rev D (Taster mit Betätiger in z) liegt beim Orchestrator bzw. Auftraggeber.

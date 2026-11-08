@@ -239,3 +239,14 @@ Format: Nr. · Datum · Entscheid · Alternativen · Begründung · Quelle · St
 - **Testplan-Widersprüche WS-01…WS-18:** entschieden in `docs/reviews/phase5_testplan_prototyp.md` Kap. 10 (EP-01…EP-18).
 - Alternativen: Anforderungen wörtlich (2.0 V; Katalog-Maximalwert → REQ-ENE-02 mit 4 × 100 µF nicht erfüllbar).
 - Quelle: Testplan Entwurf 2, Firmware-Bericht Phase 5, Sicherheit Runde 3.
+
+### D-026 · 2026-11-08 · Tastermechanik Rev C: Muster drucken mit Auflagen (Projektleiter, nach 3 Prüfrunden)
+- **Entscheid:** Kappe/Stössel Stand `842f670` (60°-Keil, Verdrehsicherung, Worst Case +0.17 mm) werden für die Muster
+  gedruckt. Red-Team C-2 (Überlast der Zunge bei 20–50 N auf die Taste) bleibt **offen für die Serienfreigabe**; Folge
+  wäre Tastenausfall, keine Gefährdung. Auflagen: Tastenkraft vor dem ersten Kappenverguss messen (≤ 12 N, > 15 N
+  stopp), Klemmring-Passprobe und Membran zusätzlich abdichten, Nase glätten, M-T2/PT11.08 mit 20 N, 50 N und Fall
+  1 m; Anleitung „beim Einstecken nicht auf die Taste drücken“.
+- **Alternativen:** harter Tastenanschlag (abgelehnt: Schaltpunkt streut 0.05–0.65 mm), versenkte Taste (nur ≈ 0.4 mm
+  Decke über dem Elektronikraum), nachgiebiges Element (bräuchte vorgespannte Feder). Für **Rev D**: Taster mit
+  Betätiger in z direkt unter dem Stössel (Layoutänderung).
+- **Quelle:** `docs/reviews/phase5_mechanik_redteam.md` (Runde 1–3), `mechanical/sensor/check_sensor.txt` 2a–2e.

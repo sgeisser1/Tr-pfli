@@ -41,8 +41,9 @@ Für alle, die den Sensor benutzen. Dauer etwa 5 Minuten. Bild: `renders/final/f
 1. **Sensor herausziehen** am Kopf, gerade nach oben. **Sonde reinigen** und trocknen (Erde würde beim Abziehen der
    Hülse an der Dichtung schleifen).
 2. Über der Schale arbeiten. Sensor mit der **Sondenspitze nach oben** halten. Die Schraube sitzt an der Kopfunterseite
-   **neben der Sonde** (zeigt jetzt nach oben). **Schraube lösen** (PH1, gegen den Uhrzeigersinn), bis sie frei dreht. Sie
-   bleibt in der Hülse und fällt nicht heraus.
+   **neben der Sonde** (zeigt jetzt nach oben). **Schraube lösen** (PH1, gegen den Uhrzeigersinn), **etwa 4 Umdrehungen,
+   bis sich die Hülse abziehen lässt – nicht weiter drehen**, sonst fällt die Schraube heraus (R3-W1). Eine
+   Ersatzschraube M2×3 bereithalten.
 3. **Graue Hülse Richtung Sondenspitze von der Kappe wegziehen und über die Sonde abziehen** (wie im Bild). Nicht an der
    blauen Kappe drücken. Innen an der Rückwand sehen Sie das Warnsymbol „CR2032 Verschluckgefahr“.
 4. **Alte Zelle herausschieben:** Sensor wieder normal halten (Kopf oben, Tropfenfenster zu Ihnen). Von vorne gesehen sitzt die Zelle rechts offen im Halter. Mit dem Fingernagel oder
@@ -59,7 +60,8 @@ Für alle, die den Sensor benutzen. Dauer etwa 5 Minuten. Bild: `renders/final/f
 9. **Hülse wieder aufschieben**, bis der obere Rand ganz unter der blauen Kappe sitzt (gleichmässige Fuge).
 10. **Schraube anziehen** (im Uhrzeigersinn), bis sie fest ist. Nicht überdrehen.
 11. **Kontrolle (Pflicht):** Die Hülse lässt sich **von Hand nicht abziehen** und die Fuge ist rundum gleich. Erst dann
-    den Sensor wieder einstecken (in fester Erde mit einem Stab vorstechen).
+    den Sensor wieder einstecken (in fester Erde mit einem Stab vorstechen). **Beim Einstecken am Kopf seitlich bzw. an
+    der Hülse greifen, nicht auf die Taste oben drücken** (die Taste ist dafür nicht ausgelegt, Red Team C-2).
 
 ## Wasser im Kopf
 

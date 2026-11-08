@@ -75,6 +75,12 @@ sich die Zunge sichtbar nach hinten (Nase), in Ruhe ist sie nicht vorgespannt. F
 
 ## 4 Platine einsetzen und Schott vergiessen (Pos. 9, 15, 16)
 
+**Vor dem ersten Kappenverguss (Pflicht, Auflagen Red Team Runde 3, D-026):** (1) Tastenkraft bis zum Klick am
+unvergossenen Kern messen (Gewichte/Kraftmesser): ≤ 12 N, über 15 N nicht vergiessen und melden (N-2, REQ-UI-05);
+(2) Klemmring-Passprobe (Presssitz hält, Membran rundum verpresst) und Membranrand zusätzlich abdichten (W-1; Dichtmittel
+nach Wahl der Mechanik, ANNAHME bis Datenblatt); (3) Gleitfläche der Nase nach dem Druck glätten (N-3);
+(4) Farbeindringprüfung der Membranabdichtung an den ersten 3 Mustern (M-W3).
+
 1. Platine (Pos. 16, Zelle **nicht** eingesetzt) mit der bestückten Seite F **zum Fenster** von unten durch den
    Schottschlitz (26.4 × 4.0) einschieben, bis die Platinenoberkante am **Anschlag der Kappe** liegt (z 53.5). Die
    Quetschrippen (Gabel und Schott-Rückwand) drücken die Platine nach vorn an die F-Referenz.
