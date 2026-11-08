@@ -2,6 +2,7 @@
 #include "port_sim.h"
 #include "fl_proto.h"
 #include "fl_app.h"
+#include "fl_platform.h"
 #include "fl_util.h"
 #include "vectors.h"
 #include <stdio.h>
@@ -174,6 +175,16 @@ void fl_port_retained_set(uint32_t v) { sim.retained = v & 0x3FFFFu; }
 /* Nachbildung von fl_fault_handler: AONRCLR1 = FL_RET_PLANNED, AONRSET1 = FL_RET_FAULT, PMCTLResetSystem
  * (naechster Start: reset_reason FL_RR_SOFTWARE = PMCTL_RESET_SYSTEM; setzt der Test) */
 void sim_fault(void) { sim.retained = ((sim.retained & ~FL_RET_PLANNED) | FL_RET_FAULT) & 0x3FFFFu; sim.reboots++; }
+/* fl_fault_handler (fl_hw.c) fuer Aufrufer aus platform/cc23/fl_assert.c (AssertHandler, Stackueberlauf) */
+jmp_buf *sim_fault_jmp;
+uint32_t sim_fault_calls;
+void fl_fault_handler(void)
+{
+    sim_fault_calls++;
+    sim_fault();
+    if (sim_fault_jmp) longjmp(*sim_fault_jmp, 1);
+    abort();                                                    /* noreturn: ohne Sprungziel Testabbruch */
+}
 void fl_port_wdt_kick(void) { sim.wdt_kicks++; }
 void fl_port_button_pullup(bool on) { sim.pullup = on; }
 bool fl_port_button_pressed(void) { return sim.button_level; }

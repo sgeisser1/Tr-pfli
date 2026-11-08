@@ -1,7 +1,7 @@
 # fluidi Sensor – Anwendungs-Build (TI Arm Clang, FreeRTOS, BLE5-Stack), ohne IDE.
 # Grundlage: SDK examples/rtos/LP_EM_CC2340R5/ble/basic_ble/freertos/ticlang/makefile (SDK 9.23.00.27):
 # gleiche Stack-/Treiber-Quellen und Optionen, ohne Menue/Display/Simple-GATT/TI-OAD; eigene Anwendung (core/,
-# platform/cc23/), eigene SysConfig (CC2340R5RGE, kein LaunchPad), eigener Linker (Slot 0 hinter MCUboot).
+# platform/cc23/; main_freertos.c als platform/cc23/fl_main.c + fl_assert.c, O-5), eigene SysConfig (CC2340R5RGE, kein LaunchPad), eigener Linker (Slot 0 hinter MCUboot).
 
 APP_B   := $(BUILD)/app
 EX      := $(SDK)/examples/rtos/LP_EM_CC2340R5/ble/basic_ble
@@ -12,13 +12,13 @@ LIBOPT  := $(BLE)/stack_util/lib_opt/src
 APP_SRC := \
   $(TOP)/core/fl_crypto.c $(TOP)/core/fl_proto.c $(TOP)/core/fl_settings.c $(TOP)/core/fl_meas.c \
   $(TOP)/core/fl_ringlog.c $(TOP)/core/fl_ui.c $(TOP)/core/fl_ota.c $(TOP)/core/fl_nvstore.c $(TOP)/core/fl_app.c \
-  $(TOP)/platform/cc23/fl_ble.c $(TOP)/platform/cc23/fl_hw.c $(if $(TESTFW),$(TOP)/core/fl_testfw.c) \
+  $(TOP)/platform/cc23/fl_ble.c $(TOP)/platform/cc23/fl_hw.c $(TOP)/platform/cc23/fl_assert.c $(TOP)/platform/cc23/fl_main.c $(if $(TESTFW),$(TOP)/core/fl_testfw.c) \
   $(MB_SRC)/boot/bootutil/src/bootutil_public.c \
   $(MB_SRC)/boot/ti/source/mcuboot_app/flash_map_backend/flash_map_backend.c \
   $(BLE)/app_util/framework/src/bleapputil_task.c $(BLE)/app_util/framework/src/bleapputil_init.c \
   $(BLE)/app_util/framework/src/bleapputil_process.c $(BLE)/app_util/framework/src/bleapputil_stack_callbacks.c \
   $(BLE)/app_util/framework/src/bleapputil_timers.c \
-  $(EX)/common/Startup/osal_icall_ble.c $(EX)/common/Startup/main_freertos.c \
+  $(EX)/common/Startup/osal_icall_ble.c \
   $(BLE)/stack_util/lib_opt/rom_init.c \
   $(wildcard $(LIBOPT)/ctrl_opt_*.c) $(wildcard $(LIBOPT)/host_opt_*.c) \
   $(SDK)/source/ti/common/nv/crc.c $(SDK)/source/ti/common/nv/nvocmp.c \

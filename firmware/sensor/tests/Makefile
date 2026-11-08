@@ -5,9 +5,10 @@ PYTHON  ?= python3
 B       := build
 CORE    := ../core
 CFLAGS  := -std=c99 -O1 -g -Wall -Wextra -Werror -Wno-missing-field-initializers -fsanitize=address,undefined \
-           -I$(CORE) -I. -I$(B) -DFLUIDI_HW_REV=0x0B
+           -I$(CORE) -I. -I$(B) -I../platform/cc23 -DFLUIDI_HW_REV=0x0B -DFL_HOST_TEST
 SRC     := $(CORE)/fl_crypto.c $(CORE)/fl_aes_sw.c $(CORE)/fl_proto.c $(CORE)/fl_settings.c $(CORE)/fl_meas.c \
-           $(CORE)/fl_ringlog.c $(CORE)/fl_ui.c $(CORE)/fl_ota.c $(CORE)/fl_nvstore.c $(CORE)/fl_app.c port_sim.c test_main.c
+           $(CORE)/fl_ringlog.c $(CORE)/fl_ui.c $(CORE)/fl_ota.c $(CORE)/fl_nvstore.c $(CORE)/fl_app.c \
+           ../platform/cc23/fl_assert.c port_sim.c test_main.c
 
 # Testfirmware (Anhang A): Kern mit -DFLUIDI_TESTFW=n, eigenes Testprogramm je Variante
 TF_SRC  := $(filter-out test_main.c,$(SRC)) $(CORE)/fl_testfw.c test_testfw.c
@@ -20,7 +21,7 @@ $(B)/vectors.h: gen_vectors.py ../../tools/fluidi_proto.py
 	@mkdir -p $(B)
 	$(PYTHON) gen_vectors.py $@
 
-$(B)/test_fluidi: $(SRC) $(B)/vectors.h $(wildcard $(CORE)/*.h) port_sim.h
+$(B)/test_fluidi: $(SRC) $(B)/vectors.h $(wildcard $(CORE)/*.h) port_sim.h ../platform/cc23/fl_platform.h
 	$(CC) $(CFLAGS) $(SRC) -lm -o $@
 
 $(B)/test_tf%: $(TF_SRC) $(B)/vectors.h $(wildcard $(CORE)/*.h) port_sim.h

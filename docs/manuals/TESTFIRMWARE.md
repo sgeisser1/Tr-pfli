@@ -44,21 +44,24 @@ Schutz im Makefile (geprüft 2026-11-09): `TESTFW` nur 1…4; mit einem Schlüss
 bricht der Build ab; `make release` bricht mit gesetztem `TESTFW` ab; `BUILD_NO` 0…99 bei Testfirmware, Serien-
 `BUILD_NO` ≥ 9000 wird abgelehnt (reserviert). Ohne `TESTFW` ist das Serien-Image **bitgleich** zum Stand vor der
 Testfirmware (unsigniertes Binärbild und MCUboot mit `cmp` verglichen, Commit 4f2f32d). Seither einzige Änderung der
-Serie: eigene Ausnahmebehandlung `fl_fault_handler` (O-5, +66 B Code).
+Serie: eigene Ausnahmebehandlung `fl_fault_handler` (O-5, +66 B Code) und Assert-/Stackueberlauf-Behandlung über
+denselben Weg (`platform/cc23/fl_assert.c`, `fl_main.c` statt SDK-`main_freertos.c`; −178 B, SDK-`AssertHandler` entfällt).
 
-Grössen (Build 2026-11-09 mit O-5, TI Arm Clang 4.0.4, `VERSION=0.1.1`):
+Grössen (Build 2026-11-09 mit O-5 inkl. Asserts, TI Arm Clang 4.0.4, `VERSION=0.1.1`):
 
 | Build | Slot 0 Code | Anteil | signiertes Image (Slot 1) | RAM | RAM frei |
 |---|---|---|---|---|---|
-| Serie 0.1.0+1 | 207 014 B | 90 % | 207 445 B | 33 666 B | 3 198 B |
-| TF-1 0.1.1+9101 | 208 956 B | 91 % | 209 388 B | 33 782 B | 3 082 B |
-| TF-2 0.1.1+9201 | 208 990 B | 91 % | 209 421 B | 33 782 B | 3 082 B |
-| TF-3 0.1.1+9301 | 209 434 B | 91 % | 209 863 B | 33 782 B | 3 082 B |
-| TF-4 0.1.1+9401 | 208 934 B | 91 % | 209 364 B | 33 782 B | 3 082 B |
+| Serie 0.1.0+1 | 206 836 B | 90 % | 207 269 B | 33 666 B | 3 198 B |
+| TF-1 0.1.1+9101 | 208 778 B | 91 % | 209 208 B | 33 782 B | 3 082 B |
+| TF-2 0.1.1+9201 | 208 808 B | 91 % | 209 241 B | 33 782 B | 3 082 B |
+| TF-3 0.1.1+9301 | 209 256 B | 91 % | 209 688 B | 33 782 B | 3 082 B |
+| TF-4 0.1.1+9401 | 208 756 B | 91 % | 209 188 B | 33 782 B | 3 082 B |
 
 Alle Prüfungen des Grössenberichts „ok“ (passt in Slot 0/Slot 1 inkl. Swap-using-Move, RAM-Reserve ≥ 2 kB); dazu
 `tools/check_fault_vectors.py` (Ziel `size`): NMI-/HardFault-Vektor → `fl_fault_handler`, ohne Stack, kein
-`Exception_handlerSpin` mehr in der Vektortabelle (O-5).
+`Exception_handlerSpin` mehr in der Vektortabelle; `AssertHandler`/`vApplicationStackOverflowHook` aus `fl_assert.obj`
+rufen nur `fl_fault_handler`, SDK-`main_freertos.obj` nicht gelinkt, `main` registriert `AssertHandler`, Rückfall-
+Callbacks der BLE-Bibliothek ohne Schleife (O-5).
 
 ## 3 Kennzeichnung (Anhang A „nie mit Werksfirmware verwechseln“)
 
@@ -72,8 +75,10 @@ Alle Prüfungen des Grössenberichts „ok“ (passt in Slot 0/Slot 1 inkl. Swap
 | Dateiname | `fluidi-sensor-<ver>…` | `fluidi-sensor-tf<n>-<ver>…` |
 | Signatur | DEV (Muster) bzw. Produktion | **nur DEV** |
 
-SESSION_INFO (52 Byte, jede Sitzung) bleibt unverändert, damit das Gateway normal arbeitet. Das Gateway zeigt heute nur
-`fw_version` (x.y.z) an, nicht `fw_build` (offen O-3).
+SESSION_INFO (52 Byte, jede Sitzung) bleibt unverändert, damit das Gateway normal arbeitet. Gateway und PWA zeigen
+„Firmware x.y.z · Build n“ und eine rote Marke **TESTFIRMWARE TF-n**, sobald Gerätename `fl-tf<n>-`, Build `9<n>xx` oder
+der TF-Anhang einer Diagnose sie zeigt (O-3 erledigt, GATEWAY_API 5.10); das Ereignisprotokoll meldet sie. Die Kennung im
+Gateway bleibt `fluidi-XXXX` (aus der Adresse).
 
 ## 4 Einspielen und Rückkehr zur Normalfirmware
 
@@ -176,6 +181,31 @@ logisch; absolute Werte daher nur am Muster aussagekräftig.
 Feuchtewert), `c_diag` = kumulierter I²C-Fehlerzähler, `temp` = TMP1075N (0x8000 + `flags` b4 bei Fehler), `vbat_mv` =
 letzter Lastwert. Das Gateway speichert die Zeilen unverändert in `reading` (Index `null`, Warnflag 16).
 
+## 6a Auslesen über das Gateway (GET_INFO + GET_DIAG)
+
+Der Sensor muss mit dem Gateway gekoppelt sein (nach Weg A/B neu koppeln).
+
+1. PWA: **Einstellungen → Sensoren & Firmware** (oder Pflanze → Karte „Sensor“) → Textknopf **Diagnose** →
+   **Diagnose abrufen**. Das Gateway fragt beim nächsten Funkkontakt (≤ Reaktionszeit; schneller: kurz die Taste drücken,
+   ausser in TF-1/TF-2-Sequenzen zählen dabei Drücke mit!) `GET_INFO` und `GET_DIAG` ab. Gleich per API:
+   `POST /api/v1/sensors/fluidi-XXXX/diag` (Sitzung + CSRF), dann `GET /api/v1/jobs/{id}`.
+2. Ergebnis im Sheet (dekodiert) und als **JSON herunterladen** (`fluidi-diag-<id>-<zeit>.json`, enthält `info_hex`,
+   `diag_hex` und die dekodierten Felder). Jede Abfrage wird im Gateway gespeichert (Tabelle `sensor_diag`, 50 je Sensor,
+   bleibt nach dem Entkoppeln erhalten).
+3. Auswertung nach Testplan, wahlweise:
+
+```sh
+.venv/bin/python scripts/testfw_eval.py diag --file fluidi-diag-fluidi-ABCD-20261109T143000Z.json --expect tf1
+.venv/bin/python scripts/testfw_eval.py diag --db /var/lib/fluidi/fluidi.sqlite --sensor fl-tf2-ABCD --expect tf2-late
+.venv/bin/python scripts/testfw_eval.py info --db /var/lib/fluidi/fluidi.sqlite --sensor fluidi-ABCD
+```
+
+`--sensor` akzeptiert Adresse, `fluidi-XXXX` oder den Testfirmware-Namen `fl-tf<n>-XXXX`. Die Datenbank nur lesend
+öffnen (Skript tut das) bzw. eine Kopie verwenden. Gateway, PWA-Anzeige und Skript dekodieren mit demselben Modul
+(`firmware/gateway/fluidi_gw/sensordiag.py`).
+
+Ablauf für PT5.12 (TF-1): Diagnose **vor** dem Zurückflashen abrufen (Weg B löscht alles), JSON sichern, dann flashen.
+
 ## 7 Zuordnung zu den Tests
 
 | Test-ID | Muster | Variante | Durchführung | Auswertung / Kriterium |
@@ -211,18 +241,18 @@ Feuchtewerte unter TF-3 sind nur informativ.
 make -C firmware/sensor test                                                       # Host-Tests inkl. TF
 ```
 
-Ergebnis 2026-11-09 mit O-5 (`make check`): Layout/Pins ok; Serie 1561 Prüfungen (davon 19 neu `[fault]`), TF-1 24,
-TF-2 77, TF-3 25, TF-4 14 Prüfungen bestanden; `test_testfw_eval.py` 12 Tests (davon 5 gegen die echten
+Ergebnis 2026-11-09 mit O-5 inkl. Asserts (`make check`): Layout/Pins ok; Serie 1569 Prüfungen (davon 19 `[fault]`,
+8 `[assert]`), TF-1 24, TF-2 77, TF-3 25, TF-4 14 Prüfungen bestanden; `test_testfw_eval.py` 13 Tests (davon 5 gegen die echten
 GET_DIAG/INFO/Datensatz-Nutzlasten des C-Kerns aus `tests/build/tf<n>_*.hex`), Flash-Werkzeug 17, Kopplungsangriff 3.
 
 ## 9 Offen / PROTOTYP-PRÜFUNG
 
 | Nr | Punkt | Wer |
 |---|---|---|
-| O-1 | **GET_DIAG/GET_INFO am Gateway abrufbar machen:** `central.execute` kennt `kind: "diag"` (Hex), aber kein API-Aufruf löst ihn aus; GET_INFO wird nie angefragt. Ohne das sind die Kriterien von PT5.12/PT11.07 (Zähler, NV-Schreibzahl) nur über den Neustartgrund im Sensor-Dokument (`reset_reason`) sichtbar | Software |
+| O-1 | ~~GET_DIAG/GET_INFO am Gateway abrufbar machen~~ erledigt 2026-11-09: `POST /sensors/{id}/diag`, PWA „Diagnose“, Kap. 6a. **PROTOTYP-PRÜFUNG:** 72-Byte-INFO bzw. bis 205-Byte-DIAG passen in einen SECURE-Frame (MTU 247); bei kleinerer ausgehandelter MTU am Muster prüfen | Software |
 | O-2 | Startsignal und Sequenz-Zeiten (100 ms, 2 s) sind ANNAHMEN; Muster in PROTOCOL 10.2 festlegen | Firmware/Orchestrator |
-| O-3 | Gateway/PWA zeigen `fw_build` nicht an; Kennung 9xxx als „Testfirmware“ anzeigen | Software |
+| O-3 | ~~Gateway/PWA zeigen `fw_build` nicht an~~ erledigt 2026-11-09 (Kap. 3, GATEWAY_API 5.10) | Software |
 | O-4 | Konvention `fw_build` = `9<n><bb>` statt Text-Suffix „-tf<n>“ (Anhang A) bestätigen | Orchestrator |
-| O-5 | **Erledigt 2026-11-09 (Prüfung offen):** Befund bestätigt – HardFault/NMI/nicht registrierter Interrupt sprangen in `Exception_handlerSpin` (SDK `kernel/freertos/exception/ExceptionArmV6M.c` Z. 67–72: Interrupts aus, Endlosschleife) → Watchdog nach bis zu 10 min, Grund „watchdog“. Neu: SysConfig `/freertos/exception` `nmiHandler`/`hardFaultHandler`/`defaultHandler` = Custom `fl_fault_handler` (`platform/cc23/fl_hw.c`): PMCTL.AONRCLR1 = `FL_RET_PLANNED`, AONRSET1 = `FL_RET_FAULT` (Bit 13), `PMCTLResetSystem` (RSTCTL.SYSRST; TRM SWCU193A 6.11.10 S. 349, 6.11.14/15 S. 353–354, 8.4.2 S. 460); kein Flash, kein Stack. `fl_app_init` meldet SYSRST + Bit als `reset_reason` 5 (hardfault), zählt abnormal (F-W3: 3 → Abschaltung) | Firmware |
+| O-5 | **Erledigt 2026-11-09 (Prüfung offen):** Befund bestätigt – HardFault/NMI/nicht registrierter Interrupt sprangen in `Exception_handlerSpin` (SDK `kernel/freertos/exception/ExceptionArmV6M.c` Z. 67–72: Interrupts aus, Endlosschleife) → Watchdog nach bis zu 10 min, Grund „watchdog“. Neu: SysConfig `/freertos/exception` `nmiHandler`/`hardFaultHandler`/`defaultHandler` = Custom `fl_fault_handler` (`platform/cc23/fl_hw.c`): PMCTL.AONRCLR1 = `FL_RET_PLANNED`, AONRSET1 = `FL_RET_FAULT` (Bit 13), `PMCTLResetSystem` (RSTCTL.SYSRST; TRM SWCU193A 6.11.10 S. 349, 6.11.14/15 S. 353–354, 8.4.2 S. 460); kein Flash, kein Stack. `fl_app_init` meldet SYSRST + Bit als `reset_reason` 5 (hardfault), zählt abnormal (F-W3: 3 → Abschaltung). **Nachtrag:** BLE-Stack-Asserts (alle Ursachen), out of memory und FreeRTOS-Stacküberlauf (SDK `main_freertos.c` Z. 157–161, 199–274: `HAL_ASSERT_SPINLOCK`) nehmen denselben Weg (`platform/cc23/fl_assert.c`). **Bleibt (dokumentiert, nicht geändert):** MCUboot-`faultISR`/`nmiISR` (NoRTOS-Startup, Schleife → MCUboot-Watchdog 60 s); SDK-Schleifen ohne Assert-Weg (`util.c` Z. 306 bei `mq_open`-Fehler, `nvocmp.c` `NVOCMP_ASSERT1`) → Watchdog 10 min | Firmware |
 | O-6 | PROTOTYP-PRÜFUNG: Watchdog-Neustart nach ≤ 10 min trotz laufendem BLE-Stack (TF-1); `__builtin_trap` erzeugt HardFault und `fl_fault_handler` startet **sofort** neu (TF-2 9 ×, Grund hardfault, kein Watchdog-Eintrag 0x50); Retention-Bits 7–17 überleben Reset und Shutdown (TRM 8.4.2); TMP1075N bleibt bei dauernder Speisung im Shutdown zwischen One-Shots | Prüfer am Muster |
 | O-7 | Kein UART-Log: Anhang A verlangt keines; DIO6/DIO20 sind LED-Pins und nach dem Verguss nicht erreichbar | – |

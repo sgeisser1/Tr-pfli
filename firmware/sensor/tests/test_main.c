@@ -852,6 +852,56 @@ static void test_fault(void)
     advance(FL_STABLE_MS + 1000); CHECK((sim.retained & FL_RET_ABN_MASK) == 0);
 }
 
+/* ---------------- Asserts / Stackueberlauf (O-5 Folge, platform/cc23/fl_assert.c) ---------------- */
+void AssertHandler(uint8_t assertCause, uint8_t assertSubcause);
+void vApplicationStackOverflowHook(void *pxTask, char *pcTaskName);
+
+/* ruft f(c) auf; true, wenn fl_fault_handler erreicht wurde (statt Rueckkehr oder Endlosschleife) */
+static bool reaches_fault(int which, uint8_t cause, uint8_t sub)
+{
+    jmp_buf jb;
+    uint32_t n = sim_fault_calls;
+    sim_fault_jmp = &jb;
+    if (setjmp(jb) == 0) {
+        if (which == 0) AssertHandler(cause, sub);
+        else vApplicationStackOverflowHook(NULL, "fl");
+        sim_fault_jmp = NULL;
+        return false;                                           /* zurueckgekehrt: Fehler */
+    }
+    sim_fault_jmp = NULL;
+    return sim_fault_calls == n + 1;
+}
+
+static void test_assert(void)
+{
+    puts("[assert] BLE-Stack-Assert (alle Ursachen) und FreeRTOS-Stackueberlauf -> fl_fault_handler, Grund hardfault");
+    /* SDK assert.h Ursachen 0x00..0x0C, dazu BLE/MAC/RCN-Bereich und unbekannt (SDK: default -> Spinlock) */
+    static const uint8_t causes[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C,
+                                     0x20, 0x40, 0x60, 0xFF};
+    int ok = 0;
+    for (size_t i = 0; i < sizeof causes; i++) {
+        sim.retained = FL_RET_PLANNED;
+        uint32_t nvw = sim.nv_writes, fw = sim.flash_writes;
+        if (reaches_fault(0, causes[i], (uint8_t)i) && sim.retained == FL_RET_FAULT && sim.nv_writes == nvw &&
+            sim.flash_writes == fw) ok++;
+    }
+    CHECK(ok == (int)sizeof causes);
+    /* Ablauf wie im Feld: 3 Asserts in Folge -> Abschaltung ohne Flash-Schreiben; Grund jeweils hardfault */
+    sim_reset_all(); sim.outlier_block = -1;
+    fl_app_init(); advance(3000);
+    CHECK(reaches_fault(0, 0x04, 0));                           /* out of memory */
+    sim.reset_reason = FL_RR_SOFTWARE; fl_app_init(); advance(3000);
+    CHECK(g_fl.reset_reason == FL_RR_HARDFAULT && (sim.retained & FL_RET_ABN_MASK) == 1 && !(sim.retained & FL_RET_FAULT));
+    CHECK(reaches_fault(1, 0, 0));                              /* Stackueberlauf */
+    sim.reset_reason = FL_RR_SOFTWARE; fl_app_init(); advance(3000);
+    CHECK(g_fl.reset_reason == FL_RR_HARDFAULT && (sim.retained & FL_RET_ABN_MASK) == 2);
+    uint32_t nvw = sim.nv_writes, fw = sim.flash_writes;
+    CHECK(reaches_fault(0, 0x05, 0));                           /* ICall abort */
+    sim.reset_reason = FL_RR_SOFTWARE; fl_app_init();
+    CHECK(sim.shutdowns == 1 && (sim.retained & FL_RET_BACKOFF) && sim.nv_writes == nvw && sim.flash_writes == fw);
+    CHECK(g_fl.cnt.wdt_resets == 0);
+}
+
 /* ---------------- Image-Pruefung nach OTA_END (W-6, F-L1) ---------------- */
 static void put_img(uint8_t maj, uint8_t min, uint16_t rev, uint32_t build, uint32_t sc, int hw)
 {
@@ -897,6 +947,7 @@ int main(void)
     test_pair_reveal();
     test_resets();
     test_fault();
+    test_assert();
     test_img_check();
     printf("\nErgebnis: %d Pruefungen bestanden, %d fehlgeschlagen\n", g_pass, g_fail);
     return g_fail ? 1 : 0;

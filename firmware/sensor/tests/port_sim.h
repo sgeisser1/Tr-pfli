@@ -33,6 +33,9 @@ typedef struct {
 
 extern sim_t sim;
 void sim_reset_all(void);
+#include <setjmp.h>
+extern jmp_buf *sim_fault_jmp;   /* gesetzt: fl_fault_handler springt zurueck (Hardware: Systemreset) */
+extern uint32_t sim_fault_calls;
 void sim_fault(void);       /* wie fl_fault_handler (fl_hw.c, O-5): FL_RET_FAULT setzen, PLANNED loeschen, Systemreset */
 void sim_flash_erase_all(void);
 void sim_log_fail_next_write(int after);
