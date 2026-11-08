@@ -24,8 +24,8 @@
 
 | ID | Testfall | Methode | Mittel | Abnahmekriterium | Quelle |
 |---|---|---|---|---|---|
-| M-T1 | Schaltfunktion | Taste mittig und an den 4 Ecken drücken, je 20 × | LED/Firmware-Rückmeldung, Kraftmesser | jede Betätigung erkannt; Betätigungskraft ≤ 5 N (**ANNAHME** Bedienbarkeit, REQ-UI-05) | REQ-UI-04/05; **P5-M2 (Keil) muss vorher gelöst sein** |
-| M-T2 | Kraftfluss, Überhub | 100 × drücken, danach Sicht auf Zunge/Finger, SW1-Lötstellen | Lupe | kein Weissbruch an der Zunge, SW1 unbeschädigt, Zelle unbelastet | M-4, `check_sensor.txt` 2b (Überhub 0.45), ST-M2 |
+| M-T1 | Schaltfunktion | Taste mittig und an den 4 Ecken drücken, je 20 × | LED/Firmware-Rückmeldung, Kraftmesser | jede Betätigung erkannt; Betätigungskraft ≤ 5 N (**ANNAHME** Bedienbarkeit, REQ-UI-05) | REQ-UI-04/05; Soll aus CAD: Schaltpunkt ≈ 0.4 mm Hub, Kraft ≈ 4.7 N + Membran (`check_sensor.txt` 2a/2c) |
+| M-T2 | Kraftfluss, Überlast | 100 × mit 20 N (**ANNAHME** Fehlbedienung) drücken, danach Sicht auf Zunge/Nase/Finger, SW1 und Lötstellen | Kraftmesser, Lupe | kein Weissbruch an Zunge (Schichtgrenzen!), SW1 schaltet weiter, Zelle unbelastet | M-4, `check_sensor.txt` 2b (Überhub 0.45), ST-M2 |
 | M-T3 | Fehlbetätigung Giesswasser | während M-W1 Tasterereignisse protokollieren | Firmware-Log | kein Tastenereignis durch Wasser, keine Werkseinstellung | REQ-UI-06 |
 | M-T4 | Dauerhaltbarkeit | 1000 Betätigungen (**ANNAHME** Lebensdauer-Stichprobe) | Zähler | Funktion wie M-T1, Membran dicht (danach M-W1) | REQ-UI-05 |
 

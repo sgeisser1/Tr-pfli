@@ -160,7 +160,8 @@ Bauteile laut Schaltplan Rev B (`hardware/sensor/out/fluidi_sensor_bom_jlc.csv`,
 | U3 TMP1075N DRL0006A | 0.6 max | `TI_TMP1075_Datasheet_SBOS854F.pdf` S. 36 („0.6 MAX“; KiCad-Modell 0.63) | Z5B, 0.7 |
 | D1 1615 (nachgeprüft) | 0.6 ± 0.1 | `TUOZHAN_…_Datasheet_A0.pdf` S. 4 (1.6 × 1.5 ± 0.1) | Z2 |
 | SW1 (Toleranz) | 2.0 ± 0.1 | XUNPU S. 1, Allgemeintoleranz 0.5…2: ± 0.10 → in der Toleranzkette M-4 | Z2, 2.0 |
-| C1–C4 1206 100 µF, Y1/Y2, SC-70, SOT-23, 0402 | KiCad-Modelle 1.6 / 0.64, 0.93 / 1.1 / 1.2 / ≤ 0.5 | **ANNAHME** Modell = Datenblatt (Datenblätter C1–C4 nicht lokal) | Z2, 2.0 |
+| C1–C4 Samsung CL31A107MQHNNNE (1206, 100 µF) | **1.60 ± 0.20 → max. 1.80** (Dickencode „H“ an 7. Stelle der Teilenummer) | `Samsung_CL31A107MQHNNNE_Catalog_2015-11.pdf` S. 4 (Kap. 7 Thickness Code: H = 1.60 mm) und S. 6 (Tabelle 1206, T 1.60 ± 0.20, Code H); KiCad-Modell 1.6 | Z2, 2.0 (Reserve 0.20 bei Max.) |
+| Y1/Y2, SC-70, SOT-23, 0402 | KiCad-Modelle 0.64, 0.93 / 1.1 / 1.2 / ≤ 0.5 | **ANNAHME** Modell = Datenblatt (Phase 5 nicht einzeln nachgeprüft) | Z2, 2.0 |
 
 Hinweis Kosten: `COSTS_REV_B.md` rechnet mit 26 × 160 mm; die Kontur Rev B ist 26 × 158.5 mm (Sonde 20 mm), die Annahme
 liegt also auf der sicheren Seite.

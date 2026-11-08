@@ -5,13 +5,15 @@ Aussenmasse 84 x 42 x 20 mm (B x T x H), Wand 2.0, Fuge z 13.85 ... 14.15
 Pi: X=0 bei x 26.0, Y=0 bei y 18.6, PCB z 5.0 ... 6.0 (ANNAHME T 1.0)
 1 Kollisionen montiert: keine
    RTC-Modul im Rahmen: Ueberschneidung 0.000 mm3
+13 RTC Adafruit 4282 (21.3 x 20.0 x 13.6 inkl. Buchsenleiste, Produktseite Z. 130): Grundriss im Rahmen 21.7 x 20.4 unter der Decke z 18.0; hoechstes Pi-Bauteil darunter z 7.8 -> Bauraum 10.2 mm. Mit Buchsenleiste (13.6) passt es NICHT (und der Pi hat keine Stiftleiste); ohne Leiste zulaessig bis 9.7 mm Modulhoehe (am Modul messen, ANNAHME bis dahin). Abstand zu Klima-Litzen 3.6, HDMI 0.5 mm
+14 Grove SHT41 (20 x 40 mm, docs/references/Seeed_Grove-SHT4x_Wiki_Auszug_2026-11-08.txt; Hoehe nicht angegeben, hier nur Platine 1.6): Klimakammer innen 8.0 x 38.0 x 16.0 (x, y, z) -> passt in KEINER Lage (40 > 38.0 innen)
 2 Mindestabstaende (Spiel, Ziel >= 0.3 FDM bzw. >= 1.0 zu Waenden):
    Pi_PCB             - Wanne 0.00   - Deckel 0.00
    Pi_Bauteile_oben   - Wanne 0.30   - Deckel 0.20
    Pi_Bauteile_unten  - Wanne 0.20   - Deckel 1.02
    microSD_Karte      - Wanne 0.50   - Deckel 1.30
    LED_Platine        - Wanne 0.00   - Deckel 0.25
-   RTC_Modul_Option   - Wanne 4.00   - Deckel 0.00
+   RTC_Modul_Option   - Wanne 5.80   - Deckel 0.00
    Klima_Modul_Option - Wanne 0.00   - Deckel 0.70
    Leitungen_Klima    - Wanne 0.20   - Deckel 0.30
    (Pi_PCB 0.00 = Auflage auf Abstandshaltern / Niederhalterrohren, gewollt; Bauteilhuelle 0.20 nur innerhalb
@@ -38,7 +40,7 @@ Pi: X=0 bei x 26.0, Y=0 bei y 18.6, PCB z 5.0 ... 6.0 (ANNAHME T 1.0)
    ist in den offiziellen Unterlagen nicht angegeben -> RSSI offen/geschlossen messen (PROTOTYP-PRUEFUNG).
 7 Wanne_grau           13.0 cm3 -> 14.0 g ASA
 7 Wanne_grau_OTG       12.9 cm3 -> 13.8 g ASA
-7 Deckel_blau          9.0 cm3 -> 9.7 g ASA
+7 Deckel_blau          9.1 cm3 -> 9.7 g ASA
 7 Fenster_transluzent  0.0 cm3 -> 0.1 g ASA
 8 Verlustleistung 1.0 W: dT Gehaeuse ~ 11 K (h = 8 W/m2K, A = 0.0111 m2, ANNAHME; Leistung Pi nicht im Product Brief)
 8 Verlustleistung 2.0 W: dT Gehaeuse ~ 22 K (h = 8 W/m2K, A = 0.0111 m2, ANNAHME; Leistung Pi nicht im Product Brief)

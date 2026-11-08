@@ -1,0 +1,8 @@
+Quelle: Seeed Studio Wiki 'Grove - Temperature & Humidity Sensor (SHT4x)' (HTML)
+URL: https://wiki.seeedstudio.com/Grove-SHT4x/
+Abgerufen: 2026-11-08 mit curl (User-Agent Mozilla/5.0), sha256 Roh-HTML: ccd2c5acf2b18ba670fe183094ca7bbfea9d5a4260adffa1c29934d2ffe6854a
+Auszug Tabelle 'Hardware Overview / Specification' (Tags entfernt):
+  Grove idle current | 1.2µA
+  Product Dimension  | 20mm x 40mm
+  Communication      | IIC
+Nicht angegeben: Bauhoehe, Lage der Befestigungsloecher, Lage der Grove-Buchse (nur Bild). Bauhoehe und Buchse am Modul messen (ANNAHME bis dahin).

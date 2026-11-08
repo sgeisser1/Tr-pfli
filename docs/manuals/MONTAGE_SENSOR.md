@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Stand | 2026-11-08, Phase 5, Gehäuse Rev C mit V-K/M-4 (D-019, D-023) und P5-M1/P5-M3 |
+| Stand | 2026-11-08, Phase 5, Gehäuse Rev C mit V-K/M-4 (D-019, D-023) und P5-M1/M2/M3 |
 | Zeichnungen | `mechanical/drawings/FL-S-00_zusammenbau_sensor.pdf` (Positionen 1–17), Einzelteile FL-S-01 … FL-S-10 |
 | Bilder | `renders/final/fluidi_03_explosion.png` (alle Teile), `renders/final/fluidi_04_batteriewechsel.png` (Hülse abgezogen) |
 | Grundlage | `docs/interfaces/PCB_OUTLINE.md` Kap. 7, `mechanical/PRINT_SETTINGS.md` Kap. 4–5, `docs/reviews/phase4_sicherheit_kragen_firmware.md` K-4/K-5/K-7, `docs/reviews/phase3_sleeve_sicherheit.md`, `docs/reviews/phase5_fmea_light.md` |
@@ -21,7 +21,7 @@ sondern die Projektleitung fragen.
 | O-2 | **Kantenversiegelung/Beschichtung der Sonde** (REQ-MECH-07) | Verfahren nicht gewählt (Red-Team W-5) |
 | O-3 | Klebstoff Lichtfenster | **ANNAHME** transparentes 2K-Epoxid oder UV-Kleber (PRINT_SETTINGS Kap. 5) |
 | O-4 | Befestigung Klemmring (Pos. 6) in der Senkung: Spiel 0.05 je Seite im CAD, Befestigung (Presssitz/Kleber) nicht festgelegt | am Muster festlegen (PROTOTYP-PRÜFUNG) |
-| O-5 | **30°-Keil Stössel ↔ Zunge fehlt im CAD** (P5-M2): Finger und Zunge sind Quader, der Finger berührt die Zunge im Modell nicht | vor dem Druck der Muster klären; ohne Keil löst die Taste SW1 nicht aus |
+| O-5 | Tastermechanik (P5-M2): Zunge 0.6 mm mit Nase (Flanke 45°), Fingerkante des Stössels gleitet darauf; SW1 schaltet im CAD nominal bei 0.40 mm Tastenhub, Toleranzkette worst +0.14 mm (`check_sensor.txt` 2a–2c) | Betätigungskraft (≈ 4.7 N + Membran, μ ANNAHME), Biegespannung worst SF 1.34 (quer zu den Schichten), Last auf SW1 nach dem Durchschalten: PROTOTYP-PRÜFUNG M-T1/M-T4 |
 | O-6 | Anzugsmoment Schraube M2 × 3 in ASA/Mutter | nicht festgelegt; „handfest mit PH1“ (**ANNAHME**), am Muster prüfen (ST-K1) |
 
 ## 1 Teile, Werkzeuge, Hilfsstoffe
@@ -62,14 +62,16 @@ Geometrie.
 
 1. **Lichtfenster (Pos. 4)** von aussen in den Tropfenausschnitt kleben, Lichtschaft nach innen (Spalt 0.1 je Seite).
    Klebstoff nur auf den Rand, nicht auf die Sichtfläche und nicht in den Innenraum (O-3).
-2. **Stössel (Pos. 8)** von unten in das Führungsrohr Ø 3.2 stecken, D-Fläche nach vorne, Finger links vor der Zunge.
+2. **Stössel (Pos. 8)** von unten in das Führungsrohr Ø 3.2 stecken, D-Fläche nach vorne, Finger links vor der Zunge,
+   Fingerkante über der Nasenflanke (die Zunge dabei nicht nach hinten biegen).
 3. **Membran (Pos. 10)** flach auf den Grund der Senkung Ø 6.4 legen.
 4. **Taste (Pos. 5)** mit dem Hals von oben durch den Klemmring (Pos. 6) stecken, **Tastenteller (Pos. 7)** von unten
    auf den Hals pressen. Die Einheit Taste + Klemmring + Teller in die Senkung setzen, Klemmring auf die Membran drücken
    (Befestigung O-4).
 
-**Prüfung 3:** Taste lässt sich 0.8 mm drücken und federt zurück (Membran), Stössel gleitet ohne Klemmen. Fenster sitzt
-bündig, keine Kleberspuren auf der Sichtfläche. Die Zunge darf in Ruhe nicht vorgespannt sein (O-5 beachten).
+**Prüfung 3:** Taste federt zurück (Membran), Stössel gleitet ohne Klemmen. Ohne Platine: beim Drücken bewegt sich die
+Zunge sichtbar nach hinten (Nase, P5-M2), in Ruhe liegt die Fingerkante ≈ 0.1 mm vor der Flanke (Zunge nicht vorgespannt).
+Fenster sitzt bündig, keine Kleberspuren auf der Sichtfläche.
 
 ## 4 Platine einsetzen und Schott vergiessen (Pos. 9, 15, 16)
 
@@ -134,7 +136,8 @@ Zellfach). Keine Zelle im Clip. Danach Dummy-Zelle entnehmen.
 - Hülse lässt sich von Hand nicht abziehen, Sichtfuge rundum gleich (0.3 mm), Kerbe um den Tropfen gleichmässig.
 - O-Ringe sichtbar verpresst bzw. nicht aus der Nut gequetscht (vor dem Aufschieben kontrollieren).
 - Ablaufschlitze hinten frei.
-- Funktion: kurzer Tastendruck → Messung/Statusanzeige (REQ-UI-04); L11 war nach dem Einsetzen sichtbar.
+- Funktion: kurzer Tastendruck → Messung/Statusanzeige (REQ-UI-04); die Taste stoppt nach dem Klick (SW1 am Anschlag,
+  nominal ≈ 0.4 mm Hub), nicht erst am Taschenboden; L11 war nach dem Einsetzen sichtbar.
 - Eintrag in der Musterliste: Seriennummer `fluidi-XXXX`, Prüfungen 2–7, Datum.
 
 ## 8 Batteriewechsel (Werkstatt / Muster)

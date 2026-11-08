@@ -47,13 +47,13 @@ freecadcmd mechanical/gen/fluidi_gateway.py          # mechanical/gateway/print/
 | Datei | Teil | Farbe | Ausrichtung (wie exportiert) | Kritische Stellen | g |
 |---|---|---|---|---|---|
 | `huelse_grau` | Hülse | Warmgrau | stehend, Boden auf dem Bett | Logo-Relief 0.25 auf senkrechter Wand (19.4 mm); Warnsymbol innen vertieft 0.3; Kerbe oben offen; 4 Ablaufschlitze 3 × 1.2 hinten (Brücke 3 mm); Furchlippe Ø 1.7 in den ersten 3 Schichten; Höhe 44.7 | 7.5 |
-| `kappe_blau` | Kappe mit Zapfen, Schott, Biegezunge | Hellblau | **kopfüber** (Decke auf dem Bett) | Tastentasche im Bett; Schott = Brücke 5.5 mm; O-Ring-Nut-Flanke 1.35 mm Überhang (ohne Stütze druckbar, Probedruck); Zunge 0.8 mm = 2 Bahnen, wächst vom Block; Ablaufstufe am Zapfen = 0.5 mm Überhang (kopfüber ohne Stütze); dünnste Zapfenwand 0.54 mm hinter den hinteren Nutecken; **Phase 5: 45°-Trichter verbindet Zapfen und Kappenwand (P5-M1, vorher 2 getrennte Körper), Mantel 0.8 um die Membran-Senkung (P5-M3)**; Massbild `mechanical/drawings/FL-S-02_kappe_blau.pdf` | 4.7 |
+| `kappe_blau` | Kappe mit Zapfen, Schott, Biegezunge | Hellblau | **kopfüber** (Decke auf dem Bett) | Tastentasche im Bett; Schott = Brücke 5.5 mm; O-Ring-Nut-Flanke 1.35 mm Überhang (ohne Stütze druckbar, Probedruck); Zunge 0.6 mm (P5-M2, 1–2 Bahnen, Arachne) mit Nase 45° (kopfüber stützenfrei), wächst vom Block; Ablaufstufe am Zapfen = 0.5 mm Überhang (kopfüber ohne Stütze); dünnste Zapfenwand 0.54 mm hinter den hinteren Nutecken; **Phase 5: 45°-Trichter verbindet Zapfen und Kappenwand (P5-M1, vorher 2 getrennte Körper), Mantel 0.8 um die Membran-Senkung (P5-M3)**; Massbild `mechanical/drawings/FL-S-02_kappe_blau.pdf` | 4.7 |
 | `kragen` | Kragen (Vergussform) | beliebig | stehend | Mutterntasche von vorne = Brücke 4.6 mm; Nutflanke 1.35 mm | 0.8 |
 | `fenster_tropfen` | Lichtfenster Sensor | natur transluzent | Tropfenfläche auf dem Bett, Schaft nach oben | Aussenfläche matt (Bettstruktur Engineering Plate = Diffusor) | 0.1 |
 | `taste_blau` | Taste 9 × 6 | Hellblau | Oberseite auf dem Bett | Hals Ø 3.0 | 0.1 |
 | `klemmring` | Klemmring Membran | Hellblau | Platte auf dem Bett | Rand 0.4 | < 0.1 |
 | `tastenteller` | Teller (auf den Tastenhals gepresst) | Hellblau | flach | 0.4 mm dick = 3 Schichten | < 0.1 |
-| `stoessel` | Stössel mit Finger und 30°-Keil | beliebig | flach auf der D-Fläche | Finger 1.15 × 1.2 mm | < 0.1 |
+| `stoessel` | Stössel mit Finger (untere hintere Kante gleitet auf der 45°-Nase der Zunge, P5-M2) | beliebig | flach auf der D-Fläche | Finger 1.15 × 1.2 mm, Gleitkante scharf | < 0.1 |
 | `schottkeil` | Schottkeil | beliebig | flach | | < 0.1 |
 | `distanzlehre_24p2` | Montage-Lehre Kragen–Schott 24.2 mm (2 Stück, wiederverwendbar; V-K, D-023) | beliebig | stehend | | |
 | `passprobe_huelse_unten/_oben` | Passungsproben (vor der ersten Hülse) | Warmgrau | stehend | Gleitsitz Kragen/Zapfen, O-Ring-Verpressung, Furchlippe | |

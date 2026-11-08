@@ -141,9 +141,14 @@ BTN = dict(X=0.0, Y=5.5, W=9.0, D=6.0, CH=1.0, PROUD=0.6, STROKE=0.8,   # Hub 0.
 PSTOP = dict(X0=-8.0, X1=-3.0, FORK=1.5, T=0.8, CLR_F=0.0, CLR_B=0.15, LEAD=0.5, RIB_Y=7.95, RIB_W=0.6)
 SW['GAP'] = 0.25                                   # M-4: Zunge 0.25 vor dem Betaetiger (Toleranzkette check_sensor.txt 2b)
 _ty1 = PCB['Y_F'] - SW['H'] - SW['GAP']
-TONGUE = dict(X0=-7.6, X1=-4.4, Y0=_ty1 - 0.8, Y1=_ty1, Z_TIP=SW['Z'] - 1.6,   # Biegezunge (Kappe)
-              COL_X0=-7.8, COL_X1=-4.2, WEDGE_GAP=0.10,   # M-4: Keil-Vorspalt 0.15 -> 0.10
-              Z_CONTACT=40.0 + _dz)
+# P5-M2 (Phase 5): Bis Rev C waren Finger und Zunge Quader, der "30-Grad-Keil" fehlte im CAD (Finger beruehrte die Zunge nie).
+# Jetzt: Nase an der Zunge mit 45-Grad-Flanke (kopfueber ohne Stuetze druckbar), Fingerkante gleitet auf der Flanke.
+# Zunge 0.8 -> 0.6 (Biegespannung quer zu den Schichten, ASA Z 35 MPa), Kontakt tiefer (Hebel 1.66 statt 2.5).
+# Auslegung: check_sensor.txt Punkt 2 (Kinematik aus dem CAD) und 2b (Toleranzkette).
+TONGUE = dict(X0=-7.6, X1=-4.4, Y0=_ty1 - 0.6, Y1=_ty1, Z_TIP=SW['Z'] - 1.6,   # Biegezunge (Kappe), Dicke 0.6
+              COL_X0=-7.8, COL_X1=-4.2, WEDGE_GAP=0.10,   # Vorspalt Fingerkante -> Flanke (quer)
+              Z_CONTACT=48.6 + 0.4)                         # Fingerunterkante in Ruhe = Z_CONTACT - 0.4 = 48.6
+NOSE = dict(X0=-6.0, X1=-4.4, Z_TOP=48.6, P=1.0, ANG=45.0, H_VERT=0.5)   # Nase: Flanke 45 Grad von (Y0, Z_TOP) nach vorn
 SCREW = dict(X=0.0, D=2.0, L=3.0,                  # V-K: M2x3 (M2x4 stuende 0.8 ueber der Mutter, 0.05 neben der O-Ring-Nut)
              HEAD_D=3.8, HEAD_H=1.3, HOLE_D=2.4, LIP_D=1.7, LIP_H=0.5,
              NUT_S=4.0, NUT_M=1.6)                 # ISO 7045 M2x3 A2 PH1, ISO 4032 M2 A2 (Nennmasse, ANNAHME bis Bestellung)

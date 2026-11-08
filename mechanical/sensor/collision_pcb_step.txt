@@ -86,7 +86,7 @@ C Kollisionen in Endlage (Schnittvolumen > 1e-04 mm3) und kleinster Abstand je B
    Q1           0.76 Kappe_blau, 2.95 Huelse_grau
    Q2           1.00 Kappe_blau, 3.80 Huelse_grau
    R10          0.80 Kappe_blau, 3.00 Huelse_grau, 3.12 ORing_Zapfen
-   SW1          0.25 Kappe_blau, 2.78 Fenster_transluzent, 3.00 Huelse_grau
+   SW1          0.25 Kappe_blau, 2.51 Stoessel, 2.78 Fenster_transluzent
    U3           0.40 Kragen, 2.81 Huelse_grau, 3.02 ORing_Kragen
    (alle anderen Bauteile >= 1.0 mm zum Gehaeuse)
 

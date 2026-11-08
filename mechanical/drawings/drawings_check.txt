@@ -1,5 +1,5 @@
 fluidi Fertigungszeichnungen - Pruefprotokoll der Masse (erzeugt von mechanical/gen/fluidi_drawings.py, 2026-11-08)
-Stand: Rev C (2026-11-08), V-K/M-4 (D-019, D-023), P5-M1/M3; git c45cedf + Arbeitsstand
+Stand: Rev C (2026-11-08), V-K/M-4 (D-019, D-023), P5-M1/M2/M3; git fba2057 + Arbeitsstand
 Jede Masszahl ist der Abstand zweier Modellpunkte; Spalte "max d" = groesster Abstand der Messpunkte zur
 Geometrie des Teils (Soll < 0.005 mm, sonst FEHLER).
 
@@ -57,12 +57,15 @@ FL-S-02  Senkung Membran = Ø6.4                                                
 FL-S-02  Fuehrung Stoessel = Ø3.2                                               ok     max d 0.0000
 FL-S-02  Senkung Tiefe = 2.3                                                    ok     max d 0.0000
 FL-S-02  Rohr bis Senkung = 2.7                                                 ok     max d 0.0000
-FL-S-02  Zunge Dicke = 0.8                                                      ok     max d 0.0000
+FL-S-02  Zunge Dicke = 0.6                                                      ok     max d 0.0000
+FL-S-02  Nase Ueberstand = 1                                                    ok     max d 0.0000
+FL-S-02  Zungenspitze bis Nasenflanke oben = 5.1                                ok     max d 0.0000
 FL-S-02  Zungenspitze bis Platinenanschlag = 10                                 ok     max d 0.0000
 FL-S-02  Gabel Weite (ohne Rippe) = 1.75                                        ok     max d 0.0000
 FL-S-02  Gabel Tiefe = 1.5                                                      ok     max d 0.0000
 FL-S-02  Anschlag unter Oberseite = 4                                           ok     max d 0.0000
 FL-S-02  F-Referenz ab Front (Gabelwange vorn) = 6.6                            ok     max d 0.0000
+FL-S-02  Nasenflanke auf Geometrie                                              ok     max d 0.0035
 FL-S-02  Tastentasche Breite = 9.8                                              ok     max d 0.0000
 FL-S-02  Tastentasche Tiefe y = 6.8                                             ok     max d 0.0000
 FL-S-02  Tastentasche ab Front = 2.1                                            ok     max d 0.0000
@@ -123,7 +126,7 @@ FL-S-07  Teller = Ø5                                                           
 FL-S-07  Bohrung (Presssitz Hals) = Ø3                                          ok     max d 0.0000
 FL-S-07  Dicke = 0.4                                                            ok     max d 0.0000
 FL-S-08  Schaft Laenge = 2.65                                                   ok     max d 0.0000
-FL-S-08  Finger + Arm = 2.4                                                     ok     max d 0.0000
+FL-S-08  Finger + Arm = 2.9                                                     ok     max d 0.0000
 FL-S-08  Finger Breite = 1.2                                                    ok     max d 0.0000
 FL-S-08  Finger bis Achse = 3.6                                                 ok     max d 0.0000
 FL-S-08  Finger Dicke = 1.15                                                    ok     max d 0.0000
@@ -174,4 +177,4 @@ FL-G-03  Tropfen Breite = 4.8                                                   
 FL-G-03  Tropfen Hoehe = 8.4                                                    ok     max d 0.0000
 FL-G-03  Dicke = 2                                                              ok     max d 0.0000
 
-Summe: 170 Masse/Hinweise geprueft, 0 Fehler
+Summe: 173 Masse/Hinweise geprueft, 0 Fehler

@@ -31,7 +31,7 @@ OUT = os.path.join(REPO, 'mechanical', 'drawings')
 PNGD = os.environ.get('FLUIDI_DRAW_PNG')
 ONLY = [s for s in os.environ.get('FLUIDI_DRAW_ONLY', '').split(',') if s]
 H, Z, PCB, CAP, BTN = FP.HEAD, FP.Z, FP.PCB, FP.CAP, FP.BTN
-STAND = 'Rev %s (%s), V-K/M-4 (D-019, D-023), P5-M1/M3; git %s' % (
+STAND = 'Rev %s (%s), V-K/M-4 (D-019, D-023), P5-M1/M2/M3; git %s' % (
     FP.REV, FP.REV_DATE, git_stand(REPO, ['mechanical/gen', 'mechanical/sensor', 'mechanical/gateway_pi']))
 DATE = datetime.date.today().isoformat()
 ALL_CHECKS = []
@@ -164,24 +164,25 @@ def d_huelse(S):
 
 # ============================================================================================ Sensor: Kappe
 def d_kappe(S):
+    XC = -5.0                      # Schnitt C-C durch Zunge, Nase, Platinenanschlag (Rippe x -5.8...-5.2 nicht geschnitten)
     k = S['Kappe_blau']
     sh = sheet('A3', 'FL-S-02', 'Kappe blau mit Zapfen, Schott, Biegezunge', 'Elektronikraum (dicht), O-Ring-Nut Zapfen, Ablaufstufe, Tastenführung, Platinenanschlag',
                'ASA (Bambu, TDS V2.0), Hellblau, ohne Russ/Metallpigment', '2:1',
                'kopfüber (Decke auf dem Bett), stützenfrei; Trichter 45° (P5-M1); O-Ring-Nutflanke 1.15 Überhang',
                notes=['6  Tropfenausschnitt r %s, Spitze %s über Mitte (drop2, k %s), Mitte x 0 / z %s; Fenster FL-S-04 eingeklebt (Spalt 0.1).'
                       % (fmt(FP.DROP['R']), fmt(FP.DROP['K'] * FP.DROP['R']), fmt(FP.DROP['K']), fmt(FP.DROP['ZC'])),
-                      '7  OFFEN P5-M2: 30°-Keil zwischen Stössel-Finger und Zunge ist im CAD nicht modelliert (beide quaderförmig) -> vor dem Druck klären.'])
+                      '7  Biegezunge 0.6 mit Nase, Flanke 45° (P5-M2); Fingerkante des Stössels FL-S-08 gleitet darauf. Nachweis check_sensor.txt 2a–2c.'])
     s = 2.0
     fr = View(sh, k, 'front', s).place(85, 200).draw('Vorderansicht', 16)
     aa = View(sh, k, 'left', s, section=(0, 0, 0)).place(178, 200).draw('A–A', 16)
     bb = View(sh, k, 'left', s, section=(BTN['AX_X'], 0, 0)).place(250, 200).draw('B–B', 16)
-    cc = View(sh, k, 'left', s, section=(-6.0, 0, 0)).place(330, 200).draw('C–C', 16)
+    cc = View(sh, k, 'left', s, section=(XC, 0, 0)).place(330, 200).draw('C–C', 16)
     tp = View(sh, k, 'top', s).place(85, 115).draw('Draufsicht', 14)
     dd = View(sh, k, 'top', s, section=(0, 0, 31.4)).place(178, 95).draw('D–D', 10)
     W2, y0 = H['W'] / 2, 6.5
     fr.cutline((0, 0, 30.3), (0, 0, 58), 'A', (1, 0, 0), ext=12)
     fr.cutline((BTN['AX_X'], 0, 30.3), (BTN['AX_X'], 0, 58), 'B', (1, 0, 0), ext=6)
-    fr.cutline((-6.0, 0, 30.3), (-6.0, 0, 58), 'C', (1, 0, 0), ext=1)
+    fr.cutline((XC, 0, 30.3), (XC, 0, 58), 'C', (1, 0, 0), ext=1)
     fr.cutline((-17.5, 0, 31.4), (17.5, 0, 31.4), 'D', (0, 0, -1), ext=12)
     L, G, SI = FP.LAND, FP.GROOVE_BOT, FP.SP_IN
     fr.dim((-W2, y0, 50), (W2, y0, 50), 'h', fr.top(1, 9), 'Breite Kappe', k)
@@ -218,14 +219,19 @@ def d_kappe(S):
     bb.centerline((ax_, ay_, BTN['TUBE_Z0'] - 2), (ax_, ay_, H['H'] + 1))
     # C-C: Zunge + Platinenanschlag
     T_, ps = FP.TONGUE, FP.PSTOP
-    cc.dim((-6, T_['Y0'], 48), (-6, T_['Y1'], 48), 'h', cc.bottom(1), 'Zunge Dicke', k, tside=1)
-    cc.dim((-6, 4.0, T_['Z_TIP']), (-6, 7.4, PCB['Z_TOP']), 'v', cc.left(1), 'Zungenspitze bis Platinenanschlag', k)
-    cc.dim((-6, PCB['Y_F'], 52.8), (-6, PCB['Y_B'] + ps['CLR_B'], 52.8), 'h', cc.top(1, 5), 'Gabel Weite (ohne Rippe)', k, tside=1)
-    cc.dim((-6, 6.0, PCB['Z_TOP'] - ps['FORK']), (-6, 7.4, PCB['Z_TOP']), 'v', cc.right(1), 'Gabel Tiefe', k, tside=1)
-    cc.dim((-6, 7.4, PCB['Z_TOP']), (-6, 10, H['H']), 'v', cc.right(2), 'Anschlag unter Oberseite', k, frame=True)
-    cc.dim((-6, 0, 50.5), (-6, PCB['Y_F'], 52.8), 'h', cc.bottom(2), 'F-Referenz ab Front (Gabelwange vorn)', k, frame=True,
-           chk=[(-6, 0, 50.5), (-6, PCB['Y_F'], 52.8)])
-    cc.note((-6, T_['Y1'], 45.5), 'SW1-Betätiger: Spalt %s\n(check_sensor.txt 2b)' % fmt(FP.SW['GAP']), 18, -6)
+    N_ = FP.NOSE
+    zf_ = N_['Z_TOP'] - N_['P']
+    cc.dim((XC, T_['Y0'], 50), (XC, T_['Y1'], 50), 'h', cc.bottom(1), 'Zunge Dicke', k, tside=1, frame=True)
+    cc.dim((XC, T_['Y0'] - N_['P'], zf_ - 0.25), (XC, T_['Y0'], 50), 'h', cc.bottom(2), 'Nase Ueberstand', k, tside=1, frame=True)
+    cc.dim((XC, 4.0, T_['Z_TIP']), (XC, T_['Y0'], N_['Z_TOP']), 'v', cc.left(1), 'Zungenspitze bis Nasenflanke oben', k, frame=True)
+    cc.dim((XC, 4.0, T_['Z_TIP']), (XC, 7.4, PCB['Z_TOP']), 'v', cc.left(2), 'Zungenspitze bis Platinenanschlag', k)
+    cc.dim((XC, PCB['Y_F'], 52.8), (XC, PCB['Y_B'] + ps['CLR_B'], 52.8), 'h', cc.top(1, 5), 'Gabel Weite (ohne Rippe)', k, tside=1)
+    cc.dim((XC, 6.0, PCB['Z_TOP'] - ps['FORK']), (XC, 7.4, PCB['Z_TOP']), 'v', cc.right(1), 'Gabel Tiefe', k, tside=1)
+    cc.dim((XC, 7.4, PCB['Z_TOP']), (XC, 10, H['H']), 'v', cc.right(2), 'Anschlag unter Oberseite', k, frame=True)
+    cc.dim((XC, 0, 50.5), (XC, PCB['Y_F'], 52.8), 'h', cc.bottom(3), 'F-Referenz ab Front (Gabelwange vorn)', k, frame=True,
+           chk=[(XC, 0, 50.5), (XC, PCB['Y_F'], 52.8)])
+    cc.note((XC, T_['Y0'] - N_['P'] / 2, N_['Z_TOP'] - N_['P'] / 2), 'Flanke 45° (P5-M2)', -18, 8, shape=k, what='Nasenflanke auf Geometrie')
+    cc.note((XC, T_['Y1'], 45.5), 'SW1-Betätiger: Spalt %s\n(check_sensor.txt 2a/2b)' % fmt(FP.SW['GAP']), 18, -6)
     # Draufsicht
     bw, bd = BTN['W'] + 2 * BTN['POCKET_GAP'], BTN['D'] + 2 * BTN['POCKET_GAP']
     tp.dim((-bw / 2, BTN['Y'], 57), (bw / 2, BTN['Y'], 57), 'h', tp.top(1, 5), 'Tastentasche Breite', k)
@@ -422,7 +428,7 @@ def d_stoessel(S):
     small(S, 'Stoessel', 'FL-S-08', 'FL-S-08_stoessel', 'Stössel mit Finger', 'überträgt den Tastenhub auf die Biegezunge der Kappe',
           'ASA (Bambu, TDS V2.0), Farbe beliebig', 10, 'flach auf der D-Fläche, 0.12 mm',
           [('f', 'front', None, (80, 165), 'Vorderansicht'), ('t', 'bottom', None, (80, 112), 'Ansicht von unten')], dims,
-          notes=['6  OFFEN P5-M2: 30°-Keilfläche am Finger bzw. Nase an der Zunge fehlt im CAD; Finger berührt die Zunge im Modell nicht.'])
+          notes=['6  Untere hintere Fingerkante = Gleitkante auf der 45°-Nasenflanke der Zunge (P5-M2), scharfkantig drucken, nicht verrunden.'])
 
 
 def d_schottkeil(S):

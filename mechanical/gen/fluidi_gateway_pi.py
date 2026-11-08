@@ -28,7 +28,7 @@ ANNAHMEN (Zeichnung enthaelt KEINE Hoehen, keine Lage von ACT-LED und Antenne ->
   PCB 1.0 mm; Bauteilhoehen ueber PCB: HDMI 3.5, Micro-USB 3.0 (Mitte 1.5), microSD-Halter 2.0, SiP 1.4, Haube 1.8,
   Kamerabuchse 2.0, uebrige Bauteile <= 1.2 (Huelle); Unterseite <= 1.2; Karte steht 2.5 ueber die Kante;
   Micro-USB-Steckerumspritzung <= 10.6 x 7.0; GPIO-Header NICHT bestueckt (bestueckt: Stifte 8.5 hoch, Option pruefen);
-  LED-Platine 8 x 8.2 x 1.0 (eigene Mini-Platine, RGB wie Sensor, an GPIO-Pads geloetet, auf Lichtschacht geklebt); RTC-Modul 15 x 12 x 4;
+  LED-Platine 8 x 8.2 x 1.0 (eigene Mini-Platine, RGB wie Sensor, an GPIO-Pads geloetet, auf Lichtschacht geklebt); RTC-Modul Adafruit 4282 21.3 x 20.0 (ohne Buchsenleiste, Hoehe am Modul messen);
   Gewindeeinsatz M2.5 Ø 3.5 x 4 (Bohrung 3.2), Schraube M2.5 x 8 Linsenkopf ISO 7380 (dk 4.7, k 1.4).
 """
 import math
@@ -76,7 +76,12 @@ PARTS = {   # Name: (X0, X1, Y0, Y1, Hoehe ueber PCB)   Lage abgegriffen, Hoehe 
 USB = dict(PWR_X=54.0, OTG_X=41.4, ZC_DZ=1.5, WIN=(11.4, 7.8), PLUG=(10.6, 7.0), RELIEF=1.2)
 HEADER = dict(X0=7.0, X1=58.9, Y0=24.0, Y1=29.0, H=8.5)
 TUBE = dict(R=2.8, INS_D=3.2, INS_L=4.6, HOLE_D=2.8, CB_D=5.4, CB_H=1.6, SCREW_L=8.0, HEAD_D=4.7, HEAD_K=1.4)
-RTC = dict(LX=15.0, LY=12.0, H=4.0, X=23.5, Y=9.6)   # Lage in Pi-Koordinaten (ueber dem SiP)
+# Phase 5 (Befund Fertigung): RTC Adafruit 4282 PiRTC 21.3 x 20.0 x 13.6 mm inkl. Buchsenleiste
+# (docs/references/Adafruit_4282_PiRTC-DS3231_Produktseite_Auszug_2026-11-08.txt, Z. 130). Mit Leiste passt es nicht (Pi ohne
+# Stiftleiste, Bauraum ueber dem Pi < 13.6). Variante mit RTC: Modul OHNE Buchsenleiste, Litzen in die Loetaugen (wie Klima),
+# flach unter die Deckeldecke geklebt. H = Grenzhoehe des Bauraums (0.5 Luft ueber Haube/SiP), KEIN Modulmass -> am Modul
+# messen. Variante ohne RTC: Rahmen bleibt leer. Lage: zwischen Haube/SiP und HDMI, vor dem Steg, neben den Klima-Litzen.
+RTC = dict(LX=21.3, LY=20.0, H=9.7, H_SRC=13.6, X=29.0, Y=15.4)   # Lage (Mitte) in Pi-Koordinaten
 LEDB = dict(S=8.0, V0=-5.0, V1=3.2, T=1.0, DIST=1.6)   # Platine 8 breit, entlang Facette V0..V1 um Fensterachse
 LOG = []
 
@@ -335,6 +340,29 @@ def checks(S):
     # RTC-Modul sitzt im Rahmen (Rahmen-Innenmass 0.2 groesser) -> Volumenueberschneidung muss 0 sein
     v = S['Deckel_blau'].common(S['RTC_Modul_Option']).Volume
     log('   RTC-Modul im Rahmen: Ueberschneidung %.3f mm3' % v)
+    # Phase 5: Modulmasse aus den Quellen gegen den Bauraum
+    R = RTC
+    ztop = G['H'] - G['WALL']
+    rb = S['RTC_Modul_Option'].BoundBox
+    below = S['Pi_Bauteile_oben'].common(box(rb.XMin, rb.XMax, rb.YMin, rb.YMax, 0, 30))
+    zpi = below.BoundBox.ZMax if below.Volume > 1e-6 else ZP
+    log('13 RTC Adafruit 4282 (21.3 x 20.0 x 13.6 inkl. Buchsenleiste, Produktseite Z. 130): Grundriss im Rahmen %.1f x %.1f '
+        'unter der Decke z %.1f; hoechstes Pi-Bauteil darunter z %.1f -> Bauraum %.1f mm. Mit Buchsenleiste (13.6) passt es NICHT '
+        '(und der Pi hat keine Stiftleiste); ohne Leiste zulaessig bis %.1f mm Modulhoehe (am Modul messen, ANNAHME bis dahin). '
+        'Abstand zu Klima-Litzen %.1f, HDMI %.1f mm'
+        % (R['LX'] + 0.4, R['LY'] + 0.4, ztop, zpi, ztop - zpi, R['H'], S['RTC_Modul_Option'].distToShape(S['Leitungen_Klima'])[0],
+           S['RTC_Modul_Option'].distToShape(pbox(*PARTS['HDMI'][:4], ZP, ZP + PARTS['HDMI'][4]))[0]))
+    C = CLIMA
+    ci = (G['W'] / 2 - G['WALL'] - (X_PART + C['WALL']), G['D'] - 2 * G['WALL'], G['H'] - 2 * G['WALL'])
+    fits = []
+    for o in ((20.0, 40.0), (40.0, 20.0)):
+        for ax_ in ('xy', 'yz', 'xz'):
+            dims = {'xy': (o[0], o[1], 1.6), 'yz': (1.6, o[0], o[1]), 'xz': (o[0], 1.6, o[1])}[ax_]
+            if all(d + 0.4 <= c for d, c in zip(dims, ci)):
+                fits.append(ax_)
+    log('14 Grove SHT41 (20 x 40 mm, docs/references/Seeed_Grove-SHT4x_Wiki_Auszug_2026-11-08.txt; Hoehe nicht angegeben, '
+        'hier nur Platine 1.6): Klimakammer innen %.1f x %.1f x %.1f (x, y, z) -> %s'
+        % (ci[0], ci[1], ci[2], ('passt (%s)' % ', '.join(fits)) if fits else 'passt in KEINER Lage (40 > %.1f innen)' % max(ci)))
     # Mindestabstaende
     def d(a, b):
         return S[a].distToShape(S[b])[0]
