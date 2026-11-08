@@ -510,6 +510,24 @@ void fl_platform_early_init(void)
 /* fataler Fehler: Neustart OHNE 'geplant'-Bit -> zaehlt als abnormal, nach 3 Abschaltung (F-W3c) */
 void fl_platform_fatal(uint8_t code) { (void)code; PMCTLResetSystem(); }
 
+/* O-5: Ausnahmebehandlung fuer HardFault, NMI und nicht registrierte Interrupts (SysConfig /freertos/exception
+ * "Custom" -> Vektortabelle resetVectors in ti_freertos_config.c; IntRegister kopiert sie beim ersten Aufruf in die
+ * RAM-Tabelle, SDK driverlib/interrupt.c Z. 101-112). Ersetzt Exception_handlerSpin (SDK ExceptionArmV6M.c Z. 67-72:
+ * Interrupts aus, Endlosschleife -> erst der Watchdog nach bis zu 10 min, Grund "watchdog").
+ * Minimal: kein Flash, keine Treiber, kein RAM-Zugriff ausser Registern, kein Stack (geprueft bei jedem Build:
+ * tools/check_fault_vectors.py, Ziel size). Grund in REG3V3 (PMCTL.AONRSET1/AONRCLR1, TRM SWCU193A 8.4.2 S. 460 und
+ * 6.11.13-15 S. 352-354), dann Systemreset ueber PMCTL.RSTCTL.SYSRST (TRM 6.11.10 S. 349; SDK driverlib/pmctl.h
+ * PMCTLResetSystem: Interrupts aus, SYSRST, Schleife) -> RSTSTA SYSSRC = 4 (TRM 6.11.11 S. 350, Tab. 8-1 S. 420)
+ * -> fl_port_reset_reason = FL_RR_SOFTWARE, fl_app_init macht daraus FL_RR_HARDFAULT (abnormal, F-W3).
+ * Fault im Handler selbst / Stapelfehler beim Eintritt: Lockup -> Hardware-Systemreset LOCKUP (TRM 4.2.1 S. 117,
+ * Tab. 8-1 S. 420) -> ebenfalls FL_RR_HARDFAULT. */
+void fl_fault_handler(void)
+{
+    HWREG(PMCTL_BASE + PMCTL_O_AONRCLR1) = FL_RET_PLANNED;
+    HWREG(PMCTL_BASE + PMCTL_O_AONRSET1) = FL_RET_FAULT;
+    PMCTLResetSystem();
+}
+
 #if FLUIDI_TESTFW
 /* TF-1: Endlosschleife im Anwendungs-Task OHNE Watchdog_clear; BLE-Stack (hoehere Prioritaet) laeuft weiter ->
  * prueft zugleich, dass nichts ausser fl_app_process den Watchdog bedient. Erwartung: Neustart nach <= 10 min
@@ -521,8 +539,8 @@ void fl_port_tf_hang(void)
     for (;;) spin++;
 }
 /* TF-2: FL_TF_FATAL_SERIES = Serienpfad fuer fatale Fehler (fl_platform_fatal, wie crit_err des BLE-Stacks);
- * FL_TF_FATAL_HARDFAULT = undefinierter Befehl -> HardFault -> Serien-Ausnahmebehandlung (SysConfig-Vektortabelle:
- * Exception_handlerSpin, Interrupts aus, Endlosschleife -> Watchdog). */
+ * FL_TF_FATAL_HARDFAULT = undefinierter Befehl -> HardFault -> Serien-Ausnahmebehandlung fl_fault_handler (O-5:
+ * FL_RET_FAULT, sofortiger Systemreset, Grund "hardfault"). */
 void fl_port_tf_fatal(uint8_t kind)
 {
     fl_port_led(FL_COL_OFF, 0);

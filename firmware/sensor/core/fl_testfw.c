@@ -114,7 +114,7 @@ bool fl_tf_point(uint8_t where)
     uint32_t ret = fl_port_retained_get();
     uint32_t ops = fl_tf_ops_boot(), mx = (ret & FL_TF_RET_MAX_MASK) >> FL_TF_RET_MAX_SHIFT;
     uint32_t cyc = (ret & FL_TF_RET_CYC_MASK) >> FL_TF_RET_CYC_SHIFT;
-    if (ops > mx) mx = ops > 31u ? 31u : ops;
+    if (ops > mx) mx = ops > FL_TF_RET_MAX_SAT ? FL_TF_RET_MAX_SAT : ops;
     if (cyc < 3u) cyc++;
     ret = (ret & ~(FL_TF_RET_MAX_MASK | FL_TF_RET_CYC_MASK)) | (mx << FL_TF_RET_MAX_SHIFT) | (cyc << FL_TF_RET_CYC_SHIFT);
     fl_port_retained_set(ret);

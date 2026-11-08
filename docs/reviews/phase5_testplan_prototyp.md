@@ -433,7 +433,7 @@ ST-S7), braucht die Rückkehr zur Normalfirmware ein Image mit höherer Version 
 | Nr | Funktion | Für | Anforderungen an die Variante |
 |---|---|---|---|
 | TF-1 | **Watchdog-Test:** nach Tastersequenz (z. B. 5 × kurz) Endlosschleife ohne Watchdog-Bedienung | PT5.12 (T-W1, REQ-FW-07) | Neustart durch Watchdog; Grund in GET_DIAG; Zähler bleibt über den Neustart erhalten |
-| TF-2 | **Fataler Fehler / Reset-Schleife:** auslösbarer fataler Fehler (Assert) nach Tastersequenz | PT11.07 (ST-F6, PP-11) | Firmware-Reaktion wie Serie (Abschaltung nach 3 Resets); NV-Schreibzahl je Zyklus in GET_DIAG |
+| TF-2 | **Fataler Fehler / Reset-Schleife:** auslösbarer fataler Fehler (Assert) nach Tastersequenz | PT11.07 (ST-F6, PP-11) | Firmware-Reaktion wie Serie (Abschaltung nach 3 Resets); NV-Schreibzahl je Zyklus in GET_DIAG. Hinweis 2026-11-09 (O-5): 9 × kurz = echter HardFault → Serien-Ausnahmebehandlung `fl_fault_handler` startet **sofort** neu (kein 10-min-Watchdog), Grund hardfault (Eintrag 0x52); Kriterium `testfw_eval.py diag --expect tf2-hf` (docs/manuals/TESTFIRMWARE.md Kap. 7) |
 | TF-3 | **SENS_PWR dauernd high:** DIO12 dauerhaft high, TMP1075N alle 60 s lesen, Ergebnis + Fehlerzähler I²C im Ringpuffer | PT11.19 (ST-W4) | sonst Normalbetrieb (Advertising, Messung) für die Datenübertragung; Ruhestrom-Mehrbedarf dokumentieren (Leck SENS_PWR–GND über Aufbau C) |
 | TF-4 | **Diagnose-Ausgabe** (optional): Zähler meas/adv/conn/led_ms, charge_uc, Resetgrund, VDD-Minimum in GET_DIAG | PT6.16, PT11.07 | falls im Werks-Build schon vorhanden: entfällt |
 

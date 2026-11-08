@@ -43,19 +43,22 @@ Seriell bauen (`make -j` scheitert schon im Serienstand an einer fehlenden Abhä
 Schutz im Makefile (geprüft 2026-11-09): `TESTFW` nur 1…4; mit einem Schlüssel, der nicht `DEV_ONLY_*` heisst,
 bricht der Build ab; `make release` bricht mit gesetztem `TESTFW` ab; `BUILD_NO` 0…99 bei Testfirmware, Serien-
 `BUILD_NO` ≥ 9000 wird abgelehnt (reserviert). Ohne `TESTFW` ist das Serien-Image **bitgleich** zum Stand vor der
-Testfirmware (unsigniertes Binärbild und MCUboot mit `cmp` verglichen).
+Testfirmware (unsigniertes Binärbild und MCUboot mit `cmp` verglichen, Commit 4f2f32d). Seither einzige Änderung der
+Serie: eigene Ausnahmebehandlung `fl_fault_handler` (O-5, +66 B Code).
 
-Grössen (Build 2026-11-09, TI Arm Clang 4.0.4, `VERSION=0.1.1`):
+Grössen (Build 2026-11-09 mit O-5, TI Arm Clang 4.0.4, `VERSION=0.1.1`):
 
 | Build | Slot 0 Code | Anteil | signiertes Image (Slot 1) | RAM | RAM frei |
 |---|---|---|---|---|---|
-| Serie 0.1.0+1 | 206 948 B | 90 % | 207 380 B | 33 666 B | 3 198 B |
-| TF-1 0.1.1+9101 | 208 908 B | 91 % | 209 339 B | 33 782 B | 3 082 B |
-| TF-2 0.1.1+9201 | 208 942 B | 91 % | 209 373 B | 33 782 B | 3 082 B |
-| TF-3 0.1.1+9301 | 209 386 B | 91 % | 209 816 B | 33 782 B | 3 082 B |
-| TF-4 0.1.1+9401 | 208 882 B | 91 % | 209 312 B | 33 782 B | 3 082 B |
+| Serie 0.1.0+1 | 207 014 B | 90 % | 207 445 B | 33 666 B | 3 198 B |
+| TF-1 0.1.1+9101 | 208 956 B | 91 % | 209 388 B | 33 782 B | 3 082 B |
+| TF-2 0.1.1+9201 | 208 990 B | 91 % | 209 421 B | 33 782 B | 3 082 B |
+| TF-3 0.1.1+9301 | 209 434 B | 91 % | 209 863 B | 33 782 B | 3 082 B |
+| TF-4 0.1.1+9401 | 208 934 B | 91 % | 209 364 B | 33 782 B | 3 082 B |
 
-Alle Prüfungen des Grössenberichts „ok“ (passt in Slot 0/Slot 1 inkl. Swap-using-Move, RAM-Reserve ≥ 2 kB).
+Alle Prüfungen des Grössenberichts „ok“ (passt in Slot 0/Slot 1 inkl. Swap-using-Move, RAM-Reserve ≥ 2 kB); dazu
+`tools/check_fault_vectors.py` (Ziel `size`): NMI-/HardFault-Vektor → `fl_fault_handler`, ohne Stack, kein
+`Exception_handlerSpin` mehr in der Vektortabelle (O-5).
 
 ## 3 Kennzeichnung (Anhang A „nie mit Werksfirmware verwechseln“)
 
@@ -116,21 +119,21 @@ Im Kopplungsschritt „Farben vergleichen“ zählt ein kurzer Druck nicht (Seri
 | TF-1 | 5 × kurz | Endlosschleife im Anwendungs-Task **ohne** Watchdog-Bedienung; BLE-Stack läuft weiter. Erwartung: Neustart nach ≤ 10 min (`CONFIG_WATCHDOG_0` period = 600 000 ms, SysConfig) |
 | TF-2 | 5 × kurz | **fataler Fehler über den Serienpfad** (`fl_platform_fatal`, wie `crit_err` des BLE-Stacks) sofort und danach bei **jedem Start nach allen Start-Schreibvorgängen** → Reset-Schleife bis zur Serienreaktion |
 | TF-2 | 7 × kurz | wie 5 ×, aber im Start **vor der ersten Lastmessung** (N-2: Soll 0 Flash-Schreibvorgänge je Zyklus) |
-| TF-2 | 9 × kurz | **echter HardFault** (undefinierter Befehl) sofort und bei jedem Start → Serien-Ausnahmebehandlung (Kap. 9, O-5) |
+| TF-2 | 9 × kurz | **echter HardFault** (undefinierter Befehl, `__builtin_trap`) sofort und bei jedem Start → Serien-Ausnahmebehandlung `fl_fault_handler` (O-5): Bit `FL_RET_FAULT` setzen, sofortiger Systemreset, Neustartgrund **hardfault** (5) |
 | TF-3 | – | keine Sequenz; ab Start dauernd aktiv |
 | TF-4 | – | keine Sequenz; nur Diagnose |
 
 Serienreaktion TF-2 (F-W3, `fl_app.c`): abnormale Neustarts (Watchdog, Brownout, Absturz, ungeplanter Software-Reset)
 werden im Retention-Register gezählt; der **3.** abnormale Start schaltet **ohne Flash-Schreiben** ab (Shutdown,
 Wecken nur per Taster). Ablauf 5 ×: Auslöser = 1. Neustart → Start mit Zähler 1 → fatal → Start 2 → fatal → Start 3
-→ Abschaltung (Sekunden; mit 9 × je ≈ 10 min Watchdog-Wartezeit, ≈ 30 min). **Danach Taster drücken** (nicht die
+→ Abschaltung (Sekunden, auch mit 9 ×: seit O-5 kein Warten auf den Watchdog mehr). **Danach Taster drücken** (nicht die
 Speisung trennen: Power-on löscht das Retention-Register und damit das Ergebnis); der Sensor startet normal, speichert
 das Ergebnis und beendet den Test.
 
-TF-2 legt seine Daten in den Bits 7–17 von `PMCTL.AONRSTA1` ab (18 bit, SDK `hw_pmctl.h` Z. 650
-`PMCTL_AONRSTA1_FLAG_M = 0x0003FFFF`; Bits 0–6 belegt die Serie, `fl_app.h`; kein SDK-Treiber für CC23x0R5 nutzt das
-Register, `grep` im SDK 9.23): Modus, max. Flash-Operationen je Zyklus (≤ 31), Zahl der fatalen Neustarts (≤ 3),
-Flash-Operationen im abschaltenden Start (≤ 3).
+TF-2 legt seine Daten in den Bits 7–12 und 14–17 von `PMCTL.AONRSTA1` ab (18 bit, SDK `hw_pmctl.h` Z. 650
+`PMCTL_AONRSTA1_FLAG_M = 0x0003FFFF`; Bits 0–6 und 13 (`FL_RET_FAULT`, O-5) belegt die Serie, `fl_app.h`; kein
+SDK-Treiber für CC23x0R5 nutzt das Register, `grep` im SDK 9.23): Modus, max. Flash-Operationen je Zyklus (≤ 15, seit
+O-5 4 bit), Zahl der fatalen Neustarts (≤ 3), Flash-Operationen im abschaltenden Start (≤ 3).
 
 ## 6 Datenformate (Testfirmware, `tf_fmt` = 1, little-endian)
 
@@ -157,7 +160,7 @@ Flash-Operationen im abschaltenden Start (≤ 3).
 | 46 | u16 | `tf2_trig` | TF-2 ausgelöst (nichtflüchtig) |
 | 48 | u8 | `tf2_mode` | letzter abgeschlossener TF-2-Lauf: 1 spät (5 ×), 2 früh (7 ×), 3 HardFault (9 ×) |
 | 49 | u8 | `tf2_cycles` | fatale Neustarts inkl. Auslöser bis zur Abschaltung (**Soll 3**) |
-| 50 | u8 | `tf2_max_ops` | max. Flash-Operationen in einem Schleifenzyklus (gesättigt 31) |
+| 50 | u8 | `tf2_max_ops` | max. Flash-Operationen in einem Schleifenzyklus (gesättigt 15) |
 | 51 | u8 | `tf2_sd_ops` | Flash-Operationen im abschaltenden Start (**Soll 0**) |
 | 52 | u32 | `tf3_reads` | TMP1075N-Lesungen (TF-3) |
 | 56 | u32 | `tf3_err` | davon I²C-Fehler |
@@ -178,7 +181,7 @@ letzter Lastwert. Das Gateway speichert die Zeilen unverändert in `reading` (In
 | Test-ID | Muster | Variante | Durchführung | Auswertung / Kriterium |
 |---|---|---|---|---|
 | **PT5.12** (T-W1, REQ-FW-07) | S2, vor Verguss | TF-1 (Weg B) | koppeln, 5 × kurz, ≤ 10 min warten, Sensor startet (Startsignal Rot/Grün) | GET_DIAG: `testfw_eval.py diag --expect tf1` → Grund Watchdog, `wdt_resets` ≥ `tf1_trig`, Eintrag 0x50; danach Werks-Hex zurück |
-| **PT11.07** (ST-F6, PP-11) | S4 | TF-2 (OTA) | 5 × → Schleife bis Abschaltung (LED aus, kein Advertising), Mittelstrom mit Aufbau D/A, dann Taster; wiederholen mit 7 × und 9 × | `diag --expect tf2-late / tf2-early / tf2-hf` → `tf2_cycles` = 3, `tf2_sd_ops` = 0, früh `tf2_max_ops` = 0, spät Wert notieren; Mittelstrom ≤ 10 × Ruhestrom (Testplan, ANNAHME) am Aufbau |
+| **PT11.07** (ST-F6, PP-11) | S4 | TF-2 (OTA) | 5 × → Schleife bis Abschaltung (LED aus, kein Advertising), Mittelstrom mit Aufbau D/A, dann Taster; wiederholen mit 7 × und 9 × | `diag --expect tf2-late / tf2-early / tf2-hf` → `tf2_cycles` = 3, `tf2_sd_ops` = 0, früh `tf2_max_ops` = 0, spät Wert notieren; HardFault (9 ×): ≥ 2 Einträge 0x52 mit `detail` ≠ 0xBF (Grund hardfault, O-5), Schleife bis Abschaltung in Sekunden statt ≈ 30 min; Mittelstrom ≤ 10 × Ruhestrom (Testplan, ANNAHME) am Aufbau |
 | **PT11.19** (ST-W4, M-W4) | S4, S5 | TF-3 (OTA) | Klimazyklen; Gateway in Reichweite (Ringspeicher 840 Datensätze ≈ 14 h bei 1/min) | `testfw_eval.py tf3 --db fluidi.sqlite --sensor <addr>` (keine ungültige Lesung) und `diag --expect tf3`; Leck SENS_PWR–GND mit Aufbau C (Kap. 7.1) |
 | **PT6.16 / PT11.07** (TF-4) | alle | jede TF-n | GET_DIAG nach dem Messfall | Zähler `meas/adv/conn/led_ms`, `charge_uc`, Resetgrund, `vdd_min` gegen Messung (ENERGIEMESSUNG Kap. 1 „Gegenprobe“) |
 
@@ -208,8 +211,8 @@ Feuchtewerte unter TF-3 sind nur informativ.
 make -C firmware/sensor test                                                       # Host-Tests inkl. TF
 ```
 
-Ergebnis 2026-11-09 (`make check`): Layout/Pins ok; Serie 1542 Prüfungen (unverändert gegenüber HEAD), TF-1 24,
-TF-2 73, TF-3 25, TF-4 14 Prüfungen bestanden; `test_testfw_eval.py` 11 Tests (davon 5 gegen die echten
+Ergebnis 2026-11-09 mit O-5 (`make check`): Layout/Pins ok; Serie 1561 Prüfungen (davon 19 neu `[fault]`), TF-1 24,
+TF-2 77, TF-3 25, TF-4 14 Prüfungen bestanden; `test_testfw_eval.py` 12 Tests (davon 5 gegen die echten
 GET_DIAG/INFO/Datensatz-Nutzlasten des C-Kerns aus `tests/build/tf<n>_*.hex`), Flash-Werkzeug 17, Kopplungsangriff 3.
 
 ## 9 Offen / PROTOTYP-PRÜFUNG
@@ -220,6 +223,6 @@ GET_DIAG/INFO/Datensatz-Nutzlasten des C-Kerns aus `tests/build/tf<n>_*.hex`), F
 | O-2 | Startsignal und Sequenz-Zeiten (100 ms, 2 s) sind ANNAHMEN; Muster in PROTOCOL 10.2 festlegen | Firmware/Orchestrator |
 | O-3 | Gateway/PWA zeigen `fw_build` nicht an; Kennung 9xxx als „Testfirmware“ anzeigen | Software |
 | O-4 | Konvention `fw_build` = `9<n><bb>` statt Text-Suffix „-tf<n>“ (Anhang A) bestätigen | Orchestrator |
-| O-5 | **Befund Serie:** HardFault → SysConfig-Vektor `Exception_handlerSpin` (SDK `kernel/freertos/exception/ExceptionArmV6M.c` Z. 67–72: Interrupts aus, Endlosschleife) → erst der Watchdog startet nach bis zu **10 min CPU aktiv** neu, Grund „watchdog“ statt „hardfault“ (`FL_RR_HARDFAULT` kommt nur aus PMCTL-LOCKUP). TF-2 9 × misst das am Muster | Firmware (Serienentscheid) |
-| O-6 | PROTOTYP-PRÜFUNG: Watchdog-Neustart nach ≤ 10 min trotz laufendem BLE-Stack (TF-1); `__builtin_trap` erzeugt HardFault (TF-2 9 ×); Retention-Bits 7–17 überleben Reset und Shutdown (TRM 8.4.2); TMP1075N bleibt bei dauernder Speisung im Shutdown zwischen One-Shots | Prüfer am Muster |
+| O-5 | **Erledigt 2026-11-09 (Prüfung offen):** Befund bestätigt – HardFault/NMI/nicht registrierter Interrupt sprangen in `Exception_handlerSpin` (SDK `kernel/freertos/exception/ExceptionArmV6M.c` Z. 67–72: Interrupts aus, Endlosschleife) → Watchdog nach bis zu 10 min, Grund „watchdog“. Neu: SysConfig `/freertos/exception` `nmiHandler`/`hardFaultHandler`/`defaultHandler` = Custom `fl_fault_handler` (`platform/cc23/fl_hw.c`): PMCTL.AONRCLR1 = `FL_RET_PLANNED`, AONRSET1 = `FL_RET_FAULT` (Bit 13), `PMCTLResetSystem` (RSTCTL.SYSRST; TRM SWCU193A 6.11.10 S. 349, 6.11.14/15 S. 353–354, 8.4.2 S. 460); kein Flash, kein Stack. `fl_app_init` meldet SYSRST + Bit als `reset_reason` 5 (hardfault), zählt abnormal (F-W3: 3 → Abschaltung) | Firmware |
+| O-6 | PROTOTYP-PRÜFUNG: Watchdog-Neustart nach ≤ 10 min trotz laufendem BLE-Stack (TF-1); `__builtin_trap` erzeugt HardFault und `fl_fault_handler` startet **sofort** neu (TF-2 9 ×, Grund hardfault, kein Watchdog-Eintrag 0x50); Retention-Bits 7–17 überleben Reset und Shutdown (TRM 8.4.2); TMP1075N bleibt bei dauernder Speisung im Shutdown zwischen One-Shots | Prüfer am Muster |
 | O-7 | Kein UART-Log: Anhang A verlangt keines; DIO6/DIO20 sind LED-Pins und nach dem Verguss nicht erreichbar | – |

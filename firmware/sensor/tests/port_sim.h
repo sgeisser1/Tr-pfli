@@ -33,6 +33,7 @@ typedef struct {
 
 extern sim_t sim;
 void sim_reset_all(void);
+void sim_fault(void);       /* wie fl_fault_handler (fl_hw.c, O-5): FL_RET_FAULT setzen, PLANNED loeschen, Systemreset */
 void sim_flash_erase_all(void);
 void sim_log_fail_next_write(int after);
 void sim_rng_queue(const uint8_t *b, size_t n);

@@ -109,6 +109,8 @@ $(FACTORY): $(SIGNED) $(MB_B)/mcuboot.out
 size: $(SIGNED)
 	$(V)$(PYTHON) $(TOP)/tools/size_report.py --mcuboot-map $(MB_B)/mcuboot.map --app-map $(APP_B)/fluidi_sensor.map \
 	  --signed $(SIGNED) --out $(BUILD)/size_report.txt
+	$(V)$(PYTHON) $(TOP)/tools/check_fault_vectors.py --objdump "$(TICLANG_ARMCOMPILER)/bin/tiarmobjdump" \
+	  --elf $(APP_B)/fluidi_sensor.out
 
 # Serienstand (F-W1): nur mit Produktionsschluessel AUSSERHALB des Repos, nie mit DEV_ONLY_*
 release:

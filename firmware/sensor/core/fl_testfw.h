@@ -42,13 +42,14 @@
 #define FL_CAUSE_TF3           0x83u     /* Datensatz-`cause` nur in TF-3 (PROTOCOL 5.6 kennt 0..5; Gateway speichert
                                           * unbekannte Werte unveraendert, model.py zeigt sie als "manual") */
 
-/* Retention-Register PMCTL.AONRSTA1: Bits 0..6 belegt fl_app.h (FL_RET_*), 18 bit gesamt
- * (SDK hw_pmctl.h: PMCTL_AONRSTA1_FLAG_M = 0x0003FFFF). TF-2 nutzt Bits 7..17; sie ueberleben Reset und
- * Shutdown, nicht Power-on (TRM 8.4.2). Geloescht beim Start nach Pin-Wecken/Power-on (= Testende). */
+/* Retention-Register PMCTL.AONRSTA1: Bits 0..6 und 13 belegt fl_app.h (FL_RET_*, Bit 13 = FL_RET_FAULT, O-5),
+ * 18 bit gesamt (SDK hw_pmctl.h: PMCTL_AONRSTA1_FLAG_M = 0x0003FFFF). TF-2 nutzt Bits 7..12 und 14..17; sie
+ * ueberleben Reset und Shutdown, nicht Power-on (TRM 8.4.2). Geloescht beim Start nach Pin-Wecken/Power-on (= Testende). */
 #define FL_TF_RET_MODE_SHIFT   7u        /* 0 aus, 1 fatal spaet, 2 fatal frueh (vor Lastmessung), 3 HardFault */
 #define FL_TF_RET_MODE_MASK    (0x3u << 7)
-#define FL_TF_RET_MAX_SHIFT    9u        /* max. Flash-Operationen in einem Schleifenzyklus (gesaettigt 31) */
-#define FL_TF_RET_MAX_MASK     (0x1Fu << 9)
+#define FL_TF_RET_MAX_SHIFT    9u        /* max. Flash-Operationen in einem Schleifenzyklus (gesaettigt 15) */
+#define FL_TF_RET_MAX_SAT      15u
+#define FL_TF_RET_MAX_MASK     (0xFu << 9)
 #define FL_TF_RET_CYC_SHIFT    14u       /* fatale Neustarts seit Ausloesen inkl. Ausloeser (gesaettigt 3) */
 #define FL_TF_RET_CYC_MASK     (0x3u << 14)
 #define FL_TF_RET_SD_SHIFT     16u       /* Flash-Operationen im Start, der abgeschaltet hat (Soll 0, gesaettigt 3) */

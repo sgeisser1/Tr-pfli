@@ -228,6 +228,12 @@ static void tf2_loop(int presses, uint8_t mode, uint8_t rr_loop, const char *nam
         CHECK(((sim.retained & FL_TF_RET_CYC_MASK) >> FL_TF_RET_CYC_SHIFT) == (uint32_t)c + 1);
         if (mode == FL_TF2_EARLY) CHECK(sim.nv_writes == nvw);   /* N-2: vor der Lastmessung kein Schreiben */
         else CHECK(sim.nv_writes > nvw);
+        if (mode == FL_TF2_HARDFAULT) {                         /* O-5: Grund "hardfault", kein Watchdog-Umweg */
+            CHECK(g_fl.reset_reason == FL_RR_HARDFAULT && (sim.retained & FL_RET_FAULT));   /* neuer Absturz */
+            uint8_t ri[256];
+            int ni = request(FL_MSG_GET_INFO, NULL, 0, ri);
+            CHECK(ni >= 68 && ri[37] == FL_RR_HARDFAULT);         /* SESSION/GET_INFO Byte 37 = 5 -> Gateway */
+        }
     }
     uint32_t nvw = sim.nv_writes, fw = sim.flash_writes;
     sim.reset_reason = rr_loop; fl_app_init();
@@ -257,9 +263,10 @@ static void test_tf2(void)
     tf2_loop(5, FL_TF2_LATE, FL_RR_SOFTWARE, "diag_tf2_late");
     CHECK(sim.tf_fatal_hf == 0);
     tf2_loop(7, FL_TF2_EARLY, FL_RR_SOFTWARE, "diag_tf2_early");
-    /* HardFault: Serie springt in Exception_handlerSpin -> Watchdog-Neustart (Grund 2) */
-    tf2_loop(9, FL_TF2_HARDFAULT, FL_RR_WATCHDOG, "diag_tf2_hf");
-    CHECK(sim.tf_fatal_hf == 3 && g_fl.cnt.wdt_resets == 2);
+    /* HardFault: Serie springt in fl_fault_handler (O-5) -> FL_RET_FAULT + Systemreset (PMCTL SYSTEM = Grund 3),
+     * fl_app_init meldet hardfault (5); kein Watchdog-Neustart mehr */
+    tf2_loop(9, FL_TF2_HARDFAULT, FL_RR_SOFTWARE, "diag_tf2_hf");
+    CHECK(sim.tf_fatal_hf == 3 && g_fl.cnt.wdt_resets == 0);
     /* andere Anzahl: keine Aktion */
     sim_reset_all(); sim.outlier_block = -1; boot_paired(); advance(3000);
     press_seq(6); press_seq(3);

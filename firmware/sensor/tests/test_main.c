@@ -792,6 +792,66 @@ static void test_resets(void)
     sim.vbat = 2950; sim.vbat_load = 0;
 }
 
+/* ---------------- Ausnahmebehandlung (O-5) ---------------- */
+static int diag_count(uint8_t code, int skip_detail)
+{
+    int k = 0;
+    for (uint8_t i = 0; i < g_fl.diag.count; i++)
+        if (g_fl.diag.e[i].code == code && g_fl.diag.e[i].detail != skip_detail) k++;
+    return k;
+}
+
+static void test_fault(void)
+{
+    puts("[fault] O-5: HardFault -> fl_fault_handler (Retention-Bit, Systemreset) -> Grund hardfault, F-W3 zaehlt");
+    /* Belegung: FL_RET_FAULT ueberschneidet weder Serien- noch TF-Bits und liegt im 18-bit-Register */
+    CHECK((FL_RET_FAULT & (FL_RET_ABN_MASK | FL_RET_PLANNED | FL_RET_UV | FL_RET_BACKOFF)) == 0);
+    CHECK((FL_RET_FAULT & ~0x3FFFFu) == 0 && (FL_RET_FAULT & (0x7Fu << 7)) != 0);   /* Bit in 7..17: alte Serie loescht es */
+    sim_reset_all(); sim.outlier_block = -1;
+    fl_app_init(); advance(3000);                                /* Power-on */
+    uint16_t wdt0 = g_fl.cnt.wdt_resets;
+    int hf0 = diag_count(FL_E_HARDFAULT, 0xBF);
+    /* 1. Absturz waehrend eines geplanten Neustarts (PLANNED gesetzt): Handler loescht PLANNED, Grund hardfault */
+    sim.retained |= FL_RET_PLANNED;
+    uint32_t rb = sim.reboots, nvw = sim.nv_writes;
+    sim_fault();
+    CHECK(sim.reboots == rb + 1 && (sim.retained & FL_RET_FAULT) && !(sim.retained & FL_RET_PLANNED));
+    CHECK(sim.nv_writes == nvw);                                 /* Fehlerpfad schreibt nichts */
+    sim.reset_reason = FL_RR_SOFTWARE; fl_app_init(); advance(3000);
+    CHECK(g_fl.reset_reason == FL_RR_HARDFAULT && !(sim.retained & FL_RET_FAULT));
+    CHECK((sim.retained & FL_RET_ABN_MASK) == 1 && sim.shutdowns == 0);
+    CHECK(g_fl.cnt.wdt_resets == wdt0 && diag_count(FL_E_HARDFAULT, 0xBF) == hf0 + 1);
+    CHECK(diag_count(FL_E_WDT_RESET, -1) == 0);
+    /* 2. zweiter Absturz */
+    sim_fault(); sim.reset_reason = FL_RR_SOFTWARE; fl_app_init(); advance(3000);
+    CHECK(g_fl.reset_reason == FL_RR_HARDFAULT && (sim.retained & FL_RET_ABN_MASK) == 2 && sim.shutdowns == 0);
+    /* 3. dritter: Reset-Schleife -> Abschaltung ohne Flash-Schreiben (F-W3a/c), Bit geloescht */
+    nvw = sim.nv_writes; uint32_t fw = sim.flash_writes;
+    sim_fault(); sim.reset_reason = FL_RR_SOFTWARE; fl_app_init();
+    CHECK(sim.shutdowns == 1 && (sim.retained & FL_RET_BACKOFF) && !(sim.retained & FL_RET_FAULT));
+    CHECK(sim.nv_writes == nvw && sim.flash_writes == fw);
+    /* Taster weckt: Normalbetrieb, Backoff gezaehlt */
+    sim.reset_reason = FL_RR_PIN; fl_app_init(); advance(3000);
+    CHECK(g_fl.mode != FL_MODE_UNDERVOLTAGE && g_fl.cnt.backoffs == 1 && g_fl.reset_reason == FL_RR_PIN);
+    CHECK(g_fl.cnt.wdt_resets == wdt0);
+    /* Gegenproben: ungeplanter Software-Reset ohne Bit bleibt "software"; Bit + Pin-/Watchdog-Reset aendert den
+     * Hardware-Grund nicht (Bit gilt nur fuer SYSRST), wird aber geloescht */
+    sim.reset_reason = FL_RR_SOFTWARE; fl_app_init(); advance(3000);
+    CHECK(g_fl.reset_reason == FL_RR_SOFTWARE && (sim.retained & FL_RET_ABN_MASK) == 1);
+    sim.retained |= FL_RET_FAULT; sim.reset_reason = FL_RR_WATCHDOG; fl_app_init(); advance(3000);
+    CHECK(g_fl.reset_reason == FL_RR_WATCHDOG && !(sim.retained & FL_RET_FAULT) && (sim.retained & FL_RET_ABN_MASK) == 2);
+    sim.retained |= FL_RET_FAULT; sim.reset_reason = FL_RR_PIN; fl_app_init(); advance(3000);
+    CHECK(g_fl.reset_reason == FL_RR_PIN && !(sim.retained & FL_RET_FAULT) && (sim.retained & FL_RET_ABN_MASK) == 0);
+    /* Absturz waehrend Unterspannungs-Abschaltung: Unterspannung hat Vorrang (Grund 6) */
+    sim.retained |= FL_RET_UV; sim_fault(); sim.reset_reason = FL_RR_SOFTWARE; fl_app_init(); advance(3000);
+    CHECK(g_fl.reset_reason == FL_RR_UNDERVOLTAGE && !(sim.retained & FL_RET_FAULT));
+    /* stabiler Betrieb 10 min nullt den Zaehler auch nach Abstuerzen */
+    sim.retained = 0; sim.reset_reason = FL_RR_POWER_ON; fl_app_init();
+    sim_fault(); sim.reset_reason = FL_RR_SOFTWARE; fl_app_init();
+    CHECK((sim.retained & FL_RET_ABN_MASK) == 1);
+    advance(FL_STABLE_MS + 1000); CHECK((sim.retained & FL_RET_ABN_MASK) == 0);
+}
+
 /* ---------------- Image-Pruefung nach OTA_END (W-6, F-L1) ---------------- */
 static void put_img(uint8_t maj, uint8_t min, uint16_t rev, uint32_t build, uint32_t sc, int hw)
 {
@@ -836,6 +896,7 @@ int main(void)
     test_app();
     test_pair_reveal();
     test_resets();
+    test_fault();
     test_img_check();
     printf("\nErgebnis: %d Pruefungen bestanden, %d fehlgeschlagen\n", g_pass, g_fail);
     return g_fail ? 1 : 0;

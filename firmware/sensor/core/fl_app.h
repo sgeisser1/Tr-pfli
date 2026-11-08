@@ -40,6 +40,12 @@ typedef struct {
 #define FL_RET_PLANNED    0x10u      /* gewollter Neustart (REBOOT, OTA, Werkseinstellung, Rueckfall) */
 #define FL_RET_UV         0x20u      /* Abschaltung wegen Unterspannung */
 #define FL_RET_BACKOFF    0x40u      /* Abschaltung wegen Reset-Schleife */
+/* O-5: Ausnahme (HardFault, NMI, nicht registrierter Interrupt) -> fl_fault_handler (platform/cc23/fl_hw.c) setzt
+ * dieses Bit, loescht FL_RET_PLANNED und loest sofort einen Systemreset aus (PMCTL.RSTCTL.SYSRST -> Neustartgrund
+ * PMCTL_RESET_SYSTEM = FL_RR_SOFTWARE). fl_app_init meldet diesen Start als FL_RR_HARDFAULT und loescht das Bit.
+ * Bit 13: Bits 7..12 und 14..17 gehoeren der Testfirmware (fl_testfw.h, FL_TF_RET_ALL). Aeltere Serienfirmware
+ * loescht Bit 13 beim Start (newret = abn) und wertet den Neustart als ungeplanten Software-Reset = abnormal. */
+#define FL_RET_FAULT      0x2000u
 #define FL_ABN_MAX        3u
 #define FL_STABLE_MS      (10u * 60000u)
 

@@ -83,6 +83,16 @@ FreeRTOS.maxPriorities = 10;
 bleCommon.configureTimerTaskPriority(FreeRTOS);
 FreeRTOS.timerStackSize = 0x00000190;
 FreeRTOS.idleStackSize = 0x00000130;
+/* O-5: HardFault, NMI und nicht registrierte Interrupts -> fl_fault_handler (platform/cc23/fl_hw.c): Grund ins
+ * Retention-Register, sofort Systemreset (statt Exception_handlerSpin = Endlosschleife bis Watchdog 10 min).
+ * Optionen: SDK kernel/freertos/.meta/exception.syscfg.js (nmiHandler, hardFaultHandler, defaultHandler, "Custom"). */
+const Exception = scripting.addModule("/freertos/exception");
+Exception.nmiHandler = "Custom";
+Exception.nmiHandlerCustomFxn = "fl_fault_handler";
+Exception.hardFaultHandler = "Custom";
+Exception.hardFaultHandlerCustomFxn = "fl_fault_handler";
+Exception.defaultHandler = "Custom";
+Exception.defaultHandlerCustomFxn = "fl_fault_handler";
 
 /* ======== NVS (Flash-Aufteilung: config/fluidi_flash_layout.h, PROTOCOL.md 6.4) ======== */
 var NVS = scripting.addModule("/ti/drivers/NVS");

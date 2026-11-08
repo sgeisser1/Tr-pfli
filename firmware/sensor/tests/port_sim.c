@@ -1,6 +1,7 @@
 /* fluidi – simulierte Plattform fuer Host-Tests (implementiert core/fl_port.h ohne Hardware). */
 #include "port_sim.h"
 #include "fl_proto.h"
+#include "fl_app.h"
 #include "fl_util.h"
 #include "vectors.h"
 #include <stdio.h>
@@ -170,6 +171,9 @@ void fl_port_reboot(void) { sim.reboots++; }
 void fl_port_shutdown(void) { sim.shutdowns++; sim.shutdown_wake = !sim.button_level; sim.pullup = !sim.button_level; }
 uint32_t fl_port_retained_get(void) { return sim.retained; }
 void fl_port_retained_set(uint32_t v) { sim.retained = v & 0x3FFFFu; }
+/* Nachbildung von fl_fault_handler: AONRCLR1 = FL_RET_PLANNED, AONRSET1 = FL_RET_FAULT, PMCTLResetSystem
+ * (naechster Start: reset_reason FL_RR_SOFTWARE = PMCTL_RESET_SYSTEM; setzt der Test) */
+void sim_fault(void) { sim.retained = ((sim.retained & ~FL_RET_PLANNED) | FL_RET_FAULT) & 0x3FFFFu; sim.reboots++; }
 void fl_port_wdt_kick(void) { sim.wdt_kicks++; }
 void fl_port_button_pullup(bool on) { sim.pullup = on; }
 bool fl_port_button_pressed(void) { return sim.button_level; }
@@ -178,7 +182,11 @@ bool fl_port_button_pressed(void) { return sim.button_level; }
 /* ---- Testfirmware ---- */
 uint32_t fl_port_tf_flash_ops(void) { return sim.nv_writes + sim.flash_writes + sim.flash_erases; }
 void fl_port_tf_hang(void) { sim.tf_hangs++; }                  /* Hardware: Endlosschleife -> Watchdog */
-void fl_port_tf_fatal(uint8_t kind) { if (kind) sim.tf_fatal_hf++; else sim.tf_fatal_series++; sim.reboots++; }
+void fl_port_tf_fatal(uint8_t kind)
+{
+    if (kind) { sim.tf_fatal_hf++; sim_fault(); }                /* __builtin_trap -> HardFault -> fl_fault_handler */
+    else { sim.tf_fatal_series++; sim.reboots++; }              /* fl_platform_fatal: Systemreset ohne Bit */
+}
 int fl_port_tf3_tmp_read(int16_t *t, uint8_t *stage)
 {
     sim.tf3_reads++;

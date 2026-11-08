@@ -762,6 +762,8 @@ void fl_app_init(void)
     /* 1) Spannung und Neustartgrund ZUERST, vor jedem Flash-Schreiben (F-W3a) */
     A->reset_reason = fl_port_reset_reason();
     uint32_t ret = fl_port_retained_get();
+    /* O-5: Systemreset aus der Ausnahmebehandlung (FL_RET_FAULT) = Absturz; das Bit faellt mit newret weg */
+    if (A->reset_reason == FL_RR_SOFTWARE && (ret & FL_RET_FAULT)) A->reset_reason = FL_RR_HARDFAULT;
 #if FLUIDI_TESTFW
     uint32_t tfret = fl_tf_boot(ret, A->reset_reason);
 #endif
