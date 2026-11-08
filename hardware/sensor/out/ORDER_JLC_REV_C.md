@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Stand | 2026-11-08, Fertigung; Grundlage Red-Team-Prüfung `docs/reviews/phase4_redteam_gesamt.md` (B-1, B-2, B-3, W-1, W-2, W-3, K-2, K-3, K-5) |
+| Stand | 2026-11-08, Fertigung; Grundlage Red-Team-Prüfung `docs/reviews/phase4_redteam_gesamt.md` (B-1, B-2, B-3, W-1, W-2, W-3, K-2, K-3, K-5). **Nachtrag 2026-11-08 (Phase 5):** Feldnamen PCB-Teil aus dem JLC-Screenshot des Auftraggebers (Standard PCB, nicht eingeloggt), Mark on PCB, Confirm Production File, Deburring, Material Type, Via Plating Method, Versand 23.52 USD, Remark (Kap. 2, 4, 8, 9) |
 | Layout | **Rev C**, Commit `03341e8` (`hardware/sensor/out/LAYOUT_REV_B.md` Kap. 11), Gerber-Job „Revision: C“ |
-| Status | **Keine Bestellung ausgelöst.** Bestellen erst nach Freigabe durch den Auftraggeber und nach Abarbeiten von Kap. 4 und 5. Feldnamen im JLC-Formular sind **ANNAHME** (Rechner nur per JavaScript, nicht skriptbar, `docs/references/JLCPCB_NOTES.md` Kap. 7) |
-| Kosten | `hardware/sensor/out/COSTS_REV_B.md` (erzeugt von `hardware/sensor/gen/cost_rev_b.py`, Stand 2026-11-08 inkl. K-2) |
+| Status | **Keine Bestellung ausgelöst.** Bestellen erst nach Freigabe durch den Auftraggeber und nach Abarbeiten von Kap. 4 und 5. Feldnamen und Optionen des **PCB-Teils** sind am Screenshot vom 2026-11-08 belegt (`docs/references/JLCPCB_NOTES.md` Kap. 10); die Felder **nach dem Einschalten von „PCB Assembly“** hat noch niemand gesehen → **ANNAHME**. Schritt-für-Schritt-Anleitung: `docs/manuals/BESTELLEN_JLC.md` |
+| Kosten | `hardware/sensor/out/COSTS_REV_B.md` (erzeugt von `hardware/sensor/gen/cost_rev_b.py`, Stand 2026-11-08 inkl. K-2, DHL 23.52 USD); Abgleich mit dem Screenshot und Gateway/System: `docs/reviews/phase5_kosten_final.md` (`scripts/cost_final_phase5.py`) |
 | Prüfskript | `.venv/bin/python hardware/sensor/gen/order_check.py --live` (Platine, Gerber-Job, Via-in-Pad, Platzhalter, sha256, Lager); Ausgabe vom 2026-11-08 10:51 in Kap. 1, 2, 7 übernommen |
 | Ersetzt | `ORDER_JLC_REV_B.md` (nur noch Verweis) |
 
@@ -43,26 +43,30 @@ Referenzen), `out/pdf/fluidi_sensor_layout_lagen.pdf`, `out/fluidi_sensor_cpl_jl
 | Delivery Format | **Single PCB** (kein Nutzen) | Economic PCBA braucht keinen Nutzen und keine Ränder (JLCPCB_NOTES Kap. 2). Nur bei Standard-PCBA: Paneel, Kap. 6 |
 | PCB Thickness | **1.6 mm** | P: 1.60 mm; J: `BoardThickness 1.6`; Economic 0.8–1.6 mm |
 | Impedance Control / Layer Stackup | **JLC04161H-7628** (= Standard „No requirement“), Impedanzkontrolle **nein** | P/J: Dielektrika 0.2104 (FR4 7628) / 1.065 / 0.2104 mm = JLC04161H-7628 (JLCPCB_NOTES Kap. 4). Economic: „Standard stack-up only“ |
-| Material / TG | Standard der Vorlage | JLCPCB_NOTES Kap. 4 (NP-155F, TG 150, DRITTQUELLE) |
+| Material Type | **FR4 TG135** (Vorgabe des Rechners, nicht ändern) | Screenshot 2026-11-08: Default TG135; Optionen FR4 TG155, Nan Ya NP-140F, KB6164-TG135, Nan Ya NP-155F, KB-6165-TG155. JLC nennt für TG135 kein Datenblatt und keine Er-Werte (`docs/references/JLCPCB_BaseMaterial_Auszug_2026-11-08.txt`; offene Kundenfrage `…QA592-TG135…`). FEM rechnet bereits mit TG-135-Laminat (`Kingboard_KB-6160A_TechnicalInformation.pdf` S. 1: Tg 135, T260 > 10 min, Td 305 °C → bleifreies Reflow 255 °C einmalig zulässig, **ANNAHME** JLC-TG135 ≈ KB-6160-Klasse). Er der Sondenisolation: **PROTOTYP-PRÜFUNG** (Kalibrierung am Muster) |
 | PCB Color (Lötstopp) | **Grün** | Economic-Tabelle: 1.6 mm mit ENIG nur grün (JLCPCB_NOTES Kap. 2, erneut abgerufen 2026-11-08). Die Platine trägt keine Farbangabe, J auch nicht |
 | Silkscreen | Weiss | – |
 | Surface Finish | **ENIG** (1 µ") | P: `copper_finish "ENIG"` (Z. 104); J: `Finish ENIG`. Grund: Minuspad der Zelle ist Leiterplattenkupfer (A-32) |
 | Outer / Inner Copper Weight | 1 oz / 0.5 oz | P/J: 0.035 / 0.0152 mm |
 | Via Covering | **Epoxy Filled & Capped (POFV)** – **verbindlich**. Ohne POFV keine Bestellung (Auflage A-2, D-023) | P: 145 Vias 0.45/0.30 mm; **8 Via-in-Pad**, alle mit Attribut gefüllt + überkupfert: 4 im EP von U1 (GND), BT1-Clip-Pad (VBAT, Y −23.89), Minuspad BT1 (GND, Y −34.80), TP1 (Y −25.50), TP2 (Y −28.50); Via-in-Pad ohne Füllattribut: 0. Im Fach genau 4 (A-1, TP3 entfällt). Die Gerber tragen kein Füllattribut (ohne X2) → nur das Formular legt POFV fest |
-| Min via hole size / diameter | 0.3 mm / 0.45 mm | P/G: einzige Via-Grösse 0.45/0.30; G: `PTH.drl` 146 Bohrungen 0.30 mm (145 Vias + AE1 Pad 2). Kein Aufpreis (JLCPCB_NOTES Kap. 3/8) |
+| Via Plating Method | **Horizontal Electroless Copper Plating** (vom Rechner erzwungen, 3.51 USD bei 20 Stk) | Screenshot: „Epoxy-filled or copper-paste-filled vias require Horizontal Electroless Copper Plating“ |
+| Min via hole size/diameter | **0.3mm/(0.4/0.45mm)** | P/G: einzige Via-Grösse 0.45/0.30; G: `PTH.drl` 146 Bohrungen 0.30 mm (145 Vias + AE1 Pad 2). Kein Aufpreis (JLCPCB_NOTES Kap. 3/8) |
 | Min track / spacing | 0.15 mm genutzt / 0.10 mm | P: kleinste Leiterbahn 0.15 mm; J: Abstände 0.10 mm (JLC 4 L: 0.09/0.09) |
 | Board Outline Tolerance | ± 0.2 mm (Standard) | PCB_OUTLINE |
-| Mark on PCB | **Order Number (Specify a location)** | P: Platzhalter `JLCJLCJLCJLC` auf **B.Silkscreen** bei X 6.00 / Y −19.70 mm (Hilfsursprung, Kopfbereich unten). JLC setzt die Nummer dorthin und nicht frei auf Zellfach oder Sonde. Optionsname und Preis im Formular: **ANNAHME**, prüfen (Kap. 4 Nr. 7) |
-| Electrical Test | Flying Probe (Standard) | – |
-| Gold Fingers / Castellated / Edge Plating | nein | – |
-| Confirm Production File | **ja** | Gerber-Vorschau von JLC prüfen (Kap. 4 Nr. 2) |
+| Mark on PCB | **Remove Mark** (Formular bietet nur „Remove Mark“ und „2D barcode (Serial Number)“) | JLC: „Order Number is not available since May 2026. Please DO NOT add "JLCJLCJLCJLC" in your silkscreen layer“; ohne Auswahl wird keine Markierung gesetzt (`docs/references/JLCPCB_HowToMarkOnPCB_Auszug_2026-11-08.txt`, „Last updated on May 22, 2026“). Der Platzhalter `JLCJLCJLCJLC` (B.Silkscreen, X 6.00 / Y −19.70, Zone Z2 Band B, im Kopf verdeckt) ist damit **überholt**. Was JLC mit dem Text macht, steht nirgends → **ANNAHME**: wird als normaler Text gedruckt oder vom Ingenieur entfernt; beides unschädlich (nur Silkscreen, kein Kupfer, keine Dicht-/Vergussfläche). Remark bittet um Entfernen (Kap. 8), Kontrolle in der Produktionsdatei Lage `bo` (Kap. 4 Nr. 2). „2D barcode“ **nicht** wählen: ohne Positionsquadrat setzt JLC den Code „in an empty area“, also evtl. auf Sonde, Schott oder Dichtstreifen. Aufräumen im Layout bei der nächsten Revision (Befund, Layout nicht geändert) |
+| Electrical Test | Flying Probe Fully Test (Vorgabe) | Screenshot |
+| Gold Fingers / Castellated / Edge Plating, übrige Optionen | No | Economic PCBA: Gold Fingers/Castellated/Edge Plating „Not Support“ (`…PCBA-Capabilities_Auszug…`) |
+| Confirm Production File | **Yes** (Screenshot stand auf „No“) | JLC empfiehlt die Option ausdrücklich für gefüllte Vias und Markierungen (`…ViaCovering_Auszug…`, `…HowToMarkOnPCB_Auszug…`); Produktionsdatei enthält Lage `sk` = zu füllende Vias (`docs/references/JLCPCB_ConfirmProductionFile_Auszug_2026-11-08.txt`). Preis nicht belegt → **ANNAHME 0 USD**, beim Umschalten ablesen (Kap. 4 Nr. 6) |
+| Deburring/Edge rounding | **Yes** (Vorgabe, 0.50 USD bei 20 Stk) | JLC verlangt Entgraten/Ecken runden bei Einzelplatinen mit einer Seite 1.5–3 cm, 0.02 USD/Stk (`docs/references/JLCPCB_ExtraCharges_Auszug_2026-11-08.txt` Nr. 6); Platine 26 mm breit. Nutzen: glatte Kanten an Sonde und Kopf (Einschub durch das Schott, Hülse). **ANNAHME:** Feld lässt sich ohnehin nicht abwählen |
+| Specify Stackup | **No** (= Standard-Lagenaufbau) | Economic PCBA: „Standard stack-up only“ (`…PCBA-Capabilities_Auszug…`). Gerber-Job/Platine: 0.2104/1.065/0.2104 mm = JLC04161H-7628 (JLCPCB_NOTES Kap. 4) |
 | Remark | siehe Kap. 8 | – |
 
 ## 3 Bestückung (PCBA)
 
 | Parameter | Wert | Begründung / Quelle |
 |---|---|---|
-| PCBA Type | **Economic** (Alternative Standard nur nach Kap. 4 Nr. 5 und Kap. 6) | 4 L, 1.6 mm, 2–50 Stk, eine Seite (JLCPCB_NOTES Kap. 2) |
+| PCB Assembly (Schalter unter den PCB-Optionen) | **einschalten** | Screenshot 2026-11-08: Schalter aus; die Wahl Economic/Standard erscheint erst danach. Alle Feldnamen dieses Kapitels: **ANNAHME** bis zum ersten Einschalten (Anleitung `docs/manuals/BESTELLEN_JLC.md` Schritt 6) |
+| PCBA Type | **Economic** (Alternative Standard nur nach Kap. 4 Nr. 5 und Kap. 6) | 4 L, 1.6 mm, 2–50 Stk, eine Seite (JLCPCB_NOTES Kap. 2, erneut abgerufen 2026-11-08: `docs/references/JLCPCB_PCBA-Capabilities_Auszug_2026-11-08.txt`). Zu Via Covering/POFV sagt JLC für Economic nichts (Kap. 10 JLCPCB_NOTES) → Kap. 4 Nr. 5 |
 | Assembly Side | **Top Side** | CPL: alle 50 Zeilen `Top`; P: auf B nur TP4/TP5 (Testpads, keine Bauteile); B.Paste ohne Öffnungen |
 | PCBA Qty | Prototyp **5** (alle), Serie **16** von 20 | `COSTS_REV_B.md` (D-013: 15 Sensoren + 1 Reserve) |
 | Tooling holes / Fiducials | nicht nötig (Economic) | JLCPCB_NOTES Kap. 2 |
@@ -81,17 +85,17 @@ Stimmt ein Punkt nicht, **nicht bezahlen** und Projektleitung informieren.
 | Nr. | Prüfpunkt | Erwartung | OK | Beleg (Screenshot-Nr.) / Notiz |
 |---|---|---|---|---|
 | 1 | sha256 der drei Dateien vor dem Upload | wie Kap. 1 | [ ] | |
-| 2 | Gerber-Vorschau („Confirm Production File“) | 4 Kupferlagen in der Reihenfolge GTL/G1/G2/GBL; Kontur geschlossen 26 × 158.5; Sondenelektroden nur auf L2/L3, Aussenkupfer endet bei Y −49.8; AE1 Pad 2 erscheint als Via (DFM K-2) | [ ] | |
-| 3 | PCB-Parameter wie Kap. 2 eingestellt | 4 L, 1.6 mm, JLC04161H-7628, grün, ENIG, Single PCB | [ ] | |
+| 2 | Gerber-Vorschau beim Upload und **Produktionsdatei** („Confirm Production File“, nach der Zahlung per E-Mail; Ordner `ok` mit Gerber-Viewer öffnen, nicht nur das Bild) | 4 Kupferlagen in der Reihenfolge GTL/G1/G2/GBL; Kontur geschlossen 26 × 158.5; Sondenelektroden nur auf L2/L3, Aussenkupfer endet bei Y −49.8; AE1 Pad 2 erscheint als Via (DFM K-2). Lage **`sk`** (gefüllte Vias) enthält **alle 146** Bohrungen 0.30 mm, mindestens die 8 Via-in-Pad (4 im U1-EP, BT1-Clip-Pad, Minuspad, TP1, TP2). Lage **`bo`**: keine Auftragsnummer, kein Barcode; `JLCJLCJLCJLC` entfernt oder als Text (beides ok). Erst dann „Yes, please proceed to production“ | [ ] | |
+| 3 | PCB-Parameter wie Kap. 2 eingestellt | 4 L, 1.6 mm, Specify Stackup No, FR4 TG135, grün, Silk weiss, ENIG 1 U", 1 oz / 0.5 oz, Single PCB, Deburring Yes, Via Plating Horizontal Electroless, Min via 0.3mm/(0.4/0.45mm), Outline ±0.2, Flying Probe Fully Test | [ ] | |
 | 4 | **Via Covering = Epoxy Filled & Capped** ausgewählt | Option aktiv, im Preis enthalten. **Ohne POFV keine Bestellung** (A-2 D-023) | [ ] | |
 | 5 | **Economic PCBA zusammen mit ENIG und POFV wählbar?** (Option nicht ausgegraut, kein Hinweis „not supported“) | ja → weiter mit Nr. 6. **Nein** → nicht bestellen; Standard-PCBA nach Kap. 6 dem Auftraggeber vorlegen. POFV hat Vorrang vor Economic | [ ] ja [ ] nein | |
-| 6 | PCB-Preis (5 Stk, ohne PCBA/Versand) gegen Angebot 2026-11-08 | 65.21 USD (20 Stk: 76.30 USD). Abweichung > 5 % → `cost_rev_b.py` nachführen | [ ] | Preis: |
-| 7 | Mark on PCB | „Specify a location“ (o. ä.) gewählt, Platzhalter auf B erkannt; Preis notieren (ANNAHME 0 USD) | [ ] | Option/Preis: |
+| 6 | PCB-Preis (ohne PCBA/Versand) gegen Angebot 2026-11-08 | 5 Stk 65.21 USD; 20 Stk 76.30 USD = Engineering 25.00 + Via Covering 18.59 + Surface Finish 18.50 + Deburring 0.50 + Board 10.20 + Via Plating 3.51 (Screenshot, Confirm Production File = No). **Aufpreis für Confirm Production File = Yes notieren** (ANNAHME 0). Abweichung > 5 % → `cost_rev_b.py` / `cost_final_phase5.py` nachführen | [ ] | Preis: |
+| 7 | Mark on PCB | **„Remove Mark“** gewählt (nicht „2D barcode (Serial Number)“); Preis 0 | [ ] | |
 | 8 | Lagerbestand am Bestelltag (K-5), v. a. **BT1 C5213768** | ≥ 5 (Prototyp) bzw. ≥ 16 (Serie); Abfrage 2026-11-08 10:51: **629 Stk** (2026-11-07: 654), Kap. 7 | [ ] | Bestand heute: |
 | 9 | BOM-Zuordnung in JLC | 26 Zeilen, alle LCSC-Nummern erkannt, keine Zeile „not matched“; Basic/Extended wie Kap. 7 | [ ] | |
 | 10 | **Confirm Parts Placement** | Abhakliste Kap. 5 vollständig | [ ] | |
-| 11 | Gesamtbetrag vor dem Bezahlen | Prototyp ≈ 163 USD JLC-Rechnung (`COSTS_REV_B.md` Kap. 3, Einzelposten); Abweichung > 10 % klären | [ ] | Betrag: |
-| 12 | Versand | GSDL ist ab Warenwert 65 USD nicht zulässig → DHL Express (23.44 USD). Bei Ankunft erwartet: MWST ≈ 12.4 CHF + Verzollung DHL 19 CHF + Vorlagegebühr 3 CHF (K-2) | [ ] | |
+| 11 | Gesamtbetrag vor dem Bezahlen | Prototyp ≈ 163.23 USD, Serie ≈ 220.33 USD JLC-Rechnung inkl. DHL (`docs/reviews/phase5_kosten_final.md` Kap. 2); Abweichung > 10 % klären. Posten „Pre-reflow Soldering“ vorhanden? (wäre +0.016 USD/Lötstelle, nicht im Modell) | [ ] | Betrag: |
+| 12 | Versand | GSDL ist ab Warenwert 65 USD nicht zulässig → **DHL Express** (Screenshot 2026-11-08: 23.52 USD, 2–4 Tage, 0.41 kg für 20 unbestückte PCB; mit PCBA am Checkout ablesen). Bei Ankunft erwartet: MWST ≈ 12.4 CHF + Verzollung DHL 19 CHF + Vorlagegebühr 3 CHF (K-2) | [ ] | |
 | 13 | Auftragsnummer JLC | | [ ] | Auftragsnr.: ________ |
 
 ## 5 Abhakliste „Confirm Parts Placement“ (W-3, B-3)
@@ -179,10 +183,17 @@ Kategorien und Gehäuse stimmen mit BOM und Register (`docs/datasheets/INDEX.csv
 
 ## 8 Remark (Kommentar an JLC)
 
-> Rev C. Via-in-pad by design: 4 vias in QFN exposed pad (U1), 4 vias in pads of battery compartment (BT1 clip pad,
-> BT1 negative pad, TP1, TP2). All vias epoxy filled and copper capped (POFV), flat. Order number at the
-> JLCJLCJLCJLC placeholder on the bottom side. Inner-layer electrodes in the probe section, no outer copper beyond
-> Y −50 mm.
+Nachgeführt 2026-11-08 (Phase 5): JLC verlangt bei gefüllten Vias die Angabe, welche Vias gefüllt werden („leave a note …
+Alternatively, you can specify to fill all vias of a particular diameter“, `docs/references/JLCPCB_ViaCovering_Auszug_2026-11-08.txt`);
+die Auftragsnummer gibt es seit Mai 2026 nicht mehr (Kap. 2, Mark on PCB). Text unverändert ins Feld „Remark“ kopieren:
+
+> Rev C. Via covering: please fill and copper-cap (POFV, flat) ALL plated holes with 0.30 mm drill (146 holes,
+> 145 vias + 1 via-like hole in antenna pad AE1). Via-in-pad by design: 4 vias in QFN exposed pad (U1), 4 vias in pads
+> of the battery compartment (BT1 clip pad, BT1 negative pad, TP1, TP2) - these must be filled and flat.
+> Mark on PCB: Remove Mark (no order number, no barcode). The bottom silkscreen contains an obsolete placeholder text
+> "JLCJLCJLCJLC" (about 20 mm from the board end with the antenna); please delete it (if not possible, print it
+> as normal text).
+> Inner-layer electrodes in the probe section, no outer copper beyond Y -50 mm (intended).
 
 ## 9 Was sich gegenüber ORDER_JLC_REV_B.md geändert hat (W-1)
 
@@ -195,3 +206,14 @@ Kategorien und Gehäuse stimmen mit BOM und Register (`docs/datasheets/INDEX.csv
 | Preise für 5/20 Stk ablesen | Angebot vom 2026-11-08 eingetragen (65.21 / 76.30 USD); am Bestelltag nur noch vergleichen (Kap. 4 Nr. 6) |
 | Verzollung 3 CHF | 19 CHF Abwicklung + max(3 CHF; 2 %) Vorlagegebühr, Quelle DHL lokal (K-2) |
 | Lagerstand 2026-11-07 | Abfrage 2026-11-08 (Kap. 7) |
+
+**Nachtrag 2026-11-08 (Phase 5, Screenshot JLC-Rechner des Auftraggebers):**
+
+| Punkt vorher | jetzt | Grund / Quelle |
+|---|---|---|
+| Mark on PCB „Order Number (Specify a location)“ | **Remove Mark** | Option existiert nicht mehr (JLC seit Mai 2026); Platzhalter auf B überholt, Layout unverändert (Befund an Layout für die nächste Revision) |
+| Confirm Production File „ja“ (ohne Preis) | **Yes**, Preis ANNAHME 0, ablesen; Prüfung Lagen `sk`/`bo` | JLC-Hilfe Produktionsdatei |
+| Deburring, Material Type, Via Plating Method, Specify Stackup fehlten | ergänzt (Yes / FR4 TG135 / Horizontal Electroless / No) | Screenshot |
+| Versand DHL 23.44 USD | **23.52 USD**, 0.41 kg (20 PCB unbestückt) | Screenshot; `scripts/cost_model.py` nachgeführt |
+| Remark „All vias epoxy filled … Order number at the JLCJLCJLCJLC placeholder“ | Füllung aller 0.30-mm-Bohrungen ausdrücklich, Platzhalter löschen | JLC Via-Covering-Hilfe; Mark on PCB |
+| PCBA-Felder | weiter **ANNAHME** (Schalter „PCB Assembly“ war aus) | Kap. 3 |

@@ -1,0 +1,21 @@
+Quelle: Adafruit, Produktseite 4282 'Adafruit PiRTC - Precise DS3231 Real Time Clock for Raspberry Pi' (HTML)
+URL: https://www.adafruit.com/product/4282
+Abgerufen: 2026-11-08 mit curl, sha256 Roh-HTML: 49b95f7d237d4fb544a139e45fd009a92bc235eadda14748b56bfac735037696
+Schaltplan: https://github.com/adafruit/Adafruit-PiRTC-DS3231-PCB (Commit 2021-02-22), lokal docs/datasheets/Adafruit_4282_PiRTC-DS3231_Schematic_2021-02-22.sch (Eagle-XML)
+Auswertung Schaltplan (Skript hardware/gateway/check_rtc_schematic.py): Netz VBAT = nur B1(+) CR1220 und IC2 VBAT (DS3231 /SO) -> kein Ladepfad (keine Diode/kein Widerstand von 3.3V/5V nach VBAT); +5V nur am Header, nicht verbunden mit IC2
+======================================================================
+2: Adafruit PiRTC - Precise DS3231 Real Time Clock for Raspberry Pi : Adafruit Industries, Unique & fun DIY electronics and kits 
+89: Adafruit PiRTC - Precise DS3231 Real Time Clock for Raspberry Pi 
+90: Adafruit PiRTC - Precise DS3231 Real Time Clock for Raspberry Pi
+105: Also include 1 x CR1220 12mm Diameter - 3V Lithium Coin Cell Battery ($ 0.95 ) 
+117: This is the best battery-backed real time clock (RTC) you can get that allows your Raspberry Pi project to keep track of time if the power is lost. Perfect for data-logging, clock-building, NTP servers, time-stamping, timers and alarms, etc. Equipped with a genuine DS3231 RTC, it works great with the Raspberry Pi and has native kernel support.
+118: The datasheet for the  DS3231  explains that this part is an "Extremely Accurate I²C-Integrated RTC/TCXO/Crystal". And, hey, it does exactly what it says on the tin! This  Real Time Clock (RTC)  is the most precise you can get in a small, low power package.
+120: Many "cheap" DS3231 RTC boards do not use genuine Maxim DS3231's - you'll get a non-calibrated RTC which does not maintain the timekeeping quality that is specified! We purchase these DS3231's from Maxim direct so we know they are 100% genuine. 
+124: Note: This product does not come with a CR1220 coin cell battery.   We recommend you purchase a coin cell battery to use with this product. 
+130: Product Dimensions: 21.3mm x 20.0mm x 13.6mm / 0.8" x 0.8" x 0.5" 
+131: Product Weight: 2.7g / 0.1oz 
+137: DS3231 Precision RTC FeatherWing - RTC Add-on For Feather Boards 
+139: Adafruit DS3231 Precision RTC Breakout 
+145: Adafruit DS3231 Precision RTC - STEMMA QT 
+177: Adafruit PiRTC - Precise DS3231 Real Time Clock for Raspberry Pi
+182: Also include 1 x CR1220 12mm Diameter - 3V Lithium Coin Cell Battery ($ 0.95 ) 

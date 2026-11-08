@@ -14,9 +14,9 @@
 
 | Szenario | PCBA | Versand | **Stück CHF** | Einmal CHF | Bestellung total CHF | Vollkosten/Sensor CHF |
 |---|---|---|---|---|---|---|
-| Prototyp 5 PCB / 5 bestueckt, 4 x 100 uF (D-013) | economic | DHL | **9.23** | 139.27 | 185.40 | 37.08 |
-| Serie 20 PCB / 16 bestueckt / 15 Sensoren, 4 x 100 uF | economic | DHL | **8.38** | 141.78 | 267.51 | 17.83 |
-| Serie 20 PCB / 16 bestueckt / 15 Sensoren, 2 x 100 uF | economic | DHL | **8.17** | 141.78 | 264.29 | 17.62 |
+| Prototyp 5 PCB / 5 bestueckt, 4 x 100 uF (D-013) | economic | DHL | **9.23** | 139.34 | 185.47 | 37.09 |
+| Serie 20 PCB / 16 bestueckt / 15 Sensoren, 4 x 100 uF | economic | DHL | **8.38** | 141.85 | 267.58 | 17.84 |
+| Serie 20 PCB / 16 bestueckt / 15 Sensoren, 2 x 100 uF | economic | DHL | **8.17** | 141.85 | 264.36 | 17.62 |
 
 REQ-FAB-04 (< 10 CHF Stückkosten bei 10–15 Stück): Serie **8.38 / 8.17 CHF** (4 / 2 × 100 µF) → **erfüllt**. PCB-Preis aus dem JLC-Angebot (5 Stk 65.21 USD, 20 Stk 76.30 USD): Aufpreise ENIG/POFV sind überwiegend fix (Befund DFM W-2 erledigt).
 
@@ -26,9 +26,9 @@ Die Stückkosten nach D-005 enthalten alles, was pro Sensor anfällt (Bauteile, 
 
 | Szenario | Sensoren | Stückkosten CHF (D-005) | Einmalkosten CHF | Vollkosten CHF/Sensor | Anteil Einmalkosten an Vollkosten |
 |---|---|---|---|---|---|
-| Prototyp 5 PCB / 5 bestueckt, 4 x 100 uF (D-013) | 5 | 9.23 | 139.27 | **37.08** | 75 % |
-| Serie 20 PCB / 16 bestueckt / 15 Sensoren, 4 x 100 uF | 15 | 8.38 | 141.78 | **17.83** | 53 % |
-| Serie 20 PCB / 16 bestueckt / 15 Sensoren, 2 x 100 uF | 15 | 8.17 | 141.78 | **17.62** | 54 % |
+| Prototyp 5 PCB / 5 bestueckt, 4 x 100 uF (D-013) | 5 | 9.23 | 139.34 | **37.09** | 75 % |
+| Serie 20 PCB / 16 bestueckt / 15 Sensoren, 4 x 100 uF | 15 | 8.38 | 141.85 | **17.84** | 53 % |
+| Serie 20 PCB / 16 bestueckt / 15 Sensoren, 2 x 100 uF | 15 | 8.17 | 141.85 | **17.62** | 54 % |
 
 ### 1.2 Verzollung alt / neu (K-2)
 
@@ -36,9 +36,9 @@ Bis 2026-11-08 rechnete das Modell nur die DHL-Vorlagegebühr (max(3 CHF; 2 %)).
 
 | Szenario | Verzollung alt CHF | neu CHF (inkl. MWST darauf) | Einmal alt | Einmal neu | Vollkosten alt | Vollkosten neu |
 |---|---|---|---|---|---|---|
-| Prototyp 5 PCB / 5 bestueckt, 4 x 100 uF (D-013) | 3.00 | 23.54 | 118.73 | 139.27 | 32.97 | 37.08 |
-| Serie 20 PCB / 16 bestueckt / 15 Sensoren, 4 x 100 uF | 3.00 | 23.54 | 121.24 | 141.78 | 16.46 | 17.83 |
-| Serie 20 PCB / 16 bestueckt / 15 Sensoren, 2 x 100 uF | 3.00 | 23.54 | 121.24 | 141.78 | 16.25 | 17.62 |
+| Prototyp 5 PCB / 5 bestueckt, 4 x 100 uF (D-013) | 3.00 | 23.54 | 118.80 | 139.34 | 32.99 | 37.09 |
+| Serie 20 PCB / 16 bestueckt / 15 Sensoren, 4 x 100 uF | 3.00 | 23.54 | 121.31 | 141.85 | 16.47 | 17.84 |
+| Serie 20 PCB / 16 bestueckt / 15 Sensoren, 2 x 100 uF | 3.00 | 23.54 | 121.31 | 141.85 | 16.25 | 17.62 |
 
 ### 1.3 Alternative Standard-PCBA (W-2, nur falls Economic + ENIG + POFV nicht bestellbar)
 
@@ -46,8 +46,8 @@ Standard-PCBA verlangt mindestens 70 × 70 mm je Einzelplatine oder Paneel sowie
 
 | Szenario | PCBA | Versand | Stück CHF | Einmal CHF | Bestellung total CHF | Vollkosten/Sensor CHF | Δ Stück ggü. Economic | Δ Bestellung ggü. Economic |
 |---|---|---|---|---|---|---|---|---|
-| ALT W-2 Standard-PCBA Prototyp: 2 Paneele = 6 PCB / 6 bestueckt / 5 Sensoren | standard | DHL | **10.72** | 184.19 | 237.79 | 47.56 | +1.50 | +52.39 |
-| ALT W-2 Standard-PCBA Serie: 7 Paneele = 21 PCB / 18 bestueckt / 15 Sensoren | standard | DHL | **9.31** | 186.06 | 325.73 | 21.72 | +0.93 | +58.22 |
+| ALT W-2 Standard-PCBA Prototyp: 2 Paneele = 6 PCB / 6 bestueckt / 5 Sensoren | standard | DHL | **10.72** | 184.26 | 237.86 | 47.57 | +1.50 | +52.39 |
+| ALT W-2 Standard-PCBA Serie: 7 Paneele = 21 PCB / 18 bestueckt / 15 Sensoren | standard | DHL | **9.31** | 186.13 | 325.80 | 21.72 | +0.93 | +58.22 |
 
 REQ-FAB-04 bleibt auch mit Standard-PCBA erfüllt, solange der Paneelpreis nicht deutlich über dem Angebot pro Platine liegt; die Mehrkosten sind überwiegend einmalig (Setup, Schablone, Fixture, Feeder für Basic-Teile). Freigabe durch den Auftraggeber nötig.
 
@@ -85,12 +85,12 @@ BOM-Typen: 10 Extended, 1 Preferred, 15 Basic; 50 Bauteile, 145 Lötstellen je B
     Schablone                                                1.53
     Feeder/Extended (10 ext., 1 pref., 15 basic Typen)      30.70
     Confirm Parts Placement                                  0.45
-    Versand DHL                                             23.44
-    Summe JLC-Rechnung einmalig                            128.94 USD
-    + MWST-Anteil CH (einmalig)                             10.09 CHF
+    Versand DHL                                             23.52
+    Summe JLC-Rechnung einmalig                            129.02 USD
+    + MWST-Anteil CH (einmalig)                             10.10 CHF
     + Verzollungsgebuehr Kurier/Post                        22.00 CHF
-    = EINMALKOSTEN                                         139.27 CHF
-  JLC-Rechnung total 163.15 USD = 133.60 CHF; MWST 12.36 CHF; Bestellung total 185.40 CHF; VOLLKOSTEN pro Sensor 37.08 CHF
+    = EINMALKOSTEN                                         139.34 CHF
+  JLC-Rechnung total 163.23 USD = 133.67 CHF; MWST 12.37 CHF; Bestellung total 185.47 CHF; VOLLKOSTEN pro Sensor 37.09 CHF
   Hinweis: GSDL nicht zulaessig (Warenwert 139.71 USD > 65.0 USD oder Gewicht > 1.5 kg) -> DHL Express gerechnet.
 ```
 
@@ -116,12 +116,12 @@ BOM-Typen: 10 Extended, 1 Preferred, 15 Basic; 50 Bauteile, 145 Lötstellen je B
     Schablone                                                1.53
     Feeder/Extended (10 ext., 1 pref., 15 basic Typen)      30.70
     Confirm Parts Placement                                  0.45
-    Versand DHL                                             23.44
-    Summe JLC-Rechnung einmalig                            131.74 USD
+    Versand DHL                                             23.52
+    Summe JLC-Rechnung einmalig                            131.82 USD
     + MWST-Anteil CH (einmalig)                             10.28 CHF
     + Verzollungsgebuehr Kurier/Post                        22.00 CHF
-    = EINMALKOSTEN                                         141.78 CHF
-  JLC-Rechnung total 220.25 USD = 180.36 CHF; MWST 16.15 CHF; Bestellung total 267.51 CHF; VOLLKOSTEN pro Sensor 17.83 CHF
+    = EINMALKOSTEN                                         141.85 CHF
+  JLC-Rechnung total 220.33 USD = 180.43 CHF; MWST 16.15 CHF; Bestellung total 267.58 CHF; VOLLKOSTEN pro Sensor 17.84 CHF
   Hinweis: GSDL nicht zulaessig (Warenwert 196.81 USD > 65.0 USD oder Gewicht > 1.5 kg) -> DHL Express gerechnet.
 ```
 
@@ -147,12 +147,12 @@ BOM-Typen: 10 Extended, 1 Preferred, 15 Basic; 50 Bauteile, 145 Lötstellen je B
     Schablone                                                1.53
     Feeder/Extended (10 ext., 1 pref., 15 basic Typen)      30.70
     Confirm Parts Placement                                  0.45
-    Versand DHL                                             23.44
-    Summe JLC-Rechnung einmalig                            131.74 USD
+    Versand DHL                                             23.52
+    Summe JLC-Rechnung einmalig                            131.82 USD
     + MWST-Anteil CH (einmalig)                             10.28 CHF
     + Verzollungsgebuehr Kurier/Post                        22.00 CHF
-    = EINMALKOSTEN                                         141.78 CHF
-  JLC-Rechnung total 216.66 USD = 177.42 CHF; MWST 15.91 CHF; Bestellung total 264.29 CHF; VOLLKOSTEN pro Sensor 17.62 CHF
+    = EINMALKOSTEN                                         141.85 CHF
+  JLC-Rechnung total 216.74 USD = 177.49 CHF; MWST 15.92 CHF; Bestellung total 264.36 CHF; VOLLKOSTEN pro Sensor 17.62 CHF
   Hinweis: GSDL nicht zulaessig (Warenwert 193.22 USD > 65.0 USD oder Gewicht > 1.5 kg) -> DHL Express gerechnet.
 ```
 
@@ -179,12 +179,12 @@ BOM-Typen: 10 Extended, 1 Preferred, 15 Basic; 50 Bauteile, 145 Lötstellen je B
     Confirm Parts Placement                                  0.45
     Fixture                                                 16.42
     Verpackung (Standard)                                    0.51
-    Versand DHL                                             23.44
-    Summe JLC-Rechnung einmalig                            178.99 USD
-    + MWST-Anteil CH (einmalig)                             13.41 CHF
+    Versand DHL                                             23.52
+    Summe JLC-Rechnung einmalig                            179.07 USD
+    + MWST-Anteil CH (einmalig)                             13.42 CHF
     + Verzollungsgebuehr Kurier/Post                        22.00 CHF
-    = EINMALKOSTEN                                         184.19 CHF
-  JLC-Rechnung total 221.53 USD = 181.41 CHF; MWST 16.23 CHF; Bestellung total 237.79 CHF; VOLLKOSTEN pro Sensor 47.56 CHF
+    = EINMALKOSTEN                                         184.26 CHF
+  JLC-Rechnung total 221.61 USD = 181.47 CHF; MWST 16.24 CHF; Bestellung total 237.86 CHF; VOLLKOSTEN pro Sensor 47.57 CHF
   Hinweis: Standard-PCBA: min. 70x70 mm -> Panel (z. B. 3-fach + Raender) noetig; Panelpreis im Rechner pruefen [ANNAHME: hier nicht modelliert].
   Hinweis: GSDL nicht zulaessig (Warenwert 198.09 USD > 65.0 USD oder Gewicht > 1.5 kg) -> DHL Express gerechnet.
 ```
@@ -213,12 +213,12 @@ BOM-Typen: 10 Extended, 1 Preferred, 15 Basic; 50 Bauteile, 145 Lötstellen je B
     Confirm Parts Placement                                  0.45
     Fixture                                                 16.42
     Verpackung (Standard)                                    0.52
-    Versand DHL                                             23.44
-    Summe JLC-Rechnung einmalig                            181.08 USD
-    + MWST-Anteil CH (einmalig)                             13.55 CHF
+    Versand DHL                                             23.52
+    Summe JLC-Rechnung einmalig                            181.16 USD
+    + MWST-Anteil CH (einmalig)                             13.56 CHF
     + Verzollungsgebuehr Kurier/Post                        22.00 CHF
-    = EINMALKOSTEN                                         186.06 CHF
-  JLC-Rechnung total 285.12 USD = 233.48 CHF; MWST 20.45 CHF; Bestellung total 325.73 CHF; VOLLKOSTEN pro Sensor 21.72 CHF
+    = EINMALKOSTEN                                         186.13 CHF
+  JLC-Rechnung total 285.20 USD = 233.55 CHF; MWST 20.46 CHF; Bestellung total 325.80 CHF; VOLLKOSTEN pro Sensor 21.72 CHF
   Hinweis: Standard-PCBA: min. 70x70 mm -> Panel (z. B. 3-fach + Raender) noetig; Panelpreis im Rechner pruefen [ANNAHME: hier nicht modelliert].
   Hinweis: GSDL nicht zulaessig (Warenwert 261.68 USD > 65.0 USD oder Gewicht > 1.5 kg) -> DHL Express gerechnet.
 ```

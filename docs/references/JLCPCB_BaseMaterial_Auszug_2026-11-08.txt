@@ -1,0 +1,57 @@
+Quelle: JLCPCB (HTML, kein PDF verfuegbar)
+URL: https://jlcpcb.com/help/article/jlcpcb-base-material
+Seitenangabe: Last updated on Oct 19, 2026
+Abgerufen: 2026-11-08T12:58:59+01:00 mit curl (User-Agent Mozilla/5.0), HTTP 200
+sha256 Roh-HTML: 6377fcf1a7c575f716c75e1fdd78395299f04baf52467f59cc464201d4c0a84e
+Inhalt: Textauszug (Skripte/Stile/Tags entfernt), Artikeltext unveraendert, Navigation/Fusszeile weggelassen.
+Verwendung: Material Type FR4 TG135/TG155: ORDER_JLC_REV_C.md Kap. 2
+======================================================================
+ Last updated on Oct 19, 2026
+ FR4 PCB (Standard Material) 
+ FR-4 refers to a grade of epoxy fiberglass material where the FR stands for "flame retarding". The TG130 refers to the glass transition temperature and indicates that this material will begin to deform at 130 ℃. FR-4 is the most common substrate material for rigid PCBs, particularly prototypes. In the PCB, the pre-preg and core will be made of this material. 
+ FR-4 materials with higher glass transition temperatures are available for multi-layer boards. High TG FR-4 (TG155) boards can withstand deformation at higher temperatures of up to 155 ℃ and are suitable for extreme temperature applications. 
+ Flex PCB (Flexible Circuits)
+ JLCPCB offers flexible PCBs made from polyimide base material. Flex PCBs are lightweight, bendable, and suitable for compact devices such as wearables, cameras, and foldable electronics.
+ Aluminium PCB 
+ Aluminum-backed PCBs can consistently increase durability and long-term reliability of a final product through temperature control and associated reductions in failure rates. Aluminum designs also deliver better mechanical stability and lower thermal expansion levels than FR-4. 
+ Aluminum-backed PCBs have gained popularity in LED applications, including traffic lights, automotive lighting and general lighting. 
+ Aluminum PCB Capability 
+ Layers 
+ 1 layer 
+ Min slot width 
+ 1.6mm 
+ Min drill size 
+ 0.65mm 
+ PCB Color 
+ White, Black 
+ PCB Thickness 
+ 1.0mm，1.2mm，1.6mm 
+ PCB Dimension 
+ 5x5mm - 602x506mm 
+ Breakdown Voltage 
+ 3000V 
+ Thermal Conductivity 
+ 1W/mK 
+ Copper Weight 
+ 1OZ 
+ Surface Finish 
+ HASL (with Lead / Leadfree) 
+ Test 
+ Full AOI Test + Random Flying Probe Test 
+ Build Time 
+ The same as 1-layer FR-4 boards 
+ PCB Panel 
+ V-CUT 
+ Minimum trace width and spacing 
+ 5mil (0.127mm) 
+ Trace to Board Outline 
+ ≥ 0.4mm 
+ Copper Core PCB 
+ JLCPCB's direct heatsink technology enables efficient cooling for high-power components such as COB LEDs and switching regulators. This is done by making heatsink pads as raised platforms from the copper PCB base so that heat transfer is not affected by the presence of any insulation. On the contrary, heat transfer on regular metal-cored PCBs must go through an insulation layer with thermal conductivity much lower than that of copper. 
+ Copper PCB Design Requirements 
+ Direct heatsink pads can be rectangular or polygonal but must be at least 1 mm wide in any direction. They cannot be connected to regular pads and traces, but where traces are required it is allowed to make all of them “direct heatsink”, i.e. raised platforms on the copper base. 
+ Vias are not possible as holes in the FR-4 layer are not plated. The minimum drill diameter is 1 mm; the minimum slot width is 1.6 mm.OSP (organic solderability preservative) surface finish is used.Panels are accepted but only V-scoring is available. 
+ Rogers PCB (High-Frequency Applications)
+ Rogers laminates are specialized PCB materials with low dielectric loss, excellent signal integrity, and stable electrical performance, making them ideal for RF, microwave, and 5G communication devices.
+ PTFE / Teflon PCB (High-Performance Substrate)
+ PTFE (Teflon) PCBs are designed for ultra-high frequency and aerospace applications. With outstanding dielectric properties and heat resistance, they provide exceptional performance in demanding high-speed circuits.

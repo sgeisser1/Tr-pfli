@@ -1,0 +1,29 @@
+Quelle: JLCPCB (HTML, kein PDF verfuegbar)
+URL: https://jlcpcb.com/help/article/how-do-i-place-an-order
+Seitenangabe: Last updated on Sep 09, 2026
+Abgerufen: 2026-11-08T12:57:51+01:00 mit curl (User-Agent Mozilla/5.0), HTTP 200
+sha256 Roh-HTML: 6eedaa9c2e4c1c88622049f8bc3b883859ab59d7b176ee9a0122a9123eba7c57
+Inhalt: Textauszug (Skripte/Stile/Tags entfernt), Artikeltext unveraendert, Navigation/Fusszeile weggelassen.
+Verwendung: Bestellablauf: docs/manuals/BESTELLEN_JLC.md
+======================================================================
+ Last updated on Sep 09, 2026
+ Ordering PCBs at JLCPCB is Easy. 
+ The following steps show how to place an order on JLCPCB easily: 
+ 1. Register and Login. If you already have an account, just log in. 
+ 2. The home page displays a quotation calculator that takes you to the ordering page. Drag your Gerber file here or click the Instant Quote button to get an quote. 
+ You can also directly go to the quote page here and place an order. 
+ 3. Choose the board specifications to get your price. 
+ (The cheapest option is $2 for 5pcs, 2-layer, PCB sizes ≤ 10cmx10cm). 
+ 4. Click ' Add your gerber file ' to upload your file.(You can also drag the file in the homepage as mentioned) For your convenience, we have written guides on how to generate gerber files in the correct format for some of the most popular circuit design programs available. 
+ Our system will automatically analyze your gerber files and detect the board dimensions and layers after you upload them. 
+ 5. Click ' Gerber Viewer ' to check your design. Please carefully review your gerber file once a problem is detected. If there are no issues, simply click ' Save to Cart ' to continue. 
+ 6. Click ' Add new item' and repeat steps 4-6 for each additional PCB you want to order. 
+ 7. In the cart, you can view the details of each item by expanding it. 
+ 8. Once you have all your PCBs in the Cart click the ' Secure Checkout ' button. 
+ 9. On the checkout page, you can add your shipping address. The shipping rate will be determined based on the country. The shipping options are listed below the address. DHL typically takes about 3-5 days for delivery (excluding the 3-4 day manufacturing time), while Airmail takes approximately 15-25 days. 
+ 10. We offer two kinds of payment methods. 
+ Review Before Payment: 
+You can pay after your file review is approved. Your design will not be put into production until we receive payment. We will inform you of the results by email after the review. To avoid any delays in delivery, please pay as soon as the file audit is approved. Failed audit order will be automatically canceled. 
+ Pay Directly (recommended): 
+We suggest you pay before the file review to ensure high production efficiency. If your file cannot be approved for production after the review, you will receive a full refund. 
+ 11. After the order payment is successful, we will arrange your production as soon as possible. During this time, you can check your order status through the ' ACCOUNT ' menu. 

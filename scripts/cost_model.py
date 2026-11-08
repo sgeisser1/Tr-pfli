@@ -153,7 +153,10 @@ LOCAL_SCRAP = 0.05
 #   DHL Express 23.44 USD (2-4 Tage), UPS Express Saver 25.36, FedEx Express 31.15,
 #   Global Standard Direct Line (GSDL) 7.63 USD (10-12 Tage), nur bis 1.5 kg UND Warenwert <= 65 USD.
 # Im Modell rechenbar: GSDL und DHL (Verzollungsgebuehren nur fuer Post/DHL belegt). UPS/FedEx nur dokumentiert.
-SHIPPING_USD = {"GSDL": 7.63, "DHL": 23.44}
+# [JLC-RECHNER 2026-11-08] Screenshot Auftraggeber (Standard PCB, nicht eingeloggt, 20 Stk 26 x 158.5 mm 4 L, ohne PCBA):
+#   "DHL Express 23.52 USD, 2-4 Tage", Gewicht 0.41 kg -> ersetzt 23.44 USD vom 2026-11-06 (Abweichung +0.08 USD).
+#   Gewichtsabhaengigkeit des Preises nicht abgelesen [ANNAHME: pauschal bis ca. 0.5 kg]; mit PCBA am Checkout pruefen.
+SHIPPING_USD = {"GSDL": 7.63, "DHL": 23.52}
 SHIPPING_OTHER_USD = {"UPS": 25.36, "FEDEX": 31.15}
 GSDL_MAX_GOODS_USD = 65.0   # Warenwert (ohne Versand) [JLC, Screenshot Auftraggeber]
 GSDL_MAX_KG = 1.5
@@ -195,6 +198,8 @@ POST_FEE_BASE_CHF = 16.0
 POST_FEE_PCT = 0.03
 POST_FEE_MAX_CHF = 70.0
 # [ANNAHME] Gewicht: ca. 20 g pro bestueckter Platine + 150 g Verpackung (fuer Info, Preis ist pauschal).
+# Abgleich 2026-11-08: JLC zeigt fuer 20 unbestueckte Platinen 26 x 158.5 mm 0.41 kg (Modell: 0.15 + 20 x 0.02 = 0.55 kg)
+# -> Modell eher hoch; Gewicht bestueckter Platinen erst am Checkout sichtbar.
 WEIGHT_PER_BOARD_KG = 0.02
 WEIGHT_PACKAGING_KG = 0.15
 

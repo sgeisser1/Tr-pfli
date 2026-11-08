@@ -1,0 +1,48 @@
+Quelle: JLCPCB (HTML, kein PDF verfuegbar)
+URL: https://jlcpcb.com/help/article/How-to-mark-on-PCB
+Seitenangabe: Last updated on May 22, 2026
+Abgerufen: 2026-11-08T12:57:15+01:00 mit curl (User-Agent Mozilla/5.0), HTTP 200
+sha256 Roh-HTML: 1dc377fff09f07bc1c25df1602b567cfbc0e7df690ea41727f6e4366257b67c2
+Inhalt: Textauszug (Skripte/Stile/Tags entfernt), Artikeltext unveraendert, Navigation/Fusszeile weggelassen.
+Verwendung: Mark on PCB (Remove Mark / 2D barcode), Platzhalter JLCJLCJLCJLC: hardware/sensor/out/ORDER_JLC_REV_C.md, docs/manuals/BESTELLEN_JLC.md
+======================================================================
+ Last updated on May 22, 2026
+ No mark will be added on the PCB by default. If you would like to enhance PCB traceability, we can add 2D Barcode(Serial Number) on the PCB as your selection. 
+ 2D Barcode(Serial Number): 
+ You can select from the following options: 2D barcode only, Number only, or 2D barcode&Number printed on the boards.
+ There are two types of 2D barcodes available: QR code and Data Matrix code. 
+ You can choose from the following sizes：5*5mm,8*8mm,or 10*10mm. 
+ In Serial Number, three elements are involved:
+ 1：Prefix: A string placed at the start of each serial code to indicate details like the company or date, e.g., "JLC" or "2024". 
+ Note: Due to limited space, the prefix will not be printed when selecting 2D barcode&Number. However, it will be visible after scanning the barcode. The picture below is for your reference.
+ 2：Unique Number: a randomly generated string to prevent serial code duplication across different orders. ABCDE is just an example. Please select the “Remove” option if you do not need it.
+ 3：Incrementing Number: You can set a starting value (between 4 to 6 digits), and the number will increase by 1 for each PCB
+ To specify the location of the barcode, please select "Specify Position" and add a solid square to the silkscreen layer matching the barcode size.
+ If you choose 2D barcode&Number, only the solid square of the barcode is needed in the silkscreen layer, the same way as the 2D barcode option. There's no need to indicate the serial number location, as it will automatically be placed below the barcode.
+ For Number-only printing, if you select "Specify Position," a 2x10mm solid square in the silkscreen layer is needed.We will make all the elements into this 2x10mm square with only one row. The more characters you fill in, the smaller the font will be, which may result in vague and unidentifiable text.
+ To ensure the 2D barcode can be scanned correctly and the serial number is clear, please position them away from traces, drillings, and other silkscreen patterns (preferably place them on the solder mask surfaces over large copper or on exposed substrate areas). 
+ If you select the "Specify Position" option but do not provide a matching square, the 2D barcode or serial number will not be added to the specified location. 
+ If no position is specified, the barcode or number will be placed in an empty area by default. If there is insufficient space on the PCB, we may be unable to print the barcode or serial number and cannot accept complaints about this issue.
+ To ensure accuracy, we recommend choosing the "confirm production file" option . We will add symbols in a separate layer called "qrt" or "qrb" to represent the barcode, and you can review these in the 2D render once the production file is ready. 
+  2D barcode symbol                              2D barcode&Number                                       2D render 
+ FAQs: 
+ How to check the barcode information for an existing order? 
+ No matter the order is in the order history or in the cart, you always have a chance to check it. Please click “ Product details ”  -- “ Mark on PCB ” -- ”2D barcode (Serial Number)” to check the details.
+ Are the numbering on each order always continuous? 
+ Currently we are unable to guarantee that the numbering on the boards will always be continuous due to the following factors:
+ 1.Extra Quantity Input During Production. Our factory may input a few additional pieces beyond your order to deal with potential scrap. However, we cannot ship all boards plus the extra pieces to you due to customs concerns. Furthermore, our staff is not able to pick them from a massive quantity of boards, which can disrupt the sequence of boards.
+ 2. Potentially Unavoidable Scrapping After Production: Even with the additional pieces input during production, there is a possibility that the number of good boards may be less than what you ordered. The numbers on any scrapped boards are random, which can lead to discontinuity in numbering.
+ Note: If any scrapped boards need to be reproduced, their numbering will follow the rules outlined in the “Reorder without edit” section below, or the 2D barcode and serial number will be removed from board completely(though this is a small possibility).
+ If you care about this, please consider this carefully when choosing the service.
+ What of the reorder rules with the barcode or serial number? 
+ Reorder without edit：
+ If the unique number is removed from the original order, the serial numbers for reorders will continue sequentially from the last number on the order you clicked to reorder. For example, if you place an original order Y1 for 10 pieces, each subsequent reorder from the latest Y1 will have serial numbers as follows: 0001–0010, 0011–0020, 0021–0030, 0031–0040, and so on. 
+ However, if you decide to reorder based on the very first order, the serial numbers for that reorder will start again from 0011–0020.
+ If the unique number is selected from the original order, only the unique number will change for each time reorder, while all other settings remain the same. The serial number in the reorder will begin with the very original starting value (0001 or whatever was set).
+ The above logic may not apply when extra quantity input or when there is scrapping during production. Therefore, we highly recommend that you edit the starting value for every reorder.
+ Reorder with edits:
+ After adding a reorder from your order history, you can click “Edit Order” in the shopping cart to change the code type, prefix, starting value of the incrementing number, or even remove the unique number.
+ If the reorder is awaiting payment, you can click “Edit 2D Barcode” to make changes as needed.
+ Notes:
+ As this is a free customization service, we do not accept liability for any scanning issues or refund claims due to service failures. By selecting this service, you acknowledge and accept these terms. 
+ Order Number is not available since May 2026. Please DO NOT add "JLCJLCJLCJLC" in your silkscreen layer for specifying order number location. For previous orders which order number has been added, order number will be remained in Reorder.

@@ -285,3 +285,45 @@ Abgerufen 2026-11-07 per WebFetch (HTML, Auszüge sinngemäss bzw. wörtlich in 
   „Surface finish: Limited by specific options“ (Tabelle wie Kap. 2, 1.6 mm grün mit ENIG), „Standard stack-up only“.
   Zu Via-Abdeckung/POFV steht dort **nichts**. Eine Websuche (2026-11-08) fand keine JLC-Aussage zur Kombination
   Economic PCBA + POFV bei 4 Lagen → bleibt **BESTELL-PRÜFUNG** im Formular (`hardware/sensor/out/ORDER_JLC_REV_C.md`).
+
+## 10 Nachtrag 2026-11-08 nachmittags (Phase 5): Formular-Screenshot, Mark on PCB, Produktionsdatei, B-2
+Lokale Textauszüge (curl, Roh-HTML-sha256 im Kopf der Dateien) unter `docs/references/JLCPCB_*_Auszug_2026-11-08.txt`.
+
+- **[JLC-RECHNER] Screenshot Auftraggeber 2026-11-08** (Standard PCB, nicht eingeloggt, 26 × 158.5 mm, 4 L, 20 Stk):
+  Feldnamen und Optionen des PCB-Teils: Material Type (Default **FR4 TG135**; FR4 TG155, Nan Ya NP-140F, KB6164-TG135,
+  Nan Ya NP-155F, KB-6165-TG155), Specify Stackup, Via Covering, **Via Plating Method** („Epoxy-filled or copper-paste-filled
+  vias require Horizontal Electroless Copper Plating“), Min via hole size/diameter „0.3mm/(0.4/0.45mm)“, **Mark on PCB**
+  (nur „Remove Mark“ / „2D barcode (Serial Number)“), Confirm Production file, Deburring/Edge rounding.
+  Charge Details 20 Stk: Engineering 25.00, Via Covering 18.59, Surface Finish 18.50, Deburring 0.50, Board 10.20,
+  Via Plating Method 3.51 → **76.30 USD**. DHL Express 23.52 USD (2–4 Tage), 0.41 kg. Schalter „PCB Assembly“ war **aus**
+  → PCBA-Felder (Economic/Standard usw.) nicht gesehen. Auswertung: `docs/reviews/phase5_kosten_final.md` Kap. 1.
+- [JLC] https://jlcpcb.com/help/article/How-to-mark-on-PCB („Last updated on May 22, 2026“), lokal
+  `JLCPCB_HowToMarkOnPCB_Auszug_2026-11-08.txt`: „No mark will be added on the PCB by default“; 2D-Barcode/Seriennummer
+  optional, Position nur über ein ausgefülltes Quadrat im Silkscreen („Specify Position“), sonst „placed in an empty area“;
+  „**Order Number is not available since May 2026. Please DO NOT add "JLCJLCJLCJLC" in your silkscreen layer**“.
+  Was mit einem vorhandenen Platzhalter geschieht, steht nicht da (**ANNAHME**: wird als Text gedruckt oder entfernt).
+- [JLC] https://jlcpcb.com/help/article/how-to-confirm-the-production-file (Sep 09, 2026), lokal
+  `JLCPCB_ConfirmProductionFile_Auszug_2026-11-08.txt`: Ablauf (E-Mail nach Zahlung, Ordner `yg`/`ok`/`info`),
+  Lagennamen u. a. `sk` = „The vias which will be filled with resin/copper/solder mask ink“, `bo` = Bottom Silkscreen.
+  **Preis der Option: nicht angegeben** (Websuche 2026-11-08 ohne Beleg) → ANNAHME 0 USD, im Rechner ablesen.
+- [JLC] https://jlcpcb.com/help/article/pcb-via-covering (Sep 09, 2026), lokal `JLCPCB_ViaCovering_Auszug_2026-11-08.txt`:
+  „For epoxy-filled vias, please leave a note or upload an image … to explain which vias should be filled. Alternatively,
+  you can specify to fill all vias of a particular diameter.“; Bohrung ≤ 0.5 mm; Qualitätsangabe „leveled solder pads have
+  a 127um depression and protrusion within 50um“ (Wortlaut der Seite).
+- [JLC] https://jlcpcb.com/help/article/in-what-cases-will-there-be-charged-extra (Sep 09, 2026), lokal
+  `JLCPCB_ExtraCharges_Auszug_2026-11-08.txt`: Nr. 6 „Removing the Bur and Round the Corner“: Einzelplatine mit einer Seite
+  1.5–3 cm → 0.02 USD/Stk (fluidi 26 mm → betroffen, Screenshot 0.50 USD/20 Stk). Nr. 10 „Small Boards“ (Seite ≤ 3 cm, Single
+  PCB): Zuschlag erst ab ≥ 500 Stk (Tabelle als Bild, lokal `JLCPCB_ExtraCharges_SmallBoards_Tabelle_2026-11-08.png`).
+  ENIG-Fläche > 30 % kostet extra (Nr. 5).
+- [JLC] https://jlcpcb.com/help/article/jlcpcb-base-material (Oct 19, 2026), lokal `JLCPCB_BaseMaterial_Auszug_2026-11-08.txt`:
+  Standard-FR-4 „TG130“, „High TG FR-4 (TG155)“ für Mehrlagen; **keine** Er-/Datenblattangaben zu den Optionen im Rechner.
+  Kundenfrage dazu ohne Antwort (`JLCPCB_QA592-TG135_Auszug_2026-11-08.txt`, „0 Reply“) – nur Hinweis.
+- **B-2 (Economic PCBA + 4 L + ENIG + POFV):** [JLC] https://jlcpcb.com/capabilities/pcb-assembly-capabilities (ohne Datum),
+  erneut abgerufen 2026-11-08, lokal `JLCPCB_PCBA-Capabilities_Auszug_2026-11-08.txt`: Economic 2/4/6 Lagen, 0.8–1.6 mm,
+  „Standard stack-up only“, Surface Finish „Limited by specific options“ (Tabelle: 1.6 mm grün ENIG 2–50 bzw. 2–30 Stk;
+  Spalte „Layer“ im HTML leer), Gold Fingers/Castellated/Edge Plating „Not Support“. **Via Covering/POFV wird weder erlaubt
+  noch ausgeschlossen.** Auch PCBA-FAQ (Teil 1/2), PCBA-Preisseite (Oct 22, 2026, lokal `JLCPCB_PCBA-Price_Auszug_2026-11-08.txt`)
+  und Websuche 2026-11-08 ergeben keine Aussage → bleibt **BESTELL-PRÜFUNG** (ORDER_JLC_REV_C.md Kap. 4 Nr. 5): nur das
+  Formular nach dem Einschalten von „PCB Assembly“ zeigt es. Ausweichweg Standard-PCBA: ORDER Kap. 6.
+- PCBA-Preisseite unverändert gegenüber Kap. 1 (Oct 22, 2026); zusätzlich ausdrücklich: „Single board assembly surcharge …
+  $0.48 per board“ und „Handling Fee“ nur Standard-PCBA.

@@ -1,0 +1,14 @@
+Quelle: JLCPCB (HTML, kein PDF verfuegbar)
+URL: https://jlcpcb.com/help/answers/detail/592-Impedance-control-with-FR4-Standard-TG-135-140
+Seitenangabe: keine Datumsangabe auf der Seite
+Abgerufen: 2026-11-08T12:58:59+01:00 mit curl (User-Agent Mozilla/5.0), HTTP 200
+sha256 Roh-HTML: bb5249e20656115bf8b9e68fd7a283a5ab8b72728922707f7f0887192bf932c5
+Inhalt: Textauszug (Skripte/Stile/Tags entfernt), Artikeltext unveraendert, Navigation/Fusszeile weggelassen.
+Verwendung: Kundenfrage (unbeantwortet, 0 Reply) zu Default FR4 TG135-140 vs. NP-155F: nur Hinweis, keine JLC-Aussage
+======================================================================
+ Impedance control with FR4-Standard TG 135-140 28*******1A
+ 2024-12-28 04:41 AM
+ When selecting 4 or 6 layer boards, the quote page selects " FR4-Standard TG 135-140" as the default dielectric material, even when impedance control is selected. However, your documentation for the impedance calculator states that an NP-155F dielectric material is assumed, which presumably matches the "FR-4 TG155" option on the quote page.
+ When impedance control is selected, are traces adjusted for the Tg135-140 material, or is the incorrect impedance simply accepted and manufactured as-is? (If the impedance will be incorrect, it would be very helpful to have the quote system warn users about this and ask if they want to switch to Tg155!)
+ Can you provide specifications (Dk, Df, etc.) for the material used for Tg135-140 boards? A datasheet would also be helpful. Thanks.
+ 0 Reply 

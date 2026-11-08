@@ -1,0 +1,236 @@
+Quelle: pi-shop.ch (Schweizer Haendler, HTML, kein PDF), Produktseiten und Versandkosten
+Abgerufen: 2026-11-08 mit curl (User-Agent Mozilla/5.0), HTTP 200; Textauszug (Tags entfernt), je Seite Abschnitt ab 'Artikelnummer' gekuerzt
+Preise CHF inkl. MWST laut Shop; Verfuegbarkeit = Anzeige am Abrufzeitpunkt
+Verwendung: hardware/gateway/BOM_GATEWAY.csv, docs/reviews/phase5_kosten_final.md (W-8)
+======================================================================
+
+### URL: https://www.pi-shop.ch/raspberry-pi-zero-2-w
+sha256 Roh-HTML: a6f2eb203b2f00d84933680f0742447f3a13176010a86bce513bf55e5c35087f
+ Artikelnummer: 
+ 11652 
+ Wir schicken Ihnen eine Email sobald das Produkt wieder verfügbar ist. 
+ Benachrichtigen 
+ Delivery Time: ab Lager 
+ Verfügbarkeit: Zur Zeit nicht an Lager 
+ CHF 17.15 
+ E-Mail an einen Freund 
+ Zubehör 
+ FLIRC Raspberry Pi Zero Case 
+ CHF 19.90 
+ Original Raspberry Pi 5V/2.5A Micro USB Steckernetzteil 
+ CHF 11.90 
+ Argon POD Case 
+ CHF 14.90 
+ ARGON POD Display 2.8 inch 
+ CHF 34.90 
+ Argon POD USB HDMI Module 
+ CHF 16.90 
+ Triple LCD HAT For Raspberry Pi, Onboard 1.3inch IPS LCD Main Screen and Dual 0.96inch IPS LCD Secondary Screens 
+ CHF 18.90 
+ Dedicated Aluminum Heatsink for Raspberry Pi Zero 
+ CHF 6.90 
+ Artikelbeschrieb 
+ Artikelbeschrieb Details 
+ Building on the success of the current Zero family, Raspberry Pi Zero 2 W is built around a Raspberry Pi-designed System-in-Package, which integrates the BCM2710A1 die used in Raspberry Pi 3 with 512MB of RAM.
+ Features
+ 1GHz quad-core, 64-bit ARM Cortex-A53 CPU 
+ VideoCore IV GPU
+ 512MB LPDDR2 DRAM
+ 802.11b/g/n wireless LAN
+ Bluetooth 4.2 / Bluetooth Low Energy (BLE)
+ MicroSD card slot
+ Mini HDMI and USB 2.0 OTG ports
+ Micro USB power
+ HAT-compatible 40-pin header
+ Composite video and reset pins via solder test points
+ CSI camera connector
+ Sie könnten auch an folgenden Artikeln interessiert sein 
+ ARGON POD Display 2.8 inch 
+ CHF 34.90 
+ Argon POD USB HDMI Module 
+ CHF 16.90 
+ ARGON POD USB-LAN Module 
+ CHF 25.90 
+
+### URL: https://www.pi-shop.ch/raspberry-pi-12-5w-micro-usb-power-supply-2254
+sha256 Roh-HTML: a7d8fcd0b873dc509bac98fc28600c6f49ff9aa6581e812cd11c533d1445589c
+ Artikelnummer: 
+ 11715 
+ Delivery Time: ab Lager 
+ Verfügbarkeit: Sofort-Versand ab Lager 
+ CHF 11.90 
+ Menge 
+ In den Warenkorb 
+ E-Mail an einen Freund 
+ Zubehör 
+ Raspberry Pi 3 Model B+ 
+ CHF 34.60 
+ Ab: 
+ CHF 31.90 
+ Artikelbeschrieb 
+ Artikelbeschrieb Details 
+ Specifications
+ 5.1V / 2.5A DC output
+ 96-264Vac operating input range
+ Short circuit and overcurrent protection
+ 1.5m 18AWG captive cable with micro USB output connector
+ Available in different variants to suit different international power sockets
+ Raspberry Pi 12.5W Micro USB Power Supply 
+
+### URL: https://www.pi-shop.ch/kingston-microsdhc-karte-industrial-uhs-i-16-gb
+sha256 Roh-HTML: 115daa78e9b6207d332bae7f8d5ead26abc792b0ab38e5fadc0875ddd5973e52
+ Artikelnummer: 
+ 10951 
+ Wir schicken Ihnen eine Email sobald das Produkt wieder verfügbar ist. 
+ Benachrichtigen 
+ Delivery Time: ab Lager 
+ Verfügbarkeit: Zur Zeit nicht an Lager 
+ CHF 27.90 
+ E-Mail an einen Freund 
+ Zubehör 
+ Raspberry Pi 3 Model B+ 
+ CHF 34.60 
+ Ab: 
+ CHF 31.90 
+ Artikelbeschrieb 
+ Artikelbeschrieb Details 
+ Kingston microSDHC-Karte Industrial UHS-I 16 GB
+ Industrielle microSDHC-Speicherkarte mit 16 GB
+ Lesen: 100 MB/s, Schreiben: 80 MB/s
+ Für den gewerblichen Einsatz, ideal für extreme Umweltbedingungen
+ Passt in viele GPS-Geräte, Tablets, Smartphones und Industriegeräte
+ Inkl. SD-Adapter
+ Application Performance Class A1
+ Diese Karte ist für Apps optimiert und liefert ein schnelles Starten und mehr Leistung für Ihre mobilen Anwendungen. Die App Performance Class ist vor allem für SD-Karten wichtig, welche in Smartphones und Tablets eingesetzt werden. Das A1-Symbol besagt, dass die SD-Karte die Anforderungen der entsprechenden App Performance Class 1 (A1) erfüllt: Mindestens 1.500/500 IOPS bei wahlfreien und mindestens 10 MB/s bei sequenziellen Transfers.
+ Video Speed Class
+ Die Video Speed Class umfasst die fünf Geschwindigkeitsstufen V6, V10, V30, V60 und V90, wobei die Zahl jeweils die Mindestschreibrate in Megabyte pro Sekunde (MB/s) angibt. Indem Sie ein Gerät mit Video Speed Class-Kennzeichen und eine SD-Speicherkarte mit dem gleichen Video Speed Class-Kennzeichen kombinieren, lassen sich Erinnerungen in bester Qualität festhalten. Die schnellsten Optionen V60 und V90 unterstützen 8K-Auflösung, während V6, V10 und V30 Full HD- und 4K-Auflösung zuverlässig erfassen.
+
+### URL: https://www.pi-shop.ch/adafruit-pirtc-precise-ds3231-real-time-clock-for-raspberry-pi
+sha256 Roh-HTML: 73818388cca3f98eed3f9d9c834c51001b6514031bb87af0dd4c68eaff996b01
+ Artikelnummer: 
+ 12131 
+ Delivery Time: ab Lager 
+ Verfügbarkeit: Sofort-Versand ab Lager 
+ CHF 18.90 
+ Menge 
+ In den Warenkorb 
+ E-Mail an einen Freund 
+ Zubehör 
+ Raspberry Pi 4 Model B - 2GB RAM 
+ CHF 60.30 
+ Raspberry Pi 4 Model B - 4GB RAM 
+ CHF 92.90 
+ Raspberry Pi 4 Model B - 8GB RAM 
+ Regulärer Preis: 
+ CHF 149.90 
+ Sonderpreis 
+ CHF 139.00 
+ Artikelbeschrieb 
+ Artikelbeschrieb Details 
+ This is the best battery-backed real time clock (RTC) you can get that allows your Raspberry Pi project to keep track of time if the power is lost. Perfect for data-logging, clock-building, NTP servers, time-stamping, timers and alarms, etc. Equipped with  a genuine DS3231  RTC, it works great with the Raspberry Pi and has native kernel support.
+ The datasheet for the  DS3231  explains that this part is an "Extremely Accurate I²C-Integrated RTC/TCXO/Crystal". And, hey, it does exactly what it says on the tin! This  Real Time Clock (RTC)  is the most precise you can get in a small, low power package.
+ Most RTCs use an external 32kHz timing crystal that is used to keep time with low current draw. And that's all well and good, but those crystals have slight drift, particularly when the temperature changes (the temperature changes the oscillation frequency very very very slightly but it does add up!) This RTC is in a beefy package because the crystal is inside the chip! And right next to the integrated crystal is a temperature sensor. That sensor compensates for the frequency changes by adding or removing clock ticks so that the timekeeping stays on schedule.
+ Many "cheap" DS3231 RTC boards do not use genuine Maxim DS3231's - you'll get a non-calibrated RTC which does not maintain the timekeeping quality that is specified! We purchase these DS3231's from Maxim direct so we know they are 100% genuine. 
+ Works perfectly with any Raspberry Pi (or similar single board linux computer) including the Pi 1, Pi 2, Pi 3, Pi 4, Pi Zero, A+, B+ etc.
+ Fully assembled & tested PCB plugs directly into your Pi's GPIO pins -  No soldering required! 
+ Will keep time for 5 years or more
+
+### URL: https://www.pi-shop.ch/fermion-ds3231-precise-rtc-breakout
+sha256 Roh-HTML: 6eb06481708c2fbd3e9547030f3bf5daae1541423fb605d7e4186250d69ae341
+ Artikelnummer: 
+ 12762 
+ Wir schicken Ihnen eine Email sobald das Produkt wieder verfügbar ist. 
+ Benachrichtigen 
+ Delivery Time: ab Lager 
+ Verfügbarkeit: Zur Zeit nicht an Lager 
+ CHF 9.90 
+ E-Mail an einen Freund 
+ Zubehör 
+ Raspberry Pi 5 Model B - 4GB RAM 
+ CHF 105.90 
+ Raspberry Pi 5 Model B - 8GB RAM 
+ CHF 164.90 
+ Raspberry Pi 5 Model B - 2GB RAM 
+ CHF 72.30 
+ Raspberry Pi 5 Model B - 16GB RAM 
+ CHF 343.60 
+ Artikelbeschrieb 
+ Artikelbeschrieb Details 
+ This real-time clock module (RTC) uses the DS3231 chip that integrates a crystal resonator and a temperature compensator, which improves the long-term accuracy of the module. In the range of -40°C to +85°C, the accuracy of DS3231 remains at ±3.5ppm (±0.3024 seconds/day).
+ The device incorporates a battery input, and maintains high precision timing when main power to the device is interrupted. The RTC provides information of seconds, minutes, hours, week, day, month and year, and it can automatically adjust the date at the end of the month, including corrections for leap year. The clock operates in either the 24-hour or 12-hour format with AM/PM indicator. Two programmable time-of-day alarms and a programmable square-wave output are provided. In addition, the RST pin can be used as a push-button input for microprocessor reset.
+ NOTE: Due to the latest air cargo regulations, the transport audit of special items such as batteries, magnets and liquids will become very strict, so this RTC module does not come with batteries anymore, please buy them locally. The button cell battery model that goes with the module is CR1220.
+ Features 
+ Internal integrated crystal resonator, small deviation
+ Internal integrated temperature compensator, small temperature drift
+ Complete clock calendar function
+ Two programmable Time-of-Day alarms
+ Applications
+ Event reminder
+ MCU external wakeup source
+ Clock and alarm output
+ Specification
+ Power Supply Voltage: 3.3V-5.5V
+ I2C Address: 0x68
+ Timing Range: 1970 ~ 2100
+ Working Temperature: -40℃ ~ +85℃
+ Timing Accuracy: ±3.5ppm (±0.3024 seconds/day)
+ Product Size: 22.5*21mm / 0.89*0.83 inch
+ Documents
+ Product wiki 
+ Shipping List
+ Fermion: DS3231 Precise RTC (Breakout) x1
+ 2.54-7P Black Single Row Connector x1
+
+### URL: https://www.pi-shop.ch/grove-temperature-humidity-sensor-sht41
+sha256 Roh-HTML: 50dd8c27323dd01b27709ceebde798340f4ca85cc62d978918f2602d7506e36d
+ Artikelnummer: 
+ 12042 
+ Wir schicken Ihnen eine Email sobald das Produkt wieder verfügbar ist. 
+ Benachrichtigen 
+ Delivery Time: ab Lager 
+ Verfügbarkeit: Zur Zeit nicht an Lager 
+ CHF 8.90 
+ E-Mail an einen Freund 
+ Downloads & Links
+ Handbücher 
+ SHT4x Datasheet 
+ (Grösse: 734.8 KB)
+ Artikelbeschrieb 
+ Zusatzinformation 
+ Artikelbeschrieb Details 
+ Grove-SHT4x is a Sensirion’s digital Humidity and Temperature Sensor which has an accuracy rate of up to ±1.8% RH and ±0.2 °C, 32µA idle current, 5.0V or 3.3V supply voltage, and an operating range of 0% to 100% RH, -40°C to +125°C. It comes with SEEED’s standard grove l2C interface enabling developers or even beginners to easily communicate with the STH4x sensor on different hardware platforms. SHT4x is an optimized CMOSens® chip that offers reduced power consumption and improved accuracy specifications. Grove-SHT4x's combined features make it an excellent choice for a wide variety of applications.
+ Features
+ Accuracy Rate:  It has relative humidity and temperature accuracy rate of up to ±1.8% RH and ±0.2 °C, respectively.
+ Extended operating ranges:  The sensor can operate between 0 and 100% RH and -40 and 125°C.
+ Grove average current:  An average current of 1.2 µA and idle up to 32µA.
+ Grove power supply:  Power supply voltage of 5v/3.3v.
+ Condensing environments:  Fully functional in condensing or environment close to saturation. (with a variable power heater)
+ Stress-Test-Driven Qualification:  SHT4x sensor is JEDEC JESD47 qualified.
+ SHT4x Sensor Datasheet 
+ Description
+ This Grove-SHT4x digital sensor is based on Sensirion's industry-proven humidity and temperature sensors. It can provide constant temperature and humidity accuracy over an extensive measurement range, making it the best price/performance ratio available. And with the  gr ove platform, you are ready to plug and play the SHT4x sensor on any microcontroller (Arduino) or microprocessor (Raspberry Pi).
+ The Grove-SHT4x digital 4th generation sensor comprises an entirely new and optimized CMOSens® chip, offering lower power consumption, a voltage supply 5/3.3 volts, and up to 32µA of idle current, which makes it highly suitable for low-power and battery-supported applications. It has an operating temperature range of -40°C to +125°C, an excellent 1.8% typical relative humidity accuracy from 25 to 75%, and a 0.2 °C typical accuracy from 0 to 75 °C.
+ The fully calibrated Grove-SHT4x sensor offers linearized digital output and NIST traceability. And our standard Grove four-pin I2C interface makes it easy to read or communicate with integrated circuits.
+ Due to the high accuracy of the SHT4x sensor and the compatibility of our grove system, Grove-SHT4x is perfect for high-end industrial applications, projects for hobbyists, learning projects for beginners, etc.
+ Applications
+ Climate Monitoring and Control
+ Cold chain data loggers
+ Smart Thermostats
+ Anti-fogging
+ SHT41 Sensor Specifications
+ Parameter 
+ Rating 
+ Temperature accuracy rate
+ ±0.2 ℃
+ Typical Humidity accuracy rate
+ ±1.8% RH
+ Maximum Relative Humidity Accuracy Rate
+ ±2.5%
+ Operating temperature range
+ -40°C to 125°C
+
+### URL: https://www.pi-shop.ch/versandkosten/
+ Liefer- & Versandkosten 
+ Versandkosten Schweiz und Liechtenstein 
+ Sämtliche Lieferungen werden mit der Schweizer Post entweder als B-Post (Economy) oder als A-Post (Priority) verschickt. Die Versandkostenpauschale beträgt Fr. 7.90 bzw. Fr. 9.90.
+ Ein Abholen vor Ort ist zur Zeit leider nicht möglich, da die Ware direkt ab Zentrallager verschickt wird.
