@@ -34,3 +34,6 @@ Ergänzt die ursprüngliche Projektbeschreibung. Gilt als Grundlage für Phase 1
   (10–12 Tage, max. 1.5 kg und Warenwert ≤ 65 USD).
 - **JLC-Angebot Rev B** (Rechner, abgelesen vom Auftraggeber 2026-11-08): 26 × 158.5 mm, 4 L, 1.6 mm, ENIG,
   Epoxy Filled & Capped: **5 Stk 65.21 USD, 20 Stk 76.30 USD** (gesamt, ohne Versand/PCBA).
+- **mDNS im Firmen-WLAN** (Auftraggeber 2026-11-08): `*.local` funktioniert, mit anderen Raspberry Pi geprüft →
+  Red-Team W-9 erledigt, kein Rückfallweg nötig.
+- **Koexistenz WLAN/BLE am Pi Zero 2 W** (Red-Team W-7): Test durch den Auftraggeber später → PROTOTYP-PRÜFUNG.
