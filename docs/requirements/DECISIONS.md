@@ -64,7 +64,7 @@ Format: Nr. · Datum · Entscheid · Alternativen · Begründung · Quelle · St
   0.358 USD/Platine; 4 L 1.6 mm 30.05 + 0.448; 4 L 2.0 mm 71.05 + 0.554. Vorher wurde der volle PCB-Preis
   den Stückkosten zugeschlagen, das Setup der Bestückung aber den Einmalkosten (Red Team K-2, Phase 2).
 - **Alternativen:** voller PCB-Preis in Stückkosten (inkonsistent); nur Vollkosten (vermischt Prototyp-/Serieneffekte).
-- **Status:** gültig, dem Auftraggeber zur Kenntnis
+- **Status:** gültig, vom Auftraggeber bestätigt 2026-11-08 (Stückkosten 8.38 CHF ok; Vollkosten 17.84 CHF zur Kenntnis)
 
 ### D-006 · 2026-11-07 · Konzeptwahl: A-32
 - **Entscheid (Auftraggeber):** Konzept **A-32**: TI CC2340R52 (QFN24) + RC-Oszillator (SN74LVC1G14, 2–6 MHz,
@@ -250,3 +250,8 @@ Format: Nr. · Datum · Entscheid · Alternativen · Begründung · Quelle · St
   Decke über dem Elektronikraum), nachgiebiges Element (bräuchte vorgespannte Feder). Für **Rev D**: Taster mit
   Betätiger in z direkt unter dem Stössel (Layoutänderung).
 - **Quelle:** `docs/reviews/phase5_mechanik_redteam.md` (Runde 1–3), `mechanical/sensor/check_sensor.txt` 2a–2e.
+
+### D-027 · 2026-11-08 · Gateway-LED vorläufig (Auftraggeber)
+- **Entscheid:** Vorschlag `docs/reviews/phase5_gateway_led.md` vorläufig angenommen: Blitz alle 5 s = ok, schnelles
+  Blinken = Kopplung, aus = Fehler/Nacht; 3-mm-LED an GPIO17 ohne Platine.
+- **Alternativen:** siehe Vorlage. **Status:** gültig „für den Moment“, Anpassung nach Mustertest möglich.
