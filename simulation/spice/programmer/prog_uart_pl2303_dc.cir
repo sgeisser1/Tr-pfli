@@ -1,0 +1,19 @@
+* fluidi PL2303 G3 - erzeugt von prog_uart.py (nicht von Hand aendern)
+.include ../led_rgb/led_models.inc
+VDD vdd 0 DC 2.2
+VTX tx0 0 DC 0.382495
+RTX tx0 tp2 200
+R12 tp2 mid 100k
+R11 mid dio20 100k
+DBLED vdd aBLED DB
+VOBLED aBLED bBLED DC {OFF_B_MIN}
+RBLED bBLED dio20 100
+.control
+set wr_singlescale
+set wr_vecnames
+option numdgt=7
+op
+wrdata prog_uart_pl2303_dc.dat v(dio20)
+quit
+.endc
+.end

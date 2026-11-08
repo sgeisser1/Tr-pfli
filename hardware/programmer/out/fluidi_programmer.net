@@ -2,7 +2,7 @@
 	(version "E")
 	(design
 		(source "/home/sgeisser/git/Tr-pfli/hardware/programmer/fluidi_programmer.kicad_sch")
-		(date "2026-11-08T11:22:59")
+		(date "2026-11-09T00:29:41")
 		(tool "Eeschema 10.0.8-10.0.8~ubuntu24.04.1")
 		(textvar
 			(name "REV") "1")
@@ -418,9 +418,9 @@
 		)
 		(comp
 			(ref "J1")
-			(value "zu Waveshare CH343")
+			(value "zu Waveshare CH343 / PL2303")
 			(footprint "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical")
-			(description "Kabel <= 20 cm (ANNAHME); 1 = H3.3 +5V, 2 = H2.2 GND, 3 = H3.2 VIO (Jumper H3 ENTFERNT), 4 = H2.4 RXD, 5 = H2.3 TXD; +5V alternativ H1.1, falls H1 bestueckt")
+			(description "Kabel <= 20 cm (ANNAHME); CH343: 1 = H3.3 +5V, 2 = H2.2 GND, 3 = H3.2 VIO (Jumper H3 ENTFERNT), 4 = H2.4 RXD, 5 = H2.3 TXD; +5V alternativ H1.1, falls H1 bestueckt. PL2303 (type A) V2: 1 = J1.3 VCC5V (Jumper J1 ENTFERNT), 2 = P2.2 GND, 3 = P2.1 VCCIO, 4 = P2.4 RXD, 5 = P2.3 TXD (README Kap. 9)")
 			(fields
 				(field
 					(name "LCSC")
@@ -428,14 +428,14 @@
 				(field
 					(name "Hersteller") "-")
 				(field
-					(name "MPN") "Litze/Steckbruecken zum Waveshare CH343 USB UART Board")
+					(name "MPN") "Litze/Steckbruecken zum Waveshare CH343 oder PL2303 (type A) V2 USB UART Board")
 				(field
 					(name "Footprint") "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical")
 				(field
 					(name "Datasheet")
 				)
 				(field
-					(name "Description") "Kabel <= 20 cm (ANNAHME); 1 = H3.3 +5V, 2 = H2.2 GND, 3 = H3.2 VIO (Jumper H3 ENTFERNT), 4 = H2.4 RXD, 5 = H2.3 TXD; +5V alternativ H1.1, falls H1 bestueckt")
+					(name "Description") "Kabel <= 20 cm (ANNAHME); CH343: 1 = H3.3 +5V, 2 = H2.2 GND, 3 = H3.2 VIO (Jumper H3 ENTFERNT), 4 = H2.4 RXD, 5 = H2.3 TXD; +5V alternativ H1.1, falls H1 bestueckt. PL2303 (type A) V2: 1 = J1.3 VCC5V (Jumper J1 ENTFERNT), 2 = P2.2 GND, 3 = P2.1 VCCIO, 4 = P2.4 RXD, 5 = P2.3 TXD (README Kap. 9)")
 			)
 			(libsource
 				(lib "Connector_Generic")
@@ -452,7 +452,7 @@
 			)
 			(property
 				(name "MPN")
-				(value "Litze/Steckbruecken zum Waveshare CH343 USB UART Board")
+				(value "Litze/Steckbruecken zum Waveshare CH343 oder PL2303 (type A) V2 USB UART Board")
 			)
 			(property
 				(name "Sheetname")

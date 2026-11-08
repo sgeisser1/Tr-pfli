@@ -1,0 +1,148 @@
+fluidi - prog_uart_pl2303.py (ngspice -b): Waveshare PL2303 USB UART Board (type A) V2 statt CH343
+
+(1) DC-Pegel [V]
+| Fall | Bedingung | Knoten | Pegel | V | Grenze | ok | Reserve |
+|---|---|---|---|---|---|---|---|
+| A0p ohne Puffer | VIO 2.0 V, Pull-up 0, Board-LED MIN | PL2303-RXD (TP1) | low | 0.586 | <= 0.40 (VIL) | NEIN | -186 mV |
+| A0p ohne Puffer | VIO 2.0 V, Pull-up 0, Board-LED MAX | PL2303-RXD (TP1) | low | 0.231 | <= 0.40 (VIL) | ja | +169 mV |
+| A0p ohne Puffer | VIO 2.0 V, Pull-up 100 uA, Board-LED MIN | PL2303-RXD (TP1) | low | 1.995 | <= 0.40 (VIL) | NEIN | -1595 mV |
+| A0p ohne Puffer | VIO 2.0 V, Pull-up 100 uA, Board-LED MAX | PL2303-RXD (TP1) | low | 1.995 | <= 0.40 (VIL) | NEIN | -1595 mV |
+| A1p Puffer-Ausgang | VIO 1.96 V, Pull-up 0, Board-LED MIN | PL2303-RXD | low | 0.062 | <= 0.40 (VIL) | ja | +338 mV |
+| A1p Puffer-Ausgang | VIO 1.96 V, Pull-up 100 uA, Board-LED MIN | PL2303-RXD | low | 0.078 | <= 0.40 (VIL) | ja | +322 mV |
+| A1p Puffer-Ausgang | VIO 2.04 V, Pull-up 0, Board-LED MIN | PL2303-RXD | low | 0.073 | <= 0.40 (VIL) | ja | +327 mV |
+| A1p Puffer-Ausgang | VIO 2.04 V, Pull-up 100 uA, Board-LED MIN | PL2303-RXD | low | 0.089 | <= 0.40 (VIL) | ja | +311 mV |
+| A2p Weg B R9 Pad 1 | VDD = VCCIO = 2.0 V, Pull-up 0, beide LED MIN | DIO6 = PL2303-RXD | low | 0.266 | <= 0.40 (VIL) | ja | +134 mV |
+| A2p Weg B R9 Pad 1 | VDD = VCCIO = 2.0 V, Pull-up 100 uA, beide LED MIN | DIO6 = PL2303-RXD | low | 0.287 | <= 0.40 (VIL) | ja | +113 mV |
+| A2p Weg B R9 Pad 1 | VDD = VCCIO = 2.1 V, Pull-up 0, beide LED MIN | DIO6 = PL2303-RXD | low | 0.322 | <= 0.40 (VIL) | ja | +78 mV |
+| A2p Weg B R9 Pad 1 | VDD = VCCIO = 2.1 V, Pull-up 100 uA, beide LED MIN | DIO6 = PL2303-RXD | low | 0.343 | <= 0.40 (VIL) | ja | +57 mV |
+| A2p Weg B R9 Pad 1 | VDD = VCCIO = 2.2 V, Pull-up 0, beide LED MIN | DIO6 = PL2303-RXD | low | 0.379 | <= 0.40 (VIL) | ja | +21 mV |
+| A2p Weg B R9 Pad 1 | VDD = VCCIO = 2.2 V, Pull-up 100 uA, beide LED MIN | DIO6 = PL2303-RXD | low | 0.399 | <= 0.40 (VIL) | ja | +1 mV |
+| A3p Weg B falsches Pad (R9 Pad 2) | VDD = VCCIO = 2.0 V, Pull-up 0, Board-LED MAX | UART_TX_MID = PL2303-RXD | low | 0.215 | <= 0.40 (VIL) | ja | +185 mV |
+| A3p Weg B falsches Pad (R9 Pad 2) | VDD = VCCIO = 2.0 V, Pull-up 100 uA, Board-LED MAX | UART_TX_MID = PL2303-RXD | low | 1.991 | <= 0.40 (VIL) | NEIN | -1591 mV |
+| Bp Sensor-RX | VDD 1.96 V (Weg A min), TXD-Low 0.0 V, LED blau MIN | DIO20 | low | 0.136 | <= 0.392 (VIL 0.2 VDDS) | ja | +256 mV |
+| Bp Sensor-RX | VDD 1.96 V (Weg A min), TXD-Low 0.1 V, LED blau MIN | DIO20 | low | 0.178 | <= 0.392 (VIL 0.2 VDDS) | ja | +214 mV |
+| Bp Sensor-RX | VDD 1.96 V (Weg A min), TXD-Low 0.2 V, LED blau MIN | DIO20 | low | 0.236 | <= 0.392 (VIL 0.2 VDDS) | ja | +156 mV |
+| Bp Sensor-RX | VDD 1.96 V (Weg A min), TXD-Low 0.4 V, LED blau MIN | DIO20 | low | 0.404 | <= 0.392 (VIL 0.2 VDDS) | NEIN | -12 mV |
+| Bp Sensor-RX | VDD 2.04 V (Weg A max), TXD-Low 0.0 V, LED blau MIN | DIO20 | low | 0.190 | <= 0.408 (VIL 0.2 VDDS) | ja | +218 mV |
+| Bp Sensor-RX | VDD 2.04 V (Weg A max), TXD-Low 0.1 V, LED blau MIN | DIO20 | low | 0.223 | <= 0.408 (VIL 0.2 VDDS) | ja | +185 mV |
+| Bp Sensor-RX | VDD 2.04 V (Weg A max), TXD-Low 0.2 V, LED blau MIN | DIO20 | low | 0.268 | <= 0.408 (VIL 0.2 VDDS) | ja | +140 mV |
+| Bp Sensor-RX | VDD 2.04 V (Weg A max), TXD-Low 0.4 V, LED blau MIN | DIO20 | low | 0.410 | <= 0.408 (VIL 0.2 VDDS) | NEIN | -2 mV |
+| Bp Sensor-RX | VDD 2.0 V (Weg B), TXD-Low 0.0 V, LED blau MIN | DIO20 | low | 0.162 | <= 0.400 (VIL 0.2 VDDS) | ja | +238 mV |
+| Bp Sensor-RX | VDD 2.0 V (Weg B), TXD-Low 0.1 V, LED blau MIN | DIO20 | low | 0.199 | <= 0.400 (VIL 0.2 VDDS) | ja | +201 mV |
+| Bp Sensor-RX | VDD 2.0 V (Weg B), TXD-Low 0.2 V, LED blau MIN | DIO20 | low | 0.250 | <= 0.400 (VIL 0.2 VDDS) | ja | +150 mV |
+| Bp Sensor-RX | VDD 2.0 V (Weg B), TXD-Low 0.4 V, LED blau MIN | DIO20 | low | 0.406 | <= 0.400 (VIL 0.2 VDDS) | NEIN | -6 mV |
+| Bp Sensor-RX | VDD 2.2 V (Weg B max), TXD-Low 0.0 V, LED blau MIN | DIO20 | low | 0.313 | <= 0.440 (VIL 0.2 VDDS) | ja | +127 mV |
+| Bp Sensor-RX | VDD 2.2 V (Weg B max), TXD-Low 0.1 V, LED blau MIN | DIO20 | low | 0.335 | <= 0.440 (VIL 0.2 VDDS) | ja | +105 mV |
+| Bp Sensor-RX | VDD 2.2 V (Weg B max), TXD-Low 0.2 V, LED blau MIN | DIO20 | low | 0.362 | <= 0.440 (VIL 0.2 VDDS) | ja | +78 mV |
+| Bp Sensor-RX | VDD 2.2 V (Weg B max), TXD-Low 0.4 V, LED blau MIN | DIO20 | low | 0.450 | <= 0.440 (VIL 0.2 VDDS) | NEIN | -10 mV |
+| Bh Sensor-RX high | Weg A, VIO min / VDD max: VIO 1.96 V, VDD 2.04 V, TXD-High DS min 0.7 x VDD_IO | DIO20 | high | 1.372 | >= 1.632 (VIH 0.8 VDDS) | NEIN | -260 mV |
+| Bh Sensor-RX high | Weg A, VIO min / VDD max: VIO 1.96 V, VDD 2.04 V, TXD-High = VDD_IO (ANNAHME, Last < 10 uA) | DIO20 | high | 1.960 | >= 1.632 (VIH 0.8 VDDS) | ja | +328 mV |
+| Bh Sensor-RX high | Weg B: VIO 2.0 V, VDD 2.0 V, TXD-High DS min 0.7 x VDD_IO | DIO20 | high | 1.400 | >= 1.600 (VIH 0.8 VDDS) | NEIN | -200 mV |
+| Bh Sensor-RX high | Weg B: VIO 2.0 V, VDD 2.0 V, TXD-High = VDD_IO (ANNAHME, Last < 10 uA) | DIO20 | high | 2.000 | >= 1.600 (VIH 0.8 VDDS) | ja | +400 mV |
+| Bh Sensor-RX high | Weg B max: VIO 2.2 V, VDD 2.2 V, TXD-High DS min 0.7 x VDD_IO | DIO20 | high | 1.540 | >= 1.760 (VIH 0.8 VDDS) | NEIN | -220 mV |
+| Bh Sensor-RX high | Weg B max: VIO 2.2 V, VDD 2.2 V, TXD-High = VDD_IO (ANNAHME, Last < 10 uA) | DIO20 | high | 2.200 | >= 1.760 (VIH 0.8 VDDS) | ja | +440 mV |
+
+(1b) Grenzwerte fuer die Eingangspruefung des Boards
+| Groesse | Wert | Einheit |
+|---|---|---|
+| Board-Modell: Strom RXD -> GND bei VCCIO 2.0 V, Pull-up 0 | 0.430 | mA |
+| Board-Modell: Strom RXD -> GND bei VCCIO 2.0 V, Pull-up 100 uA | 0.530 | mA |
+| Board-Modell: Strom RXD -> GND bei VCCIO 2.04 V, Pull-up 0 | 0.467 | mA |
+| Board-Modell: Strom RXD -> GND bei VCCIO 2.04 V, Pull-up 100 uA | 0.567 | mA |
+| Board-Modell: Strom RXD -> GND bei VCCIO 2.2 V, Pull-up 0 | 0.618 | mA |
+| Board-Modell: Strom RXD -> GND bei VCCIO 2.2 V, Pull-up 100 uA | 0.718 | mA |
+| A1p (Weg A): zulaessiger Board-Strom in den U4-Ausgang bis RXD = 0.40 V | 2.174 | mA |
+| A2p (Weg B): zulaessiger Board-Strom in DIO6 bis 0.40 V, VDD = 2.0 V | 0.692 | mA |
+| A2p (Weg B): zulaessiger Board-Strom in DIO6 bis 0.40 V, VDD = 2.1 V | 0.531 | mA |
+| A2p (Weg B): zulaessiger Board-Strom in DIO6 bis 0.40 V, VDD = 2.2 V | 0.352 | mA |
+| Bp: zulaessiges TXD-Low bis DIO20 = 0.2 x VDDS, VDD = 1.96 V | 387.589 | mV |
+| Bp: zulaessiges TXD-Low bis DIO20 = 0.2 x VDDS, VDD = 2.0 V | 393.234 | mV |
+| Bp: zulaessiges TXD-Low bis DIO20 = 0.2 x VDDS, VDD = 2.2 V | 382.495 | mV |
+
+(2) Transient PL2303-TXD -> DIO20: Bytes 55 55 00 FF 01 80 CC 33, Taktfehler +-1.5 % (ANNAHME), Kriterium Reserve >= 0.2 Bit
+| Richtung | TXD-Low | Baud | Kapazitaeten | Schwellen | V low / high | t10-90 steigend [us] | fallend [us] | Bytes ok | Reserve [Bit] | ok |
+|---|---|---|---|---|---|---|---|---|---|---|
+| PL2303-TXD -> DIO20, VDD 2.0 V | 0 V | 19200 | nominal, LED 0 pF | 0->1 max / 1->0 min | 0.162 / 2.000 | 3.19 | 2.42 | ja | 0.357 | ja |
+| PL2303-TXD -> DIO20, VDD 2.0 V | 0 V | 19200 | nominal, LED 0 pF | 0->1 min / 1->0 max | 0.162 / 2.000 | 3.19 | 2.42 | ja | 0.357 | ja |
+| PL2303-TXD -> DIO20, VDD 2.0 V | 0 V | 19200 | schlecht, LED 30 pF | 0->1 max / 1->0 min | 0.162 / 2.000 | 17.49 | 13.25 | ja | 0.354 | ja |
+| PL2303-TXD -> DIO20, VDD 2.0 V | 0 V | 19200 | schlecht, LED 30 pF | 0->1 min / 1->0 max | 0.162 / 2.000 | 17.49 | 13.25 | ja | 0.357 | ja |
+| PL2303-TXD -> DIO20, VDD 2.0 V | 0 V | 57600 | nominal, LED 0 pF | 0->1 max / 1->0 min | 0.162 / 2.000 | 3.19 | 2.42 | ja | 0.356 | ja |
+| PL2303-TXD -> DIO20, VDD 2.0 V | 0 V | 57600 | nominal, LED 0 pF | 0->1 min / 1->0 max | 0.162 / 2.000 | 3.19 | 2.42 | ja | 0.357 | ja |
+| PL2303-TXD -> DIO20, VDD 2.0 V | 0 V | 57600 | schlecht, LED 30 pF | 0->1 max / 1->0 min | 0.162 / 2.000 | 17.49 | 13.25 | ja | 0.300 | ja |
+| PL2303-TXD -> DIO20, VDD 2.0 V | 0 V | 57600 | schlecht, LED 30 pF | 0->1 min / 1->0 max | 0.162 / 2.000 | 17.49 | 13.25 | ja | 0.307 | ja |
+| PL2303-TXD -> DIO20, VDD 2.0 V | 0.1 V | 19200 | nominal, LED 0 pF | 0->1 max / 1->0 min | 0.199 / 2.000 | 3.19 | 2.65 | ja | 0.357 | ja |
+| PL2303-TXD -> DIO20, VDD 2.0 V | 0.1 V | 19200 | nominal, LED 0 pF | 0->1 min / 1->0 max | 0.199 / 2.000 | 3.19 | 2.65 | ja | 0.357 | ja |
+| PL2303-TXD -> DIO20, VDD 2.0 V | 0.1 V | 19200 | schlecht, LED 30 pF | 0->1 max / 1->0 min | 0.199 / 2.000 | 17.49 | 14.52 | ja | 0.355 | ja |
+| PL2303-TXD -> DIO20, VDD 2.0 V | 0.1 V | 19200 | schlecht, LED 30 pF | 0->1 min / 1->0 max | 0.199 / 2.000 | 17.49 | 14.52 | ja | 0.351 | ja |
+| PL2303-TXD -> DIO20, VDD 2.0 V | 0.1 V | 57600 | nominal, LED 0 pF | 0->1 max / 1->0 min | 0.199 / 2.000 | 3.19 | 2.65 | ja | 0.357 | ja |
+| PL2303-TXD -> DIO20, VDD 2.0 V | 0.1 V | 57600 | nominal, LED 0 pF | 0->1 min / 1->0 max | 0.199 / 2.000 | 3.19 | 2.65 | ja | 0.357 | ja |
+| PL2303-TXD -> DIO20, VDD 2.0 V | 0.1 V | 57600 | schlecht, LED 30 pF | 0->1 max / 1->0 min | 0.199 / 2.000 | 17.49 | 14.52 | ja | 0.295 | ja |
+| PL2303-TXD -> DIO20, VDD 2.0 V | 0.1 V | 57600 | schlecht, LED 30 pF | 0->1 min / 1->0 max | 0.199 / 2.000 | 17.49 | 14.52 | ja | 0.284 | ja |
+| PL2303-TXD -> DIO20, VDD 2.0 V | 0.2 V | 19200 | nominal, LED 0 pF | 0->1 max / 1->0 min | 0.250 / 2.000 | 3.19 | 2.88 | ja | 0.357 | ja |
+| PL2303-TXD -> DIO20, VDD 2.0 V | 0.2 V | 19200 | nominal, LED 0 pF | 0->1 min / 1->0 max | 0.250 / 2.000 | 3.19 | 2.88 | ja | 0.357 | ja |
+| PL2303-TXD -> DIO20, VDD 2.0 V | 0.2 V | 19200 | schlecht, LED 30 pF | 0->1 max / 1->0 min | 0.250 / 2.000 | 17.49 | 15.77 | ja | 0.329 | ja |
+| PL2303-TXD -> DIO20, VDD 2.0 V | 0.2 V | 19200 | schlecht, LED 30 pF | 0->1 min / 1->0 max | 0.250 / 2.000 | 17.49 | 15.77 | ja | 0.338 | ja |
+| PL2303-TXD -> DIO20, VDD 2.0 V | 0.2 V | 57600 | nominal, LED 0 pF | 0->1 max / 1->0 min | 0.250 / 2.000 | 3.19 | 2.88 | ja | 0.349 | ja |
+| PL2303-TXD -> DIO20, VDD 2.0 V | 0.2 V | 57600 | nominal, LED 0 pF | 0->1 min / 1->0 max | 0.250 / 2.000 | 3.19 | 2.88 | ja | 0.353 | ja |
+| PL2303-TXD -> DIO20, VDD 2.0 V | 0.2 V | 57600 | schlecht, LED 30 pF | 0->1 max / 1->0 min | 0.250 / 2.000 | 17.49 | 15.78 | ja | 0.205 | ja |
+| PL2303-TXD -> DIO20, VDD 2.0 V | 0.2 V | 57600 | schlecht, LED 30 pF | 0->1 min / 1->0 max | 0.250 / 2.000 | 17.49 | 15.78 | ja | 0.232 | ja |
+| PL2303-TXD -> DIO20, VDD 2.0 V | DC-Grenze 393 mV | 19200 | nominal, LED 0 pF | 0->1 max / 1->0 min | 0.400 / 2.000 | 3.19 | 3.14 | ja | 0.350 | ja |
+| PL2303-TXD -> DIO20, VDD 2.0 V | DC-Grenze 393 mV | 19200 | nominal, LED 0 pF | 0->1 min / 1->0 max | 0.400 / 2.000 | 3.19 | 3.14 | ja | 0.357 | ja |
+| PL2303-TXD -> DIO20, VDD 2.0 V | DC-Grenze 393 mV | 19200 | schlecht, LED 30 pF | 0->1 max / 1->0 min | 0.400 / 2.000 | 17.50 | 17.21 | ja | 0.248 | ja |
+| PL2303-TXD -> DIO20, VDD 2.0 V | DC-Grenze 393 mV | 19200 | schlecht, LED 30 pF | 0->1 min / 1->0 max | 0.400 / 2.000 | 17.50 | 17.21 | ja | 0.300 | ja |
+| PL2303-TXD -> DIO20, VDD 2.0 V | DC-Grenze 393 mV | 57600 | nominal, LED 0 pF | 0->1 max / 1->0 min | 0.400 / 2.000 | 3.19 | 3.14 | ja | 0.304 | ja |
+| PL2303-TXD -> DIO20, VDD 2.0 V | DC-Grenze 393 mV | 57600 | nominal, LED 0 pF | 0->1 min / 1->0 max | 0.400 / 2.000 | 3.19 | 3.14 | ja | 0.333 | ja |
+| PL2303-TXD -> DIO20, VDD 2.0 V | DC-Grenze 393 mV | 57600 | schlecht, LED 30 pF | 0->1 max / 1->0 min | 0.400 / 2.000 | 17.50 | 17.21 | NEIN | 0.001 | NEIN |
+| PL2303-TXD -> DIO20, VDD 2.0 V | DC-Grenze 393 mV | 57600 | schlecht, LED 30 pF | 0->1 min / 1->0 max | 0.400 / 2.000 | 17.50 | 17.21 | ja | 0.107 | NEIN |
+| PL2303-TXD -> DIO20, VDD 2.2 V | 0 V | 19200 | nominal, LED 0 pF | 0->1 max / 1->0 min | 0.313 / 2.200 | 3.19 | 2.03 | ja | 0.357 | ja |
+| PL2303-TXD -> DIO20, VDD 2.2 V | 0 V | 19200 | nominal, LED 0 pF | 0->1 min / 1->0 max | 0.313 / 2.200 | 3.19 | 2.03 | ja | 0.357 | ja |
+| PL2303-TXD -> DIO20, VDD 2.2 V | 0 V | 19200 | schlecht, LED 30 pF | 0->1 max / 1->0 min | 0.313 / 2.200 | 17.49 | 11.10 | ja | 0.357 | ja |
+| PL2303-TXD -> DIO20, VDD 2.2 V | 0 V | 19200 | schlecht, LED 30 pF | 0->1 min / 1->0 max | 0.313 / 2.200 | 17.49 | 11.10 | ja | 0.351 | ja |
+| PL2303-TXD -> DIO20, VDD 2.2 V | 0 V | 57600 | nominal, LED 0 pF | 0->1 max / 1->0 min | 0.313 / 2.200 | 3.19 | 2.03 | ja | 0.357 | ja |
+| PL2303-TXD -> DIO20, VDD 2.2 V | 0 V | 57600 | nominal, LED 0 pF | 0->1 min / 1->0 max | 0.313 / 2.200 | 3.19 | 2.03 | ja | 0.357 | ja |
+| PL2303-TXD -> DIO20, VDD 2.2 V | 0 V | 57600 | schlecht, LED 30 pF | 0->1 max / 1->0 min | 0.313 / 2.200 | 17.49 | 11.10 | ja | 0.311 | ja |
+| PL2303-TXD -> DIO20, VDD 2.2 V | 0 V | 57600 | schlecht, LED 30 pF | 0->1 min / 1->0 max | 0.313 / 2.200 | 17.49 | 11.10 | ja | 0.308 | ja |
+| PL2303-TXD -> DIO20, VDD 2.2 V | 0.1 V | 19200 | nominal, LED 0 pF | 0->1 max / 1->0 min | 0.335 / 2.200 | 3.19 | 2.21 | ja | 0.357 | ja |
+| PL2303-TXD -> DIO20, VDD 2.2 V | 0.1 V | 19200 | nominal, LED 0 pF | 0->1 min / 1->0 max | 0.335 / 2.200 | 3.19 | 2.21 | ja | 0.357 | ja |
+| PL2303-TXD -> DIO20, VDD 2.2 V | 0.1 V | 19200 | schlecht, LED 30 pF | 0->1 max / 1->0 min | 0.335 / 2.200 | 17.49 | 12.10 | ja | 0.347 | ja |
+| PL2303-TXD -> DIO20, VDD 2.2 V | 0.1 V | 19200 | schlecht, LED 30 pF | 0->1 min / 1->0 max | 0.335 / 2.200 | 17.49 | 12.10 | ja | 0.343 | ja |
+| PL2303-TXD -> DIO20, VDD 2.2 V | 0.1 V | 57600 | nominal, LED 0 pF | 0->1 max / 1->0 min | 0.335 / 2.200 | 3.19 | 2.21 | ja | 0.357 | ja |
+| PL2303-TXD -> DIO20, VDD 2.2 V | 0.1 V | 57600 | nominal, LED 0 pF | 0->1 min / 1->0 max | 0.335 / 2.200 | 3.19 | 2.21 | ja | 0.356 | ja |
+| PL2303-TXD -> DIO20, VDD 2.2 V | 0.1 V | 57600 | schlecht, LED 30 pF | 0->1 max / 1->0 min | 0.335 / 2.200 | 17.49 | 12.10 | ja | 0.291 | ja |
+| PL2303-TXD -> DIO20, VDD 2.2 V | 0.1 V | 57600 | schlecht, LED 30 pF | 0->1 min / 1->0 max | 0.335 / 2.200 | 17.49 | 12.10 | ja | 0.277 | ja |
+| PL2303-TXD -> DIO20, VDD 2.2 V | 0.2 V | 19200 | nominal, LED 0 pF | 0->1 max / 1->0 min | 0.362 / 2.200 | 3.19 | 2.42 | ja | 0.357 | ja |
+| PL2303-TXD -> DIO20, VDD 2.2 V | 0.2 V | 19200 | nominal, LED 0 pF | 0->1 min / 1->0 max | 0.362 / 2.200 | 3.19 | 2.42 | ja | 0.357 | ja |
+| PL2303-TXD -> DIO20, VDD 2.2 V | 0.2 V | 19200 | schlecht, LED 30 pF | 0->1 max / 1->0 min | 0.362 / 2.200 | 17.49 | 13.25 | ja | 0.326 | ja |
+| PL2303-TXD -> DIO20, VDD 2.2 V | 0.2 V | 19200 | schlecht, LED 30 pF | 0->1 min / 1->0 max | 0.362 / 2.200 | 17.49 | 13.25 | ja | 0.332 | ja |
+| PL2303-TXD -> DIO20, VDD 2.2 V | 0.2 V | 57600 | nominal, LED 0 pF | 0->1 max / 1->0 min | 0.362 / 2.200 | 3.19 | 2.42 | ja | 0.347 | ja |
+| PL2303-TXD -> DIO20, VDD 2.2 V | 0.2 V | 57600 | nominal, LED 0 pF | 0->1 min / 1->0 max | 0.362 / 2.200 | 3.19 | 2.42 | ja | 0.350 | ja |
+| PL2303-TXD -> DIO20, VDD 2.2 V | 0.2 V | 57600 | schlecht, LED 30 pF | 0->1 max / 1->0 min | 0.362 / 2.200 | 17.49 | 13.25 | ja | 0.218 | ja |
+| PL2303-TXD -> DIO20, VDD 2.2 V | 0.2 V | 57600 | schlecht, LED 30 pF | 0->1 min / 1->0 max | 0.362 / 2.200 | 17.49 | 13.25 | ja | 0.237 | ja |
+| PL2303-TXD -> DIO20, VDD 2.2 V | DC-Grenze 382 mV | 19200 | nominal, LED 0 pF | 0->1 max / 1->0 min | 0.440 / 2.200 | 3.19 | 2.84 | ja | 0.353 | ja |
+| PL2303-TXD -> DIO20, VDD 2.2 V | DC-Grenze 382 mV | 19200 | nominal, LED 0 pF | 0->1 min / 1->0 max | 0.440 / 2.200 | 3.19 | 2.84 | ja | 0.357 | ja |
+| PL2303-TXD -> DIO20, VDD 2.2 V | DC-Grenze 382 mV | 19200 | schlecht, LED 30 pF | 0->1 max / 1->0 min | 0.440 / 2.200 | 17.49 | 15.57 | ja | 0.268 | ja |
+| PL2303-TXD -> DIO20, VDD 2.2 V | DC-Grenze 382 mV | 19200 | schlecht, LED 30 pF | 0->1 min / 1->0 max | 0.440 / 2.200 | 17.49 | 15.57 | ja | 0.306 | ja |
+| PL2303-TXD -> DIO20, VDD 2.2 V | DC-Grenze 382 mV | 57600 | nominal, LED 0 pF | 0->1 max / 1->0 min | 0.440 / 2.200 | 3.19 | 2.84 | ja | 0.315 | ja |
+| PL2303-TXD -> DIO20, VDD 2.2 V | DC-Grenze 382 mV | 57600 | nominal, LED 0 pF | 0->1 min / 1->0 max | 0.440 / 2.200 | 3.19 | 2.84 | ja | 0.336 | ja |
+| PL2303-TXD -> DIO20, VDD 2.2 V | DC-Grenze 382 mV | 57600 | schlecht, LED 30 pF | 0->1 max / 1->0 min | 0.440 / 2.200 | 17.49 | 15.57 | ja | 0.024 | NEIN |
+| PL2303-TXD -> DIO20, VDD 2.2 V | DC-Grenze 382 mV | 57600 | schlecht, LED 30 pF | 0->1 min / 1->0 max | 0.440 / 2.200 | 17.49 | 15.57 | ja | 0.139 | NEIN |
+
+(3) USB ein-/ausstecken (Weg A, Adapter Rev 1): Grenze VDD_IO - VIN <= 0.3 V (PL2303 S. 39 Tab. 11-1)
+| Vorgang | Sensor | LDO-Modell | Klemmdiode | max(VDD_IO - VIN) [V] | Dauer > 0.3 V [ms] | VDD_IO bei VIN 0.5 V | ok |
+|---|---|---|---|---|---|---|---|
+| USB einstecken | nein | nur Parasitaerdiode (ungünstig) | keine | 0.000 | 0.00 |  | ja |
+| USB einstecken | ja (410 uF) | nur Parasitaerdiode (ungünstig) | keine | 0.000 | 0.00 |  | ja |
+| USB ziehen | nein | nur Parasitaerdiode (ungünstig) | keine | 1.059 | 46.97 | 1.53 V | NEIN |
+| USB ziehen | nein | nur Parasitaerdiode (ungünstig) | RB751S-40 VIO->+5V | 0.409 | 9.86 | 0.84 V | NEIN |
+| USB ziehen | nein | rueckwaerts leitend im Dropout | keine | 1.059 | 46.87 | 1.53 V | NEIN |
+| USB ziehen | nein | rueckwaerts leitend im Dropout | RB751S-40 VIO->+5V | 0.383 | 9.63 | 0.84 V | NEIN |
+| USB ziehen | ja (410 uF) | nur Parasitaerdiode (ungünstig) | keine | 1.056 | 397.21 | 1.46 V | NEIN |
+| USB ziehen | ja (410 uF) | nur Parasitaerdiode (ungünstig) | RB751S-40 VIO->+5V | 0.390 | 2.96 | 0.75 V | NEIN |
+| USB ziehen | ja (410 uF) | rueckwaerts leitend im Dropout | keine | 1.056 | 397.13 | 1.46 V | NEIN |
+| USB ziehen | ja (410 uF) | rueckwaerts leitend im Dropout | RB751S-40 VIO->+5V | 0.383 | 2.86 | 0.75 V | NEIN |
+| USB ziehen | nein | nur Parasitaerdiode (ungünstig) | keine, R 1k VIO->GND | 0.448 | 1.12 | 0.56 V | NEIN |
+| USB ziehen | nein | nur Parasitaerdiode (ungünstig) | keine, R 470 VIO->GND | 0.014 | 0.00 | 0.10 V | ja |
+| USB ziehen | nein | nur Parasitaerdiode (ungünstig) | RB751S-40 VIO->+5V, R 1k VIO->GND | 0.359 | 0.68 | 0.52 V | NEIN |
+| USB ziehen | ja (410 uF) | nur Parasitaerdiode (ungünstig) | keine, R 1k VIO->GND | 0.179 | 0.00 | 0.00 V | ja |
+| USB ziehen | ja (410 uF) | nur Parasitaerdiode (ungünstig) | keine, R 470 VIO->GND | -0.005 | 0.00 | 0.00 V | ja |
+| USB ziehen | ja (410 uF) | nur Parasitaerdiode (ungünstig) | RB751S-40 VIO->+5V, R 1k VIO->GND | 0.179 | 0.00 | 0.00 V | ja |

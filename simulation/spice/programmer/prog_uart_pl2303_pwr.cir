@@ -1,0 +1,43 @@
+* fluidi PL2303 PWR - erzeugt von prog_uart.py (nicht von Hand aendern)
+.include ../led_rgb/led_models.inc
+
+.subckt XC6206 in out params: VSET=2.0 RON=2.5 GM=10 ILIM=0.2 BIDIR=0
+* Durchlasselement: Regelung, Dropout (RON), Strombegrenzung; aktiv ab VIN 1.8 V (DS S. 5)
+B1 in out I = max(0,min(1,(v(in)-1.7)/0.1)) * ( v(in) >= v(out) ? max(0, min(min(GM*(VSET-v(out)), ILIM), (v(in)-v(out))/RON)) : ( v(out) < VSET-0.01 ? BIDIR*(v(in)-v(out))/RON : 0 ) )
+* Parasitaerdiode VOUT -> VIN (DS S. 3)
+DB out in DBODY
+.model DBODY D(IS=1e-12 N=1)
+.ends
+.model DRB751 D(IS=6.1e-10 N=1 RS=1)
+.model SWU SW(VT=0.5 VH=0.1 RON=0.05 ROFF=1e9)
+
+VUSB usb 0 DC 5
+VCTL ctl 0 PWL(0 1 1m 1 1.001m 0)
+S1 usb vin ctl 0 SWU
+CVIN vin 0 5.7u
+RIDD vin 0 333
+DPWR vin aPWR DR
+VOPWR aPWR bPWR DC {OFF_R_MIN}
+RPWR bPWR 0 1000
+XU1 vin v33 XC6206 VSET=3.3 BIDIR=0
+C2 v33 0 1u
+XU2 v33 vdd XC6206 VSET=2.0 BIDIR=0
+C3 vdd 0 1u
+XU3 v33 vio XC6206 VSET=2.0 BIDIR=0
+C4 vio 0 1u
+CB4 vio 0 1u
+C5 vio 0 0.1u
+RVIO vio 0 1e9
+CSEN vdd 0 410u
+RSEN vdd 0 2.5k
+DCL vio vin DRB751
+RBL vio 0 1k
+.control
+set wr_singlescale
+set wr_vecnames
+option numdgt=7
+tran 5u 0.4 0 20u
+wrdata prog_uart_pl2303_pwr.dat v(vin) v(vio) v(v33) v(vdd)
+quit
+.endc
+.end

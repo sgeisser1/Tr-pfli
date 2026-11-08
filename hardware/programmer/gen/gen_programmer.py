@@ -17,6 +17,8 @@ Schaltung und Begruendung: hardware/programmer/README.md. Pinbelegungen:
   Waveshare CH343 USB UART Board: H1 1 +5V / 2 GND / 3 +3.3V / 4 GND; H3 Jumper 3 +5V / 2 VIO / 1 +3.3V;
   H2 1 VOUT / 2 GND / 3 TXD / 4 RXD / 5 RTS / 6 CTS
   (docs/references/Waveshare_CH343-USB-UART-Board_Schematic_2026-11-08.pdf)
+  Alternative Waveshare PL2303 USB UART Board (type A) V2: P2 1 VCCIO / 2 GND / 3 TXD / 4 RXD; Jumper J1 1 VCC3.3V /
+  2 VCCIO / 3 VCC5V (docs/references/Waveshare_PL2303-USB-UART-Board-TypeA-V2_Schematic_2026-11-08.pdf; README Kap. 9)
 """
 import copy
 import json
@@ -61,7 +63,7 @@ PARTDB = {
               DS + "Samsung_CL31A107MQHNNNE_Catalog_2015-11.pdf", "MLCC 100 nF 50 V X7R 0805"),
     "R10M": ("UNI-ROYAL", "0402WGF1005TCE", "C26082", DS + "UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf",
              "R 10 MOhm 1 % 0402 (Seriendatenblatt 01005-2512, Kap. 6 Resistance Range: 0402 1 Ohm-10 MOhm)"),
-    "CABLE": ("-", "Litze/Steckbruecken zum Waveshare CH343 USB UART Board", "", "", "Kabel <= 20 cm (ANNAHME)"),
+    "CABLE": ("-", "Litze/Steckbruecken zum Waveshare CH343 oder PL2303 (type A) V2 USB UART Board", "", "", "Kabel <= 20 cm (ANNAHME)"),
     "DUMMY": ("-", "Eigenbau: 2 x FR4 1.6 mm Cu, D 20.0 mm", "", "", "Dummy-Zelle CR2032-Form (README Kap. 4)"),
     "POGO": ("-", "Federkontaktstift, Handelsware", "", "", "Federstifte auf TP1/TP2 (ANNAHME, README Kap. 4)"),
 }
@@ -78,9 +80,11 @@ def add(ref, lib, val, fp, key, x, y, rot, conns, note=""):
 
 L = LIBNAME + ":"
 # Versorgung: USB 5 V (Waveshare H3.3 bzw. H1.1) -> U1 3.3 V -> U2 2.0 V (Dummy-Zelle) und U3 2.0 V (VIO des CH343 + Puffer)
-add("J1", "Connector_Generic:Conn_01x05", "zu Waveshare CH343", "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical",
+add("J1", "Connector_Generic:Conn_01x05", "zu Waveshare CH343 / PL2303", "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical",
     "CABLE", 12, 20, 0, {"1": "+5V", "2": "GND", "3": "VIO", "4": "RXD_HOST", "5": "TXD_HOST"},
-    note="1 = H3.3 +5V, 2 = H2.2 GND, 3 = H3.2 VIO (Jumper H3 ENTFERNT), 4 = H2.4 RXD, 5 = H2.3 TXD; +5V alternativ H1.1, falls H1 bestueckt")
+    note="CH343: 1 = H3.3 +5V, 2 = H2.2 GND, 3 = H3.2 VIO (Jumper H3 ENTFERNT), 4 = H2.4 RXD, 5 = H2.3 TXD; +5V alternativ "
+         "H1.1, falls H1 bestueckt. PL2303 (type A) V2: 1 = J1.3 VCC5V (Jumper J1 ENTFERNT), 2 = P2.2 GND, 3 = P2.1 VCCIO, "
+         "4 = P2.4 RXD, 5 = P2.3 TXD (README Kap. 9)")
 add("U1", L + "XC6206PxxxMR", "XC6206P332MR", "Package_TO_SOT_SMD:SOT-23", "LDO33", 34, 14, 0,
     {"1": "GND", "2": "+3V3", "3": "+5V"})
 add("C1", "Device:C", "1u", FP_C, "C1U", 26, 18, 0, {"1": "+5V", "2": "GND"}, note="CIN U1")
@@ -261,11 +265,13 @@ NOTES = [
     (4, 5, "VERSORGUNG  USB 5 V (Waveshare H3.3) -> U1 3.3 V -> U2 2.0 V (Dummy-Zelle = Sensor-VDD) und U3 2.0 V (VIO).\n"
            "Einzelfehler: U2 oder U3 durchlegiert -> hoechstens 3.3 V (VDDS max 3.8 V, abs. max 4.1 V, CC2340 DS S. 18);\n"
            "U1 durchlegiert -> U2/U3 regeln weiter (VIN max 6.0 V). Fuer 5 V am Sensor braucht es zwei Fehler (R2-L02).\n"
-           "Waveshare: Jumper H3 (3.3 V/5 V) ENTFERNEN, VIO kommt von U3. Vor dem Einsetzen VDD_DUT und VIO messen."),
-    (4, 64, "TX-PUFFER  CH343-RXD hat 3-21 uA Pull-up (DS S. 8) + Board-LED 2 kOhm: ueber 2 x 100 kOhm kein Low.\n"
+           "Waveshare: Jumper H3 (CH343) bzw. J1 (PL2303) ENTFERNEN, VIO kommt von U3. Vor dem Einsetzen VDD_DUT und VIO messen.\n"
+           "PL2303: Eingangspruefung README Kap. 9.3; Dummy-Zelle vor dem Ziehen der USB entfernen (Kap. 9.4)."),
+    (4, 64, "TX-PUFFER  CH343-RXD hat 3-21 uA Pull-up (DS S. 8) + Board-LED 2 kOhm (PL2303: 1 kOhm, VIL 0.4 V):\n"
+            "ueber 2 x 100 kOhm kein Low.\n"
             "U4 SN74AUP1G17 (Leck <= 0.5 uA -> <= 0.1 V ueber 200 kOhm) direkt am Federstift TP1, <= 3 cm Draht.\n"
             "R1 10 MOhm: schwacher Ruhepegel high, bevor der Bootloader DIO6 als Ausgang schaltet.\n"
-            "Nachweis: simulation/spice/programmer/prog_uart.py (Pegel, Flanken, 19200-57600 Baud)."),
+            "Nachweis: simulation/spice/programmer/prog_uart.py bzw. prog_uart_pl2303.py (Pegel, Flanken, 19200-57600 Baud)."),
     (72, 46, "SICHERHEIT (CONCEPTS 2.7, R2-A2)\n"
              "Dummy-Zelle und Federstiftkopf sind EIN starres Teil.\n"
              "Speisung nur ueber Clip/Minuspad, keine Zelle\n"

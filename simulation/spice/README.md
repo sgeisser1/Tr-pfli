@@ -8,6 +8,7 @@ Q2 an DIO11, TMP1075N im Kragen, 4 × 100 µF im Prototyp). Alle Läufe per Skri
 timeout 3600 .venv/bin/python simulation/spice/osc/osc_sim.py     # (b) ca. 10 min, schreibt osc/osc_report.txt
 .venv/bin/python simulation/spice/uart_backfeed/uart_backfeed.py  # (c) < 10 s
 .venv/bin/python simulation/spice/programmer/prog_uart.py          # (d) ca. 15 s, Erstprogrammierung (2026-11-08)
+.venv/bin/python simulation/spice/programmer/prog_uart_pl2303.py   # (e) ca. 10 s, dasselbe mit PL2303-Board (2026-11-09)
 ```
 
 Jedes Skript schreibt die Netzliste (`*.cir`, letzter Fall), eine CSV mit allen Fällen und PNG-Plots in seinen Ordner.
@@ -139,6 +140,24 @@ Puffer 5–10 pF, DIO20 7–9 pF, blaue LED 0–30 pF. Bericht `programmer/prog_
 | Zeitverhalten TX (Puffer am Stift), 57600 Baud | t10–90 3.1 µs (nominal) / 6.0 µs (schlecht); Reserve 0.290 / 0.216 Bit | ≥ 0.20 Bit (**ANNAHME**) |
 | Zeitverhalten TX, Puffer am Kabelende (40 pF) | 18.2 µs; 57600 Baud: Bytes falsch | → Puffer muss am Stift sitzen |
 | Zeitverhalten RX (DIO20), 57600 Baud | t10–90 3.2/2.4 µs (LED 0 pF) bis 17.5/13.3 µs (LED 30 pF); Reserve ≥ 0.300 Bit | ≥ 0.20 Bit |
+
+## (e) Erstprogrammierung mit Waveshare PL2303 USB UART Board (type A) V2 statt CH343 (FW-T3)
+
+Modell und Quellen im Kopf von `programmer/prog_uart_pl2303.py` (nutzt die Bausteine von `prog_uart.py`); Bewertung
+und Bedingungen `hardware/programmer/README.md` Kap. 9. PL2303GS: VIL ≤ 0.4 V, VOL/VOH ohne Stromangabe, Pull-up ohne
+Wert (**ANNAHME** 0/100 µA), Board-LEDs 1 kΩ an VCCIO (Typ **ANNAHME** wie rote Sensor-LED). Bericht
+`programmer/prog_uart_pl2303_report.txt`, Plot `programmer/prog_uart_pl2303_pwr.png`.
+
+| Fall | Ergebnis | Grenze |
+|---|---|---|
+| A0p ohne Puffer, PL2303-RXD an TP1 | 0.59 V bis 2.0 V | 0.40 V → **nicht lesbar**, Puffer bleibt |
+| A1p Puffer-Ausgang → PL2303-RXD, 1.96–2.04 V | 0.062–0.089 V | 0.40 V: +311 mV |
+| A2p Weg B an R9 Pad 1, 2.0 / 2.1 / 2.2 V | bis 0.287 / 0.343 / 0.399 V | 0.40 V → Weg B höchstens 2.1 V |
+| Bp DIO20 bei TXD-Low 0 V / 0.4 V (Datenblattgrenze) | 0.136–0.313 V / 0.404–0.450 V | 0.2 × VDDS → Messkriterium TXD-Low ≤ 0.10 V |
+| Bh DIO20 high bei TXD-High 0.7 × VDD_IO (Datenblattminimum) | 1.37 V | 1.63 V → Messkriterium TXD-High ≥ VCCIO − 0.10 V |
+| Zeitverhalten RX, 57600 Baud, LED 30 pF, TXD-Low 0 / 0.1 / 0.2 V | Reserve 0.300 / 0.284 / 0.205 Bit | ≥ 0.20 Bit |
+| USB einstecken (Weg A) | VDD_IO − VIN ≤ 0.000 V | ≤ 0.3 V (abs. max) |
+| USB ziehen (Weg A), ohne / RB751S-40 / 470 Ω an VIO | bis 1.06 V / 0.41 V / 0.014 V | ≤ 0.3 V → Vorschlag 470 Ω (PA-6) |
 
 ## Offene Punkte
 

@@ -16,7 +16,7 @@ Der Adapter ist ein **Werkzeug**. Er gehört nicht zum Sensor und ändert weder 
 
 | Punkt | Festlegung | Grund |
 |---|---|---|
-| USB-UART | Waveshare **CH343 USB UART Board** (Micro-USB, SKU 21441; Type-C geht auch, Stiftbelegung am Board prüfen), Jumper H3 **entfernt**, VIO von aussen | VIO 1.7–5.5 V (`WCH_CH343_Datasheet_V1E.pdf` S. 8 Tab. 6.2), kein Rückstrom aus VIO (S. 4 Kap. 5.2) |
+| USB-UART | Waveshare **CH343 USB UART Board** (Micro-USB, SKU 21441; Type-C geht auch, Stiftbelegung am Board prüfen), Jumper H3 **entfernt**, VIO von aussen. **Alternative (2026-11-09, mit Bedingungen):** Waveshare **PL2303 USB UART Board (type A) V2**, Jumper J1 **entfernt** (Kap. 9) | VIO 1.7–5.5 V (`WCH_CH343_Datasheet_V1E.pdf` S. 8 Tab. 6.2), kein Rückstrom aus VIO (S. 4 Kap. 5.2); PL2303GS: VDD_IO 1.8 V … VIN + 0.3 V (`Prolific_PL2303GS_Datasheet_Rev1.0.4.pdf` S. 39 Tab. 11-2a) |
 | Speisung Sensor | **2.0 V** aus XC6206P202 (U2), über die **Dummy-Zelle** in den Clip; Vorstufe XC6206P332 (U1) aus USB 5 V | 1.960–2.040 V (`Torex_XC6206_Datasheet_ETR0305-004b.pdf` S. 5 Tab. E-1) ⇒ ≥ 250 mV über VDDS min 1.71 V (`TI_CC2340R5_Datasheet_SWRS272F.pdf` S. 18 Tab. 7.3) statt 40–70 mV bei 1.8 V (W-4). Einzelfehler begrenzt auf 3.3 V (Kap. 2.3) |
 | VIO des CH343 | eigener 2.0-V-Regler U3 (gleicher Typ) | das Einstecken der Dummy-Zelle lädt die 4 × 100 µF des Sensors; die USB-Brücke bleibt davon unberührt (Kap. 2.2) |
 | Sensor → Host (TX) | **Schmitt-Puffer SN74AUP1G17** (U4) direkt am Federstift TP1, Pull-up 10 MΩ (R1) | CH343-RXD hat 3–21 µA Pull-up (S. 8) und auf dem Waveshare-Board eine LED mit 2 kΩ nach VIO: über die 2 × 100 kΩ kommt kein Low an (SPICE A0: 0.64…1.99 V > 0.5 V) |
@@ -31,7 +31,7 @@ Der Adapter ist ein **Werkzeug**. Er gehört nicht zum Sensor und ändert weder 
 
 | Ref | Teil (Hersteller, MPN) | LCSC (JLC-Abfrage 2026-11-08) | Funktion, Beschaltung | Quelle |
 |---|---|---|---|---|
-| J1 | Steckbrücken zum Waveshare-Board | – | 1 = H3.3 **+5V** (Jumper-Stiftleiste, Jumper H3 weg!), 2 = H2.2 **GND**, 3 = H3.2 **VIO**, 4 = H2.4 **RXD**, 5 = H2.3 **TXD**; +5V alternativ H1.1, falls die 4-polige Leiste H1 bestückt ist (**ANNAHME**, am Board prüfen) | `docs/references/Waveshare_CH343-USB-UART-Board_Schematic_2026-11-08.pdf` (H1/H2/H3, Micro-Variante) |
+| J1 | Steckbrücken zum Waveshare-Board | – | **CH343:** 1 = H3.3 **+5V** (Jumper-Stiftleiste, Jumper H3 weg!), 2 = H2.2 **GND**, 3 = H3.2 **VIO**, 4 = H2.4 **RXD**, 5 = H2.3 **TXD**; +5V alternativ H1.1, falls die 4-polige Leiste H1 bestückt ist (**ANNAHME**, am Board prüfen). **PL2303 (type A) V2:** 1 = J1.3 **VCC5V** (Stift auf der Seite „5V“, Jumper J1 weg!), 2 = P2.2 **GND**, 3 = P2.1 **VCCIO**, 4 = P2.4 **RXD**, 5 = P2.3 **TXD** (Kap. 9) | `docs/references/Waveshare_CH343-USB-UART-Board_Schematic_2026-11-08.pdf` (H1/H2/H3, Micro-Variante); `docs/references/Waveshare_PL2303-USB-UART-Board-TypeA-V2_Schematic_2026-11-08.pdf` (J1, P2) |
 | U1 | Torex XC6206P332MR-G | C5446 (Basic, Lager 492 937) | 5 V → +3V3; SOT-23: 1 VSS, 2 VOUT, 3 VIN | Torex DS S. 2 „Pin Assignment“; IOUTMAX 200 mA (S. 1) |
 | U2 | Torex XC6206P202MR-G | C2891260 (Extended, Lager 1 963) | +3V3 → **VDD_DUT** (Dummy-Zelle) | DS S. 5 Tab. E-1 1.960–2.040 V, Ishort typ 130 mA (E-6) |
 | U3 | Torex XC6206P202MR-G | C2891260 | +3V3 → **VIO** (CH343 + U4 + R1) | wie U2 |
@@ -233,7 +233,7 @@ deutlich unter 100 CHF. Die Mindestmengen reichen für 2–5 Adapter.
 
 1. Bestücken: U1–U3, C1–C4 nahe an die Regler, U4/C5/R1 auf den Federstiftkopf. Leitung Stift TP1 → U4 ≤ 3 cm.
    Flussmittel am TP1-Knoten gründlich entfernen (10 MΩ / 200 kΩ: Kriechströme > 0.1 µA verschieben den Pegel).
-2. Waveshare: **Jumper H3 abziehen**. J1 anschliessen. USB einstecken. Messen: +3V3 = 3.2–3.4 V, **VDD_DUT und VIO =
+2. Waveshare: **Jumper H3 abziehen** (PL2303-Board: **Jumper J1**, vorher Eingangsprüfung Kap. 9.3). J1 anschliessen. USB einstecken. Messen: +3V3 = 3.2–3.4 V, **VDD_DUT und VIO =
    1.96–2.04 V**. Erst dann weiter.
 3. Dummy-Zelle: Dicke 3.0–3.2 mm an 3 Stellen (PS-W3); Widerstand Oberseite ↔ Mittelinsel > 10 MΩ ohne Speisung; mit Speisung 1.96–2.04 V, richtige Polarität.
 4. **Schleifentest mit Prüfstecker:** Zwei 100-kΩ-Widerstände in Serie zwischen Stift TP2 und Stift TP1 (bildet die
@@ -249,4 +249,94 @@ deutlich unter 100 CHF. Die Mindestmengen reichen für 2–5 Adapter.
 | PA-2 | Sicherheitsprüfung des Adapters (R2-A2 einteilig, R2-L02 Einzelfehler Kap. 2.3) | `sicherheit` |
 | PA-3 | 20 × Flashen bei 57600 und 19200 Baud, Flanke an U4 messen (Kap. 5) | PROTOTYP-PRÜFUNG |
 | PA-4 | VDDS am Sensor während Chip-Erase messen (Erwartung ≥ 1.95 V) | PROTOTYP-PRÜFUNG |
-| PA-5 | Bezug Waveshare-Board mit Versand in die Schweiz (FW-T3) | Auftraggeber |
+| PA-5 | Bezug Waveshare-Board mit Versand in die Schweiz (FW-T3); **Alternative PL2303 (pi-shop.ch) elektrisch freigegeben mit Bedingungen** (Kap. 9) | Auftraggeber |
+| PA-6 | Entladewiderstand **470 Ω VIO → GND** (0805, parallel C4) gegen VDD_IO > VIN + 0.3 V beim Ziehen der USB (PL2303, Kap. 9.4). Schaltplanänderung Rev 1 → **Rückmeldung Orchestrator** nötig; bis dahin Ablaufregel Kap. 9.4 | Elektronik, Orchestrator |
+| PA-7 | Eingangsprüfung PL2303-Board (Kap. 9.3) und 20 × Flashen bei 57600/19200 mit dem PL2303 | PROTOTYP-PRÜFUNG |
+
+## 9 Alternative USB-UART: Waveshare PL2303 USB UART Board (type A) V2 (Prüfung Elektronik 2026-11-09)
+
+Anlass: CH343-Board nur aus dem Ausland (FW-T3); PL2303-Board bei pi-shop.ch Art. 11757, CHF 8.90
+(`docs/manuals/EINKAUFSLISTE.md` Kap. 3). **Ergebnis: freigegeben mit Bedingungen B1–B6 (Kap. 9.5)** für Weg A und
+Weg B. Nachweis: `simulation/spice/programmer/prog_uart_pl2303.py` (ngspice 42, `-b`), Bericht
+`prog_uart_pl2303_report.txt`, Plot `prog_uart_pl2303_pwr.png`. Der Adapter-Schaltplan Rev 1 bleibt unverändert;
+J1 hat dieselben fünf Funktionen, nur die Gegenstifte am Board ändern sich (Tab. 2.1).
+
+### 9.1 Datenblatt und Board gegenüber CH343
+
+| Punkt | PL2303GS / Board (Quelle) | CH343 | Folge |
+|---|---|---|---|
+| I/O-Speisung | VDD_IO 1.8 V … VIN + 0.3 V (`Prolific_PL2303GS_Datasheet_Rev1.0.4.pdf` S. 39 Tab. 11-2a); abs. max VDD_IO −0.3 … VIN + 0.3 V (S. 39 Tab. 11-1); keine Aussage zu Rückstrom | 1.7–5.5 V, kein Rückstrom aus VIO | VCCIO nie ohne USB (Kap. 9.4) |
+| Eingang | VIL ≤ 0.4 V, VIH ≥ 0.7 × VDD_IO (S. 39 Tab. 11-2b); RXD mit schwachem Pull-up nach VDD_IO, **Wert fehlt** (S. 13 Tab. 7-2, S. 27) | VIL ≤ 0.5 V, 3–21 µA | Pull-up als Klammer 0/100 µA (**ANNAHME**) |
+| Ausgang | VOL ≤ 0.4 V, VOH ≥ 0.7 × VDD_IO, **ohne Strom-Testbedingung** (S. 39 Tab. 11-2b) | VOL ≤ 0.4 V @ 3 mA, VOH ≥ VIO − 0.4 V @ 2 mA | Messkriterien Kap. 9.3 Schritt 4/5 |
+| I/O-Pins | 5-V-tolerant, −0.3 … 6.0 V (S. 39 Tab. 11-1; S. 33) | – | Pegel an RXD/TXD ≤ 2.1 V, weit unter 6.0 V (Verhalten ohne VIN im Datenblatt nicht beschrieben) |
+| Taktgenauigkeit | keine Angabe | ±1.5 % | **ANNAHME** ±1.5 %; der ROM-Bootloader misst die Baudrate des Hosts (TRM S. 461/464) |
+| Board | `Waveshare_PL2303-USB-UART-Board-TypeA-V2_Schematic_2026-11-08.pdf`: P2 1 VCCIO / 2 GND / 3 TXD / 4 RXD; Jumper J1 1 VCC3.3V / 2 VCCIO / 3 VCC5V; RXD-LED D3 und TXD-LED D2 je **1 kΩ** von VCCIO; PWR-LED 1 kΩ an 5 V; C1 4.7 µF an VIN, C4 1 µF an VCCIO; LED-Typ nicht angegeben | RXD-LED 2 kΩ | LED-Modell **ANNAHME** (rote Sensor-LED, Exemplar mit grösstem Strom) |
+| Treiber | VID/PID 067B:23A3 (S. 22 Tab. 9-1; vor Rev. 1.0.3 23F3, S. 2) | `cdc_acm` | Linux-Modul `pl2303`; im WSL-Kernel 6.18.54.1 enthalten (`modules.alias`: 067B:23A3 und 23F3, geprüft 2026-11-09). Port **`/dev/ttyUSB0`** statt `/dev/ttyACM0`. Raspberry Pi OS: **ANNAHME** enthalten (`ls /dev/ttyUSB*`) |
+
+### 9.2 Pegel und Zeitverhalten (SPICE, `prog_uart_pl2303_report.txt`)
+
+| Fall | Ergebnis | Grenze | Bewertung |
+|---|---|---|---|
+| A0p PL2303-RXD direkt an TP1 (ohne Puffer) | 0.59 V (ohne Pull-up) bis 2.0 V (100 µA) | 0.40 V | verletzt → **Puffer U4 bleibt Pflicht** |
+| A1 Puffer-Eingang | unabhängig vom Host, `prog_uart_report.txt` gilt: Reserve ≥ +101 mV | – | unverändert |
+| A1p U4-Ausgang low → PL2303-RXD (LED 1 kΩ, Pull-up 0/100 µA), VIO 1.96–2.04 V | 0.062–0.089 V | 0.40 V | **+311 mV** |
+| A2p Weg B, RXD an R9 Pad 1, VDD = VCCIO 2.0 V | 0.266–0.287 V | 0.40 V | +113 mV |
+| A2p dto. 2.1 V / 2.2 V | 0.322–0.343 V / 0.379–0.399 V | 0.40 V | +57 mV / **+1 mV** → Weg B **höchstens 2.1 V** (CH343: 2.2 V) |
+| A3p Weg B am falschen Pad (R9 Pad 2) | bis 1.99 V | 0.40 V | wie bisher falsch |
+| Bp DIO20 low, TXD-Low 0 V (VDD 1.96 / 2.04 / 2.0 / 2.2 V) | 0.136 / 0.190 / 0.162 / 0.313 V | 0.2 × VDDS | +218 … +256 mV (Weg B 2.2 V: +127 mV) |
+| Bp DIO20 low, TXD-Low = Datenblattgrenze 0.4 V | 0.404–0.450 V | 0.2 × VDDS | verletzt → Messkriterium TXD-Low ≤ 0.10 V |
+| Bh DIO20 high, TXD-High = Datenblattminimum 0.7 × VDD_IO | 1.37 V (VIO 1.96, VDD 2.04 V) | 1.63 V (0.8 × VDDS) | verletzt → Messkriterium TXD-High ≥ VCCIO − 0.10 V |
+| Transient TXD → DIO20, 57600 Baud, LED 30 pF, ±1.5 % | Reserve 0.300 / 0.284 / 0.205 Bit bei TXD-Low 0 / 0.1 / 0.2 V; bei 0.39 V 0.001 Bit, Bytes falsch | ≥ 0.20 Bit | mit TXD-Low ≤ 0.10 V ≥ 0.28 Bit |
+| Grenzstrom Board → RXD (Weg A, U4-Ausgang bis 0.40 V) | 2.17 mA | – | Board-Modell: 0.43–0.57 mA |
+| Grenzstrom Board → DIO6 (Weg B bis 0.40 V) | 0.69 / 0.53 / 0.35 mA bei 2.0 / 2.1 / 2.2 V | – | Messkriterium ≤ 0.69 mA bei 2.0 V |
+
+### 9.3 Eingangsprüfung des Boards (einmal je Board, vor dem ersten Sensor)
+
+Werkzeug: Labornetzteil 2.0 V / 10 mA, Multimeter. Kein Sensor angeschlossen.
+
+1. Jumper J1 abziehen, USB einstecken (PWR-LED leuchtet). Ohne Draht an P2 messen: J1-Stift auf der Seite „5V“
+   ≈ 5 V gegen GND (USB; Lage laut Bestückungsdruck, Schaltplan S. 2, **am Board prüfen**), Stift „3.3V“ 2.97–3.63 V
+   (VO_33, PL2303GS S. 39 Tab. 11-2a),
+   **VCCIO (P2.1) offen ≤ 0.10 V** (das Board treibt VCCIO nicht zurück; Voraussetzung für Weg B).
+2. Erst jetzt das Netzteil (2.0 V, 10 mA, ausgeschaltet) an P2.1/P2.2 und einschalten: Strom ≤ 1 mA (VDD_IO-Ruhestrom
+   ist im Datenblatt nicht angegeben; Budget Weg B: Sensor ≤ 7 mA + Board-LEDs ≤ 1 mA + VDD_IO ≤ 1 mA < 10 mA).
+3. Strommesser (mA-Bereich) von P2.4 RXD nach GND: **≤ 0.69 mA** (Grenze Weg B bei 2.0 V). 0.69–2.1 mA: nur Weg A.
+   Über 2.1 mA: Board ungeeignet.
+4. Port öffnen (`picocom -b 57600 /dev/ttyUSB0`), P2.3 TXD gegen GND: **≥ 1.90 V**.
+5. Break halten: `python3 -c "import serial,time; s=serial.Serial('/dev/ttyUSB0',57600); s.break_condition=True; time.sleep(30)"`,
+   währenddessen TXD **≤ 0.10 V**.
+6. **Netzteil aus, dann USB ziehen.** Werte auf dem Board notieren.
+
+### 9.4 VDD_IO > VIN + 0.3 V (Rückspeisung) und Querströme
+
+- **Weg A, USB einstecken:** VIO entsteht aus VIN über U1 und U3 → max(VDD_IO − VIN) = 0.000 V (SPICE (3), auch mit
+  angeschlossenem Sensor).
+- **Weg A, USB ziehen:** VIN fällt mit IDD max 15 mA (S. 39) schneller als VIO (2.1 µF, Last unbekannt = 0, ANNAHME).
+  Unter VIN ≈ 1.8 V regeln U1/U3 nicht mehr (Torex S. 5), die Parasitärdiode des XC6206 leitet nur VOUT → VIN (S. 3).
+  Ergebnis ohne Gegenmassnahme: **VDD_IO − VIN bis 1.06 V**, über 0.3 V während 47 ms (Sensor ab) bzw. bis
+  Simulationsende 400 ms (Sensor dran; VIO ohne Last). Quelle ist nur die Ladung der VIO-Kondensatoren
+  (≈ 2.1 µF × 1 V ≈ 2 µC); kein anderer Pfad speist VIO. Mit Klemmdiode RB751S-40 VIO → +5V: 0.38–0.41 V (VF 0.37 V @
+  1 mA, `CJ_RB751S-40_Datasheet.pdf` S. 1) – reicht nicht. Mit **470 Ω VIO → GND: ≤ 0.014 V** in allen Fällen (1 kΩ
+  ohne Sensor: 0.45 V). Mehrlast für U3 4.3 mA, unkritisch (Ishort typ 130 mA). → **PA-6** (Schaltplanänderung, Rückmeldung).
+  Bis dahin: Dummy-Zelle **vor** dem Ziehen der USB entfernen; **PROTOTYP-PRÜFUNG:** VIO und VIN beim Ziehen mit
+  Oszilloskop aufnehmen.
+- **Weg B:** VCCIO kommt vom Labornetzteil. Ohne USB läge VDD_IO **dauernd** bei 2.0–2.1 V über VIN = 0 V, Strom nur
+  durch die 10-mA-Begrenzung begrenzt. Deshalb feste Reihenfolge (PROGRAMMIEREN_SENSOR Kap. 5): **USB zuerst
+  einstecken, Netzteil zuletzt ein; Netzteil zuerst aus, USB zuletzt ziehen**; PC während Weg B nicht in den
+  Ruhezustand. Einzelfehler (Reihenfolge vertauscht): Schaden am Board möglich (8.90 CHF); der Sensor bleibt durch die
+  10-mA-Begrenzung geschützt, keine Zelle im Kreis (Regel 1). **Sicherheit zur Kenntnis.**
+- **Gegenrichtung:** Bei gesteckter USB und offenem VCCIO ≤ 0.10 V (Kap. 9.3 Schritt 1) → das Board speist den Sensor
+  nicht über VCCIO.
+- **LED-Ströme an 2.0 V:** RXD-LED bei RXD = 0 V 0.43 mA (Modell, mit Pull-up 100 µA 0.53 mA), TXD-LED gleich gross
+  bei TXD low; beide aus VCCIO (Weg A: U3, Weg B: Netzteil). PWR-LED aus USB 5 V.
+
+### 9.5 Bedingungen der Freigabe
+
+| Nr | Bedingung |
+|---|---|
+| B1 | Weg A nur mit Puffer U4 am Federstift; PL2303-RXD nie direkt an TP1 (A0p) |
+| B2 | Jumper J1 des Boards entfernt; Anschluss J1 nach Tab. 2.1 |
+| B3 | Eingangsprüfung Kap. 9.3 bestanden (VCCIO offen ≤ 0.10 V, RXD-Kurzschlussstrom ≤ 0.69 mA bzw. ≤ 2.1 mA nur Weg A, TXD high ≥ 1.90 V, TXD low ≤ 0.10 V) |
+| B4 | Weg B: Netzteil 2.0 V, **höchstens 2.1 V**, 10 mA; Reihenfolge USB/Netzteil nach Kap. 9.4 |
+| B5 | Weg A: bis zum Entscheid PA-6 Dummy-Zelle vor dem Ziehen der USB entfernen |
+| B6 | Port `/dev/ttyUSB0` (Treiber `pl2303`); 20 × Flashen bei 57600 und 19200 (PA-7) |

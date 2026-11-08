@@ -46,13 +46,13 @@ S. 102, Tab. 6-31: GPIO17 „Low“) → LED bleibt bis zum Overlay dunkel, kein
 UART (GPIO14/15). Alternativfunktion SPI1_CE1/SPI0_CE1 – SPI wird nicht genutzt (**ANNAHME**, `config.txt` prüfen).
 
 **Strom (nachgerechnet):**
-- VOH ≥ 3.0 V bei 2 mA, IOH ≥ 17 mA bei VO 2.3 V; Pi-3V3 ausgelegt für **≈ 3 mA je GPIO**, 16 mA je Pad unschädlich
+- VOH ≥ 3.0 V bei 2 mA (Default-Treiberstärke 8 mA; die Spezifikation gilt bis zum eingestellten Strom, Auszug Z. 15/36), IOH ≥ 17 mA bei VO 2.3 V nur bei maximaler Treiberstärke 16 mA (Fussnote c, Z. 466; Korrektur Elektronik 2026-11-09); Pi-3V3 ausgelegt für **≈ 3 mA je GPIO**, 16 mA je Pad unschädlich
   (`docs/references/RaspberryPi_GPIO-Doku_Auszug_2026-11-08.txt`, Z. 423 ff. und Z. 42/46 gpio-pad-controls).
 - VF ≈ 1.9 V bei 3 mA (Kennlinie `Kingbright_WP710A10GD_Datasheet_V10B.pdf` S. 3, abgelesen, **ANNAHME** ±0.05 V);
   VF typ 2.0 / max 2.4 V bei 10 mA (S. 2).
 - Typisch: I = (3.3 − 1.9) / 470 = **3.0 mA** → P_LED 5.7 mW (abs. max 62.5 mW, IF max 25 mA, S. 2), P_R 4.2 mW
   (1/4 W, `Yageo_MFR_Datasheet_V4.pdf` S. 3).
-- Ungünstig: (3.0 − 2.3) / 470 = 1.5 mA.
+- Ungünstig: (3.0 − 2.3) / 470 = 1.5 mA; mit VF max 2.4 V (S. 2) und R +1 %: 1.26 mA. Höchstwert mit 3.3 V + 5 % (**ANNAHME**), VF 1.9 V − 0.1 V Toleranz (S. 2 Note 2) − 0.03 V (40 °C, −2 mV/°C) und R −1 %: 3.7 mA (Nachrechnung Elektronik 2026-11-09, 470 Ω bestätigt).
 - Helligkeit proportional zu IF (S. 3): typ 25 mcd × 0.30 ≈ **7 mcd**, ungünstig 10 mcd × 0.15 ≈ 1.5 mcd hinter dem
   transluzenten Fenster. **PROTOTYP-PRÜFUNG** Sichtbarkeit im hellen Raum; zu dunkel → R1 330 Ω (≈ 4 mA typ., über der
   3-mA-Auslegung, unter dem 16-mA-Wert) oder Variante C.

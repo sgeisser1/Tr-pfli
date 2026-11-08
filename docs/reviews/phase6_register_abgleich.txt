@@ -1,5 +1,5 @@
-fluidi Registerabgleich, 2026-11-09 00:13, scripts/check_register.py
-INDEX.csv: 202 Zeilen
+fluidi Registerabgleich, 2026-11-09 00:33, scripts/check_register.py
+INDEX.csv: 206 Zeilen
 
 == 1 JLC-BOM production/rev-C/1_jlc_upload/fluidi_sensor_bom_jlc.csv
    Kopie hardware/sensor/out/fluidi_sensor_bom_jlc.csv inhaltsgleich: ja

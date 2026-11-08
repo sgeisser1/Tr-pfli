@@ -1,0 +1,39 @@
+fall,bedingung,knoten,pegel,v,grenze,ok,reserve_mV
+A0p ohne Puffer,"VIO 2.0 V, Pull-up 0, Board-LED MIN",PL2303-RXD (TP1),low,0.58614977,<= 0.40 (VIL),False,-186.14977
+A0p ohne Puffer,"VIO 2.0 V, Pull-up 0, Board-LED MAX",PL2303-RXD (TP1),low,0.23097293,<= 0.40 (VIL),True,169.02707000000004
+A0p ohne Puffer,"VIO 2.0 V, Pull-up 100 uA, Board-LED MIN",PL2303-RXD (TP1),low,1.9953299,<= 0.40 (VIL),False,-1595.3299
+A0p ohne Puffer,"VIO 2.0 V, Pull-up 100 uA, Board-LED MAX",PL2303-RXD (TP1),low,1.9953299,<= 0.40 (VIL),False,-1595.3299
+A1p Puffer-Ausgang,"VIO 1.96 V, Pull-up 0, Board-LED MIN",PL2303-RXD,low,0.061940981,<= 0.40 (VIL),True,338.05901900000003
+A1p Puffer-Ausgang,"VIO 1.96 V, Pull-up 100 uA, Board-LED MIN",PL2303-RXD,low,0.077705348,<= 0.40 (VIL),True,322.29465200000004
+A1p Puffer-Ausgang,"VIO 2.04 V, Pull-up 0, Board-LED MIN",PL2303-RXD,low,0.073482252,<= 0.40 (VIL),True,326.517748
+A1p Puffer-Ausgang,"VIO 2.04 V, Pull-up 100 uA, Board-LED MIN",PL2303-RXD,low,0.089217156,<= 0.40 (VIL),True,310.782844
+A2p Weg B R9 Pad 1,"VDD = VCCIO = 2.0 V, Pull-up 0, beide LED MIN",DIO6 = PL2303-RXD,low,0.2657349,<= 0.40 (VIL),True,134.26510000000002
+A2p Weg B R9 Pad 1,"VDD = VCCIO = 2.0 V, Pull-up 100 uA, beide LED MIN",DIO6 = PL2303-RXD,low,0.28701172,<= 0.40 (VIL),True,112.98828
+A2p Weg B R9 Pad 1,"VDD = VCCIO = 2.1 V, Pull-up 0, beide LED MIN",DIO6 = PL2303-RXD,low,0.32191659,<= 0.40 (VIL),True,78.08341000000001
+A2p Weg B R9 Pad 1,"VDD = VCCIO = 2.1 V, Pull-up 100 uA, beide LED MIN",DIO6 = PL2303-RXD,low,0.34287379,<= 0.40 (VIL),True,57.12621000000001
+A2p Weg B R9 Pad 1,"VDD = VCCIO = 2.2 V, Pull-up 0, beide LED MIN",DIO6 = PL2303-RXD,low,0.3786158,<= 0.40 (VIL),True,21.38420000000002
+A2p Weg B R9 Pad 1,"VDD = VCCIO = 2.2 V, Pull-up 100 uA, beide LED MIN",DIO6 = PL2303-RXD,low,0.39934562,<= 0.40 (VIL),True,0.65438000000001
+A3p Weg B falsches Pad (R9 Pad 2),"VDD = VCCIO = 2.0 V, Pull-up 0, Board-LED MAX",UART_TX_MID = PL2303-RXD,low,0.21508511,<= 0.40 (VIL),True,184.91489
+A3p Weg B falsches Pad (R9 Pad 2),"VDD = VCCIO = 2.0 V, Pull-up 100 uA, Board-LED MAX",UART_TX_MID = PL2303-RXD,low,1.9906953,<= 0.40 (VIL),False,-1590.6953
+Bp Sensor-RX,"VDD 1.96 V (Weg A min), TXD-Low 0.0 V, LED blau MIN",DIO20,low,0.13574425,<= 0.392 (VIL 0.2 VDDS),True,256.25575
+Bp Sensor-RX,"VDD 1.96 V (Weg A min), TXD-Low 0.1 V, LED blau MIN",DIO20,low,0.17759144,<= 0.392 (VIL 0.2 VDDS),True,214.40856000000002
+Bp Sensor-RX,"VDD 1.96 V (Weg A min), TXD-Low 0.2 V, LED blau MIN",DIO20,low,0.23568387,<= 0.392 (VIL 0.2 VDDS),True,156.31613000000002
+Bp Sensor-RX,"VDD 1.96 V (Weg A min), TXD-Low 0.4 V, LED blau MIN",DIO20,low,0.40376809,<= 0.392 (VIL 0.2 VDDS),False,-11.768090000000008
+Bp Sensor-RX,"VDD 2.04 V (Weg A max), TXD-Low 0.0 V, LED blau MIN",DIO20,low,0.19041232,<= 0.408 (VIL 0.2 VDDS),True,217.58768000000003
+Bp Sensor-RX,"VDD 2.04 V (Weg A max), TXD-Low 0.1 V, LED blau MIN",DIO20,low,0.22307586,<= 0.408 (VIL 0.2 VDDS),True,184.92414000000005
+Bp Sensor-RX,"VDD 2.04 V (Weg A max), TXD-Low 0.2 V, LED blau MIN",DIO20,low,0.26774367,<= 0.408 (VIL 0.2 VDDS),True,140.25633000000005
+Bp Sensor-RX,"VDD 2.04 V (Weg A max), TXD-Low 0.4 V, LED blau MIN",DIO20,low,0.41009455,<= 0.408 (VIL 0.2 VDDS),False,-2.094549999999973
+Bp Sensor-RX,"VDD 2.0 V (Weg B), TXD-Low 0.0 V, LED blau MIN",DIO20,low,0.16234875,<= 0.400 (VIL 0.2 VDDS),True,237.65125000000003
+Bp Sensor-RX,"VDD 2.0 V (Weg B), TXD-Low 0.1 V, LED blau MIN",DIO20,low,0.19920703,<= 0.400 (VIL 0.2 VDDS),True,200.79297000000003
+Bp Sensor-RX,"VDD 2.0 V (Weg B), TXD-Low 0.2 V, LED blau MIN",DIO20,low,0.25018383,<= 0.400 (VIL 0.2 VDDS),True,149.81617000000003
+Bp Sensor-RX,"VDD 2.0 V (Weg B), TXD-Low 0.4 V, LED blau MIN",DIO20,low,0.4062259,<= 0.400 (VIL 0.2 VDDS),False,-6.225899999999951
+Bp Sensor-RX,"VDD 2.2 V (Weg B max), TXD-Low 0.0 V, LED blau MIN",DIO20,low,0.31314799,<= 0.440 (VIL 0.2 VDDS),True,126.85201000000006
+Bp Sensor-RX,"VDD 2.2 V (Weg B max), TXD-Low 0.1 V, LED blau MIN",DIO20,low,0.33474003,<= 0.440 (VIL 0.2 VDDS),True,105.25997000000004
+Bp Sensor-RX,"VDD 2.2 V (Weg B max), TXD-Low 0.2 V, LED blau MIN",DIO20,low,0.36234875,<= 0.440 (VIL 0.2 VDDS),True,77.65125000000006
+Bp Sensor-RX,"VDD 2.2 V (Weg B max), TXD-Low 0.4 V, LED blau MIN",DIO20,low,0.45018383,<= 0.440 (VIL 0.2 VDDS),False,-10.183829999999949
+Bh Sensor-RX high,"Weg A, VIO min / VDD max: VIO 1.96 V, VDD 2.04 V, TXD-High DS min 0.7 x VDD_IO",DIO20,high,1.3720002,>= 1.632 (VIH 0.8 VDDS),False,-259.9998000000001
+Bh Sensor-RX high,"Weg A, VIO min / VDD max: VIO 1.96 V, VDD 2.04 V, TXD-High = VDD_IO (ANNAHME, Last < 10 uA)",DIO20,high,1.9600001,>= 1.632 (VIH 0.8 VDDS),True,328.0000999999999
+Bh Sensor-RX high,"Weg B: VIO 2.0 V, VDD 2.0 V, TXD-High DS min 0.7 x VDD_IO",DIO20,high,1.4000002,>= 1.600 (VIH 0.8 VDDS),False,-199.99980000000005
+Bh Sensor-RX high,"Weg B: VIO 2.0 V, VDD 2.0 V, TXD-High = VDD_IO (ANNAHME, Last < 10 uA)",DIO20,high,2.0,>= 1.600 (VIH 0.8 VDDS),True,399.9999999999999
+Bh Sensor-RX high,"Weg B max: VIO 2.2 V, VDD 2.2 V, TXD-High DS min 0.7 x VDD_IO",DIO20,high,1.5400002,>= 1.760 (VIH 0.8 VDDS),False,-219.9998000000003
+Bh Sensor-RX high,"Weg B max: VIO 2.2 V, VDD 2.2 V, TXD-High = VDD_IO (ANNAHME, Last < 10 uA)",DIO20,high,2.2,>= 1.760 (VIH 0.8 VDDS),True,439.99999999999994

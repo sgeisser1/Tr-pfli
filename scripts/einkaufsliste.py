@@ -141,7 +141,7 @@ Adapter, kein Rückstrom, ROM-Bootloader 19 200–57 600 Baud, +5 V vom USB für
 | Option | Bezug (Abruf) | Kosten inkl. Versand | Bewertung |
 |---|---|---|---|
 | A Waveshare **CH343 USB UART Board** SKU 21440–21443 (TOOL-UART1, bisher geplant) | waveshare.com USD 3.49 (2026-11-07), Seite JS-basiert, Lager/Versand nicht ablesbar; eckstein-shop.de Art. WS21443 EUR 4.15, „ca. 3 Wochen“, Seite meldet „nicht in Ihr Lieferland“ (Land nicht erkennbar); kein CH-Händler gefunden (pi-shop.ch „ch343“: nur Geräte mit CH343-Chip, z. B. Industrial USB TO TTL mit festem 3.3/5-V-Pegel; bastelgarage.ch, play-zone.ch: keine Treffer) | ≈ 3–4 CHF + Auslandsversand **ANNAHME 10–25 CHF** (programmer/README Kap. 6) | elektrisch belegt (CH343-Datenblatt), aber eigener Auslandsversand |
-| **B Waveshare PL2303 USB UART Board (type A) V2** (PL2303GS, TOOL-UART2) | **pi-shop.ch Art. 11757, CHF 8.90, Sofort-Versand** (2026-11-09) | **8.90 CHF, kein Zusatzversand** (mit G2/G3 bei pi-shop.ch) | **bedingt gleichwertig**, siehe unten |
+| **B Waveshare PL2303 USB UART Board (type A) V2** (PL2303GS, TOOL-UART2) | **pi-shop.ch Art. 11757, CHF 8.90, Sofort-Versand** (2026-11-09) | **8.90 CHF, kein Zusatzversand** (mit G2/G3 bei pi-shop.ch) | **freigegeben mit Bedingungen** (Elektronik 2026-11-09), siehe unten |
 | C Adafruit CH9102F Friend / Waveshare Industrial USB TO TTL (CH343G) | pi-shop.ch CHF 7.90 / 12.90 | – | **ungeeignet**: Pegel fest 3.3/5 V per Schalter, kein externes VIO |
 
 Begründung B gegen Datenblatt (`docs/datasheets/Prolific_PL2303GS_Datasheet_Rev1.0.4.pdf`):
@@ -150,15 +150,18 @@ VDD_IO 1.8 V … VIN + 0.3 V (S. 39 Tab. 11-2a) → 2.0 V zulässig; 6 Mbit/s be
 (`docs/references/Waveshare_PL2303-USB-UART-Board-TypeA-V2_Schematic_2026-11-08.pdf`): Jumper J1 5V/VCCIO/3.3V offen
 = VCCIO von aussen; +5 V an J1 abgreifbar; P2 = VCCIO/GND/TXD/RXD.
 
-Unterschiede zum CH343 (**Prüfung durch Elektronik vor dem Kauf als Ersatz**):
-1. **Abs. max VDD_IO ≤ VIN + 0.3 V** (S. 39 Tab. 11-1) und kein Hinweis auf Rückstromfreiheit → VCCIO nur bei gesteckter
-   USB anlegen. Im Adapter erfüllt (U3 wird aus USB-5 V gespeist), **nicht** im Behelf mit Labornetzteil an VCCIO.
-2. VIL ≤ 0.4 V statt 0.5 V (CH343) und RXD-LED mit **1 kΩ** statt 2 kΩ nach VCCIO, interner RXD-Pull-up ohne Wertangabe
-   (S. 13) → SPICE A0/A1/A2 (`simulation/spice/programmer`) mit diesen Werten wiederholen.
-3. J1-Belegung im Adapter (`hardware/programmer/README.md` Kap. 3, J1) an das PL2303-Board anpassen.
+Prüfung Elektronik 2026-11-09 (`hardware/programmer/README.md` Kap. 9, SPICE `simulation/spice/programmer/prog_uart_pl2303.py`):
+1. **Abs. max VDD_IO ≤ VIN + 0.3 V** (S. 39 Tab. 11-1): Einstecken unkritisch (0.000 V); Weg B nur mit Reihenfolge
+   „USB zuerst ein, zuletzt aus“; Weg A beim Ziehen der USB kurzzeitig bis 1.06 V (Ladung der VIO-Kondensatoren) → Dummy-Zelle
+   vorher heraus, Vorschlag Entladewiderstand 470 Ω an VIO (PA-6, ≤ 0.014 V).
+2. VIL ≤ 0.4 V, RXD-LED 1 kΩ: mit Puffer U4 0.06–0.09 V (+311 mV); Weg B an R9 Pad 1 +113 mV bei 2.0 V, **höchstens 2.1 V**.
+   VOL/VOH ohne Stromangabe → Eingangsprüfung des Boards (TXD high ≥ 1.90 V, TXD low ≤ 0.10 V, RXD → GND ≤ 0.69 mA,
+   VCCIO offen ≤ 0.10 V).
+3. J1 des Adapters: 1 = Board-J1 Stift „5V“ (VCC5V), 2 = P2.2 GND, 3 = P2.1 VCCIO, 4 = P2.4 RXD, 5 = P2.3 TXD; Jumper J1 ab.
+   Port `/dev/ttyUSB0` (Treiber `pl2303`, VID/PID 067B:23A3, S. 22).
 
-**Empfehlung:** Variante B (ein Händler weniger, 8.90 CHF) **sobald die Elektronik 1–3 bestätigt**; sonst A über
-waveshare.com zusammen mit einer ohnehin nötigen Auslandsbestellung.
+**Empfehlung:** Variante B (ein Händler weniger, 8.90 CHF) unter den Bedingungen B1–B6 (README Kap. 9.5); A nur noch,
+falls ohnehin eine Auslandsbestellung bei waveshare.com nötig ist.
 
 """
 

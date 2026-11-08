@@ -3,8 +3,8 @@
 | | |
 |---|---|
 | Dokument | `docs/manuals/INSTALL_FIRMWARE_TOOLS.md` |
-| Version | 1.1 (Phase 4; 1.1: Gateway = Pi Zero 2 W nach D-014, Flasher `scripts/flash_sensor.py`, Programmieren → `PROGRAMMIEREN_SENSOR.md`) |
-| Datum | 2026-11-07, nachgeführt 2026-11-08 |
+| Version | 1.2 (Phase 4; 1.1: Gateway = Pi Zero 2 W nach D-014, Flasher `scripts/flash_sensor.py`, Programmieren → `PROGRAMMIEREN_SENSOR.md`; 1.2: PL2303-Board als Alternative, Elektronik) |
+| Datum | 2026-11-07, nachgeführt 2026-11-08 und 2026-11-09 |
 | Skript | `scripts/install_firmware_tools.sh` (installiert), `scripts/toolcheck.sh` (prüft nur) |
 | Ersteller | Firmware/Energie |
 
@@ -95,7 +95,7 @@ Hinweis: Die TI-Installer laufen mit `--mode unattended --prefix ~/fluidi-tools/
 
 ## 4 Schritt für Schritt – Windows (USB an WSL durchreichen)
 
-Nur nötig, sobald der USB-UART-Adapter (CH343) am PC hängt. Das Gateway (Pi Zero 2 W) wird nicht per USB geflasht
+Nur nötig, sobald der USB-UART-Adapter (CH343 oder PL2303) am PC hängt. Das Gateway (Pi Zero 2 W) wird nicht per USB geflasht
 (`docs/manuals/GATEWAY_SETUP.md`).
 
 1. **usbipd-win installieren** (PowerShell, einmalig):
@@ -116,9 +116,11 @@ Nur nötig, sobald der USB-UART-Adapter (CH343) am PC hängt. Das Gateway (Pi Ze
    Meldet sich das Board neu an (z. B. nach einem Spannungseinbruch an VIO), hilft
    `usbipd attach --wsl --busid 2-3 --auto-attach` in einem eigenen Fenster.
 4. In Ubuntu: `lsusb` und `ls /dev/ttyACM* /dev/ttyUSB*`. Der CH343 erscheint als
-   `/dev/ttyACM0` (Treiber `cdc_acm`), CH340/CP210x/FTDI als `/dev/ttyUSB0`.
+   `/dev/ttyACM0` (Treiber `cdc_acm`), CH340/CP210x/FTDI und das **PL2303-Board** (VID/PID 067B:23A3, Treiber
+   `pl2303`, im WSL-Kernel 6.18.54.1 enthalten, geprüft 2026-11-09) als `/dev/ttyUSB0`.
 5. Lösen: `usbipd detach --busid 2-3` oder Kabel ziehen. Solange das Gerät an WSL hängt, sieht
-   Windows es nicht.
+   Windows es nicht. `detach` schaltet die USB-Speisung nicht ab. **PL2303-Board:** Kabel erst ziehen, wenn VCCIO
+   spannungslos ist (Netzteil aus bzw. Dummy-Zelle heraus, `hardware/programmer/README.md` Kap. 9.4).
 6. Test: `picocom -b 115200 /dev/ttyACM0` (Beenden: Ctrl-A, Ctrl-X).
 
 Rückfall, falls usbipd nicht will: `scripts/flash_sensor.py` läuft auch unter Windows-Python oder auf dem
@@ -133,9 +135,9 @@ Board, Bootloader-Falle W-10). Adapter: `hardware/programmer/README.md`.
 
 | Teil | Zweck | Bezug / Preis (Abruf 2026-11-07) | Status |
 |---|---|---|---|
-| **USB-UART mit externem VIO**: Waveshare **CH343 USB UART Board** (CH343G, Micro/Mini/Type-A/Type-C, SKU 21440–21443), Jumper H3 entfernt | Sensor über ROM-UART-Bootloader flashen, Log lesen | waveshare.com **USD 3.49** (Micro, SKU 21441); eckstein-shop.de **EUR 4.15** (Type-C, „ca. 3 Wochen“); kein CH-Händler, Auslandsversand nicht ablesbar (**ANNAHME** 10–25 CHF). **Alternative (bedingt, Abruf 2026-11-09):** Waveshare PL2303 USB UART Board (type A) V2, pi-shop.ch Art. 11757, CHF 8.90, Sofort-Versand, ohne Zusatzversand mit den Gateway-Teilen – Bedingungen `docs/manuals/EINKAUFSLISTE.md` Kap. 3 (FW-T3) | Bezug offen, Entscheid Elektronik |
+| **USB-UART mit externem VIO**: Waveshare **CH343 USB UART Board** (CH343G, Micro/Mini/Type-A/Type-C, SKU 21440–21443), Jumper H3 entfernt, **oder** Waveshare **PL2303 USB UART Board (type A) V2** (PL2303GS), Jumper J1 entfernt | Sensor über ROM-UART-Bootloader flashen, Log lesen | CH343: waveshare.com **USD 3.49** (Micro, SKU 21441); eckstein-shop.de **EUR 4.15** (Type-C, „ca. 3 Wochen“); kein CH-Händler, Auslandsversand nicht ablesbar (**ANNAHME** 10–25 CHF). PL2303: pi-shop.ch Art. 11757, **CHF 8.90**, Sofort-Versand (Abruf 2026-11-09), ohne Zusatzversand mit den Gateway-Teilen | PL2303 **elektrisch freigegeben mit Bedingungen B1–B6** (Elektronik 2026-11-09, `hardware/programmer/README.md` Kap. 9); Bezug Auftraggeber |
 | Programmieradapter Rev 1 (Dummy-Zelle 2.0 V, Federstifte TP1/TP2, Schmitt-Puffer SN74AUP1G17 am TX-Stift) | speist den Sensor statt der Zelle (R2-A2), Pegelanpassung TX | `hardware/programmer/README.md` Kap. 6: ≈ CHF 25–55 | Schaltplan Rev 1 (ERC 0), Mechanik offen (PA-1) |
-| Behelf (nur Muster vor dem Verguss): Labornetzteil 2.0 V/20 mA, CH343-RXD an **R9 Pad 1** | erste Muster ohne Adapter | Werkstatt | `PROGRAMMIEREN_SENSOR.md` Kap. 5 |
+| Behelf (nur Muster vor dem Verguss): Labornetzteil 2.0 V/10 mA (höchstens 20 mA; mit PL2303 höchstens 2.1 V), RXD des USB-UART an **R9 Pad 1** | erste Muster ohne Adapter | Werkstatt | `PROGRAMMIEREN_SENSOR.md` Kap. 5 |
 | ~~USB-C-Datenkabel für Gateway XIAO ESP32-S3 Plus~~ | **veraltet** (D-014: Gateway = Pi Zero 2 W) | – | – |
 
 **Pegel 2.0 V statt 1.8 V:** VIO des CH343 1.7–5.5 V (`docs/datasheets/WCH_CH343_Datasheet_V1E.pdf` S. 8 Tab. 6.2),
@@ -147,6 +149,15 @@ das Waveshare-Board hängt zusätzlich eine LED mit 2 kΩ an RXD. Über die 2 ×
 (SPICE `simulation/spice/programmer/prog_uart_report.txt`, Fall A0: 0.64 V bis fast VIO). Der Programmieradapter
 puffert TX direkt am Federstift (Fall A1: Low ≤ 0.37 V, Schwelle ≥ 0.47 V); im Behelf wird RXD vor den Widerständen an
 DIO6 (R9 Pad 1) angeschlossen (Fall A2: 0.25 V bei 2.0 V). **PROTOTYP-PRÜFUNG:** 20 × Flashen bei 57600 und 19200 Baud.
+
+**PL2303-Board (Alternative, Prüfung 2026-11-09):** VDD_IO 1.8 V … VIN + 0.3 V, abs. max ebenso
+(`docs/datasheets/Prolific_PL2303GS_Datasheet_Rev1.0.4.pdf` S. 39 Tab. 11-1/11-2a), VIL ≤ 0.4 V, VOL/VOH ohne
+Strom-Testbedingung (Tab. 11-2b), RXD-Pull-up ohne Wert (S. 13), RXD-/TXD-LED je 1 kΩ an VCCIO (Board-Schaltplan).
+SPICE `simulation/spice/programmer/prog_uart_pl2303.py`: Puffer → RXD 0.06–0.09 V (Grenze 0.40 V); Weg B an R9 Pad 1
+0.27–0.29 V bei 2.0 V, bei 2.2 V nur +1 mV Reserve → Weg B **höchstens 2.1 V**; ohne Puffer kein Low (wie CH343).
+Freigabe mit Bedingungen: Eingangsprüfung des Boards (VCCIO offen ≤ 0.10 V, RXD → GND ≤ 0.69 mA, TXD high ≥ 1.90 V,
+TXD low ≤ 0.10 V), **VCCIO nie ohne gesteckte USB** (Weg B: USB zuerst ein, zuletzt aus; Weg A: Dummy-Zelle vor dem
+Ziehen der USB heraus), Port `/dev/ttyUSB0`. Einzelheiten `hardware/programmer/README.md` Kap. 9.
 
 Nicht nötig: TI-LaunchPad oder XDS110 (keine SWD-Pads, E3), ARM-GCC, IAR, CCS, UniFlash, ESP-IDF.
 Optional für frühe Entwicklung ohne eigene Platine wäre ein LaunchPad LP-EM-CC2340R5 (Preis nicht
@@ -191,7 +202,7 @@ SHA-256 (ti.com, 2026-11-07):
 |---|---|---|
 | FW-T1 | Build-Test mit SysConfig 1.28.2 statt 1.26.x (`basic_ble` für CC2340R5, ticlang) nach der Installation | Firmware |
 | FW-T2 | ~~Puffer am TX-Federstift~~ **entworfen** 2026-11-08: `hardware/programmer` (SN74AUP1G17, 2.0 V, VIO aus eigenem 2.0-V-Regler); Mechanik und Sicherheitsprüfung offen | Elektronik, Mechanik, Sicherheit |
-| FW-T3 | Bezug CH343-Board mit Versand in die Schweiz ≤ 10 CHF bestätigen. **Stand 2026-11-09:** CH343 nur aus dem Ausland (Versand nicht belegt); PL2303GS-Board bei pi-shop.ch 8.90 CHF erfüllt VDD_IO 1.8 V…VIN+0.3 V (`docs/datasheets/Prolific_PL2303GS_Datasheet_Rev1.0.4.pdf` S. 39), aber VIL ≤ 0.4 V, RXD-LED 1 kΩ, VCCIO nur mit USB → SPICE A0–A2 und J1-Belegung prüfen (`docs/manuals/EINKAUFSLISTE.md` Kap. 3) | Elektronik, dann Auftraggeber |
+| FW-T3 | Bezug CH343-Board mit Versand in die Schweiz ≤ 10 CHF bestätigen. **Stand 2026-11-09:** CH343 nur aus dem Ausland (Versand nicht belegt); **PL2303-Board (pi-shop.ch, 8.90 CHF) von der Elektronik freigegeben mit Bedingungen B1–B6** (SPICE `prog_uart_pl2303.py`, J1-Belegung, Eingangsprüfung, Reihenfolge USB/VCCIO; `hardware/programmer/README.md` Kap. 9). Offen: Kaufentscheid; Entladewiderstand 470 Ω an VIO (PA-6) | Auftraggeber (Kauf), Orchestrator (PA-6) |
 | FW-T4 | ~~`scripts/cc23_bsl.py`~~ **erledigt** als `scripts/flash_sensor.py` (Baudrate ≤ 57 600, `--sim`, `--dry-run`, `--lock`) | Firmware |
 
 ## Quellen (Abruf 2026-11-07)

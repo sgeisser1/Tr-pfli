@@ -1233,7 +1233,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "zu Waveshare CH343"
+		(property "Value" "zu Waveshare CH343 / PL2303"
 			(at 30.4 45.92 0)
 			(effects
 				(font
@@ -1260,7 +1260,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Kabel <= 20 cm (ANNAHME); 1 = H3.3 +5V, 2 = H2.2 GND, 3 = H3.2 VIO (Jumper H3 ENTFERNT), 4 = H2.4 RXD, 5 = H2.3 TXD; +5V alternativ H1.1, falls H1 bestueckt"
+		(property "Description" "Kabel <= 20 cm (ANNAHME); CH343: 1 = H3.3 +5V, 2 = H2.2 GND, 3 = H3.2 VIO (Jumper H3 ENTFERNT), 4 = H2.4 RXD, 5 = H2.3 TXD; +5V alternativ H1.1, falls H1 bestueckt. PL2303 (type A) V2: 1 = J1.3 VCC5V (Jumper J1 ENTFERNT), 2 = P2.2 GND, 3 = P2.1 VCCIO, 4 = P2.4 RXD, 5 = P2.3 TXD (README Kap. 9)"
 			(at 30.48 50.8 0)
 			(effects
 				(font
@@ -1287,7 +1287,7 @@
 				(hide yes)
 			)
 		)
-		(property "MPN" "Litze/Steckbruecken zum Waveshare CH343 USB UART Board"
+		(property "MPN" "Litze/Steckbruecken zum Waveshare CH343 oder PL2303 (type A) V2 USB UART Board"
 			(at 30.48 50.8 0)
 			(effects
 				(font
@@ -3910,7 +3910,7 @@
 			)
 		)
 	)
-	(text "VERSORGUNG  USB 5 V (Waveshare H3.3) -> U1 3.3 V -> U2 2.0 V (Dummy-Zelle = Sensor-VDD) und U3 2.0 V (VIO).\nEinzelfehler: U2 oder U3 durchlegiert -> hoechstens 3.3 V (VDDS max 3.8 V, abs. max 4.1 V, CC2340 DS S. 18);\nU1 durchlegiert -> U2/U3 regeln weiter (VIN max 6.0 V). Fuer 5 V am Sensor braucht es zwei Fehler (R2-L02).\nWaveshare: Jumper H3 (3.3 V/5 V) ENTFERNEN, VIO kommt von U3. Vor dem Einsetzen VDD_DUT und VIO messen."
+	(text "VERSORGUNG  USB 5 V (Waveshare H3.3) -> U1 3.3 V -> U2 2.0 V (Dummy-Zelle = Sensor-VDD) und U3 2.0 V (VIO).\nEinzelfehler: U2 oder U3 durchlegiert -> hoechstens 3.3 V (VDDS max 3.8 V, abs. max 4.1 V, CC2340 DS S. 18);\nU1 durchlegiert -> U2/U3 regeln weiter (VIN max 6.0 V). Fuer 5 V am Sensor braucht es zwei Fehler (R2-L02).\nWaveshare: Jumper H3 (CH343) bzw. J1 (PL2303) ENTFERNEN, VIO kommt von U3. Vor dem Einsetzen VDD_DUT und VIO messen.\nPL2303: Eingangspruefung README Kap. 9.3; Dummy-Zelle vor dem Ziehen der USB entfernen (Kap. 9.4)."
 		(exclude_from_sim no)
 		(at 10.16 12.7 0)
 		(effects
@@ -3921,7 +3921,7 @@
 		)
 		(uuid "97067e59-b169-567a-8890-30d2713d37cc")
 	)
-	(text "TX-PUFFER  CH343-RXD hat 3-21 uA Pull-up (DS S. 8) + Board-LED 2 kOhm: ueber 2 x 100 kOhm kein Low.\nU4 SN74AUP1G17 (Leck <= 0.5 uA -> <= 0.1 V ueber 200 kOhm) direkt am Federstift TP1, <= 3 cm Draht.\nR1 10 MOhm: schwacher Ruhepegel high, bevor der Bootloader DIO6 als Ausgang schaltet.\nNachweis: simulation/spice/programmer/prog_uart.py (Pegel, Flanken, 19200-57600 Baud)."
+	(text "TX-PUFFER  CH343-RXD hat 3-21 uA Pull-up (DS S. 8) + Board-LED 2 kOhm (PL2303: 1 kOhm, VIL 0.4 V):\nueber 2 x 100 kOhm kein Low.\nU4 SN74AUP1G17 (Leck <= 0.5 uA -> <= 0.1 V ueber 200 kOhm) direkt am Federstift TP1, <= 3 cm Draht.\nR1 10 MOhm: schwacher Ruhepegel high, bevor der Bootloader DIO6 als Ausgang schaltet.\nNachweis: simulation/spice/programmer/prog_uart.py bzw. prog_uart_pl2303.py (Pegel, Flanken, 19200-57600 Baud)."
 		(exclude_from_sim no)
 		(at 10.16 162.56 0)
 		(effects

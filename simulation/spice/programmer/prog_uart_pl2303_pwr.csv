@@ -1,0 +1,17 @@
+vorgang,sensor,ldo,klemme,dv_max,t_ueber_0_3,vio_bei_vin_0_5,q_uC,ok
+USB einstecken,nein,nur Parasitaerdiode (ungünstig),keine,1.891336188e-14,0.0,nan,3.9718059947999995e-14,True
+USB einstecken,ja (410 uF),nur Parasitaerdiode (ungünstig),keine,1.90401067e-14,0.0,nan,3.9984224069999996e-14,True
+USB ziehen,nein,nur Parasitaerdiode (ungünstig),keine,1.0586943899999999,46.9717733,1.533392484063492,2.223258219,False
+USB ziehen,nein,nur Parasitaerdiode (ungünstig),RB751S-40 VIO->+5V,0.4085433999999999,9.860000300000001,0.8417476005303505,0.8579411399999997,False
+USB ziehen,nein,rueckwaerts leitend im Dropout,keine,1.0586879900000001,46.8717733,1.5333925411001812,2.2232447790000003,False
+USB ziehen,nein,rueckwaerts leitend im Dropout,RB751S-40 VIO->+5V,0.3828252000000001,9.626928400000002,0.84174760215846,0.8039329200000002,False
+USB ziehen,ja (410 uF),nur Parasitaerdiode (ungünstig),keine,1.05603205,397.2117733,1.4645028514823633,2.217667305,False
+USB ziehen,ja (410 uF),nur Parasitaerdiode (ungünstig),RB751S-40 VIO->+5V,0.3899796,2.9600000000000004,0.7513750822241454,0.8189571599999999,False
+USB ziehen,ja (410 uF),rueckwaerts leitend im Dropout,keine,1.0561280000000002,397.1317733,1.4645028913222247,2.2178688,False
+USB ziehen,ja (410 uF),rueckwaerts leitend im Dropout,RB751S-40 VIO->+5V,0.3825989000000001,2.8598486000000007,0.7513750805690178,0.8034576900000001,False
+USB ziehen,nein,nur Parasitaerdiode (ungünstig),"keine, R 1k VIO->GND",0.4480120999999999,1.1199999999999999,0.5631451198612205,0.9408254099999998,False
+USB ziehen,nein,nur Parasitaerdiode (ungünstig),"keine, R 470 VIO->GND",0.014106500000000022,0.0,0.09506848965393552,0.029623650000000043,True
+USB ziehen,nein,nur Parasitaerdiode (ungünstig),"RB751S-40 VIO->+5V, R 1k VIO->GND",0.35856559999999993,0.68,0.517260847970661,0.7529877599999998,False
+USB ziehen,ja (410 uF),nur Parasitaerdiode (ungünstig),"keine, R 1k VIO->GND",0.1790138000000001,0.0,2.0566280474811626e-09,0.37592898000000025,True
+USB ziehen,ja (410 uF),nur Parasitaerdiode (ungünstig),"keine, R 470 VIO->GND",-0.004531300000000016,0.0,9.639217810397158e-10,0.0,True
+USB ziehen,ja (410 uF),nur Parasitaerdiode (ungünstig),"RB751S-40 VIO->+5V, R 1k VIO->GND",0.1789662999999999,0.0,6.124586975285253e-07,0.3758292299999998,True
