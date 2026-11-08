@@ -5,13 +5,13 @@
       "Application": "Pcbnew",
       "Version": "10.0.8-10.0.8~ubuntu24.04.1"
     },
-    "CreationDate": "2026-11-07T23:28:38+01:00"
+    "CreationDate": "2026-11-08T10:07:07+01:00"
   },
   "GeneralSpecs": {
     "ProjectId": {
       "Name": "fluidi_sensor",
       "GUID": "666c7569-6469-45f7-9365-6e736f722e6b",
-      "Revision": "rev?"
+      "Revision": "C"
     },
     "Size": {
       "X": 26.05,
@@ -19,7 +19,7 @@
     },
     "LayerNumber": 4,
     "BoardThickness": 1.6,
-    "Finish": "HAL lead-free"
+    "Finish": "ENIG"
   },
   "DesignRules": [
     {

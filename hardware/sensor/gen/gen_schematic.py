@@ -308,10 +308,10 @@ NOTES = [
               "  Loetstoppoeffnungen, Abstand gegen Loetbruecke/Wasserfilm (R2-A3).\n"
               "Grenze (R2-A1): Fehlerfall <= 10 mA, Ladung <= 1 % C = 2.25 mAh\n"
               "  (Maxell Warnings S.2, Panasonic Handbook S.1).\n"
-              "Pads RX/TX im Zellfach ausserhalb der Zellflaeche, keine Vias (R2-W01).\n"
+              "Pads RX/TX im Zellfach ausserhalb der Zellflaeche, Via-in-Pad gefuellt (D-023).\n"
               "Kein nRST-, SWD- oder VDD-Pad. ROM-Bootloader: SW1 (DIO21) beim\n"
               "  Einschalten gedrueckt, RX = DIO20, TX = DIO6 (TRM S.464).\n"
-              "TP3 GND (Fach); TP4 MEAS_CLK, TP5 PROBE_SENSE auf der B-Seite des\n"
+              "Adapter-GND ueber das Minuspad (TP3 entfaellt, A-1). TP4 MEAS_CLK, TP5 PROBE_SENSE auf B des\n"
               "  Elektronikbands: nur messen, keine Quelle (Abstimmung sicherheit)."),
     (4, 66, "MESSKETTE D3 (D-018)  Q2 AO3401A schaltet OSC_PWR (DIO11 low = an, R13 haelt aus).\n"
             "U2 SN74LVC1G14: Y -> R3 1 k -> A, Sondenknoten PROBE_SENSE gegen GND (Innenlagen),\n"

@@ -1,13 +1,13 @@
-# fluidi Sensor – Layout Rev B (Phase 4a Welle 2)
+# fluidi Sensor – Layout Rev C (Phase 4a Welle 2/3; Dateiname historisch „REV_B“)
 
 | | |
 |---|---|
-| Stand | 2026-11-07, Elektronik |
+| Stand | **Rev C 2026-11-08** (Überarbeitung nach Welle 3, D-023, PCB_OUTLINE Rev C); Rev B 2026-11-07. Änderungen Rev C und Befund-Antworten: **Kap. 11** |
 | Platine | `hardware/sensor/fluidi_sensor.kicad_pcb` (KiCad 10.0.8), Regeln `fluidi_sensor.kicad_dru`, Projekt `fluidi_sensor.kicad_pro` |
 | Erzeugung | `bash hardware/sensor/gen/run_pcb.sh` (Generator, DRC in WSL und Windows, Exporte). Module: `gen_pcb.py` (Footprints, Netze/Felder/Symbol-UUID aus der Schaltplan-Netzliste), `pcb_place.py` (Platzierung), `pcb_build.py` (Kupfer, Zonen, Regelflächen, Silkscreen), `pcb_router.py` (eigener Raster-Router mit Rip-up), `pcb_rules.py` (DRC-Regeln), `cpl_jlc.py` (CPL), `drc_summary.py` |
 | Option | `--u3 band`: Rückfallebene ohne Kragenfeld (U3/C24 rechts oben im Band, ganzes Z5 nach Z5A-Regel) |
-| Grundlage | `docs/interfaces/PCB_OUTLINE.md` Rev B, `mechanical/interfaces/pcb_outline.json`, `simulation/field/REPORT.md` Kap. 8, AN043 (`docs/appnotes/TI_AN043_SmallPCBAntenna_SWRA117D.pdf`), `docs/appnotes/TI_CC23xx_HWDesignGuide_SWRA834A.pdf`, `docs/references/JLCPCB_NOTES.md`, `docs/reviews/phase4_sicherheit_kragen_firmware.md` (K-1 … K-7) |
-| Status | Entwurf zur Prüfung durch einen anderen Agenten. Kein Commit |
+| Grundlage | `docs/interfaces/PCB_OUTLINE.md` **Rev C** (Kap. 6.3 Masstabelle in `docs/reviews/phase4_kollision_mechanik.md`), D-023, `mechanical/interfaces/pcb_outline.json`, `simulation/field/REPORT.md` Kap. 8, AN043 (`docs/appnotes/TI_AN043_SmallPCBAntenna_SWRA117D.pdf`), `docs/appnotes/TI_CC23xx_HWDesignGuide_SWRA834A.pdf`, `docs/references/JLCPCB_NOTES.md`, `docs/reviews/phase4_sicherheit_kragen_firmware.md` (K-1 … K-7) |
+| Status | Rev C: Entwurf zur Prüfung. Kein Commit. Titelblock der Platine „fluidi Sensor“, Revision **C** (Gerber-Job) |
 
 ## 1 Lagenaufbau und Lagennutzung
 
@@ -15,7 +15,7 @@ JLC04161H-7628 (Standard „No requirement“, `JLCPCB_NOTES.md` Kap. 4), 1.6 mm
 
 | Lage | Dicke | Band (Kopf) | Fach/Schott | Kragen, Z6, Sonde |
 |---|---|---|---|---|
-| F.Cu (L1) | 35 µm | Bauteile, Signale, HF-Kette, GND-Fläche | nur Pads (Clip, Minuspad, TP1–TP3) | U3/C24 im Feld (Option kragen), sonst kein Kupfer |
+| F.Cu (L1) | 35 µm | Bauteile, Signale, HF-Kette, GND-Fläche | nur Pads (Clip, Minuspad, TP1, TP2; Rev C ohne TP3) | U3/C24 im Feld (Option kragen), sonst kein Kupfer |
 | Prepreg 7628 | 0.2104 mm, Er 4.4 | | | Isolation über den Elektroden |
 | In1.Cu (L2) | 15.2 µm | **GND-Bezugsfläche** (HF, Antenne), nur die S-Zuleitung L2 | GND (Kante ≥ 1.0 mm) + S-Zuleitung | Guard, G-Elektrode, G-Steg, S-Elektrode |
 | Kern | 1.065 mm, Er 4.5 (KiCad-Standard, von JLC nicht belegt) | | | |
@@ -88,26 +88,33 @@ benannt ohne Sperre: `Z3_Z4_INNEN`, `VIP_FACH`, `Z5B_FELD`, `Z5A_DICHT`.
 | Via | Ø ≥ 0.45, Bohrung ≥ 0.20 (verwendet 0.45/0.30), Restring ≥ 0.075 | JLC, Ø < 0.45 kostet Aufpreis |
 | Bohrabstand / Bohrung–Kupfer | ≥ 0.25 / ≥ 0.20 | JLC |
 | Kupfer–Kontur | ≥ 0.30 allgemein, **≥ 1.25 ab Z5A** (Sonde, Spitze) | JLC 0.2; Feld Kap. 8, REQ-MECH-06 |
-| K-3 | Innenlagen in Schott/Fach ≥ 1.0 zur Kante | Sicherheit Phase 4 |
+| K-3 / LS-K1 | Innenlagen in Schott, Fach **und Kragen bis Y 50.0** ≥ 1.0 zur Kante (Regelfläche `Z3_Z4_INNEN` Y 20.82…50.0) | Sicherheit Phase 4 |
+| LS-K2 | Innenlagen in Schott/Fach: /VBAT ↔ GND ≥ 0.5 (Zonenabstand, Antipad am VBAT-VIP) | Sicherheit Layout Rev B |
+| DFM K-1 | SMD-Pad ↔ Pad (verschiedene Netze) ≥ 0.15 | JLC |
+| Vergusskanten | Pad-Rand ≥ 0.5 zu Y 22.70 (Schott) und Y 46.90 (Kragen): Sperrstreifen ohne Pads `VERGUSS_SCHOTT_PADSPERRE` Y 22.2…23.2, `VERGUSS_KRAGEN_PADSPERRE` Y 46.4…47.4 (F/B); `Z3_SCHOTT` sperrt Pads | PCB_OUTLINE Rev C, LS-W1 |
+| Anschlag | `ANSCHLAG_KAPPE` X −8.0…−3.0, Y 0…1.5: keine Bauteile (Kupfer erlaubt) | PCB_OUTLINE Rev C Kap. 6 |
 | K-1 | Dichtstreifen Z5A Innenlagen nur GND und /PROBE_SENSE | Sicherheit Phase 4 |
-| K-2 | Vias im Kragenfeld ≥ 1.0 zur Kante; Feld x −9.0 … −4.6 (statt −9.4); alle Vias tented | Sicherheit Phase 4 |
+| K-2 | Vias im Kragenfeld ≥ 1.0 zur Kante; Feld x −9.0 … −4.6, **Y 47.4 … 49.8** (Rev C); Vias tented, Via-in-Pad gefüllt | Sicherheit Phase 4 |
 | Fach | Vias nur als Via-in-Pad (Regelfläche `VIP_FACH`) | S2-W03, REQ-MECH-05 |
 | Schott, Kragen ausser Feld, nass | keine Vias | S3-K1, REQ-MECH-05 |
 | Silkscreen | Text ≥ 1.0 mm hoch, ≥ 0.15 Strich; Bibliotheks-Silk auf 0.15 verbreitert | JLC |
 
-Kragenfeld (Option kragen): U3 TMP1075N (180°) und C24 im Feld; 4 Vias in der Spalte x −5.0 (SDA, GND, SCL,
-SENS_PWR) + 1 GND-Via x −8.7 (Kante 1.08 mm), alle tented. Die U3-Leitungen enden im Feld (z ≥ 4.4, K-1).
+Kragenfeld (Option kragen, Rev C): U3 TMP1075N (180°) **(−6.69, 48.60)** und C24 **(−8.45, 48.70)**; 4 Vias in der
+Spalte x −5.0 (SDA 47.65, GND 48.29, SCL 48.93, SENS_PWR 49.57) + 1 GND-Via (−8.7, 47.65) (Kante 1.075 mm), alle tented.
+Die U3-Leitungen enden im Feld (Y ≤ 49.8, z ≥ 3.7, K-1). U3-Footprint `fluidi:SOT-563_TI_DRL0006A` (Rev C).
+
+Zonen Rev C (KiCad-Y): Z3 20.8…23.2, Z4 23.2…46.7, Z5B 46.7…50.0, Z5A 50.0…52.7 (Vergusskante Sonde Y 52.2), Z6 52.7…58.5.
 
 ## 5 Platzierung und Routing
 
 - Feste Lagen nach PCB_OUTLINE Kap. 5 eingehalten: D1 (0, 9.6) – **180° gedreht** (Kathoden G/B links zu R7/R8,
-  gleiche Leuchtfläche), SW1 (−6.0, 8.4) unrotiert, BT1 Zelle (3.0, 34.45) 90°, TP1–TP3 im Streifen x −10.6.
+  gleiche Leuchtfläche), SW1 (−6.0, 8.4) unrotiert, BT1 Zelle **(3.0, 34.80)** 90° (Rev C), TP1/TP2 im Streifen x −10.6 (TP3 entfällt).
   Alle Courtyards im Band Y 5.7…20.8, ≥ 0.3 zur Kontur, überlappungsfrei (Generator prüft). Höhen ≤ 2.0 (Bibliothek).
 - U1 (6.0, 12.6) rot 270 (Pin 1 oben → HF), Q1 oben links (VBAT über In2 am rechten/oberen Rand), Messkette links,
   Puffer C1–C4 unten quer (Biegelinie), I²C-Pull-ups R4/R5 unten Mitte bei den Übergabevias der U3-Leitungen.
 - UART-Barrieren (R2-A3): R9/R11 (2a) oben Mitte, R10/R12 (2b) unten links, getrennte Bauteile > 10 mm auseinander,
   alle im Elektronikraum.
-- Testpads: TP1 TX, TP2 RX, TP3 GND (F, Fach, beschriftet), TP4 MEAS_CLK und TP5 PROBE_SENSE auf B im Band.
+- Testpads: TP1 TX, TP2 RX (F, Fach, beschriftet; Adapter-GND über das Minuspad, A-1), TP4 MEAS_CLK und TP5 PROBE_SENSE auf B im Band.
 - Router: Raster 0.05 mm, Lagen F/B, Entwurfsabstand 0.15, Bahnen 0.15 (Signal) / 0.20 (DCDC_SW, VDDR, OSC_PWR,
   VBAT), Vias 0.45/0.30; GND- und VDD-Fanout je Pad (Via-Lage weg von fremden Pads), danach Netze mit Rip-up/
   Reroute und Verlaufskosten. Reihenfolge per Startwert: **Seed 7** (kragen) bzw. **8** (band) routen vollständig
@@ -116,27 +123,31 @@ SENS_PWR) + 1 GND-Via x −8.7 (Kante 1.08 mm), alle tented. Die U3-Leitungen en
 
 ## 6 Silkscreen
 
-F: Wortmarke „fluidi“ v3a (10 mm breit, Strich 0.52 mm) und „rev B“ in Z6, Stecktiefenlinie Y 58.5 (z −5) mit
-„max“ und Pfeil, TX/RX/GND an den Pads; Pin-1-/Polaritätsmarken aus den Bibliotheks-Footprints (auf 0.15 mm).
-B: „fluidi rev B“, Linie und „max“. Referenzen nur auf F.Fab/B.Fab (Band zu dicht), Bestückungsplan daraus.
-Kein Warnsymbol (laut Auftrag am Gehäuse).
+F: Wortmarke „fluidi“ v3a (10 mm breit, Strich 0.52 mm) und „rev C“ in Z6, Stecktiefenlinie Y 58.5 (z −5) mit
+„max“ und Pfeil, TX/RX an den Pads; Pin-1-/Polaritätsmarken aus den Bibliotheks-Footprints (auf 0.15 mm).
+B: „fluidi rev C“, Linie und „max“; **im Fach (Rev C, LS-K3/S3-W4) Warndreieck 9 × 8 mm mit „!“, „CR2032“,
+„Verschluckgefahr“, „keep away from children“** (X −7.5…7.5, Y 26…40.7); **„JLCJLCJLCJLC“** als Platzhalter für die
+JLC-Auftragsnummer auf B im Band (X 2…10, Y 19.7; im Formular „Specify a location“ wählen, K-4).
+Referenzen nur auf F.Fab/B.Fab (Band zu dicht), Bestückungsplan daraus.
 
-## 7 DRC-Ergebnis (2026-11-07, `run_pcb.sh`, mit `--schematic-parity --refill-zones --severity-all`)
+## 7 DRC-Ergebnis Rev C (2026-11-08, `run_pcb.sh`, `--schematic-parity --severity-all`)
 
-| | Verletzungen | Ungeroutet | Parität |
-|---|---|---|---|
-| KiCad 10.0.8 WSL (`out/drc_wsl.rpt`, `.json`) | **0** | **0** | 0 |
-| KiCad 10.0.8 Windows (`out/drc_win.rpt`) | **0 Fehler**, 4 Warnungen `lib_footprint_mismatch` (U2, U4–U6) | **0** | 0 |
-| Option `--u3 band` (Seed 8, WSL, Prüflauf im Scratchpad) | 0 | 0 | 0 |
+Zonen werden in `run_pcb.sh` mit `kicad-cli pcb drc --refill-zones --save-board` gefüllt (Python-Füllung kennt die
+Projektregeln wie LS-K2 nicht); die Gerber entstehen aus dieser gespeicherten Füllung. DRC je mit und ohne Neufüllung:
 
-Die 4 Windows-Warnungen: Die Windows-Bibliothek hat eine neuere `SOT-353_SC-70-5` (Version 20260206) mit anderer
-Silk/Courtyard-Linie; Pads gleich (Diff geprüft). Schaltplan neu erzeugt: ERC 0 Fehler, 1 Warnung (unverändert,
-pin_to_pin SENS_PWR-Flag).
+| | mit `--refill-zones` | gespeicherte Füllung | Ungeroutet | Parität |
+|---|---|---|---|---|
+| KiCad 10.0.8 WSL (`out/drc_wsl.rpt`, `drc_wsl_nofill.rpt`) | **0** | **0** | **0** | 0 |
+| KiCad 10.0.8 Windows (`out/drc_win.rpt`, `drc_win_nofill.rpt`) | **0 Fehler**, 4 Warnungen | **0 Fehler**, 4 Warnungen | **0** | 0 |
 
-**Gegenprüfung Projektleitung (2026-11-07):** DRC ohne `--refill-zones` (gespeicherte Füllung, aus der die Gerber
-entstehen) ergab im ersten Stand 2 × `copper_edge_clearance` (K-3, 0.9977 mm an einem Bogen, Zonen GND_FACH_In1/In2).
-Korrektur: Fach-Zonenpolygon mit 1.05 mm Abstand statt 1.0 mm (`pcb_build.py`). Nach Neulauf (`run_pcb.sh kragen 7`)
-DRC mit und ohne Neufüllung: 0 Verletzungen, 0 ungeroutet, 0 Parität (WSL); Windows 0 Fehler, 4 Warnungen wie oben.
+Die 4 Windows-Warnungen `lib_footprint_mismatch` (U2, U4–U6): Die Windows-Bibliothek hat eine neuere `SOT-353_SC-70-5`
+(Version 20260206) mit anderer Silk-/Courtyard-Linie; Pads gleich (Diff geprüft). Schaltplan (`run_all.sh`): Netzliste
+57 Bauteile / 153 Pins / 37 Netze wie Soll, ERC WSL und Windows 0 Fehler, 1 Warnung (unverändert, pin_to_pin SENS_PWR-Flag).
+Routing Seed 7 vollständig (31 Netze). Option `--u3 band` in Rev C nicht neu geprüft (Rev B: 0/0/0, Seed 8).
+
+Nachgeprüft in der gespeicherten Platine (pcbnew): BT1 (3.000, 34.800) 90°, Plus-Pads Y 23.25…24.52 und 45.08…46.35
+(Spanne 23.10; 0.55 mm zu Y 22.70 und 46.90), TP3 entfernt, **8 Vias gefüllt + überkupfert** (VBAT, Minus, TP1, TP2 im Fach;
+4 im EP von U1), U3 Pad–Pad 0.20 mm, Titelblock Rev C, Gerber-Job „Revision C“, „Finish ENIG“.
 
 ## 8 Exporte (`hardware/sensor/out/`)
 
@@ -154,7 +165,13 @@ DRC mit und ohne Neufüllung: 0 Verletzungen, 0 ungeroutet, 0 Parität (WSL); Wi
 
 **JLC-Rotationen** (Tabelle `docs/references/matthewlai_JLCKicadTools_cpl_rotations_db_2026-11-07.csv`,
 DRITTQUELLE, nicht von JLC): SOT-23 −90 (Q1, Q2), QFN-24 +270 (U1), SOT-353 +180 (U2, U4–U6) sind in der CPL
-angewendet. Ohne Korrektur: 0402, 1206, SOT-563 (U3), 3225/3215, TS-1088, 1615, WPN2016, 3034. **Alle Rotationen in
+angewendet. **Projektregel (W-3, in `cpl_jlc.py` markiert): SOT-563 +180 (U3)**, Begründung DFM-Bericht W-3 (gleiche
+Pinanordnung wie SOT-363/SOT-353, TI-Tape wie DCK); BESTELL-PRÜFUNG. Ohne Korrektur: 0402, 1206, 3225/3215, TS-1088,
+1615, WPN2016, 3034.
+
+**Fertigungsvorgaben (verbindlich, A-2/LS-W4/W-6):** Oberfläche **ENIG** (Platine `copper_finish ENIG`, Gerber-Job);
+**Via Covering „Epoxy filled & capped“ (POFV) für die ganze Platine** – die 8 Via-in-Pad (4 im Fach, 4 im EP von U1)
+tragen in der Platine das Attribut gefüllt/überkupfert. **Ohne POFV wird nicht bestellt.** Alle übrigen Vias tented. **Alle Rotationen in
 der JLC-Vorschau („Confirm Parts Placement“) Teil für Teil prüfen**, besonders U1 (Pin 1), Q1/Q2, U3, D1, Y1.
 
 ## 9 Befunde an Schnittstellen (Abstimmung nötig)
@@ -176,7 +193,54 @@ der JLC-Vorschau („Confirm Parts Placement“) Teil für Teil prüfen**, beson
 - I²C über ≈ 30 mm Innenlage: Flanken messen (100 kHz empfohlen, PINMAP).
 - Cpar der Messkette (zwei Zuleitungen, TP5) und Kalibrierung; FR4-Feuchte (Feld Kap. 7).
 - Kragenverguss: Tasche, Lunker, Leckstrom (K-7); Zellfach-VIP: Flutung REQ-SAF-05.
+- A-3: Sichtprüfung der 4 Fach-VIP (≥ 10×), Querschliff VBAT-VIP an einer Opferplatine. A-4: Isolationswiderstand
+  VBAT–GND und TX/RX–GND vor/nach Flutung (3 V, ohne Zelle). U3 (Pad–Pad 0.20) Sichtkontrolle Lötbrücken.
 - VDD-Fläche auf In2: Einbruch beim Funken mit SPICE-Annahme vergleichen (Messung VDDS).
 - Router-Ergebnis ist DRC-sauber, aber nicht von Hand optimiert (lange Umwege einzelner Signale, viele Vias):
-  Review der Leitungsführung von LED/UART/Messkette, ggf. Nachbesserung in Rev C.
+  Review der Leitungsführung von LED/UART/Messkette, ggf. Nachbesserung in einer späteren Revision.
 
+
+## 11 Rev C (2026-11-08): Änderungen und Antworten auf die Befunde der Welle 3
+
+Grundlage: D-023, PCB_OUTLINE Rev C, `docs/reviews/phase4_layout_revb_sicherheit.md` (L-1/A-1…A-5, LS-W1…W4, LS-K1…K4),
+`phase4_layout_revb_dfm.md` (W-1…W-7, K-1…K-7), `phase4_kollision_mechanik.md` Kap. 6.3, `simulation/field/REPORT.md` Kap. 11.
+Kap. 9 oben beschreibt den Stand Rev B (historisch).
+
+**Geändert:** Schaltplan (TP3 entfernt, Footprints BT1 `fluidi:BatteryHolder_Keystone_3034_1x20mm_NegPad4mm_W23p1`, U3
+`fluidi:SOT-563_TI_DRL0006A`, Hinweistext), Bibliothek (`gen_lib.py`), Platzierung (BT1, U3/C24, Kragenvias), Zonen/Regel-
+flächen nach Rev C, DRC-Regeln, Silkscreen, Fertigungsattribute, CPL-Regel, Register, PROBE_CAPACITANCE, `osc_sim.py`.
+
+| Befund | Antwort |
+|---|---|
+| L-1 | *umgesetzt* nach D-023: Via-in-Pad im Fach nur mit POFV; DRC `VIP_FACH` bleibt |
+| A-1 | *umgesetzt*: TP3 und sein VIP entfernt (Schaltplan, Platine). Im Fach genau 4 VIP (VBAT, Minus, TP1, TP2), nachgeprüft |
+| A-2 | *umgesetzt* (Layoutseite): Kap. 8 „Fertigungsvorgaben“, Via-Attribut gefüllt/überkupfert in der Platine. Bestell-Checkliste/README: Projektleitung (ORDER) |
+| A-3 | *übernommen* als PROTOTYP-PRÜFUNG (Kap. 10); Ort Testplan REQ-DOC-03 (Projektleitung/Sicherheit) |
+| A-4 | *übernommen* als PROTOTYP-PRÜFUNG (Kap. 10), Testplan REQ-SAF-05 |
+| A-5 | *umgesetzt* in D-023 und PCB_OUTLINE Rev C Z4 (Mechanik/Projektleitung); Layout folgt (4 VIP, nur VBAT/GND/TX/RX) |
+| LS-W1 | *umgesetzt*: Pad-Spanne 23.10 (Katalogminimum W, `Keystone_3034_Catalog_M65.pdf` S. 1 Fig. 1), BT1 (3.000, 34.800); Pad-Rand 0.55 mm zu Y 22.70/46.90; DRC-Sperrstreifen 0.5 mm; `Z3_SCHOTT` sperrt Pads |
+| LS-W2 | *umgesetzt*: TP3 entfällt |
+| LS-W3 | *umgesetzt* (Mechanik, PCB_OUTLINE Rev C Clip x −4.4…11.7 nach Datenblatt); Footprint unverändert in Lage zum Datenblatt, PROTOTYP-PRÜFUNG R2-W01 Nr. 3 bleibt |
+| LS-W4 | *umgesetzt*: POFV in Kap. 8 und als Via-Attribut; Kosten mit POFV durch Projektleitung (Commit 6e857da) |
+| LS-K1 | *umgesetzt*: `Z3_Z4_INNEN` bis Y 50.0 (neue Kragenkante Z5A), Regel K-3 ≥ 1.0 |
+| LS-K2 | *umgesetzt*: DRC-Regel /VBAT ↔ GND ≥ 0.5 auf Innenlagen in `Z3_Z4_INNEN`; Füllung über kicad-cli mit Projektregeln, DRC 0 |
+| LS-K3 | *umgesetzt*: Warndreieck + „CR2032 / Verschluckgefahr / keep away from children“ auf B im Fach |
+| LS-K4 | *nicht Layout*: Masszeichnung (OP-K7), FMEA und Testplan liegen bei Sicherheit/Projektleitung; keine Layoutänderung |
+| W-1 | *bestätigt* (POFV im Kostenmodell); `cost_rev_b.py` nicht angefasst, BOM-Teile unverändert (nur Footprint-Namen) |
+| W-2 | *nicht Layout*: erledigt durch JLC-Angebot (Projektleitung, 6e857da) |
+| W-3 | *umgesetzt*: SOT-563 +180 als markierte Projektregel in `cpl_jlc.py` (gilt auch für `SOT-563_TI_DRL0006A`), BESTELL-PRÜFUNG in der JLC-Vorschau. Einverstanden mit der Begründung |
+| W-4 | *umgesetzt*: `copper_finish ENIG` (Platine, Gerber-Job „Finish: ENIG“) |
+| W-5 | *nicht Layout*: BESTELL-PRÜFUNG Economic + POFV + ENIG (Projektleitung) |
+| W-6 | *umgesetzt*: 8 Via-in-Pad mit Attribut gefüllt + überkupfert (4 Fach, 4 EP U1), Kap. 8 „POFV für die ganze Platine“ |
+| W-7 | *umgesetzt*: Block „REV C“ in `docs/datasheets/INDEX.csv` (26 Zeilen = BOM, Ref → Teil wie `fluidi_sensor_bom_jlc.csv`); 15 alte Ref-Zeilen (u. a. „R3 R4 R5 4.7k“, C23, „C1 C2“, R-LED-G) als VERALTET markiert, nicht gelöscht |
+| K-1 | *umgesetzt*: DRC-Regel Pad–Pad ≥ 0.15. U3 mit TI-Landmuster DRL0006A (Pads 0.67 × 0.30, Reihen 1.48, `TI_TMP1075_Datasheet_SBOS854F.pdf` S. 37) → **0.20 mm** statt 0.150 |
+| K-2 | *abgelehnt (keine Änderung)*: AE1-Pad 2 ist Teil der AN043-Kopie (Masse-Via der IFA, Lage bestimmt die Abstimmung). Restring 0.10 mm liegt über dem JLC-Via-Minimum (0.05) und unter dem PTH-Minimum (0.15). Ersetzen würde die Antennengeometrie ändern. BESTELL-PRÜFUNG: in der Gerber-Vorschau muss die Bohrung als Via erscheinen; sonst Pad durch Via 0.45/0.30 an gleicher Stelle ersetzen |
+| K-3 | *akzeptiert, keine Änderung*: nach der ersten Bestellung bestätigte Rotationen als Projekttabelle ablegen |
+| K-4 | *umgesetzt*: „JLCJLCJLCJLC“ auf B im Band |
+| K-5 | *umgesetzt*: Titelblock Revision C → Gerber-Job „Revision: C“ |
+| K-6 | *umgesetzt* über K-1 (0.20 mm) |
+| K-7 | *abgelehnt (keine Änderung)*: Ursprung oben Mitte bleibt (Schnittstelle PCB_OUTLINE Kap. 1); bei Versatz in der Vorschau Hilfsursprung verschieben |
+| Feld (REPORT Kap. 11.5) | *umgesetzt*: PROBE_CAPACITANCE C0 7.0 → 7.3 pF, Cg 1.71, Knoten ≈ 9.9 pF; `simulation/spice/osc/osc_sim.py` C_NODE 10.5 → 9.9 pF. Neulauf abgebrochen: ein ngspice-Fall (Mitte, Leitungswasser, mit Cref1) stand nach 22 min noch (Konvergenz), `osc_report.txt` daher noch Stand 2026-11-07; Frequenzen mit Knoten 9.9 pF hat die Feldsimulation gerechnet (REPORT Kap. 11.3: Luft 27.72 … Wasser 9.80 MHz, MEAS_CLK 0.595 … 4.56 MHz); Tabelle Kap. 8 (S-Zuleitung) nachgeführt. Option dünnere Zuleitungen (11.4) nicht umgesetzt (nicht nötig laut 11.5) |
+
+Weitere Rev-C-Punkte: Platinenanschlag X −8.0…−3.0 / Y 0…1.5 als Regelfläche ohne Bauteile; DRC jetzt auch ohne
+`--refill-zones` in `run_pcb.sh`; Fach-Zonenpolygon 1.05 mm (Korrektur Projektleitung) beibehalten; STEP neu erzeugt.

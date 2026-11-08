@@ -45,7 +45,7 @@ import params as P  # noqa: E402
 
 EPS0 = 8.8541878128e-12
 FIT = json.load(open(os.path.join(ROOT, "simulation", "field", "results", "probe_lumped_3d_extrap.json")))
-C_NODE = 10.5e-12          # 10 pF (CONCEPTS 2.3) + TP5 0.5 pF
+C_NODE = 9.9e-12           # Layout Rev B/C: U2 4.5 + TP5 0.5 + Bahnen/Vias/Zuleitung (field REPORT Kap. 11.3); vorher 10.5
 C_PIN = 6e-12
 C_REF1 = 22e-12
 C_OUT = 4.5e-12            # U4 CLK 3.5 pF + 1 pF

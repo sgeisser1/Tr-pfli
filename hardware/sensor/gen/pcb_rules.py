@@ -6,7 +6,7 @@ Quellen:
 - Projekt: docs/interfaces/PCB_OUTLINE.md Rev B Kap. 3 (Zonen), simulation/field/REPORT.md Kap. 8 (Kupfer >= 1.25 zur
   Kontur), REQ-MECH-05/06, S2-W03/S3-K1 (keine Vias im Fach/Schott), Sicherheit Phase 4 K-1...K-3.
 Die benannten Regelflaechen (Z1_ANTENNE, Z3_SCHOTT, Z4_FACH, VIP_FACH, Z3_Z4_INNEN, Z5_KRAGEN, Z5B_FELD, Z5A_DICHT,
-Z6_Z7_NASS, Z5A_Z7_SONDE) legt pcb_build.py an.
+Z6_Z7_NASS, Z5A_Z7_SONDE, VERGUSS_*_PADSPERRE, ANSCHLAG_KAPPE) legt pcb_build.py an (Rev C nach PCB_OUTLINE Rev C).
 """
 
 DRU = """(version 1)
@@ -37,8 +37,16 @@ DRU = """(version 1)
   (constraint text_height (min 1.0mm))
   (constraint text_thickness (min 0.15mm)))
 
+(rule "JLC SMD-Pad - Pad >= 0.15 (DFM K-1)"
+  (condition "A.Type == 'Pad' && B.Type == 'Pad'")
+  (constraint clearance (min 0.15mm)))
+
 # ---------------- Projektregeln (spaetere Regeln haben Vorrang)
-(rule "K-3 Innenlagen Schott/Zellfach >= 1.0 mm zur Kante"
+(rule "LS-K2 VBAT - GND Innenlagen Schott/Fach >= 0.5"
+  (layer inner)
+  (condition "A.NetName == '/VBAT' && B.NetName == 'GND' && A.intersectsArea('Z3_Z4_INNEN')")
+  (constraint clearance (min 0.5mm)))
+(rule "K-3/LS-K1 Innenlagen Schott, Fach, Kragen bis Y 50.0 >= 1.0 mm zur Kante"
   (layer inner)
   (condition "A.intersectsArea('Z3_Z4_INNEN')")
   (constraint edge_clearance (min 1.0mm)))

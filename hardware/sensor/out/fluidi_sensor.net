@@ -2,7 +2,7 @@
 	(version "E")
 	(design
 		(source "/home/sgeisser/git/Tr-pfli/hardware/sensor/fluidi_sensor.kicad_sch")
-		(date "2026-11-07T21:27:16")
+		(date "2026-11-08T00:47:32")
 		(tool "Eeschema 10.0.8-10.0.8~ubuntu24.04.1")
 		(textvar
 			(name "REV") "B")
@@ -133,7 +133,7 @@
 		(comp
 			(ref "BT1")
 			(value "CR2032 / Keystone 3034TR")
-			(footprint "fluidi:BatteryHolder_Keystone_3034_1x20mm_NegPad4mm")
+			(footprint "fluidi:BatteryHolder_Keystone_3034_1x20mm_NegPad4mm_W23p1")
 			(datasheet "docs/datasheets/Keystone_3034_Catalog_M65.pdf")
 			(description "Halter CR2032 SMT (Zelle Panasonic CR2032 lokal); Clip = Plus, Minus = ENIG-Pad 4x4 mm (R2-W01); Zelle Panasonic CR2032 lokal; Halter 90 Grad gedreht (Mechanik S-01)")
 			(fields
@@ -146,7 +146,7 @@
 				(field
 					(name "JLC") "Extended")
 				(field
-					(name "Footprint") "fluidi:BatteryHolder_Keystone_3034_1x20mm_NegPad4mm")
+					(name "Footprint") "fluidi:BatteryHolder_Keystone_3034_1x20mm_NegPad4mm_W23p1")
 				(field
 					(name "Datasheet") "docs/datasheets/Keystone_3034_Catalog_M65.pdf")
 				(field
@@ -3725,85 +3725,6 @@
 			)
 		)
 		(comp
-			(ref "TP3")
-			(value "GND")
-			(footprint "TestPoint:TestPoint_Pad_D1.0mm")
-			(description "nicht bestueckt; Messpunkt GND")
-			(fields
-				(field
-					(name "LCSC")
-				)
-				(field
-					(name "Hersteller") "-")
-				(field
-					(name "MPN") "Leiterplattenstruktur")
-				(field
-					(name "JLC") "-")
-				(field
-					(name "Footprint") "TestPoint:TestPoint_Pad_D1.0mm")
-				(field
-					(name "Datasheet")
-				)
-				(field
-					(name "Description") "nicht bestueckt; Messpunkt GND")
-			)
-			(libsource
-				(lib "Connector")
-				(part "TestPoint")
-				(description "test point")
-			)
-			(property
-				(name "LCSC")
-				(value "")
-			)
-			(property
-				(name "Hersteller")
-				(value "-")
-			)
-			(property
-				(name "MPN")
-				(value "Leiterplattenstruktur")
-			)
-			(property
-				(name "JLC")
-				(value "-")
-			)
-			(property
-				(name "Sheetname")
-				(value "fluidi_sensor")
-			)
-			(property
-				(name "Sheetfile")
-				(value "fluidi_sensor.kicad_sch")
-			)
-			(property
-				(name "exclude_from_bom")
-			)
-			(property
-				(name "ki_keywords")
-				(value "test point tp")
-			)
-			(property
-				(name "ki_fp_filters")
-				(value "Pin* Test*")
-			)
-			(sheetpath
-				(names "/")
-				(tstamps "/")
-			)
-			(tstamps "545be4df-ee63-5455-92e7-2dd5733cc12b")
-			(units
-				(unit
-					(name "A")
-					(pins
-						(pin
-							(num "1")
-						)
-					)
-				)
-			)
-		)
-		(comp
 			(ref "TP4")
 			(value "MEAS_CLK")
 			(footprint "TestPoint:TestPoint_Pad_D1.0mm")
@@ -4190,7 +4111,7 @@
 		(comp
 			(ref "U3")
 			(value "TMP1075NDRLR")
-			(footprint "Package_TO_SOT_SMD:SOT-563")
+			(footprint "fluidi:SOT-563_TI_DRL0006A")
 			(datasheet "docs/datasheets/TI_TMP1075_Datasheet_SBOS854F.pdf")
 			(description "Temperatursensor I2C SOT-563 (TMP1075N, 1.62-3.6 V); im Sondenkragen (Option f, Freigabe S3-K2); Adresse 0x48 (A0 = GND, DS S.14 Tab. 7-3); ALERT offen")
 			(fields
@@ -4203,7 +4124,7 @@
 				(field
 					(name "JLC") "Extended")
 				(field
-					(name "Footprint") "Package_TO_SOT_SMD:SOT-563")
+					(name "Footprint") "fluidi:SOT-563_TI_DRL0006A")
 				(field
 					(name "Datasheet") "docs/datasheets/TI_TMP1075_Datasheet_SBOS854F.pdf")
 				(field
@@ -6314,12 +6235,6 @@
 				(ref "SW1")
 				(pin "2")
 				(pinfunction "2_2")
-				(pintype "passive")
-			)
-			(node
-				(ref "TP3")
-				(pin "1")
-				(pinfunction "1_1")
 				(pintype "passive")
 			)
 			(node

@@ -16,6 +16,13 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.."))
 DB = os.path.join(ROOT, "docs/references/matthewlai_JLCKicadTools_cpl_rotations_db_2026-11-07.csv")
 
 
+# Projektregeln (nicht in der Drittquelle), vor der Tabelle gepruefte Reihenfolge; jede ist eine BESTELL-PRUEFUNG
+# in der JLC-Vorschau ("Confirm Parts Placement"):
+# - SOT-563 (U3, auch der abgeleitete fluidi-Footprint SOT-563_TI_DRL0006A): +180 wie SOT-363/SOT-353 mit gleicher
+#   Pinanordnung und TI-Tape (DFM-Bericht phase4_layout_revb_dfm.md W-3). Bei 180-Grad-Fehler waeren V+ und GND vertauscht.
+PROJECT_RULES = [(re.compile(r"^SOT-563"), 180.0, "PROJEKTREGEL W-3 (BESTELL-PRUEFUNG)")]
+
+
 def load_db():
     rules = []
     for row in csv.reader(open(DB)):
@@ -38,7 +45,11 @@ def main(src, dst):
         for r in rows:
             pkg = r["Package"]
             corr, pat = 0.0, ""
-            for rx, c in rules:
+            for rx, c, why in PROJECT_RULES:
+                if rx.search(pkg):
+                    corr, pat = c, why
+                    break
+            for rx, c in ([] if pat else rules):
                 if rx.search(pkg):
                     corr, pat = c, rx.pattern
                     break

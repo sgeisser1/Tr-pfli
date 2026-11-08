@@ -3924,7 +3924,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "fluidi:BatteryHolder_Keystone_3034_1x20mm_NegPad4mm"
+		(property "Footprint" "fluidi:BatteryHolder_Keystone_3034_1x20mm_NegPad4mm_W23p1"
 			(at 25.4 60.96 0)
 			(effects
 				(font
@@ -13188,7 +13188,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Package_TO_SOT_SMD:SOT-563"
+		(property "Footprint" "fluidi:SOT-563_TI_DRL0006A"
 			(at 55.88 121.92 0)
 			(effects
 				(font
@@ -15658,175 +15658,6 @@
 		(uuid "ab4cabba-0faa-5327-b18f-682cd0a52a75")
 	)
 	(symbol
-		(lib_id "Connector:TestPoint")
-		(at 386.08 142.24 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom no)
-		(on_board yes)
-		(dnp no)
-		(uuid "545be4df-ee63-5455-92e7-2dd5733cc12b")
-		(property "Reference" "TP3"
-			(at 388.08 141.24 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "GND"
-			(at 388.08 143.74 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
-			(at 386.08 142.24 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 386.08 142.24 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "nicht bestueckt; Messpunkt GND"
-			(at 386.08 142.24 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "LCSC" ""
-			(at 386.08 142.24 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Hersteller" "-"
-			(at 386.08 142.24 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "MPN" "Leiterplattenstruktur"
-			(at 386.08 142.24 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "JLC" "-"
-			(at 386.08 142.24 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "c1043354-a1ac-547b-810e-123bbf5fdae1")
-		)
-		(instances
-			(project "fluidi_sensor"
-				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
-					(reference "TP3")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(wire
-		(pts
-			(xy 386.08 142.24)
-			(xy 386.08 144.78)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "d6e76136-18e5-5159-a18d-3400519fcb28")
-	)
-	(symbol
-		(lib_id "power:GND")
-		(at 386.08 144.78 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom no)
-		(on_board yes)
-		(dnp no)
-		(uuid "cf7d0330-2563-5cf6-ac1c-ce4ce57c5726")
-		(property "Reference" "#PWR051"
-			(at 386.08 144.78 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "GND"
-			(at 386.08 147.78 0)
-			(effects
-				(font
-					(size 1 1)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 386.08 144.78 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 386.08 144.78 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "8f587cb3-0c20-578d-8082-d103cafc5681")
-		)
-		(instances
-			(project "fluidi_sensor"
-				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
-					(reference "#PWR051")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "power:PWR_FLAG")
 		(at 111.76 40.64 0)
 		(unit 1)
@@ -15834,8 +15665,8 @@
 		(in_bom no)
 		(on_board yes)
 		(dnp no)
-		(uuid "55b04fa4-d1e7-5dfe-aa28-5fdf00d44cfc")
-		(property "Reference" "#FLG52"
+		(uuid "e8da6903-c0c8-5bad-aca1-73bdfb1d12fe")
+		(property "Reference" "#FLG51"
 			(at 111.76 40.64 0)
 			(effects
 				(font
@@ -15871,12 +15702,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "8e67ff79-9a8f-533a-98d6-5290f95a2290")
+			(uuid "2ef056e9-ed61-59b4-8019-e47ae5a1dc44")
 		)
 		(instances
 			(project "fluidi_sensor"
 				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
-					(reference "#FLG52")
+					(reference "#FLG51")
 					(unit 1)
 				)
 			)
@@ -15901,8 +15732,8 @@
 		(in_bom no)
 		(on_board yes)
 		(dnp no)
-		(uuid "b5e090a9-d9e2-5079-8e01-ae5513e83d75")
-		(property "Reference" "#PWR053"
+		(uuid "bd2f3a5d-b038-5f06-b52b-e6bc73cfa7f4")
+		(property "Reference" "#PWR052"
 			(at 111.76 43.18 0)
 			(effects
 				(font
@@ -15938,12 +15769,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "15c0f22f-88c7-5780-9845-f3d78866b70d")
+			(uuid "68cbb5ce-5195-54fe-aa1e-b5a8608ac827")
 		)
 		(instances
 			(project "fluidi_sensor"
 				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
-					(reference "#PWR053")
+					(reference "#PWR052")
 					(unit 1)
 				)
 			)
@@ -15957,8 +15788,8 @@
 		(in_bom no)
 		(on_board yes)
 		(dnp no)
-		(uuid "2ca4cf35-f3a5-5340-89fc-eb2d498bf4a1")
-		(property "Reference" "#FLG54"
+		(uuid "603bcffe-8d23-5378-b26a-199fc05886e0")
+		(property "Reference" "#FLG53"
 			(at 111.76 66.04 0)
 			(effects
 				(font
@@ -15994,12 +15825,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "c5152008-6640-5c97-995c-e884ef990f9b")
+			(uuid "8e85e6e7-11f9-56c0-8e4a-5fa21c41afca")
 		)
 		(instances
 			(project "fluidi_sensor"
 				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
-					(reference "#FLG54")
+					(reference "#FLG53")
 					(unit 1)
 				)
 			)
@@ -16024,8 +15855,8 @@
 		(in_bom no)
 		(on_board yes)
 		(dnp no)
-		(uuid "c77b91ef-06bf-5589-b7e4-3e4a8a8c83d6")
-		(property "Reference" "#PWR055"
+		(uuid "848ee1fa-8ea8-5717-b179-8504246ffca7")
+		(property "Reference" "#PWR054"
 			(at 111.76 68.58 0)
 			(effects
 				(font
@@ -16061,12 +15892,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "b93aa1a2-241e-5921-ae85-29484d80b0db")
+			(uuid "5543d51f-2058-581e-9291-50d86beba01a")
 		)
 		(instances
 			(project "fluidi_sensor"
 				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
-					(reference "#PWR055")
+					(reference "#PWR054")
 					(unit 1)
 				)
 			)
@@ -16080,8 +15911,8 @@
 		(in_bom no)
 		(on_board yes)
 		(dnp no)
-		(uuid "e448eed9-7252-525d-ad9b-d63593dbe23c")
-		(property "Reference" "#FLG56"
+		(uuid "f55090e0-b04a-5b34-ac36-bb53329b1593")
+		(property "Reference" "#FLG55"
 			(at 111.76 101.6 0)
 			(effects
 				(font
@@ -16117,12 +15948,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "b551c0f1-2473-553f-82a7-11792e3671b1")
+			(uuid "9a96f8f9-6d93-5ac2-bfd5-f60cab8a315e")
 		)
 		(instances
 			(project "fluidi_sensor"
 				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
-					(reference "#FLG56")
+					(reference "#FLG55")
 					(unit 1)
 				)
 			)
@@ -16157,8 +15988,8 @@
 		(in_bom no)
 		(on_board yes)
 		(dnp no)
-		(uuid "bb8ccce7-2c0f-545f-a0e7-e717d1e0c37c")
-		(property "Reference" "#FLG57"
+		(uuid "e448eed9-7252-525d-ad9b-d63593dbe23c")
+		(property "Reference" "#FLG56"
 			(at 132.08 213.36 0)
 			(effects
 				(font
@@ -16194,12 +16025,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "acef370f-f028-561a-b7bd-400257c902d2")
+			(uuid "b551c0f1-2473-553f-82a7-11792e3671b1")
 		)
 		(instances
 			(project "fluidi_sensor"
 				(path "/0e237d33-ea64-5532-bc2b-321defdc5b17"
-					(reference "#FLG57")
+					(reference "#FLG56")
 					(unit 1)
 				)
 			)
@@ -16259,7 +16090,7 @@
 		)
 		(uuid "648d16b7-05e8-50b0-83d3-39cca1031579")
 	)
-	(text "PROGRAMMIERUNG (REQ-SAF-CC-03, Auflagen R2-A1...A4)\nBarriere 1: Dummy-Zellen-Adapter einteilig, statt der Zelle im Halter,\n  Speisung nur ueber die Halterkontakte, VDD 1.8-2.0 V, 1.8-V-UART (R2-A2).\nBarriere 2: je Pad 2 x 100 k, beide im Elektronikraum, getrennte\n  Loetstoppoeffnungen, Abstand gegen Loetbruecke/Wasserfilm (R2-A3).\nGrenze (R2-A1): Fehlerfall <= 10 mA, Ladung <= 1 % C = 2.25 mAh\n  (Maxell Warnings S.2, Panasonic Handbook S.1).\nPads RX/TX im Zellfach ausserhalb der Zellflaeche, keine Vias (R2-W01).\nKein nRST-, SWD- oder VDD-Pad. ROM-Bootloader: SW1 (DIO21) beim\n  Einschalten gedrueckt, RX = DIO20, TX = DIO6 (TRM S.464).\nTP3 GND (Fach); TP4 MEAS_CLK, TP5 PROBE_SENSE auf der B-Seite des\n  Elektronikbands: nur messen, keine Quelle (Abstimmung sicherheit)."
+	(text "PROGRAMMIERUNG (REQ-SAF-CC-03, Auflagen R2-A1...A4)\nBarriere 1: Dummy-Zellen-Adapter einteilig, statt der Zelle im Halter,\n  Speisung nur ueber die Halterkontakte, VDD 1.8-2.0 V, 1.8-V-UART (R2-A2).\nBarriere 2: je Pad 2 x 100 k, beide im Elektronikraum, getrennte\n  Loetstoppoeffnungen, Abstand gegen Loetbruecke/Wasserfilm (R2-A3).\nGrenze (R2-A1): Fehlerfall <= 10 mA, Ladung <= 1 % C = 2.25 mAh\n  (Maxell Warnings S.2, Panasonic Handbook S.1).\nPads RX/TX im Zellfach ausserhalb der Zellflaeche, Via-in-Pad gefuellt (D-023).\nKein nRST-, SWD- oder VDD-Pad. ROM-Bootloader: SW1 (DIO21) beim\n  Einschalten gedrueckt, RX = DIO20, TX = DIO6 (TRM S.464).\nAdapter-GND ueber das Minuspad (TP3 entfaellt, A-1). TP4 MEAS_CLK, TP5 PROBE_SENSE auf B des\n  Elektronikbands: nur messen, keine Quelle (Abstimmung sicherheit)."
 		(exclude_from_sim no)
 		(at 264.16 76.2 0)
 		(effects

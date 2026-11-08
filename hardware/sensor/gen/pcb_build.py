@@ -24,6 +24,7 @@ ROUTE_ORDER = ["X48N", "X48P", "X32P", "X32N", "DCDC_SW", "VDDD", "VDDR", "RSTN"
                "VBAT", "SENS_PWR", "I2C_SDA", "I2C_SCL",
                "LED_R_K", "LED_G_K", "LED_B_K", "LED_R_UART_TX", "LED_G", "LED_B_UART_RX", "BTN_BOOT_N",
                "UART_TX_MID", "UART_RX_MID", "UART_TX_PAD", "UART_RX_PAD"]
+REV = "C"
 FIXED_NETS = {"RF_PIN", "RF_FILT", "RF_ANT_DC", "ANT_FEED", "X48P", "X48N"}
 TW_XTAL = 0.15
 
@@ -109,12 +110,12 @@ def add_rule_area(board, name, sp, layers, tracks=False, vias=False, pads=False,
     return z
 
 
-def silk_text(board, text, x, y, h, layer, thick=0.18, mirror=False, rot=0, just=None):
+def silk_text(board, text, x, y, h, layer, thick=0.18, mirror=False, rot=0, just=None, wf=0.9):
     t = pcbnew.PCB_TEXT(board)
     t.SetText(text)
     t.SetPosition(P(x, y))
     t.SetLayer(lid(board, layer))
-    t.SetTextSize(pcbnew.VECTOR2I(mm(h * 0.9), mm(h)))
+    t.SetTextSize(pcbnew.VECTOR2I(mm(h * wf), mm(h)))
     t.SetTextThickness(mm(thick))
     t.SetMirrored(mirror)
     t.SetTextAngleDegrees(rot)
@@ -202,6 +203,12 @@ def build(board, fps, nets, place, args):
     ds.m_MinSilkTextHeight = mm(1.0)
     ds.m_MinSilkTextThickness = mm(0.15)
     ds.SetAuxOrigin(P(0, 0))
+    tb = board.GetTitleBlock()
+    tb.SetTitle("fluidi Sensor")
+    tb.SetRevision(REV)              # DFM K-5: Revision im Gerber-Job
+    tb.SetDate("2026-11-08")
+    tb.SetCompany("fluidi")
+    tb.SetComment(0, "PCB_OUTLINE Rev C (D-023), JLC04161H-7628, ENIG, Via-in-Pad POFV")
     ds.SetGridOrigin(P(0, 0))
 
     # Silkscreen der Bibliotheks-Footprints auf JLC-Mindestbreite 0.15 mm
@@ -314,7 +321,7 @@ def build(board, fps, nets, place, args):
     ux, uy = padxy("U1", "25")
     for dx in (-0.6, 0.6):
         for dy in (-0.6, 0.6):
-            fixed_via(ux + dx, uy + dy, "GND")
+            fixed_via(ux + dx, uy + dy, "GND", filled=True)   # Via-in-Pad im EP: POFV (DFM W-6)
     # Antennen-Massepunkt (Pad 2 ist THT im Footprint) -> zusaetzlich 2 Vias neben dem Massearm (AN043 Abb. 3)
     # (Pad 2 = Via to ground)
 
@@ -348,7 +355,7 @@ def build(board, fps, nets, place, args):
     minus = [p for p in fps["BT1"].Pads() if p.GetNumber() == "2"][0]
     mx, my = pcbnew.ToMM(minus.GetPosition().x) - G.OX, pcbnew.ToMM(minus.GetPosition().y) - G.OY
     vip.append((mx, my, "GND"))
-    for tp, net in (("TP1", "UART_TX_PAD"), ("TP2", "UART_RX_PAD"), ("TP3", "GND")):
+    for tp, net in (("TP1", "UART_TX_PAD"), ("TP2", "UART_RX_PAD")):   # TP3 entfaellt (A-1)
         x, y = padxy(tp, "1")
         vip.append((x, y, net))
     for (x, y, n) in vip:
@@ -356,7 +363,8 @@ def build(board, fps, nets, place, args):
     sy = PL.STUB_VIA_Y
     # VBAT auf In2: im Fach nach rechts (Kante >= 1.0, K-3), im Band am rechten und oberen Rand (VDD-Flaeche
     # bleibt zusammenhaengend) bis zum Uebergabevia neben Q1 (Verpolschutz oben links)
-    vbat_pts = [(bx, vy), (PL.VBAT_X, vy), (PL.VBAT_X, PL.VBAT_Y), PL.VBAT_VIA]
+    # Stueck bei Y 20.5 getrennt: die Regel VBAT-GND >= 0.5 (LS-K2) gilt nur fuer die Stuecke in Schott/Fach
+    vbat_pts = [(bx, vy), (PL.VBAT_X, vy), (PL.VBAT_X, PL.STUB_VIA_Y), (PL.VBAT_X, PL.VBAT_Y), PL.VBAT_VIA]
     fixed_track("In2.Cu", vbat_pts, 0.3, "VBAT")
     stubs["VBAT"] = PL.VBAT_VIA
     for (xa, ya), (xb, yb) in zip(vbat_pts[:-1], vbat_pts[1:]):
@@ -380,13 +388,13 @@ def build(board, fps, nets, place, args):
         add_track(board, nets, "F.Cu", [p["2"], (vx, PL.U3_VIA_Y["GND"])], 0.2, "GND")
         add_track(board, nets, "F.Cu", [p["1"], (vx, PL.U3_VIA_Y["I2C_SCL"])], w, "I2C_SCL")
         gx = (p["6"][0] + p["1"][0]) / 2
-        add_track(board, nets, "F.Cu", [p["6"], (gx, p["6"][1]), (gx, 46.85), (vx - 0.3, 46.85),
+        add_track(board, nets, "F.Cu", [p["6"], (gx, p["6"][1]), (gx, G.U3_FIELD[1] + 0.15), (vx - 0.3, G.U3_FIELD[1] + 0.15),
                                         (vx, PL.U3_VIA_Y["I2C_SDA"])], w, "I2C_SDA")
         add_track(board, nets, "F.Cu", [p["4"], (c24["2"][0] + 0.45, p["4"][1]), c24["2"]], 0.2, "GND")
         add_via(board, nets, PL.U3_GND_VIA2[0], PL.U3_GND_VIA2[1], "GND")
         add_track(board, nets, "F.Cu", [PL.U3_GND_VIA2, c24["2"]], 0.2, "GND")
         add_track(board, nets, "F.Cu", [p["5"], (p["5"][0] - 0.45, p["5"][1]), c24["1"]], w, "SENS_PWR")
-        add_track(board, nets, "F.Cu", [c24["1"], (c24["1"][0], 48.95), (vx - 0.4, 48.95),
+        add_track(board, nets, "F.Cu", [c24["1"], (c24["1"][0], G.U3_FIELD[3] - 0.15), (vx - 0.4, G.U3_FIELD[3] - 0.15),
                                         (vx, PL.U3_VIA_Y["SENS_PWR"])], w, "SENS_PWR")
         # Innenlage In2 (L3) nach oben ins Band, Abstand Kante >= 1.0 (K-3)
         for n in ("I2C_SDA", "I2C_SCL", "SENS_PWR"):
@@ -429,7 +437,7 @@ def build(board, fps, nets, place, args):
         fl = []
         free_g = rt.free_masks(nn, 0.1)
         for (ref, num, m) in pad_cells.get(netname, []):
-            if ref in ("AE1", "BT1", "TP3", "VIA", "E1") or (ref, num) in skip:
+            if ref in ("AE1", "BT1", "VIA", "E1") or (ref, num) in skip:
                 continue
             if u3 == "kragen" and ref in ("U3", "C24"):
                 continue
@@ -613,14 +621,22 @@ def _finish(board, fps, nets, place, args, rt, nid, st):
     a0 = PL.ANT_X - 3.05
     add_rule_area(board, "Z1_ANTENNE", G.rect_poly(-13.5, -0.5, 13.5, G.KEEPOUT_Y), cu_all, tracks=True, vias=True,
                   pour=True)
-    add_rule_area(board, "Z3_SCHOTT", G.rect_poly(-13.5, G.SCHOTT_Y0, 13.5, G.SCHOTT_Y1), outer, tracks=True,
+    add_rule_area(board, "Z3_SCHOTT", G.rect_poly(-13.5, G.SCHOTT_Y0, 13.5, G.SCHOTT_Y1), outer, tracks=True, pads=True,
                   vias=True, pour=True)
-    add_rule_area(board, "Z4_FACH", G.rect_poly(-13.5, G.SCHOTT_Y1, 13.5, G.FACH_Y1 + 0.1), outer, tracks=True,
+    add_rule_area(board, "Z4_FACH", G.rect_poly(-13.5, G.SCHOTT_Y1, 13.5, G.FACH_Y1), outer, tracks=True,
                   pour=True)
-    add_rule_area(board, "Z3_Z4_INNEN", G.rect_poly(-13.5, G.SCHOTT_Y0 + 0.02, 13.5, G.FACH_Y1 + 0.1), cu_all)
+    # K-3 / LS-K1: Innenlagen >= 1.0 zur Kante in Schott, Fach und Kragen bis zum Dichtstreifen (Y 50.0)
+    add_rule_area(board, "Z3_Z4_INNEN", G.rect_poly(-13.5, G.SCHOTT_Y0 + 0.02, 13.5, G.Z5B_Y1), cu_all)
+    # Rev C: Pad-Rand >= 0.5 mm zu den Vergusskanten Schott (Y 22.70) und Kragen (Y 46.90) -> Sperrstreifen ohne Pads
+    add_rule_area(board, "VERGUSS_SCHOTT_PADSPERRE", G.rect_poly(-13.5, G.VERGUSS_SCHOTT_Y - 0.5, 13.5,
+                  G.VERGUSS_SCHOTT_Y + 0.5), outer, pads=True)
+    add_rule_area(board, "VERGUSS_KRAGEN_PADSPERRE", G.rect_poly(-13.5, G.VERGUSS_KRAGEN_Y - 0.5, 13.5,
+                  G.VERGUSS_KRAGEN_Y + 0.5), outer, pads=True)
+    # Platinenanschlag der Kappe (Rev C Kap. 6): keine Bauteile, Kupfer erlaubt
+    add_rule_area(board, "ANSCHLAG_KAPPE", G.rect_poly(*G.ANSCHLAG), outer, fps=True)
     for (x, y, n) in st["vip"]:
         add_rule_area(board, "VIP_FACH", G.rect_poly(x - 0.3, y - 0.3, x + 0.3, y + 0.3), cu_all)
-    kragen = G.rect_poly(-11, G.FACH_Y1 + 0.1, 11, G.Z5A_Y1)
+    kragen = G.rect_poly(-11, G.FACH_Y1, 11, G.Z5A_Y1)
     if u3 == "kragen":
         fx0, fy0, fx1, fy1 = G.U3_FIELD
         kragen.BooleanSubtract(G.rect_poly(fx0, fy0, fx1, fy1))
@@ -657,9 +673,20 @@ def _finish(board, fps, nets, place, args, rt, nid, st):
         ax = 8.3 if not mir else -8.3
         silk_poly(board, [[(ax - 0.5, 59.6), (ax + 0.5, 59.6), (ax, 58.75)]], lay)
         silk_line(board, (ax, 59.6), (ax, 60.6), 0.2, lay)
-    silk_text(board, "fluidi rev B", 0.0, 56.1, 1.5, "B.SilkS", thick=0.22, mirror=True)
-    silk_text(board, "rev B", 6.0, 56.1, 1.2, "F.SilkS", thick=0.18)
-    for tp, lab in (("TP1", "TX"), ("TP2", "RX"), ("TP3", "GND")):
+    silk_text(board, "fluidi rev " + REV, 0.0, 56.1, 1.5, "B.SilkS", thick=0.22, mirror=True)
+    silk_text(board, "rev " + REV, 6.0, 56.1, 1.2, "F.SilkS", thick=0.18)
+    # LS-K3 / S3-W4: Warnsymbol (Dreieck 9 x 8 mm mit "!") und Text auf B im Fach (x -8...8, Y 25.5...42.5)
+    tri = [(-4.5, 34.0), (4.5, 34.0), (0.0, 26.0), (-4.5, 34.0)]
+    for a, b in zip(tri[:-1], tri[1:]):
+        silk_line(board, a, b, 0.4, "B.SilkS")
+    silk_line(board, (0.0, 28.6), (0.0, 31.6), 0.6, "B.SilkS")
+    silk_poly(board, [[(-0.35, 32.4), (0.35, 32.4), (0.35, 33.1), (-0.35, 33.1)]], "B.SilkS")
+    silk_text(board, "CR2032", 0.0, 36.0, 1.5, "B.SilkS", thick=0.25, mirror=True)
+    silk_text(board, "Verschluckgefahr", 0.0, 38.2, 1.2, "B.SilkS", thick=0.2, mirror=True, wf=0.8)
+    silk_text(board, "keep away from children", 0.0, 40.2, 1.0, "B.SilkS", thick=0.17, mirror=True, wf=0.65)
+    # DFM K-4: Platzhalter JLC-Auftragsnummer (B, Band, ohne Pads darunter)
+    silk_text(board, "JLCJLCJLCJLC", 6.0, 19.7, 1.0, "B.SilkS", thick=0.17, mirror=True, wf=0.65)
+    for tp, lab in (("TP1", "TX"), ("TP2", "RX")):
         x, y = [pcbnew.ToMM(v) for v in (fps[tp].GetPosition().x, fps[tp].GetPosition().y)]
         silk_text(board, lab, x - G.OX + 1.2, y - G.OY, 1.0, "F.SilkS", thick=0.15, just="left")
     for tp, lab in (("TP4", "CLK"), ("TP5", "S")):
@@ -700,7 +727,7 @@ STACKUP = """\t\t(stackup
 \t\t\t(layer "B.Mask" (type "Bottom Solder Mask") (thickness 0.01))
 \t\t\t(layer "B.Paste" (type "Bottom Solder Paste"))
 \t\t\t(layer "B.SilkS" (type "Bottom Silk Screen"))
-\t\t\t(copper_finish "HAL lead-free")
+\t\t\t(copper_finish "ENIG")
 \t\t\t(dielectric_constraints no)
 \t\t)
 """

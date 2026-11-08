@@ -26,8 +26,16 @@
   (constraint text_height (min 1.0mm))
   (constraint text_thickness (min 0.15mm)))
 
+(rule "JLC SMD-Pad - Pad >= 0.15 (DFM K-1)"
+  (condition "A.Type == 'Pad' && B.Type == 'Pad'")
+  (constraint clearance (min 0.15mm)))
+
 # ---------------- Projektregeln (spaetere Regeln haben Vorrang)
-(rule "K-3 Innenlagen Schott/Zellfach >= 1.0 mm zur Kante"
+(rule "LS-K2 VBAT - GND Innenlagen Schott/Fach >= 0.5"
+  (layer inner)
+  (condition "A.NetName == '/VBAT' && B.NetName == 'GND' && A.intersectsArea('Z3_Z4_INNEN')")
+  (constraint clearance (min 0.5mm)))
+(rule "K-3/LS-K1 Innenlagen Schott, Fach, Kragen bis Y 50.0 >= 1.0 mm zur Kante"
   (layer inner)
   (condition "A.intersectsArea('Z3_Z4_INNEN')")
   (constraint edge_clearance (min 1.0mm)))

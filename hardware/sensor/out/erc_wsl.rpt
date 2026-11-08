@@ -1,11 +1,11 @@
-ERC report (2026-11-07T21:27:17, Encoding UTF8)
+ERC report (2026-11-08T00:47:33, Encoding UTF8)
 Report includes: Errors, Warnings, Exclusions
 
 ***** Sheet /
 [pin_to_pin]: Pins of type Bidirectional and Power output are connected
     ; warning
     @(208.28 mm, 73.66 mm): Symbol U1 Pin 5 [DIO12, Bidirectional, Line]
-    @(111.76 mm, 101.60 mm): Symbol #FLG56 Pin 1 [Power output, Line]
+    @(111.76 mm, 101.60 mm): Symbol #FLG55 Pin 1 [Power output, Line]
 
  ** ERC messages: 1  Errors 0  Warnings 1
 

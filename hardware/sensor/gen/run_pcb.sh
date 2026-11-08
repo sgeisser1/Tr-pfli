@@ -15,15 +15,27 @@ mkdir -p "$OUT" "$OUT/gerber" "$OUT/pdf" "$OUT/render"
 
 $PY hardware/sensor/gen/gen_pcb.py --u3 "$U3" --seed "$SEED" --out "$PCB" --plot "$OUT/layout_band_routing.png"
 
-echo "--- DRC KiCad $(kicad-cli --version) (WSL)"
+# Zonen mit allen Regeln (inkl. .kicad_dru, z. B. LS-K2 VBAT-GND 0.5) fuellen und speichern: Die Python-Fuellung kennt
+# die Projektregeln nicht. Die Gerber entstehen aus dieser gespeicherten Fuellung.
+kicad-cli pcb drc --refill-zones --save-board -o /dev/null "$PCB" >/dev/null
+
+# DRC je zweimal: mit Neufuellung und auf der gespeicherten Fuellung (aus der die Gerber entstehen)
+echo "--- DRC KiCad $(kicad-cli --version) (WSL), mit --refill-zones"
 kicad-cli pcb drc --schematic-parity --refill-zones --severity-all --format report -o "$OUT/drc_wsl.rpt" "$PCB" | tail -1
 kicad-cli pcb drc --schematic-parity --refill-zones --severity-all --format json -o "$OUT/drc_wsl.json" "$PCB" >/dev/null
-grep -E "^\*\*" "$OUT/drc_wsl.rpt" || true
+grep -E "^\*\* Found" "$OUT/drc_wsl.rpt" || true
+echo "--- DRC KiCad (WSL), gespeicherte Fuellung"
+kicad-cli pcb drc --schematic-parity --severity-all --format report -o "$OUT/drc_wsl_nofill.rpt" "$PCB" | tail -1
+grep -E "^\*\* Found" "$OUT/drc_wsl_nofill.rpt" || true
 if [ -x "$WIN" ]; then
-  echo "--- DRC KiCad $($WIN --version | tr -d '\r') (Windows)"
+  echo "--- DRC KiCad $($WIN --version | tr -d '\r') (Windows), mit --refill-zones"
   "$WIN" pcb drc --schematic-parity --refill-zones --severity-all --format report \
     -o "$(wslpath -w "$OUT")\\drc_win.rpt" "$(wslpath -w "$PCB")" | tail -1
-  grep -E "^\*\*" "$OUT/drc_win.rpt" || true
+  grep -E "^\*\* Found" "$OUT/drc_win.rpt" || true
+  echo "--- DRC KiCad (Windows), gespeicherte Fuellung"
+  "$WIN" pcb drc --schematic-parity --severity-all --format report \
+    -o "$(wslpath -w "$OUT")\\drc_win_nofill.rpt" "$(wslpath -w "$PCB")" | tail -1
+  grep -E "^\*\* Found" "$OUT/drc_win_nofill.rpt" || true
 fi
 
 echo "--- Gerber/Bohrdaten (JLC: Protel-Endungen, ohne X2, Bohrdaten Excellon mm, PTH/NPTH getrennt)"

@@ -1,9 +1,9 @@
-(footprint "BatteryHolder_Keystone_3034_1x20mm_NegPad4mm"
+(footprint "BatteryHolder_Keystone_3034_1x20mm_NegPad4mm_W23p1"
 	(version 20241229)
 	(generator "fluidi_gen_lib")
 	(generator_version "9.0")
 	(layer "F.Cu")
-	(descr "Keystone 3034 (LCSC C5213768), Clip-Pads aus KiCad-Bibliothek (W 23.24 >= 23.1, Hoehe 5.08 ~ 5.1 min, Katalog S.1 Fig. 1); Minuspad 4 x 4 mm (>= 3.96 mm SQ min) nach Auflage R2-W01 Nr. 1, statt 17.8-mm-Kreis der Bibliothek")
+	(descr "Keystone 3034 (LCSC C5213768), abgeleitet aus der KiCad-Bibliothek: Clip-Pads 5.08 x 1.27, Spanne auf das Katalogminimum W 23.1 gekuerzt (Padmitten +-10.915 statt +-10.985, Keystone_3034_Catalog_M65.pdf S.1 Fig. 1 Pad Layout; LS-W1, D-023); Minuspad 4 x 4 mm (>= 3.96 mm SQ min) nach Auflage R2-W01 Nr. 1, statt 17.8-mm-Kreis der Bibliothek")
 	(tags "Keystone type 3034 coin cell retainer")
 	(property "Reference" "REF**"
 		(at 0 -11.5 0)
@@ -63,26 +63,6 @@
 		)
 		(layer "F.SilkS")
 		(uuid "3f14b5f4-5fee-46bd-8a20-6c92b8b11a14")
-	)
-	(fp_line
-		(start -10.78 3)
-		(end -10.78 3.63)
-		(stroke
-			(width 0.12)
-			(type solid)
-		)
-		(layer "F.SilkS")
-		(uuid "3f82f6dc-98e2-436d-bf9b-01030d57d9db")
-	)
-	(fp_line
-		(start -10.78 3.63)
-		(end -9.34 7.58)
-		(stroke
-			(width 0.12)
-			(type solid)
-		)
-		(layer "F.SilkS")
-		(uuid "d9d2d592-a8dc-4cda-bc27-059b9448c8f4")
 	)
 	(fp_line
 		(start -8.7 -7.54)
@@ -153,17 +133,6 @@
 		)
 		(layer "F.SilkS")
 		(uuid "cc58bf2f-f46e-46d9-87e2-3e805185d70f")
-	)
-	(fp_arc
-		(start -6.003354 8.56653)
-		(mid -7.921654 8.918738)
-		(end -9.34 7.58)
-		(stroke
-			(width 0.12)
-			(type solid)
-		)
-		(layer "F.SilkS")
-		(uuid "f15a5dde-8d71-4dd9-803f-f51014db8e05")
 	)
 	(fp_arc
 		(start 9.325243 7.588169)
@@ -506,13 +475,13 @@
 		)
 	)
 	(pad "1" smd rect
-		(at -10.985 0)
+		(at -10.915 0)
 		(size 1.27 5.08)
 		(layers "F.Cu" "F.Mask" "F.Paste")
 		(uuid "a378d747-29cc-440a-bf7b-c8c3abeba343")
 	)
 	(pad "1" smd rect
-		(at 10.985 0)
+		(at 10.915 0)
 		(size 1.27 5.08)
 		(layers "F.Cu" "F.Mask" "F.Paste")
 		(uuid "2c6bb5b5-cbe9-4165-aaf4-0c1ef8cbeaf0")

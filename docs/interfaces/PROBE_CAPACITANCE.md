@@ -2,14 +2,14 @@
 
 | | |
 |---|---|
-| Stand | 2026-11-07, Phase 4a Welle 1 (Feldsimulation), Entwurf zur Prüfung |
+| Stand | 2026-11-07, Phase 4a Welle 1 (Feldsimulation); nachgeführt 2026-11-08 auf Layout Rev B/C (REPORT Kap. 11): C0 7.3 pF, Knoten ≈ 9.9 pF |
 | Quelle | `simulation/field/` (Skripte `probe3d.py`, `probe3d_post.py`, `study2d.py`, `salt.py`); Werte reproduzierbar |
 | Geometrie | Empfehlung `sg` (S/G koplanar 7.75/2/7.75 mm auf L2+L3, S z = 10…86 mm, G-Steg 88…90, Guard bis 8 mm), Skizze `simulation/field/plots/sketch_electrodes.png` |
 | Gilt für | JLC04161H-7628, 1.6 mm, Lötstopplack 30 µm, Sonde 20 mm breit, 105 mm unter der Dichtlinie |
 
 ## 1 Anschluss
 Zweipol zwischen **S** (Eingang Schmitt-Inverter, Knoten mit R und Cref) und **GND**. Die Werte enthalten **nicht**
-die Pin-/Leiterbahnkapazität im Kopf (CONCEPTS 2.3: 10 pF **ANNAHME**) und keine Cref.
+die Pin-/Leiterbahnkapazität im Kopf (Layout Rev B/C: ≈ 9.9 pF, Kap. 3; vorher CONCEPTS 2.3: 10 pF **ANNAHME**) und keine Cref.
 
 ## 2 Kapazitäten (verlustfrei, σ = 0)
 
@@ -34,8 +34,12 @@ Für R/Cref zusätzlich Exemplar- und Steckstreuung berücksichtigen (Luftspalt 
  S ──┬───────── C0 ─────────┬── GND
      └── Ci ──┬── Cs ──┬────┘
               └── Rs ──┘
- C0 = 7.0 pF   Ci = 99 pF   Cs = ε'·Cg   Cg = 1.72 pF   Rs = ε0/(σ_b·Cg) = 5.15 Ω·m / σ_b
+ C0 = 7.3 pF   Ci = 99 pF   Cs = ε'·Cg   Cg = 1.71 pF   Rs = ε0/(σ_b·Cg) = 5.15 Ω·m / σ_b
 ```
+**Stand Layout Rev B/C (2026-11-08, `simulation/field/REPORT.md` Kap. 11.3):** C0 7.30 pF, Ci 99.1 pF, Cg 1.711 pF
+(bisher 7.05 / 99.0 / 1.719, Wirkung der beiden S-Zuleitungen L2/L3 im Guard). Knotenkapazität PROBE_SENSE ausserhalb
+der Sonde **≈ 9.9 pF** (U2 4.5 + TP5 0.5 + Band-Bahnen 0.89 + 4 Vias 0.6 **ANNAHME** + Zuleitung z_f < −15 3.25 +
+Breite/Verguss 0.16) statt 10 pF **ANNAHME** + 0.5 pF.
 Fit an die Bestwerte (Luft/4/25/80, max. Abweichung 1.1 %, `results/probe_lumped_3d_extrap.json`); die Struktur
 ist durch die komplexe 2D-FEM bestätigt (rms 1–2 %). σ_b = Bulk-Leitfähigkeit des Substrats:
 

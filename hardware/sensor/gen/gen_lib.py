@@ -153,7 +153,7 @@ def sym_tmp1075n():
             pin("input", -10.16, -2.54, 0, "A0", "4"), pin("open_collector", 10.16, 0, 180, "ALERT", "3"),
             pin("power_in", 0, 7.62, 270, "V+", "5"), pin("power_in", 0, -7.62, 90, "GND", "2")]
     g = [rect(-7.62, 5.08, 7.62, -5.08)]
-    return symbol("TMP1075NDRL", "U", "TMP1075NDRLR", "Package_TO_SOT_SMD:SOT-563",
+    return symbol("TMP1075NDRL", "U", "TMP1075NDRLR", "fluidi:SOT-563_TI_DRL0006A",
                   "docs/datasheets/TI_TMP1075_Datasheet_SBOS854F.pdf",
                   "Temperatursensor I2C TMP1075N, SOT-563 (DRL); Pins DS S.4 Abb. 5-4, Tab. 5-1; V+ 1.62-3.6 V (S.5)",
                   g, pins)
@@ -259,19 +259,61 @@ def fp_keystone3034():
     src = sexpr.parse(open(os.path.join(KICAD_FP, "Battery.pretty", "BatteryHolder_Keystone_3034_1x20mm.kicad_mod"))
                       .read())
     n = copy.deepcopy(src)
-    n[1] = Q("BatteryHolder_Keystone_3034_1x20mm_NegPad4mm")
+    n[1] = Q("BatteryHolder_Keystone_3034_1x20mm_NegPad4mm_W23p1")
     for i, x in enumerate(n):
         if isinstance(x, list) and x[0] == "descr":
-            n[i] = ["descr", Q("Keystone 3034 (LCSC C5213768), Clip-Pads aus KiCad-Bibliothek (W 23.24 >= 23.1, "
-                               "Hoehe 5.08 ~ 5.1 min, Katalog S.1 Fig. 1); Minuspad 4 x 4 mm (>= 3.96 mm SQ min) "
-                               "nach Auflage R2-W01 Nr. 1, statt 17.8-mm-Kreis der Bibliothek")]
+            n[i] = ["descr", Q("Keystone 3034 (LCSC C5213768), abgeleitet aus der KiCad-Bibliothek: Clip-Pads 5.08 x 1.27, "
+                               "Spanne auf das Katalogminimum W 23.1 gekuerzt (Padmitten +-10.915 statt +-10.985, "
+                               "Keystone_3034_Catalog_M65.pdf S.1 Fig. 1 Pad Layout; LS-W1, D-023); Minuspad 4 x 4 mm "
+                               "(>= 3.96 mm SQ min) nach Auflage R2-W01 Nr. 1, statt 17.8-mm-Kreis der Bibliothek")]
+        if isinstance(x, list) and x[0] == "pad" and x[1] == "1":
+            # Padmitte von +-10.985 auf +-10.915 (Aussenkante 23.10 statt 23.24)
+            for k, y in enumerate(x):
+                if isinstance(y, list) and y[0] == "at":
+                    xv = float(y[1])
+                    y[1] = "%g" % (10.915 if xv > 0 else -10.915)
         if isinstance(x, list) and x[0] == "pad" and x[1] == "2":
             # ohne Lotpaste wie die KiCad-Vorlage: Kontaktflaeche ENIG blank (A-32), kein Lothoecker unter der Zelle
             n[i] = ["pad", Q("2"), "smd", "rect", ["at", "0", "0"], ["size", "4", "4"],
                     ["layers", Q("F.Cu"), Q("F.Mask")]]
         if isinstance(x, list) and x[0] == "generator":
             n[i] = ["generator", Q("fluidi_gen_lib")]
+    # Silk-Linie/-Bogen am geschlossenen Clip-Ende (lokal x < -5, y > 3.5) entfernen: liegt im Layout (90 Grad,
+    # Zelle X 3.0 / Y 34.8) ueber der Schulter der Kontur (Rev C, DRC silk_edge_clearance)
+    def _pts(item):
+        out = []
+        for y in item:
+            if isinstance(y, list) and y[0] in ("start", "mid", "end"):
+                out.append((float(y[1]), float(y[2])))
+        return out
+
+    def _silk(item):
+        return any(isinstance(y, list) and y[0] == "layer" and y[1] == "F.SilkS" for y in item)
+    n[:] = [x for x in n if not (isinstance(x, list) and x[0] in ("fp_line", "fp_arc") and _silk(x)
+                                 and any(px < -5 and py > 3.5 for px, py in _pts(x)))]
     n.append(fp_text("R2-W01: unter der Zelle nur Loetstopplack", 0, 4, "Cmts.User", 0.8))
+    write_fp(n)
+
+
+def fp_sot563_ti():
+    """SOT-563 mit TI-Landmuster DRL0006A (Pads 0.67 x 0.30, Mitte-Mitte 1.48, Pitch 0.5 -> Pad-Pad 0.20 statt 0.15 der
+    KiCad-Bibliothek; TI_TMP1075_Datasheet_SBOS854F.pdf S. 37 "Land Pattern Example", DFM K-1/K-6)."""
+    src = sexpr.parse(open(os.path.join(KICAD_FP, "Package_TO_SOT_SMD.pretty", "SOT-563.kicad_mod")).read())
+    n = copy.deepcopy(src)
+    n[1] = Q("SOT-563_TI_DRL0006A")
+    for i, x in enumerate(n):
+        if isinstance(x, list) and x[0] == "descr":
+            n[i] = ["descr", Q("SOT-563 (TI DRL0006A), abgeleitet aus KiCad SOT-563: Pads 0.67 x 0.30, Spaltenabstand "
+                               "1.48 nach TI_TMP1075_Datasheet_SBOS854F.pdf S. 37 (Land Pattern Example); "
+                               "Pad-Pad 0.20 mm")]
+        if isinstance(x, list) and x[0] == "generator":
+            n[i] = ["generator", Q("fluidi_gen_lib")]
+        if isinstance(x, list) and x[0] == "pad":
+            for y in x:
+                if isinstance(y, list) and y[0] == "at":
+                    y[1] = "%g" % (0.74 if float(y[1]) > 0 else -0.74)
+                if isinstance(y, list) and y[0] == "size":
+                    y[1], y[2] = "0.67", "0.3"
     write_fp(n)
 
 
@@ -289,6 +331,7 @@ def main():
     fp_led1615()
     fp_wpn201610()
     fp_keystone3034()
+    fp_sot563_ti()
     fp_probe()
     print("Bibliothek geschrieben:", LIBDIR)
 

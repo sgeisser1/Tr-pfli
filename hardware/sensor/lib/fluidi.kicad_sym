@@ -844,7 +844,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Package_TO_SOT_SMD:SOT-563"
+		(property "Footprint" "fluidi:SOT-563_TI_DRL0006A"
 			(at 0 -5.08 0)
 			(hide yes)
 			(effects

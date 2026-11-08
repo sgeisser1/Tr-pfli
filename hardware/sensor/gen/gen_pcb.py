@@ -60,11 +60,13 @@ GUARD_Y1 = yf(8)                     # Guard bis z_f 8
 BAND_Y0, BAND_Y1 = 5.7, 20.8
 KEEPOUT_Y = 5.2                      # Masseflaeche ab hier (AN043 D4)
 SCHOTT_Y0, SCHOTT_Y1 = 20.8, 23.2
-FACH_Y1 = 46.0
-Z5B_Y1 = 49.3
-Z5A_Y1 = 52.0
+FACH_Y1 = 46.7                       # Rev C (V-K): Z4 bis Y 46.7
+Z5B_Y1 = 50.0
+Z5A_Y1 = 52.7
+VERGUSS_SCHOTT_Y, VERGUSS_KRAGEN_Y, VERGUSS_SONDE_Y = 22.70, 46.90, 52.20   # PCB_OUTLINE Rev C Kap. 6.3
+ANSCHLAG = (-8.0, 0.0, -3.0, 1.5)     # Platinenanschlag der Kappe: keine Bauteile
 Z6_Y1 = 58.5
-U3_FIELD = (-9.0, 46.7, -4.6, 49.1)  # x0, y0, x1, y1 (Sicherheit K-2: x >= -9.0)
+U3_FIELD = (-9.0, 47.4, -4.6, 49.8)  # x0, y0, x1, y1 (K-2: x >= -9.0; Rev C/V-K Y 47.4 ... 49.8)
 
 POWER_NETS = {"VDD", "VBAT", "VDDR", "DCDC_SW", "OSC_PWR"}
 
@@ -255,7 +257,7 @@ def check_placement(fps, u3):
                     pass
                 errs.append("Ueberlappung %s / %s" % (refs[a], refs[b]))
     for r, (x0, y0, x1, y1, lay) in bx.items():
-        if r in ("BT1", "E1", "AE1", "TP1", "TP2", "TP3", "U3", "C24"):
+        if r in ("BT1", "E1", "AE1", "TP1", "TP2", "U3", "C24"):
             continue
         if x0 < -12.7 or x1 > 12.7 or y0 < BAND_Y0 or y1 > BAND_Y1:
             errs.append("%s ausserhalb Band: %.2f %.2f %.2f %.2f" % (r, x0, y0, x1, y1))

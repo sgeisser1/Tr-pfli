@@ -24,11 +24,11 @@ VBAT_X, VBAT_Y = 11.8, 6.35         # VBAT-Leitung In2: rechter Rand, dann obere
 VBAT_VIA = (-12.25, 6.6)            # Uebergabevia VBAT neben Q1                   # Uebergabevias Innenlage In2 -> F/B am Bandende
 
 # Kragenfeld U3 (Z5B, Sicherheit K-2: x >= -9.0; Vias >= 1.0 mm von der Kante, tented)
-U3_KRAGEN = dict(U3=(-6.69, 47.9, 180), C24=(-8.45, 48.0, 90))
-U3_GND_VIA2 = (-8.7, 46.95)        # zweites GND-Via fuer C24/U3 Pin 4 (Kante 1.3 mm, K-2)
+U3_KRAGEN = dict(U3=(-6.69, 48.60, 180), C24=(-8.45, 48.70, 90))   # Rev C (V-K): +0.70 in Y
+U3_GND_VIA2 = (-8.7, 47.65)        # zweites GND-Via fuer C24/U3 Pin 4 (Kante 1.3 mm, K-2)
 # Vias im Kragenfeld: Spalte x -5.0 (Abstand Kante 4.8 mm, S-Zuleitung L2 bei -2.85)
 U3_VIA_X = -5.0
-U3_VIA_Y = dict(I2C_SDA=46.95, GND=47.59, I2C_SCL=48.23, SENS_PWR=48.87)
+U3_VIA_Y = dict(I2C_SDA=47.65, GND=48.29, I2C_SCL=48.93, SENS_PWR=49.57)
 U3_LINE_X = dict(I2C_SDA=0.0, I2C_SCL=0.6, SENS_PWR=1.2)   # Innenlage In2 im Fach
 
 PLACE = {
@@ -36,7 +36,7 @@ PLACE = {
     "AE1": (ANT_X, ANT_Y, 0, "F"),
     "D1": (0.0, 9.6, 180, "F"),       # 180 Grad: G_K/B_K links (zu R7/R8), R_K/Anode rechts
     "SW1": (-6.0, 8.4, 0, "F"),
-    "BT1": (3.0, 34.45, 90, "F"),
+    "BT1": (3.0, 34.80, 90, "F"),     # Rev C (V-K, D-023)
     # HF-Kette, Reihenfolge von der Antenne: C20 (Pi, DNM) - R2 - C19 (DNM) - C18 - C17 - L2 - C16 - U1 Pin 1
     "C20": (-0.85, RF_Y + 0.48, 270, "F"),
     "R2": (0.65, RF_Y, 180, "F"),
@@ -95,7 +95,6 @@ PLACE = {
     # Testpads Zellfach (Streifen x -12.7...-7.5, z 12...30 -> Y 23.5...41.5)
     "TP1": (-10.6, 25.5, 0, "F"),
     "TP2": (-10.6, 28.5, 0, "F"),
-    "TP3": (-10.6, 31.5, 0, "F"),
     # Testpads B-Seite im Band
     "TP5": (-2.3, 17.9, 0, "B"),
     "TP4": (-8.0, 13.6, 0, "B"),

@@ -5,6 +5,9 @@ Teiledaten (LCSC, Hersteller, MPN, JLC-Kategorie, Datenblatt) in PARTDB; JLC-Sta
 JLC-Teilesuche (selectSmtComponentList) geprueft, siehe hardware/sensor/gen/jlc_check.json (neu erzeugen mit
 jlc_check.py).
 
+Rev C (2026-11-08, D-023): TP3 (GND im Fach) entfaellt (Auflage A-1, Adapter-GND ueber das Minuspad);
+Halter-Footprint mit Clip-Pad-Spanne W 23.1 (Katalogminimum, LS-W1).
+
 Rev B (2026-11-07) gegenueber Rev A:
 - Messkette D3 (D-018, docs/concepts/MESSKETTE_SALZ.md): R3 1 kOhm (auf 10 kOhm umloetbar), Teiler /8 aus
   3 x SN74LVC1G80 (U4-U6), Lastschalter Q2 AO3401A an DIO11 (OSC_EN_N, R13 100k Pull-up), Cref2/C23 entfaellt,
@@ -98,7 +101,7 @@ def add(ref, lib, val, fp, key, x, y, rot, conns, dnp=False, note=""):
 
 
 # ---------------- Energie (oben links)
-add("BT1", "Device:Battery_Cell", "CR2032 / Keystone 3034TR", "fluidi:BatteryHolder_Keystone_3034_1x20mm_NegPad4mm",
+add("BT1", "Device:Battery_Cell", "CR2032 / Keystone 3034TR", "fluidi:BatteryHolder_Keystone_3034_1x20mm_NegPad4mm_W23p1",
     "KS3034", 10, 24, 0, {"1": "VBAT", "2": "GND"},
     note="Clip = Plus, Minus = ENIG-Pad 4x4 mm (R2-W01); Zelle Panasonic CR2032 lokal; Halter 90 Grad gedreht (Mechanik S-01)")
 add("Q1", "fluidi:AO3401A", "AO3401A", "Package_TO_SOT_SMD:SOT-23", "AO3401", 17, 19, 270,
@@ -190,7 +193,7 @@ add("TP4", "Connector:TestPoint", "MEAS_CLK", "TestPoint:TestPoint_Pad_D1.0mm", 
     note="B-Seite Elektronikband, f_osc/8 (nur messen)")
 
 # ---------------- Temperatur (Mitte links): U3 + C24 im Sondenkragen (FLOORPLAN_OPTIONS Option f), R4/R5 im Band
-add("U3", "fluidi:TMP1075NDRL", "TMP1075NDRLR", "Package_TO_SOT_SMD:SOT-563", "TMPN", 22, 48, 0,
+add("U3", "fluidi:TMP1075NDRL", "TMP1075NDRLR", "fluidi:SOT-563_TI_DRL0006A", "TMPN", 22, 48, 0,
     {"6": "I2C_SDA", "1": "I2C_SCL", "3": "NC", "4": "GND", "2": "GND", "5": "SENS_PWR"},
     note="im Sondenkragen (Option f, Freigabe S3-K2); Adresse 0x48 (A0 = GND, DS S.14 Tab. 7-3); ALERT offen")
 add("C24", "Device:C", "100nF", FP_C, "C100N", 8, 46, 0, {"1": "SENS_PWR", "2": "GND"},
@@ -223,8 +226,6 @@ add("R12", "Device:R", "100k", FP_R, "R100K", 132, 56, 90, {"1": "UART_RX_MID", 
     note="Barriere 2b RX (R2-A3)")
 add("TP2", "Connector:TestPoint", "UART_RX", "TestPoint:TestPoint_Pad_D1.5mm", "PCB", 142, 56, 0, {"1": "UART_RX_PAD"},
     note="Pogo-Pad RX im Zellfach ausserhalb der Zellflaeche")
-add("TP3", "Connector:TestPoint", "GND", "TestPoint:TestPoint_Pad_D1.0mm", "PCB", 152, 56, 0, {"1": "GND"},
-    note="Messpunkt GND")
 
 # Power-Flags (ERC): VDD/GND/SENS_PWR/OSC_PWR werden von passiven Bauteilen bzw. einem GPIO gespeist
 FLAGS = [("VDD", 44, 16), ("GND", 44, 26), ("SENS_PWR", 44, 40), ("OSC_PWR", 52, 84)]

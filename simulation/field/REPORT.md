@@ -103,7 +103,7 @@ Schnittstelle zum Schaltplan: `docs/interfaces/PROBE_CAPACITANCE.md`. Skizze: `p
 | G | L2 + L3 | x +1…+8.75, z Kopf…90 |
 | G-Steg | L2 + L3 | volle Breite (±8.75), z 88…90 |
 | Guard | L2 + L3 | volle Breite, Kopf…z 8, Kanal für die S-Zuleitung |
-| S-Zuleitung | nur L2, L3 darunter GND | 0.3 breit bei x −4.9, Abstand zum Guard 0.3 |
+| S-Zuleitung | Empfehlung: nur L2, L3 darunter GND. **Layout Rev B/C: L2 x −8.0 + L3 x −7.0** (zweite Zuleitung für S auf L3, Kap. 11) | je 0.3 breit, Kanal zum Guard 0.3 |
 
 - Vias zwischen L2 und L3 nur im Kopf (z < −3); z 0–2 ohne Vias; für z > 0 L1/L4 ohne Kupfer, keine Vias.
 - Kupfer ≥ 1.25 mm von der Kontur, auch an der Spitze. Silkscreen Stecktiefe bei z = 5.
