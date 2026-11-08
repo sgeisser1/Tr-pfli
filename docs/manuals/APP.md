@@ -89,7 +89,7 @@ sonst blockiert.
 
 ## 4 Betrieb über das Gateway
 
-1. **Gateway einrichten** (einmalig, per USB am PC, ARCHITECTURE Kap. 9.1): Einrichtungsprogramm erzeugt
+1. **Gateway einrichten** (einmalig, per SSH mit dem Installationsskript, `docs/manuals/GATEWAY_SETUP.md`): erzeugt
    Zertifikat und WLAN-Zugang und zeigt **Einrichtungscode** und **Fingerabdruck** der fluidi-CA.
 2. **CA-Zertifikat auf jedem Gerät installieren** (`fluidi-ca.crt`, Fingerabdruck vergleichen):
    - **iOS/iPadOS (Safari):** Datei öffnen → Einstellungen → „Profil geladen“ → Installieren → danach
@@ -104,14 +104,14 @@ sonst blockiert.
 3. `https://fluidi.local` öffnen → beim ersten Mal **Einrichtungscode + eigenes Passwort** (≥ 10 Zeichen).
 4. **App installieren:** iOS: Teilen → „Zum Home-Bildschirm“ (nur Safari). Android: Menü → „App installieren“.
    Desktop: Symbol „App installieren“ in der Adressleiste.
-5. Sensor koppeln: Seite **Koppeln** → „Kopplung starten“ → Sensortaste ≥ 3 s (LED gelb) → bestätigen.
+5. Sensor koppeln: Seite **Koppeln** → „Kopplung starten“ → Sensortaste halten, bis die LED nach 3 s einmal gelb aufblitzt, dann vor 8 s loslassen (danach blinkt sie 1 × pro Sekunde) → bestätigen (`docs/manuals/PAIRING_KALIBRIERUNG.md`).
 
 Hinweise:
 - `fluidi.local` braucht mDNS im WLAN (Android ab ca. Version 12, nicht über VPN). Geht es nicht, siehe
   ARCHITECTURE Kap. 9 / CONCEPTS 5.2 (IT-DNS-Name mit neuer Einmal-CA).
 - Updates der PWA kommen mit dem Gateway-Update; der Service Worker lädt die neue Shell beim nächsten Öffnen.
 - Offline (Gateway nicht erreichbar) zeigt die App den zuletzt geladenen Stand mit Hinweisbalken.
-- Passwort vergessen: Gateway per USB → Einrichtungsprogramm → „Passwort zurücksetzen“ (Daten bleiben).
+- Passwort vergessen: per SSH auf dem Gateway `python3 -m fluidi_gw reset-password` → neuer Einrichtungscode (Daten bleiben).
 - Zertifikat läuft nach ≤ 825 Tagen ab; die App warnt 60 Tage vorher (Einstellungen → System).
 
 ## 5 Stil-Entwürfe selbst ausprobieren (Software-Konzept)

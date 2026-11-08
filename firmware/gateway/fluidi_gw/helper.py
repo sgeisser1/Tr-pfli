@@ -3,7 +3,10 @@ fluidi-helper.path/.service, wenn in /var/lib/fluidi/requests eine Anfrage liegt
 hat keine Root-Rechte (ProtectSystem=strict, NoNewPrivileges).
 
 Aktionen: reboot · wifi (nmcli, Rückfall nach 120 s, UC-13) · ntp (timesyncd-Drop-in) · update (Release umschalten
-mit Rückfall, REQ-GW-11). Alles andere wird verworfen und protokolliert (journald, flüchtig).
+mit Rückfall, REQ-GW-11) · led (Status-LED GPIO17, D-027: nur die Zustände ok/pair/off mit fest programmierten
+Werten). Alles andere wird verworfen und protokolliert (journald, flüchtig).
+
+Direkter Aufruf `fluidi-helper led off` (systemd ExecStopPost des Gateway-Dienstes): LED aus, wenn der Dienst endet.
 """
 from __future__ import annotations
 
@@ -18,6 +21,9 @@ from pathlib import Path
 REQ = Path("/var/lib/fluidi/requests")
 OPT = Path("/opt/fluidi")
 NTP_DROPIN = Path("/etc/systemd/timesyncd.conf.d/fluidi.conf")
+LED_DIR = Path("/sys/class/leds/fluidi")      # dtoverlay=gpio-led,gpio=17,label=fluidi (install_gateway.sh)
+# Kernel-Trigger "timer": delay_on/delay_off in ms (docs.kernel.org/leds/leds-class). Muss zu statusled.PATTERNS passen.
+LED_PATTERNS = {"ok": (100, 4900), "pair": (100, 100), "off": None}
 
 
 def sh(*cmd, check=True, timeout=60):
@@ -79,10 +85,38 @@ def do_update(req):
     shutil.rmtree(src, ignore_errors=True)
 
 
-ACTIONS = {"reboot": lambda r: sh("systemctl", "reboot"), "wifi": do_wifi, "ntp": do_ntp, "update": do_update}
+def do_led(req):
+    state = req.get("state")
+    if state not in LED_PATTERNS:
+        raise ValueError("LED-Zustand ungültig")
+    if not (LED_DIR / "trigger").exists():
+        print("Status-LED nicht vorhanden (Overlay gpio-led fehlt oder Neustart nötig)", file=sys.stderr)
+        return
+    pat = LED_PATTERNS[state]
+    if pat is None:
+        (LED_DIR / "trigger").write_text("none")
+        (LED_DIR / "brightness").write_text("0")
+        return
+    (LED_DIR / "trigger").write_text("timer")
+    (LED_DIR / "delay_on").write_text(str(pat[0]))
+    (LED_DIR / "delay_off").write_text(str(pat[1]))
 
 
-def main():
+ACTIONS = {"reboot": lambda r: sh("systemctl", "reboot"), "wifi": do_wifi, "ntp": do_ntp, "update": do_update,
+           "led": do_led}
+
+
+def main(argv=None):
+    argv = sys.argv[1:] if argv is None else argv
+    if argv:
+        if len(argv) == 2 and argv[0] == "led" and argv[1] in LED_PATTERNS:
+            try:
+                do_led({"state": argv[1]})
+            except OSError as e:
+                print(f"LED: {e}", file=sys.stderr)
+            return
+        print(f"unbekannter Aufruf: {argv}", file=sys.stderr)
+        sys.exit(2)
     for f in sorted(REQ.glob("*.json")):
         try:
             req = json.loads(f.read_text())

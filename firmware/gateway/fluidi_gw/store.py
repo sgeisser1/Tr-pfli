@@ -216,8 +216,12 @@ class Store:
                                             [(int(t), fl, addr, s) for t, fl, s in updates]))
 
     def uncertain_readings(self, addr, since):
-        return self.q("SELECT seq, boot_id, uptime, flags FROM reading WHERE sensor=? AND (flags & 6) != 0 AND rx>=?",
-                      (addr, since))
+        """Werte mit rekonstruierter/unsicherer Zeit: alle mit Empfang ab `since` und – unabhängig vom Empfangszeitpunkt
+        (Systemuhr ohne RTC nach Stromausfall evtl. weit zurück, phase5_gateway_zeit.md Z-8/V-4) – alle mit Flag
+        „Zeit unsicher“, deren boot_id inzwischen einen gültigen Synchronpunkt hat."""
+        return self.q("SELECT seq, boot_id, uptime, flags FROM reading WHERE sensor=? AND (flags & 6) != 0 AND (rx>=? OR "
+                      "((flags & 4) != 0 AND boot_id IN (SELECT boot_id FROM syncpoint WHERE sensor=? AND valid=1)))",
+                      (addr, since, addr))
 
     def delete_readings(self, addr):
         self.tx(lambda c: c.execute("DELETE FROM reading WHERE sensor=?", (addr,)))

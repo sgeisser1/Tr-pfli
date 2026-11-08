@@ -27,7 +27,7 @@ export default async function system(el, ctx) {
           kv('Kryptografie', sy.crypto_backend || '–'), sy.cpu_temp_c != null ? kv('CPU-Temperatur', `${fmt.n1(sy.cpu_temp_c)} °C`) : null,
           sy.climate ? kv('Raumklima', `${fmt.n1(sy.climate.temp_c)} °C · ${fmt.n0(sy.climate.rh_pct)} % rF`) : kv('Raumklima', 'kein Sensor')),
         h('div.actions', null, h('button.btn.ghost.sm', { type: 'button', onclick: async () => { if (window.confirm('Gateway neu starten? Die App ist ca. 1 min nicht erreichbar.')) { await ctx.api.post('/system/reboot'); toast('Neustart …'); } } }, 'Neu starten'))),
-        card('Zeit', h('dl.kv', null, kv('Jetzt', fmt.dateTime(t.now)), kv('Quelle', { ntp: 'Internet-Zeit (NTP)', rtc: 'Uhr-Baustein', browser: 'vom Handy', none: 'keine gültige Zeit' }[t.source] || t.source),
+        card('Zeit', h('dl.kv', null, kv('Jetzt', fmt.dateTime(t.now)), kv('Quelle', { ntp: 'Internet-Zeit (NTP)', browser: 'vom Handy', none: 'keine gültige Zeit' }[t.source] || t.source),
           kv('Zeitzone', t.timezone)), t.valid ? null : h('p.err', null, 'Ohne gültige Zeit verteilt das Gateway keine Zeit an die Sensoren; Werte werden als „Zeit unsicher“ markiert.'), timeBtn),
         card('Speicher', h('dl.kv', null, kv('Messwerte', fmt.n0(st.records)), kv('Ältester Wert', st.oldest ? fmt.date(st.oldest) : '–'),
           kv('Datenbank', `${fmt.n1(st.used_bytes / 2 ** 20)} MB`), kv('Frei', st.free_bytes ? `${fmt.n1(st.free_bytes / 2 ** 30)} GB` : '–'),

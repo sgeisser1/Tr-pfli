@@ -11,6 +11,10 @@ Belege: docs/datasheets/Sensirion_SHT4x_Datasheet_V7.3.pdf
 Konkretes Breakout-Modul und Verdrahtung: docs/manuals/GATEWAY_SETUP.md (Platzhalter, PROTOTYP-PRÜFUNG).
 
 SD-Schonung: Messung alle 5 min, Werte im RAM gesammelt, in die Datenbank alle 30 min in einer Transaktion.
+Zeit ohne RTC (D-028, phase5_gateway_zeit.md Z-7/V-3): Solange die Gateway-Zeit ungültig ist (kein NTP, keine
+Browserzeit), bekommen die Werte nur einen Monotonzeitstempel und bleiben im RAM (höchstens MAX_PENDING Werte);
+sobald die Zeit gültig ist, werden sie auf die Gateway-Zeit umgerechnet und gespeichert. Ein Neustart vor dem
+Zeitabgleich verwirft diese Werte (kein Datenpfad der Pflanzen, nur Raumklima).
 Eigenerwärmung des Pi verfälscht die Temperatur -> belüftete, getrennte Kammer (D-017), Offset später kalibrieren.
 """
 from __future__ import annotations
@@ -26,6 +30,7 @@ from . import timesvc
 I2C_SLAVE = 0x0703  # linux/i2c-dev.h
 CMD_MEASURE_HIGH = 0xFD
 FLUSH_S = 1800
+MAX_PENDING = 2016          # 7 Tage à 5 min ohne gültige Zeit, danach älteste verwerfen
 
 
 def crc8(data: bytes) -> int:
@@ -94,7 +99,8 @@ class Climate:
             self.dev = SimClimate()
         self.source = self.dev.source if self.dev else "off"
         self._stop = threading.Event()
-        self.last_flush = timesvc.wall()
+        self.last_flush = time.monotonic()
+        self.dropped = 0
 
     def sample(self):
         if not self.dev:
@@ -104,17 +110,41 @@ class Climate:
         except Exception as e:  # noqa: BLE001
             self.err = str(e)
             return None
-        now = int(timesvc.wall())
+        now, mono = int(timesvc.wall()), time.monotonic()
         self.last = {"t": now, "temp_c": t, "rh_pct": rh}
-        self.buf.append((now, t, rh))
-        if now - self.last_flush >= FLUSH_S:
+        # (Gateway-Zeit oder None bei ungültiger Zeit, Monotonzeit, T, rF)
+        self.buf.append((now if timesvc.valid() else None, mono, t, rh))
+        if mono - self.last_flush >= FLUSH_S:
             self.flush()
         return self.last
 
-    def flush(self):
-        rows, self.buf = self.buf, []
+    def flush(self, final=False):
+        """Gepufferte Werte speichern. Werte ohne gültige Zeit bleiben im Puffer, bis die Zeit gültig ist."""
+        self.last_flush = time.monotonic()
+        if not self.buf:
+            return
+        if any(w is None for w, *_ in self.buf) and not timesvc.valid():
+            keep = [x for x in self.buf if x[0] is None]
+            rows = [(w, t, rh) for w, _, t, rh in self.buf if w is not None]
+            if final:
+                self.log("info", "climate_time", f"{len(keep)} Klimawerte ohne gültige Zeit verworfen")
+                keep = []
+            elif len(keep) > MAX_PENDING:
+                self.dropped += len(keep) - MAX_PENDING
+                keep = keep[-MAX_PENDING:]
+            self.buf = keep
+        else:
+            wall, mono = timesvc.wall(), time.monotonic()
+            rows = [(w if w is not None else int(wall - (mono - m)), t, rh) for w, m, t, rh in self.buf]
+            self.buf = []
         self.store.insert_climate(rows)
-        self.last_flush = timesvc.wall()
+
+    def pending_rows(self):
+        """Noch nicht gespeicherte Werte als (t, T, rF); ohne gültige Zeit nur die mit Zeitstempel."""
+        ok = timesvc.valid()
+        wall, mono = timesvc.wall(), time.monotonic()
+        return [(w if w is not None else int(wall - (mono - m)), t, rh) for w, m, t, rh in list(self.buf)
+                if w is not None or ok]
 
     def latest(self):
         from datetime import datetime, timezone
@@ -136,4 +166,4 @@ class Climate:
     def stop(self):
         self._stop.set()
         if self.buf:
-            self.flush()
+            self.flush(final=True)

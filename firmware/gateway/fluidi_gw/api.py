@@ -1203,7 +1203,7 @@ def climate_get(h, q, **_):
     cl = M.climate
     rows = [dict(r) for r in M.store.climate(t0, t1)]
     if cl:  # noch nicht gesicherte Werte aus dem RAM (Schreibbündelung, climate.py)
-        rows += [{"t": t, "temp": tc, "rh": rh} for t, tc, rh in list(cl.buf) if t0 <= t <= t1]
+        rows += [{"t": t, "temp": tc, "rh": rh} for t, tc, rh in cl.pending_rows() if t0 <= t <= t1]
     out = {"source": cl.source if cl else "off", "latest": cl.latest() if cl else None, "from": t0, "to": t1,
            "t": [], "temp_c": [], "rh_pct": []}
     step = 3600 if t1 - t0 > 3 * 86400 else 0

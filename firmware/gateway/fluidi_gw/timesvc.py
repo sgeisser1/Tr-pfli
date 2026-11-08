@@ -1,8 +1,13 @@
 """Zeitdienst des Gateways (ARCHITECTURE.md Kap. 5, REQ-GW-09, Entscheidungsvorlage docs/reviews/phase5_gateway_zeit.md).
 
-Reihenfolge der Zeitquellen: NTP (systemd-timesyncd, abschaltbar) -> RTC (Pi Zero 2 W hat keine; OP-GW-3)
--> Browserzeit einer angemeldeten PWA (nur wenn sonst keine gültige Zeit). Ohne gültige Zeit verteilt das
-Gateway keine Zeit an Sensoren und markiert Werte mit Flag 2 (unsicher).
+Das Gateway hat KEINE Echtzeituhr (D-028: Pi Zero 2 W ohne RTC, Gateway dauerhaft im Geschäfts-WLAN).
+Reihenfolge der Zeitquellen: NTP (systemd-timesyncd, abschaltbar) -> Browserzeit einer angemeldeten PWA (nur wenn
+sonst keine gültige Zeit, Plausibilitätsprüfung). Ohne gültige Zeit verteilt das Gateway keine Zeit an Sensoren und
+markiert Werte mit Flag 2 (unsicher); sie werden nach dem ersten gültigen Synchronpunkt zurückgerechnet.
+
+Nach einem Neustart ohne Netz steht die Systemuhr auf der zuletzt von systemd-timesyncd gespeicherten Zeit (bzw.
+dem systemd-Mindestdatum) und ist damit um die Ausfalldauer zu spät. Diese Uhr gilt deshalb NIE als gültig, nur
+`timedatectl NTPSynchronized=yes` (ANNAHME Raspberry Pi OS wie systemd 255, PROTOTYP-PRÜFUNG GZ-1).
 
 Die Systemuhr wird NICHT verstellt (der Dienst läuft ohne CAP_SYS_TIME). Die Browserzeit wird an die
 monotone Uhr gebunden (Anker), damit ein späterer Sprung der Systemuhr (z. B. NTP kommt nachträglich) die
@@ -31,6 +36,11 @@ def wall() -> float:
 
 def plausible(t_unix: float) -> bool:
     return PLAUSIBLE_MIN <= t_unix < PLAUSIBLE_MAX
+
+
+def valid() -> bool:
+    """Gilt die Gateway-Zeit (NTP oder Browser)? Ohne aktiven Zeitdienst (Hilfsprogramme, Tests): ja."""
+    return _ACTIVE.valid if _ACTIVE is not None else True
 
 
 class TimeService:
@@ -110,4 +120,4 @@ class TimeService:
         from datetime import datetime, timezone
         iso = lambda t: datetime.fromtimestamp(t, timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ") if t else None  # noqa: E731
         return {"now": iso(self.now()), "valid": self.valid, "source": self.source, "last_sync": iso(self.last_sync),
-                "rtc_ok": False, "timezone": tz}
+                "timezone": tz}

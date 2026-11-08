@@ -41,7 +41,7 @@ Nicht im Gateway: private Signierschlüssel (Firmware, CA), Cloud-Dienste, Fernw
               │                                                                       │
  PWA/Browser ◄┼─ HTTPS-Server ─ REST-API ─ Auth/Sitzungen ─ SSE-Broker ◄── Ereignisse │
   (WLAN)      │      │ statische PWA (im Software-Abbild)                            │
-              │  Zeitdienst (NTP → RTC → Browser)   Backup/Restore   MQTT (optional)  │
+              │  Zeitdienst (NTP → Browser, o. RTC) Backup/Restore   MQTT (optional)  │
               │  mDNS fluidi.local                  Ereignisprotokoll  Watchdog       │
               └───────────────────────────────────────────────────────────────────────┘
 ```
@@ -100,7 +100,7 @@ warnt, wenn die Reserve bei hohem Intervall unter 2 Jahre fällt.
 | **Duplikat** (gleiche `seq` nochmals, z. B. Quittung verloren) | Schlüssel `(sensor, seq)` eindeutig; Gateway führt je Sensor die höchste lückenlos quittierte `seq` und eine Bitmaske der letzten 1024 `seq` → Duplikat verwerfen, trotzdem quittieren |
 | **Nachlieferung Puffer** (UC-10, bis 60 Tage) | Blockweise holen, je Block dauerhaft schreiben, **erst dann quittieren** (Sensor löscht erst nach Quittung, REQ-LOG-02); SSE nur für den neuesten Wert; Flag 3 |
 | **Zeitsprung Sensor** (Batteriewechsel ohne Gateway: nur relative Zeit seit Boot, REQ-SYS-07) | Sensor liefert `boot_id` + Relativzeit; Gateway rechnet `t = t_gw_jetzt − (rel_jetzt − rel_wert)`; Flag 1; Driftkorrektur nur, wenn Sensor beide Zeitbasen kennt (ABGLEICH PROTOCOL) |
-| **Zeitsprung Gateway** (NTP korrigiert stark, RTC leer) | Gateway-Zeit gilt erst nach gültiger Quelle; bis dahin Flag 2 und keine Zeitverteilung; Sprünge > 10 min ins Ereignisprotokoll |
+| **Zeitsprung Gateway** (NTP korrigiert stark; keine RTC, D-028: nach Stromausfall steht die Uhr auf der zuletzt gespeicherten Zeit) | Gateway-Zeit gilt erst nach gültiger Quelle; bis dahin Flag 2 und keine Zeitverteilung; Sprünge > 10 min ins Ereignisprotokoll |
 | **Werte in der Zukunft / weit zurück** | > 5 min Zukunft oder vor Kopplungsdatum → speichern mit Flag 4, nicht für „letzter Wert“ verwenden |
 | **Unbekannter Sensor** | Nur im Kopplungsfenster als Kandidat sichtbar; sonst ignorieren (kein Verbindungsaufbau, keine Speicherung); Häufung ins Ereignisprotokoll (Rate-Limit) |
 | **Ungültige Signatur/MAC, Replay** | Verwerfen, Zähler im Ereignisprotokoll, Verbindung trennen (REQ-RF-06) |
@@ -114,10 +114,13 @@ mit der aktuellen Kalibrierung um; der Sensor braucht so keine Kalibriermathemat
 
 ## 5 Zeit (REQ-GW-09, REQ-SYS-07)
 
-Reihenfolge: **NTP** (öffentlich oder Firmen-NTP, abschaltbar, OP-08) → **RTC** mit Pufferung ohne Ladepfad
-(OP-K14, S2-W06; Baustein offen) → **Browserzeit** einer angemeldeten PWA, nur wenn sonst keine gültige Zeit.
-Ohne gültige Zeit: keine Zeitverteilung an Sensoren, Werte mit Flag 2. RTC wird bei jeder NTP-Synchronisation
-nachgestellt. Gangabweichung ±2 min/Monat ≈ ±46 ppm muss die RTC ohne Referenz einhalten (Baustein so wählen).
+**D-028 (2026-11-08): Gateway ohne RTC.** Reihenfolge: **NTP** (öffentlich oder Firmen-NTP, abschaltbar, OP-08)
+→ **Browserzeit** einer angemeldeten PWA (automatisch beim Öffnen der App, nur wenn sonst keine gültige Zeit,
+Plausibilität 2026 ≤ t < 2100). Die nach einem Neustart von `systemd-timesyncd` gesetzte Uhr (zuletzt gespeicherte
+Zeit) gilt **nicht** als gültig. Ohne gültige Zeit: keine Zeitverteilung an Sensoren, Werte mit Flag 2; nach dem
+ersten gültigen Synchronpunkt werden sie über die Sensor-Laufzeit zurückgerechnet (auch wenn die Systemuhr beim
+Empfang weit zurücklag), Raumklimawerte werden bis dahin im RAM gehalten (`climate.py`).
+Details und Prüfungen am Gerät: `docs/reviews/phase5_gateway_zeit.md` (GZ-1…GZ-4).
 Zeitzone für LED-Fenster und Tagesmittel: IANA-Name (`Europe/Zurich`), Umrechnung im Gateway.
 
 ## 6 BLE-Strategie
@@ -255,7 +258,7 @@ grössere Datenmengen), Koexistenz WLAN/BLE im selben Funkteil.
 ### 12.1 Hardware-Eckdaten (belegt)
 512 MB LPDDR2, 2.4 GHz 802.11 b/g/n, Bluetooth 4.2 mit BLE, microSD, USB-OTG
 (`docs/datasheets/RaspberryPi_Zero2W_ProductBrief_2024-04.pdf`, S. 2); Versorgung 5 V DC 2.5 A, Betrieb
-−20…70 °C, Produktion zugesichert (S. 3). Keine RTC (S. 2: nicht aufgeführt) → externe RTC wie bei A.
+−20…70 °C, Produktion zugesichert (S. 3). Keine RTC (S. 2: nicht aufgeführt); D-028: auch keine externe RTC (Zeit per NTP, Rückfall Browserzeit).
 
 ### 12.2 Software-Stapel (Vorschlag)
 | Schicht | Wahl | Bemerkung |
@@ -265,7 +268,7 @@ grössere Datenmengen), Koexistenz WLAN/BLE im selben Funkteil.
 | BLE | **bleak** (BlueZ über D-Bus) | Central, Scan, GATT |
 | HTTP | asyncio-Server (z. B. aiohttp) oder der Mock-Kern erweitert; TLS über Python `ssl` | gleiche Routen wie `mock_server.py` |
 | Datenbank | **SQLite**, WAL, `synchronous=FULL`, Tabellen nach 3.1, Index `(sensor, t)`, eindeutig `(sensor, seq)` | Backup-Export im Format Kap. 8 |
-| Zeit | `systemd-timesyncd` oder chrony (NTP, abschaltbar), RTC per Device-Tree-Overlay (`hwclock`) | Browserzeit wie A |
+| Zeit | `systemd-timesyncd` (NTP, abschaltbar), **keine RTC** (D-028) | Browserzeit wie A |
 | mDNS | Avahi, Hostname `fluidi` | |
 | OTA Sensor | Python-Client für das gewählte Transportprotokoll (MCUboot/SMP-ähnlich bzw. TI-OAD), Referenz `smpclient` (Apache-2.0, research_gateway [Q12]) | Signaturprüfung mit `cryptography` |
 | MQTT | paho-mqtt (optional) | |
@@ -328,7 +331,7 @@ Jobs, SSE, CSV und Kalibrierungsrechnung (`fluidi_calc.py`). Ausbau-Schritte:
 | OP-GW-0 | **Plattformentscheid** ESP32-S3 vs. Pi Zero 2 W | Auftraggeber |
 | OP-GW-1 | PY25Q128HA-Datenblatt (Zyklenfestigkeit) lokal ablegen | Software/Projektleitung |
 | OP-GW-2 | ESP32: eFuses Release-Modus (irreversibel) ja/nein | Auftraggeber + Sicherheit |
-| OP-GW-3 | RTC-Baustein ohne Ladepfad (OP-K14) für beide Varianten | Elektronik |
+| OP-GW-3 | ~~RTC-Baustein ohne Ladepfad~~ – erledigt: keine RTC (D-028) | – |
 | OP-GW-4 | Koexistenz-/Reichweitentest (OP-K12) mit der gewählten Plattform | Prototyp |
 | OP-GW-5 | Einrichtungsprogramm A1 (Web Serial) vs. A2 (Python) | Software, nach Plattformentscheid |
 | OP-GW-6 | Abgleich mit `firmware/PROTOCOL.md` (Kap. 4, 6, 7) | Firmware + Software |

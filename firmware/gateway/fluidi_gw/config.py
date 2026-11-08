@@ -47,6 +47,7 @@ class Config:
     pbkdf2_iterations: int = 200_000
     time_mode: str = "system"                # system | sim
     helper_dir: Path | None = None           # Anfragen an den Root-Helfer (helper.py), Standard data_dir/requests
+    status_led: str = "auto"                 # auto | on | off – Gateway-LED GPIO17 (D-027); auto = an ausser Simulation
     quiet: bool = False
     # Startkalibrierung (REQ-MES-07) in 0.01 pF: ANNAHME aus MESSKETTE_SALZ.md Kap. 0 (D3, 13.3 pF trocken),
     # Nasswert grob; PROTOTYP-PRÜFUNG am Muster (API-3)

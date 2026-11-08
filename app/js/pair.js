@@ -80,7 +80,7 @@ export default async function pair(el, ctx) {
             toast(h('span', null, icon('check'), ` ${c.device} gekoppelt – die LED leuchtet grün.`), 'ok');
             ctx.go(`/pflanze/${fin.result.plant_id}`);
           } else {
-            msg.textContent = fin.message || 'Kopplung fehlgeschlagen. Taste am Sensor erneut ≥ 3 s drücken.';
+            msg.textContent = fin.message || 'Kopplung fehlgeschlagen. Taste am Sensor erneut 3 s halten (bis zum gelben Blitz) und loslassen.';
             btn.disabled = false;
             busy = false;
           }
@@ -101,7 +101,7 @@ export default async function pair(el, ctx) {
         h('div.pairsteps', null,
           step('1', 'Batterie (CR2032) einsetzen.'),
           step('2', '„Kopplung starten“ – das Gateway sucht 3 Minuten.'),
-          step('3', 'Taste oben am Sensor mindestens 3 s drücken, bis die LED gelb blinkt.'),
+          step('3', 'Taste oben am Sensor halten, bis die LED nach 3 s kurz gelb blitzt, dann loslassen (vor 8 s). Danach blinkt sie 1 × pro Sekunde gelb.'),
           step('4', 'Sensor wählen, Farbfolge vergleichen, bestätigen.')),
         h('button.btn.primary', { type: 'button', onclick: async () => { state = await ctx.api.post('/pairing/start', { duration_s: 180 }); draw(); } }, icon('plus'), 'Kopplung starten')));
       return;
@@ -111,7 +111,7 @@ export default async function pair(el, ctx) {
       card('Suche läuft', h('p', null, 'Noch ', cd, ' – Sensoren im Kopplungsmodus erscheinen hier.'), h('div.progress.indet', null, h('span')),
         h('button.btn.ghost.sm', { type: 'button', onclick: async () => { state = await ctx.api.post('/pairing/stop'); draw(); } }, 'Suche beenden')),
       ...(state.candidates.length ? state.candidates.map(candidateCard)
-        : [h('section.card.empty', null, dropChar('sleepy', { size: 60 }), h('p', null, 'Noch kein Sensor gefunden. Taste am Sensor mindestens 3 Sekunden drücken, bis die LED gelb blinkt.'))]));
+        : [h('section.card.empty', null, dropChar('sleepy', { size: 60 }), h('p', null, 'Noch kein Sensor gefunden. Taste am Sensor halten, bis die LED nach 3 s kurz gelb blitzt, dann loslassen. Der Sensor blinkt danach gelb.'))]));
   }
   const step = (n, t) => h('div.pstep', null, h('span.pstep-n', null, n), h('span', null, t));
 

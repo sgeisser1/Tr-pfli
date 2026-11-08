@@ -3,9 +3,9 @@
 | | |
 |---|---|
 | Dokument | `docs/manuals/GATEWAY_SETUP.md` |
-| Version | 0.1 (Phase 4 Welle 2) |
-| Datum | 2026-11-07 |
-| Gilt für | Gateway-Software `firmware/gateway/` (Version 0.5.0), PWA `app/`, D-014 (Pi Zero 2 W), D-017 (Klimasensor), D-020 |
+| Version | 0.2 (Phase 6: ohne RTC, Status-LED) |
+| Datum | 2026-11-08 |
+| Gilt für | Gateway-Software `firmware/gateway/` (Version 0.5.0), PWA `app/`, D-014 (Pi Zero 2 W), D-017/D-029 (Klimasensor), D-020, D-027 (Status-LED, vorläufig), D-028 (keine RTC) |
 | Status | Anleitung **ohne Test am echten Pi** erstellt: Software und Installationsskript sind in WSL/Simulation geprüft; die Schritte am Gerät sind **PROTOTYP-PRÜFUNG** (Kap. 10). |
 
 Kennzeichnungen wie im Projekt: **ANNAHME**, **PROTOTYP-PRÜFUNG**.
@@ -19,11 +19,15 @@ Handy (Pixel 10, Chrome)  ──HTTPS──►  fluidi.local:443   PWA + API (An
 Büro-Bildschirm           ──HTTP───►  fluidi.local:8080  Dashboard, nur lesen, ohne Login (abschaltbar)
                                        fluidi.local:80    nur Weiterleitung + CA-Zertifikat
 Sensoren  ◄──BLE──►  Pi Zero 2 W (eingebautes Bluetooth)  ── I²C ── SHT4x (Raumklima)
+                                                           ── GPIO17 ── grüne Status-LED
+Zeit: NTP über das WLAN (keine Echtzeituhr im Gateway, D-028); Rückfall: Uhrzeit des Handys beim Öffnen der App
 ```
 
 Benötigt: Raspberry Pi Zero 2 W, microSD (empfohlen: Industrial/pSLC, ≥ 8 GB), Netzteil 5 V 2.5 A Micro-USB
 (`docs/datasheets/RaspberryPi_Zero2W_ProductBrief_2024-04.pdf`, S. 3), ein PC mit **Raspberry Pi Imager**, das
-fluidi-Repository auf dem PC, optional ein SHT4x-Breakout (Kap. 5).
+fluidi-Repository auf dem PC, das SHT4x-Breakout (Teil siehe `hardware/gateway/BOM_GATEWAY.csv`, Kap. 5) und die
+Status-LED (grüne 3-mm-LED + Widerstand 470 Ω, Kap. 5.2). **Keine** Echtzeituhr (RTC) und keine Knopfzelle im
+Gateway (D-028): Das Gateway steht dauerhaft im WLAN und holt die Zeit per NTP.
 
 Zeitbedarf: ca. 45 min (davon 15–20 min Paketinstallation auf dem Pi).
 
@@ -76,6 +80,8 @@ sudo ./install_gateway.sh            # oder: sudo ./install_gateway.sh --wheels 
 | Zertifikat | Einmal-CA nur für `fluidi.local` (Kap. 6), CA-Schlüssel nur im Arbeitsspeicher |
 | Dienste | `fluidi-gateway.service` (ohne Root, Watchdog), `fluidi-helper.path` (Root-Helfer für WLAN/NTP/Neustart/Update) |
 | Firewall | nftables: eingehend nur 80, 443, 8080, mDNS 5353, DHCP; 22 nur bis `--finish` |
+| Status-LED | Zeile `dtoverlay=gpio-led,gpio=17,label=fluidi,trigger=heartbeat` in `/boot/firmware/config.txt` (wirksam nach dem nächsten Neustart); der Dienst schaltet sie über den Root-Helfer (Kap. 5.2) |
+| Zeit | NTP über `systemd-timesyncd` einschalten (nur bei der Erstinstallation; danach gilt die Einstellung in der App). **Kein** RTC-Overlay, kein `hwclock` (D-028) |
 
 Am Ende zeigt das Skript **Einrichtungscode** und **CA-Fingerabdruck** – beides notieren.
 
@@ -85,6 +91,7 @@ Den **öffentlichen** Schlüssel (PEM) vom Entwickler nach `/etc/fluidi/keys/sen
 Der private Schlüssel bleibt offline beim Entwickler (REQ-FW-04).
 
 ### 4.3 Prüfen
+Nach der **Erstinstallation einmal neu starten** (`sudo reboot`), damit das LED-Overlay geladen wird (Kap. 5.2).
 ```bash
 sudo ./install_gateway.sh --check
 journalctl -u fluidi-gateway -n 50       # Protokoll (nur im RAM, nach Neustart leer)
@@ -98,18 +105,21 @@ sudo ./install_gateway.sh --finish       # SSH aus, Port 22 zu
 Später wieder Zugang (nur mit physischem Zugriff): SD-Karte am PC, leere Datei `ssh` auf die Boot-Partition,
 neu starten (Raspberry-Pi-OS-Funktion, **ANNAHME** für Trixie unverändert), danach `--finish` erneut.
 
-## 5 Klimasensor anschliessen (D-017) – PLATZHALTER
+## 5 Klimasensor und Status-LED anschliessen
 
-> **Platzhalter:** Breakout-Modul, Kabellänge und Lage der belüfteten Kammer im Gehäuse G1 sind noch nicht
-> festgelegt (Mechanik/Elektronik). Diese Anleitung wird nach der Wahl ergänzt. **PROTOTYP-PRÜFUNG.**
+### 5.1 Klimasensor (D-017, D-029)
 
-Vier Drähte vom SHT4x-Breakout an die Stiftleiste J8 des Pi (Pinbelegung aus
+Verbaut wird ein **SHT4x-Breakout** (Teil, Bezugsquelle und Masse siehe `hardware/gateway/BOM_GATEWAY.csv`; die Wahl
+eines kleineren Breakouts für die Klimakammer läuft in Phase 6, D-029). Elektrisch gilt für jedes SHT4x-Breakout:
+I²C-Adresse **0x44**, Versorgung **3.3 V**. **PROTOTYP-PRÜFUNG:** Lage in der belüfteten Kammer, Kabellänge.
+
+Vier Drähte vom Breakout an die Stiftleiste J8 des Pi (Pinbelegung aus
 `docs/datasheets/RaspberryPi_Zero2W_ReducedSchematics_RP-008360-DS-1.pdf`, Block J8):
 
 | Breakout | Pi J8 | Bemerkung |
 |---|---|---|
-| VIN / VDD | Pin 1 (3V3) | SHT4x: VDD 1.08–3.6 V (`docs/datasheets/Sensirion_SHT4x_Datasheet_V7.3.pdf`, S. 9) – **nicht** an 5 V (Pin 2/4), ausser das Breakout hat einen eigenen Regler (Datenblatt des Breakouts prüfen) |
-| GND | Pin 6 (GND) | GND-Pin im Schaltplan prüfen (**PROTOTYP-PRÜFUNG**) |
+| VIN / VDD | Pin 1 (3V3) | SHT4x: VDD 1.08–3.6 V (`docs/datasheets/Sensirion_SHT4x_Datasheet_V7.3.pdf`, S. 9) – **nicht** an 5 V (Pin 2/4), ausser das Breakout hat einen eigenen Regler (Datenblatt/Schaltplan des gewählten Breakouts prüfen) |
+| GND | Pin 6 oder Pin 9 (GND) | Gehäuse-CAD sieht Pin 6 oder 9 vor (`mechanical/gen/fluidi_gateway_pi.py`); Pin 14 bleibt für die LED frei. GND-Pins im Schaltplan prüfen (**PROTOTYP-PRÜFUNG**) |
 | SDA | Pin 3 (GPIO2, SDA1) | I²C-Bus 1 → `/dev/i2c-1` |
 | SCL | Pin 5 (GPIO3, SCL1) | |
 
@@ -118,9 +128,44 @@ an eine gekürzte Stiftleiste; Lötstellen mit Schrumpfschlauch isolieren. Den S
 SoC/WLAN-Chip platzieren (Eigenerwärmung); belüftete, thermisch getrennte Kammer (D-017).
 
 Prüfen: `sudo i2cdetect -y 1` → Adresse **44** (SHT4x-AD1B, Datenblatt S. 1). Danach
-`sudo systemctl restart fluidi-gateway`; in der App unter *System* erscheint „Raumklima … °C · … % rF“.
+`sudo systemctl restart fluidi-gateway`; in der App unter *Einstellungen → System: Zeit, WLAN, Protokoll* erscheint
+bei „Raumklima“ „… °C · … % rF“ (sonst „kein Sensor“).
 Pull-ups für SDA/SCL: auf dem Pi vorhanden laut Schaltplan (R23/R24 bei GPIO2/3, **ANNAHME** aus Bauteilnähe,
 prüfen); zusätzliche Pull-ups auf dem Breakout sind unkritisch.
+
+Raumklima und Zeit: Solange das Gateway keine gültige Zeit hat (Kap. 9), hält es die Klimawerte im Arbeitsspeicher
+und speichert sie erst nach dem Zeitabgleich mit korrigierter Zeit; ein Neustart vorher verwirft sie.
+
+### 5.2 Status-LED (D-027, vorläufig)
+
+Schaltung nach `docs/reviews/phase5_gateway_led.md` Kap. 3 (Variante B): **J8 Pin 11 (GPIO17) → Widerstand 470 Ω →
+Anode** der grünen 3-mm-LED (langes Bein), **Kathode** (kurzes Bein, Abflachung) → **J8 Pin 14 (GND)**. Widerstand
+direkt am Anodenbein, beide Lötstellen mit Schrumpfschlauch. **Vor dem Einschalten** den Widerstand zwischen Pin 11
+und Pin 14 messen (ohne Widerstand wäre GPIO17 bei leuchtender LED fast kurzgeschlossen). LED in den Lichtschacht des
+Deckels (Mechanik).
+
+| LED | Bedeutung | Quelle |
+|---|---|---|
+| Herzschlag-Muster des Kernels (Trigger `heartbeat`) | Pi startet, fluidi-Dienst noch nicht bereit | Kernel-Overlay `trigger=heartbeat` |
+| **kurzer Blitz alle 5 s** | alles in Ordnung: Dienst läuft, Funk bereit | Dienst (`fluidi_gw/statusled.py`) |
+| **schnelles Blinken** (5 × pro s) | Kopplungsfenster in der App offen | Dienst |
+| **aus** | Nacht (ausserhalb des LED-Zeitfensters der Sensoren bzw. an abgewählten Wochentagen), Schalter „Status-LED“ in der App aus, **Funk ausgefallen**, Dienst gestoppt/abgestürzt oder Gateway ohne Strom | Dienst / systemd `ExecStopPost` |
+
+**ANNAHMEN** (D-027 gilt „für den Moment“): Nacht = gleiches Zeitfenster wie der Giessen-Hinweis der Sensoren
+(*Einstellungen → Messung & Sensor-LED*); ohne gültige Zeit gilt „Tag“; der Schalter „Status-LED (Quittung,
+Lebenszeichen)“ schaltet auch die Gateway-LED; Kopplung blinkt auch nachts. „Aus“ ist mehrdeutig (Nacht oder
+Fehler) – tagsüber heisst „aus“ also Fehler (FEHLERSUCHE.md).
+
+Technik: Das Blinken macht der Kernel (Trigger `timer`). Der Dienst hat keine Root-Rechte; er legt bei einem
+Zustandswechsel eine Anfrage für `fluidi-helper` ab (Aktion `led`, nur `ok|pair|off`). Endet der Dienst, schaltet
+systemd die LED aus (`ExecStopPost=+… fluidi-helper led off`). Abschalten der Funktion: `status_led = "off"` in
+`/etc/fluidi/gateway.toml`.
+
+Prüfen (nach dem Neustart, der das Overlay lädt): `sudo ./install_gateway.sh --check` → Zeile „Status-LED“ mit
+Trigger `[timer]` (Dienst läuft) bzw. `[heartbeat]` (Dienst noch nicht gestartet). Von Hand:
+`echo none | sudo tee /sys/class/leds/fluidi/trigger; echo 1 | sudo tee /sys/class/leds/fluidi/brightness` → LED an.
+**PROTOTYP-PRÜFUNG:** Sichtbarkeit hinter dem Fenster (zu dunkel → 330 Ω, Vorlage Kap. 3), Trigger `timer` im
+Raspberry-Pi-Kernel vorhanden, LED aus nach `sudo systemctl stop fluidi-gateway` und nach einem Watchdog-Neustart.
 
 ## 6 Zertifikat auf dem Pixel 10 installieren (Android)
 
@@ -156,10 +201,12 @@ Erneuern (Zertifikat ≤ 825 Tage, die App warnt 60 Tage vorher): SSH einschalte
 
 ## 7 Sensoren koppeln
 
-App → *Einstellungen → Sensor koppeln → Kopplung starten*. Am Sensor Taste ≥ 3 s, bis die LED gelb blinkt.
-Sensor in der Liste wählen, Pflanze (Art aus 40 Profilen) angeben → **Farbfolge vergleichen**: Die LED zeigt fünf
-Farben (rot/grün/gelb), die App dieselbe Folge. Stimmt sie: **kurz die Sensortaste drücken** und in der App
-**„Farben stimmen“**. LED grün = gekoppelt.
+App → *Einstellungen → Sensor koppeln → Kopplung starten* (die Gateway-LED blinkt schnell). Am Sensor die Taste
+halten, bis die LED nach 3 s **einmal kurz gelb** aufblitzt, dann loslassen (vor 8 s); der Sensor blinkt danach
+1 × pro Sekunde gelb (bis 2 min). Sensor in der Liste wählen, Pflanze (Art aus 40 Profilen) angeben → **Farbfolge
+vergleichen**: Die LED zeigt fünf Farben (rot/grün/gelb), die App dieselbe Folge. Stimmt sie: **kurz die
+Sensortaste drücken** und in der App **„Farben stimmen“**. LED 1 s grün = gekoppelt. Ausführlich für Endnutzer:
+`docs/manuals/PAIRING_KALIBRIERUNG.md`.
 
 ## 8 SD-Karte und Stromausfall
 
@@ -180,7 +227,7 @@ Farben (rot/grün/gelb), die App dieselbe Folge. Stimmt sie: **kurz die Sensorta
 | Passwort vergessen | SSH einschalten (Kap. 4.4), `cd /opt/fluidi/current/gateway && sudo -u fluidi /opt/fluidi/venv/bin/python -m fluidi_gw reset-password -c /etc/fluidi/gateway.toml` → neuer Einrichtungscode; Daten bleiben (UC-16) |
 | Dashboard für Kollegen | App → Einstellungen → Dashboard → „Ohne Anmeldung im Firmennetz“ → Bildschirm öffnet `http://fluidi.local:8080/` (HTTP, nur lesen, keine Sensor-IDs; D-020) |
 | WLAN wechseln | App → System → WLAN wechseln (Rückfall nach 2 min ohne Erfolg) |
-| Zeit | NTP (einzige Verbindung nach aussen, abschaltbar; Firmen-NTP unter Einstellungen → Zeit). Ohne NTP (z. B. nach Stromausfall ohne Internet) übernimmt das Gateway beim Öffnen der App durch den angemeldeten Admin automatisch die Uhrzeit des Handys (nur wenn plausibel); sonst App → System → „Zeit vom Handy übernehmen“. Bis dahin: Werte „Zeit unsicher“, sie werden danach anhand der Sensor-Laufzeit zurückgerechnet (docs/reviews/phase5_gateway_zeit.md) |
+| Zeit | **Keine Echtzeituhr im Gateway (D-028).** NTP (einzige Verbindung nach aussen, abschaltbar; Firmen-NTP unter Einstellungen → Zeit). Nach einem Stromausfall steht die Uhr zuerst auf der zuletzt gespeicherten Zeit und gilt **nicht** als gültig, bis NTP synchronisiert. Ohne NTP (z. B. nach Stromausfall ohne Internet) übernimmt das Gateway beim Öffnen der App durch den angemeldeten Admin automatisch die Uhrzeit des Handys (nur wenn plausibel); sonst App → System → „Zeit vom Handy übernehmen“. Bis dahin: Werte „Zeit unsicher“, sie werden danach anhand der Sensor-Laufzeit zurückgerechnet (docs/reviews/phase5_gateway_zeit.md) |
 | Sensor-Firmware | App → Sensoren & Firmware → signiertes Abbild hochladen → Verteilen |
 | Gateway-Update | neue Repository-Version auf den Pi kopieren, `sudo ./install_gateway.sh` (Daten bleiben); signiertes Online-Update über die App ist vorbereitet (REQ-GW-11, Schlüssel `/etc/fluidi/keys/gateway-update.pem`) |
 | Simulation am PC | `cd firmware/gateway && python3 -m fluidi_gw sim --port 8080` (Sensoren simuliert, gleiches Funkprotokoll) |
@@ -193,11 +240,19 @@ Farben (rot/grün/gelb), die App dieselbe Folge. Stimmt sie: **kurz die Sensorta
 3. Name-Constraint-CA auf dem Pixel 10 (Kap. 6), mDNS `fluidi.local` in Chrome.
 4. Klimasensor: Eigenerwärmung im Gehäuse, Offset.
 5. Schreibrate der SD-Karte über 7 Tage messen.
-6. Watchdog: Funk-Thread blockieren → systemd startet neu.
+6. Watchdog: Funk-Thread blockieren → systemd startet neu; Status-LED geht dabei aus und danach wieder auf „Blitz“.
+7. Status-LED (Kap. 5.2): Sichtbarkeit, Muster, aus bei gestopptem Dienst.
+8. Zeit ohne RTC (D-028): Prüfungen GZ-1…GZ-4 in `docs/reviews/phase5_gateway_zeit.md` Kap. 6 (Pi stromlos ohne Netz,
+   Systemzeit nach dem Start, Handyzeit beim Öffnen der App, unplausible Handyzeit wird abgelehnt). **ANNAHME:**
+   `systemd-timesyncd` speichert die Zeit auch unter Raspberry Pi OS regelmässig (`/var/lib/systemd/timesync/clock`).
 
 ## 11 Quellen
 - Raspberry Pi Zero 2 W Product Brief (lokal), Reduced Schematics (lokal, J8).
 - Sensirion SHT4x Datenblatt V7.3 (lokal, `docs/datasheets/INDEX.csv` GW-CLIM1).
+- Overlay gpio-led: `docs/references/RaspberryPi_GPIO-Doku_Auszug_2026-11-08.txt` (overlays/README Z. 1606–1658);
+  LED-Trigger `timer` mit `delay_on`/`delay_off`: https://docs.kernel.org/leds/leds-class.html (abgerufen 2026-11-08);
+  Lage von `config.txt` (`/boot/firmware/`): https://www.raspberrypi.com/documentation/computers/config_txt.html
+  (abgerufen 2026-11-08).
 - AOSP „DNS Resolver“ (.local ab Nov. 2021, Android 12+): https://source.android.com/docs/core/ota/modular-system/dns-resolver (abgerufen 2026-11-07).
 - CA-Installation Android (Menüpfad): z. B. https://cloudveil.org/?p=2314925 , https://help.cybozu.cn/en/settings/browser/certificate/other/an_chrome.html (abgerufen 2026-11-07).
 - Debian-Paketversionen python3-cryptography: https://packages.debian.org/bookworm/python3-cryptography , https://packages.debian.org/trixie/python3-cryptography (abgerufen 2026-11-07).

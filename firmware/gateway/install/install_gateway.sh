@@ -44,6 +44,15 @@ check() {
     printf '  %-22s %s\n' "$s" "$(systemctl is-active "$s" 2>/dev/null || true)"
   done
   ss -lntup 2>/dev/null | awk 'NR==1 || /:(22|80|443|8080|5353) /' || true
+  # Zeit ohne RTC (D-028): NTP über systemd-timesyncd; Rückfall Browserzeit aus der App (GATEWAY_SETUP Kap. 9)
+  printf '  %-22s %s\n' "systemd-timesyncd" "$(systemctl is-active systemd-timesyncd 2>/dev/null || true)"
+  printf '  %-22s %s\n' "NTP synchronisiert" "$(timedatectl show -p NTPSynchronized --value 2>/dev/null || echo ?)"
+  # Status-LED (D-027): Overlay gpio-led -> /sys/class/leds/fluidi
+  if [ -e /sys/class/leds/fluidi/trigger ]; then
+    printf '  %-22s %s\n' "Status-LED" "vorhanden, Trigger: $(grep -o '\[[a-z0-9-]*\]' /sys/class/leds/fluidi/trigger || echo ?)"
+  else
+    printf '  %-22s %s\n' "Status-LED" "fehlt (Overlay in config.txt? Neustart nötig?)"
+  fi
   [ -x "$OPT/venv/bin/python" ] && "$OPT/venv/bin/python" -c 'import bleak, cryptography; print("bleak", bleak.__version__ if hasattr(bleak,"__version__") else "?", "cryptography", cryptography.__version__)' || true
 }
 
@@ -90,6 +99,29 @@ if p.exists():
         p.write_text(s)
 PY
 systemctl restart bluetooth || true
+# Status-LED (D-027, docs/reviews/phase5_gateway_led.md): grüne LED + 470 Ohm an GPIO17 (J8 Pin 11), GND Pin 14.
+# Kernel-Overlay gpio-led: Herzschlag ab dem Start, danach steuert der Dienst über fluidi-helper (Aktion led).
+# config.txt liegt bei Raspberry Pi OS in /boot/firmware/ (raspberrypi.com/documentation config_txt), älter /boot/.
+BOOTCFG=""
+for f in /boot/firmware/config.txt /boot/config.txt; do [ -f "$f" ] && { BOOTCFG="$f"; break; }; done
+LED_OVERLAY="dtoverlay=gpio-led,gpio=17,label=fluidi,trigger=heartbeat"
+if [ -n "$BOOTCFG" ]; then
+  if ! grep -qxF "$LED_OVERLAY" "$BOOTCFG"; then
+    printf '\n# fluidi Status-LED (D-027)\n%s\n' "$LED_OVERLAY" >> "$BOOTCFG"
+    echo "Status-LED: Overlay in $BOOTCFG eingetragen – wirksam nach dem nächsten Neustart"
+  fi
+else
+  echo "Hinweis: config.txt nicht gefunden – Zeile '$LED_OVERLAY' von Hand eintragen"
+fi
+# Zeit (D-028, ohne RTC): NTP über systemd-timesyncd (Root-Helfer stellt Server/Ein-Aus nach den App-Einstellungen).
+# Ohne Netz übernimmt der Dienst die Handyzeit beim Öffnen der App; kein RTC-Overlay, kein hwclock.
+# Nur bei der Erstinstallation einschalten: danach gilt die Einstellung aus der App (Drop-in des Root-Helfers).
+if systemctl cat systemd-timesyncd.service >/dev/null 2>&1; then
+  [ -f /etc/systemd/timesyncd.conf.d/fluidi.conf ] || timedatectl set-ntp true 2>/dev/null \
+    || echo "Hinweis: 'timedatectl set-ntp true' fehlgeschlagen"
+else
+  echo "Hinweis: systemd-timesyncd fehlt – ohne NTP gilt nur die Handyzeit aus der App (GATEWAY_SETUP Kap. 9)"
+fi
 # WLAN-Energiesparen aus: Gateway muss jederzeit erreichbar sein (Koexistenz WLAN/BLE: PROTOTYP-PRÜFUNG OP-K12)
 mkdir -p /etc/NetworkManager/conf.d
 printf '[connection]\nwifi.powersave = 2\n' > /etc/NetworkManager/conf.d/fluidi-powersave.conf

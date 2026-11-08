@@ -1923,9 +1923,8 @@ components:
       properties:
         now: {$ref: '#/components/schemas/Timestamp'}
         valid: {type: boolean}
-        source: {type: string, enum: [ntp, rtc, browser, none]}
+        source: {type: string, enum: [ntp, browser, none], description: 'Gateway ohne RTC (D-028)'}
         last_sync: {oneOf: [{$ref: '#/components/schemas/Timestamp'}, {type: 'null'}]}
-        rtc_ok: {type: boolean}
         timezone: {type: string}
     SystemStatus:
       type: object

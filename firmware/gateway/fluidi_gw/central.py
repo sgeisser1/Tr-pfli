@@ -52,6 +52,7 @@ class Central:
         self.ota_lock = None
         self.last_try = {}
         self.stats = {"sessions": 0, "errors": 0, "auth_fail": 0}
+        self.radio_ok = True            # False, wenn der Funk nicht startet (Status-LED aus, statusled.py)
         self.ready = threading.Event()
 
     # ------------------------------------------------------------------ Thread
@@ -71,6 +72,7 @@ class Central:
         try:
             await self.radio.start(self._on_adv)
         except Exception as e:  # noqa: BLE001
+            self.radio_ok = False
             self.model.log("error", "radio", f"Funk nicht verfügbar: {e}")
             log.error("Radio-Start fehlgeschlagen: %s", e)
         self.ready.set()

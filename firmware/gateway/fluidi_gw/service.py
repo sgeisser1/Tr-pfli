@@ -8,7 +8,7 @@ import socket
 import threading
 import time
 
-from . import backup, central, climate, config, model, mqtt, server, store, timesvc, transport
+from . import backup, central, climate, config, model, mqtt, server, statusled, store, timesvc, transport
 from .simsensor import SimSensor
 
 log = logging.getLogger("fluidi")
@@ -59,6 +59,8 @@ class Gateway:
         self.mqtt.configure(self.model.settings["mqtt"], self.store.meta_get("mqtt_password"))
         self.model.mqtt = self.mqtt
         self.ctl = server.ServerCtl(self.model, cfg)
+        use_led = cfg.status_led == "on" or (cfg.status_led == "auto" and not sim)
+        self.led = statusled.StatusLed(self.model, self.central, self.ctl.helper_request) if use_led else None
         self.sims = []
         if sim:
             self._make_sims()
@@ -112,6 +114,8 @@ class Gateway:
     def start(self):
         self.central.start()
         self.climate.start()
+        if self.led:
+            self.led.start()
         if self.sims and self.cfg.sim_autopair:
             self._autopair()
         srv = self.ctl.start()
@@ -119,6 +123,8 @@ class Gateway:
         return srv
 
     def stop(self):
+        if self.led:
+            self.led.stop()
         self.ctl.stop()
         self.climate.stop()
         self.central.stop()

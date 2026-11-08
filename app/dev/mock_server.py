@@ -2107,7 +2107,7 @@ def dashboard_get(h: Handler, sess, **_):
 # ------------------------------------------------------------------------------ System
 def _time_out(S):
     return {"now": C.iso(now()), "valid": True, "source": "ntp", "last_sync": C.iso(now() - 1800),
-            "rtc_ok": True, "timezone": S.settings["time"]["timezone"]}
+            "timezone": S.settings["time"]["timezone"]}
 
 
 @route("GET", "/system", auth="read")

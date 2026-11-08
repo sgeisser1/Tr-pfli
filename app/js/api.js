@@ -77,7 +77,7 @@ export const put = (p, b) => req('PUT', p, b);
 export const del = (p, query) => req('DELETE', p, undefined, { query });
 
 /** Browserzeit anbieten (GATEWAY_API 5.7, REQ-GW-09): Das Gateway übernimmt sie nur ohne gültige Zeit
- *  (kein NTP, keine RTC, z. B. nach Stromausfall ohne Internet). Ohne Anmeldung/CSRF nichts tun, Fehler still. */
+ *  (kein NTP – das Gateway hat keine Uhr mit Batterie, D-028 –, z. B. nach Stromausfall ohne Internet). Ohne Anmeldung/CSRF nichts tun, Fehler still. */
 export async function offerTime() {
   if (!csrf) return null;
   try { return await req('POST', '/system/time', { t: new Date().toISOString() }, { noHooks: true }); } catch { return null; }

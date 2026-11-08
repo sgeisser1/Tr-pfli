@@ -12,6 +12,9 @@ Group=fluidi
 SupplementaryGroups=bluetooth i2c
 WorkingDirectory=/opt/fluidi/current/gateway
 ExecStart=/opt/fluidi/venv/bin/python -m fluidi_gw serve -c /etc/fluidi/gateway.toml
+# Status-LED (D-027) aus, sobald der Dienst endet (Stopp, Absturz, Watchdog); "+" = als root ohne Sandbox,
+# fluidi-helper kennt nur fest programmierte Aktionen
+ExecStopPost=+/usr/bin/python3 -I /usr/local/sbin/fluidi-helper led off
 Restart=always
 RestartSec=5
 # Watchdog (REQ-FW-07): der Dienst meldet sich nur, solange der Funk-Thread lebt
