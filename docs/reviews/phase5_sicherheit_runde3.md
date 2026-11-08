@@ -110,3 +110,25 @@ FMEA F-48 (144), F-49 (126).
 
 Bitte je Befund *umgesetzt* / *abgelehnt (Grund)*: R3-W1, R3-K1…K4 → Projektleitung/Anleitungen; R3-W2, R3-W3 →
 `mechanik`; R3-W4 (G-R1…G-R5) → `gateway`/`mechanik`/Projektleitung; PS-W1-Auflagen A1–A5 → `mechanik` bei PA-1.
+
+## Nachtrag (2026-11-08): Entscheid WS-13 – Quelle an TP1/TP2 im Test ST-Z5 / PT11.06
+
+**Entscheid: ST-Z5 bleibt als ausdrückliche, einzige Ausnahme von Regel 1** (`PROGRAMMIEREN_SENSOR.md` Regel 1,
+Elektronik-Grundregel, ENERGIEMESSUNG). Der Test ist der einzige Nachweis der Rückstrombarriere (REQ-SAF-CC-03,
+R2-A4, FMEA F-05). Ohne ihn bleibt die SPICE-Rechnung (`simulation/spice/README.md` (c): ≤ 45.9 µA je Pad bei 5.5 V und
+überbrücktem R) unbestätigt. Regel 1 gilt unverändert für Programmieren, Energiemessung und jeden anderen Betrieb.
+
+Bedingungen (alle Pflicht):
+
+| Nr | Bedingung |
+|---|---|
+| Z5-1 | Nur an den von der Projektleitung bestimmten Prüfmustern, nur durch den benannten Prüfer, auf nicht brennbarer Unterlage, beaufsichtigt. Nicht zusammen mit Programmieren oder Energiemessung. |
+| Z5-2 | Quelle = Labornetzteil, Strombegrenzung **≤ 1 mA** vor dem Anschliessen eingestellt und am offenen Ausgang kontrolliert (Faktor ≥ 10 unter der Ladegrenze 10 mA, Maxell S. 2; Faktor ≈ 20 über dem Erwartungswert). Strommessung in der Pad-Leitung. |
+| Z5-3 | Zellstrom nur über den Mess-Zwischenadapter (Shunt/Amperemeter), keine Quelle in Serie zur Zelle. |
+| Z5-4 | **Fall „Zelle 0 V“ ohne Zelle:** Clip-Kontakte über den Shunt verbinden (misst denselben Strom ohne Ladegefahr). Fall „entladene Zelle“ nur mit Zelle **2.0–2.6 V** (keine Zelle < 2.0 V, keine beschädigte Zelle). |
+| Z5-5 | Dauer je Fall ≤ 10 min (ANNAHME; bei 55 µA ≈ 9 µAh, < 0.01 % der Kapazität). |
+| Z5-6 | Abbruch: Pad-Strom > 100 µA **oder** Strombegrenzung des Netzteils spricht an **oder** Erwärmung/Geruch/Aufblähen; dann Quelle zuerst abklemmen, Zelle danach entfernen. |
+| Z5-7 | Überbrückung des 100-kΩ-Widerstands nur als Draht für den Test, nach dem Test entfernen und per Foto/Widerstandsmessung (≈ 200 kΩ) nachweisen; Muster als „Fehlertest“ kennzeichnen. Zellen aus dem Test entsorgen. |
+
+Textvorschlag für Regel 1 (Projektleitung): „… keine Speisung über TP1/TP2. Einzige Ausnahme: Sicherheitstest
+PT11.06/ST-Z5 nach den Bedingungen Z5-1…Z5-7 in `docs/reviews/phase5_sicherheit_runde3.md`.“

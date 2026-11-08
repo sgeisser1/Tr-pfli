@@ -17,7 +17,8 @@ fehlt: am **offenen Board vor dem Verguss**, mit Labornetzteil und gelöteten Dr
 1. **Nie mit eingesetzter Zelle programmieren.** Speisung **nur über die Dummy-Zelle bzw. Dummy-Scheibe im Clip**
    (Weg A und Weg B). Die Scheibe belegt den Clip, so dass keine Zelle parallel zum Netzteil eingesetzt werden kann
    (Veto PS-K1, `docs/reviews/phase5_programmer_sicherheit.md`). Keine Prüfklemme am Clip, kein Draht am Minuspad,
-   keine Quelle an TP1/TP2.
+   keine Speisung über TP1/TP2. Einzige Ausnahme: Sicherheitstest PT11.06/ST-Z5 nach den Bedingungen Z5-1…Z5-7
+   (`docs/reviews/phase5_sicherheit_runde3.md`, Entscheid WS-13).
 2. Labornetzteil (Weg B): **2.0 V** (höchstens 2.2 V), Strombegrenzung **≤ 20 mA**, Polarität vor dem Anschliessen messen.
 3. Der CH343 bekommt seine I/O-Spannung (VIO) immer aus **derselben 2.0-V-Speisung** (Weg A: Adapter-Regler U3,
    Weg B: dasselbe Labornetzteil). **Jumper H3** auf dem Waveshare-Board **abziehen**. Mit 3.3-V- oder 5-V-Pegeln wird
