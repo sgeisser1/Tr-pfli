@@ -128,12 +128,13 @@ Ablauf:
    den gefüllten Via-in-Pad-Flächen im Fach löten (PS-W2).
 3. CH343-RXD: Kupferlackdraht 0.1–0.2 mm auf **R9 Pad 1** löten (wenig Zinn, kurz, R9 nicht ablöten), Draht mit
    Kaptonband zugentlasten.
-4. CH343-TXD: Draht an TP2 (Ø 1.5 mm, leicht zu löten) oder Prüfspitze.
+4. CH343-TXD: an TP2 (Ø 1.5 mm) **nur mit Prüfspitze oder Federstift mit flachem/gerundetem Kopf**, nicht löten:
+   TP2 ist eine gefüllte Via-in-Pad-Fläche im Fach (PS-W2).
 5. Netzteil auf 2.0 V, **10 mA** (höchstens 20 mA) einstellen, **erst dann** anschliessen (PS-L3). VIO am Waveshare-Board messen: 2.0 V.
 6. **Taster drücken und halten**, Netzteil einschalten, nach ≈ 1 s loslassen (leerer Chip: Taster unnötig).
 7. `flash_sensor.py info …`, dann `program …` wie Weg A Schritt 4–5. Bei Fehlern `--baud 19200`.
 8. **Feste Reihenfolge (Veto PS-K1):** (a) Netzteil **aus und abziehen**, (b) **Dummy-Scheibe heraus**,
-   (c) Draht an R9 und TP2 **entfernen**. Erst nach Schritt 9 eine Zelle einsetzen.
+   (c) Draht an R9 **entfernen**, Prüfspitze von TP2 abnehmen. Erst nach Schritt 9 eine Zelle einsetzen.
 9. **Nacharbeit (Pflicht):** Flussmittel mit Isopropanol reinigen, unter der Lupe prüfen: R9 auf beiden Pads gelötet,
    kein Zinn zwischen den Pads oder zu R8/D1, kein Drahtrest. **Foto** von R9/R6/TP2 unter der Lupe ablegen (die
    Widerstandsmessung erkennt einen vergessenen Draht nicht, PS-W4). Kontrollmessung ohne Speisung: TP1 ↔ R9 Pad 1
