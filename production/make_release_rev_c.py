@@ -101,9 +101,17 @@ def check():
     readme = open(os.path.join(DST, "README.md"), encoding="utf-8").read()
     m = re.search(r"Git-Stand \| `([0-9a-f]+)`", readme)
     head = git("rev-parse", "--short", "HEAD")
-    if not m or not head.startswith(m.group(1)[:7]) and not m.group(1).startswith(head[:7]):
-        bad.append(f"Git-Stand im README {m.group(1) if m else '-'} != HEAD {head}")
-    if "nicht committete" in readme:
+    if not m:
+        bad.append("Git-Stand fehlt im README")
+    else:
+        # Paket darf in einem spaeteren Commit liegen: massgebend ist, dass sich keine Quelle seit dem Stand geaendert hat
+        srcs = sorted({os.path.relpath(s_, ROOT) for _, s_, _ in sources()})
+        changed = git("diff", "--name-only", m.group(1), "HEAD", "--", *srcs)
+        if changed:
+            bad.append(f"Quellen seit Stand {m.group(1)} geaendert: {changed.split()}")
+        if git("status", "--porcelain", "--", *srcs):
+            bad.append("Quellen haben nicht committete Aenderungen")
+    if "+ **nicht committete" in readme:
         bad.append("Paket wurde aus einer Arbeitskopie mit nicht committeten Aenderungen erzeugt")
     for b_ in bad:
         print("ABWEICHUNG:", b_)

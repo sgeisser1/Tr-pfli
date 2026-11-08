@@ -1,0 +1,10 @@
+Designator,Value,Footprint,LCSC,Grund
+AE1,AN043_IFA,RF_Antenna:Texas_SWRA117D_2.4GHz_Right,,Leiterplattenstruktur/Pad (nicht in BOM)
+C19,DNM,Capacitor_SMD:C_0402_1005Metric,,DNP
+C20,DNM,Capacitor_SMD:C_0402_1005Metric,,DNP
+E1,Sonde_Innenlagen,fluidi:SONDE_PLATZHALTER,,Leiterplattenstruktur/Pad (nicht in BOM)
+TP1,UART_TX,TestPoint:TestPoint_Pad_D1.5mm,,Leiterplattenstruktur/Pad (nicht in BOM)
+TP2,UART_RX,TestPoint:TestPoint_Pad_D1.5mm,,Leiterplattenstruktur/Pad (nicht in BOM)
+TP4,MEAS_CLK,TestPoint:TestPoint_Pad_D1.0mm,,Leiterplattenstruktur/Pad (nicht in BOM)
+TP5,PROBE_SENSE,TestPoint:TestPoint_Pad_D1.0mm,,Leiterplattenstruktur/Pad (nicht in BOM)
+-,Panasonic CR2032,-,-,"lokal beschafft (D-006), nicht von JLC bestueckt"
