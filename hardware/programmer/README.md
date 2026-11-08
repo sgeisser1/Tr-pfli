@@ -123,24 +123,55 @@ Layout Rev C (`hardware/programmer/gen/behelf_pads.py`, Bild `out/behelf_lagepla
 | Platinenkante | X ±13.0 im Fach | PCB_OUTLINE Z4 |
 | B-Seite Fach | nur Silkscreen, keine Pads | PCB_OUTLINE Z4 Fach B |
 
-**Dummy-Zelle:** zwei Scheiben Ø 20.0 mm aus FR4 1.6 mm, einseitig kupferkaschiert, verklebt (zusammen 3.2 mm):
+**Dummy-Zelle** (Auflage PS-W3, `docs/reviews/phase5_programmer_sicherheit.md`): Scheibe Ø 20.0 mm, **Gesamtdicke
+3.0–3.2 mm inkl. Kupfer und Kleber** (CR2032 höchstens 3.2 mm, `Panasonic_CR2032_Datasheet_2026-02.pdf` S. 1; die
+Clip-Lötstellen liegen auf dem Katalogminimum, ein dickerer Dummy spreizt den Clip). Zwei FR4-Scheiben 1.6 mm ergeben
+mehr als 3.2 mm und sind **nicht zulässig**; z. B. eine Scheibe dünner wählen oder plan schleifen (Plattendicken nach
+Lieferant, **ANNAHME**). Dicke an 3 Stellen mit dem Messschieber messen und auf dem Dummy notieren (Kap. 7 Schritt 3).
+Rand wie bei einer Zelle leicht fasen.
 - Oberseite: Kupfer ganzflächig = **+** (Clip drückt darauf), Litze von der Seite in einer Nut zwischen den Scheiben.
 - Unterseite: Kupfer bis auf eine **Mittelinsel Ø 8 mm** entfernt = **−** (deckt das 4 × 4-Pad samt ±1 mm Lage ab). Litze
   durch eine Bohrung Ø 1 mm von innen anlöten, Lötstelle plan schleifen (keine Erhebung, die das Minuspad zerkratzt).
-- Rand und übrige Unterseite isolierend (FR4). Damit ist der Dummy sicherer als eine echte Zelle: Er hat keinen
-  Plusrand auf der Unterseite (R2-W01).
+- Rand und übrige Unterseite isolierend (FR4). Kein Plusrand auf der Unterseite (R2-W01).
 - Isolation Ober-/Unterseite vor dem ersten Einsatz messen (> 10 MΩ).
 
-**Federstiftkopf:** zwei Federkontaktstifte im Abstand 3.0 mm über TP1/TP2, Spitzen mit Krone oder Spitze für die
-gefüllten Via-in-Pad-Flächen. Der Kopf ist **starr mit der Dummy-Zelle verbunden** (R2-A2), z. B. als Bügel aus ASA
-(3D-Druck), der von der +X-Seite über den Clip (Höhe 4.1 mm, Abstand ≥ 1 mm) zu X −10.6 greift. Ein Gegenhalter
-greift unter die Platinenkante bei X −13 auf der B-Seite und nimmt die Federkraft auf. Die Elektronik (U4, R1, C5)
-sitzt auf dem Bügel, **≤ 3 cm** Draht vom Stift TP1 bis U4-Pin 2 (SPICE: mit 40 pF am Kabelende fällt 57600 Baud aus).
-Federkraft, Hub und Stifttyp: **ANNAHME**, mit `mechanik` festlegen. Der Kopf darf das Schott nicht belasten und muss
-ohne Hülse passen (`docs/reviews/phase3_sleeve_sicherheit.md`).
+**Federstiftkopf – Konzept Mechanik (Phase 5, noch keine druckbare Konstruktion).** Lagen aus dem Layout Rev C
+(pcbnew, Pad-Mitten in Kopfkoordinaten x/z, `docs/interfaces/PCB_OUTLINE.md` Kap. 1) und `fluidi_params.py`:
 
-Offene Geometriefrage (**mit `mechanik`**): Kommt man an den Anschlaglappen am geschlossenen Clip-Ende (X ≈ −4.4…−7)
-vorbei, kann der Bügel auch flach auf der −X-Seite der Scheibe ansetzen. Das geht nur mit dem 3D-Modell des Clips.
+| Merkmal | Lage | Quelle |
+|---|---|---|
+| TP1 (TX) / TP2 (RX) | x −10.60, z **28.00** / **25.00**, Pad Ø 1.5, auf F (y 6.6) | `fluidi_sensor.kicad_pcb` (pcbnew, Phase 5 ausgelesen) |
+| Clipkörper XBT1 | x −4.4 … 11.7, z 7.15 … 30.25, Höhe 4.1 → Oberkante y 2.5 | PCB_OUTLINE Kap. 5 |
+| Zelle/Dummy in Endlage | x −7.0 … 13.0, Mitte z 18.70, Einschub von +x nach −x | PCB_OUTLINE Kap. 5 |
+| Schott-Unterkante (nicht belasten) | z 30.8 (TP1-Pad-Rand z 28.75 → 2.05 mm Abstand) | `fluidi_params.py` Z['BULK0'] |
+| Platinenkante neben TP | x −13.0 (Fach), B-Seite y 8.2, Hülse abgezogen → frei | PCB_OUTLINE Kap. 3 |
+
+Befund aus der Geometrie: Ein **starr** mit dem Dummy verbundener Stift auf Pad-Höhe (y ≈ 6.6) läuft beim Einschieben
+(Bewegung −x) über den Clipkörper (x −4.4 … 11.7, bis y 2.5), sobald der Dummy mehr als ≈ 6 mm vor der Endlage steht.
+Stifte mit einem Hub ≥ 5 mm gibt es in dieser Bauform kaum (**ANNAHME**). Darum Vorschlag:
+1. **Bügel** (ASA, 3D-Druck) fest mit der Dummy-Zelle verklebt bzw. verstiftet, greift von der offenen Clip-Seite
+   (+x, x > 13) **vor dem Clip** (y ≤ 1.5, d. h. ≥ 1 mm Luft zur Clip-Oberkante y 2.5) nach −x bis über TP1/TP2.
+2. **Stiftträger als Schwinge** am Bügel, unverlierbar gelagert (Achse parallel z), mit Feder nach vorn (−y) gehalten:
+   Beim Einschieben stehen die Stiftspitzen vor y 1.5. Erst in Endlage des Dummys schliesst der **Gegenhalter**
+   (Klammer um die Platinenkante x −13, Auflage auf B bei TP-Höhe) die Schwinge und drückt die Stifte auf TP1/TP2. Die
+   Federkraft schliesst sich über Platine und Gegenhalter, nicht über das Schott (PS-W1 d) und nicht über die Zelle.
+3. Der Gegenhalter lässt sich nur schliessen, wenn der Dummy ganz im Clip sitzt (Anschlag am Bügel bei x 13.0 +
+   Spiel) → PS-W1 (a). Mit gestecktem Adapter belegt der Dummy den Clip → PS-W1 (b). Dummy verkehrt (Bügel zeigt nach
+   hinten) → Schwinge liegt auf B, Stifte erreichen TP1/TP2 nicht → PS-W1 (c).
+4. **Stifte (PS-W2): flacher oder gerundeter Kopf, keine Krone/Spitze**, auf den gefüllten VIP-Flächen; Federkraft so
+   klein wie möglich (≤ 1 N je Stift, **ANNAHME**), Hub ≥ 1 mm. Kein Löten auf TP1/TP2/Minuspad/VBAT-Pad.
+5. U4/R1/C5 auf dem Stiftträger, Draht Stift TP1 → U4-Pin 2 ≤ 3 cm (Kap. 3/5).
+
+Ob „Bügel + unverlierbare Schwinge“ die Auflage PS-W1 („EIN starres Teil“) erfüllt, entscheidet die Sicherheit: Dummy
+und Bügel sind starr, nur der Stiftträger bewegt sich und ist ohne Werkzeug nicht abnehmbar. Alternative ohne bewegtes
+Teil: Stiftträger erst nach dem Einschieben auf einen Zapfen des Dummys stecken (zweiteilig, verletzt PS-W1 wörtlich).
+
+**Warum noch kein Druckteil:** Für die Federstifte liegt **kein Datenblatt lokal** (`docs/datasheets/INDEX.csv` Zeile
+P-J3). Für Bohrung/Presssitz, Einbaulänge, Hub und Kraft werden Aussen- und Kopfdurchmesser, Länge, Hub, Federkraft
+gebraucht. Benötigt: Datenblatt eines Federkontaktstifts Ø ≤ 1.5 mm Kopf flach oder gerundet (z. B. Raster-1.27-Typ),
+Hub ≥ 1 mm, Kraft ≤ 1 N; dazu das Massbild des Keystone 3034 ist vorhanden (`Keystone_3034_Catalog_M65.pdf`). Danach
+Generator `mechanical/gen/fluidi_programmer_head.py` (Bügel, Schwinge, Gegenhalter) mit Kollisionsprüfung gegen
+`fluidi_sensor_mit_pcb.step` (ohne Hülse). **PROTOTYP-PRÜFUNG** ST-P1 (PS-W1 a–d).
 
 ## 5 Zeitverhalten (SPICE)
 
@@ -194,7 +225,7 @@ deutlich unter 100 CHF. Die Mindestmengen reichen für 2–5 Adapter.
    Flussmittel am TP1-Knoten gründlich entfernen (10 MΩ / 200 kΩ: Kriechströme > 0.1 µA verschieben den Pegel).
 2. Waveshare: **Jumper H3 abziehen**. J1 anschliessen. USB einstecken. Messen: +3V3 = 3.2–3.4 V, **VDD_DUT und VIO =
    1.96–2.04 V**. Erst dann weiter.
-3. Dummy-Zelle: Widerstand Oberseite ↔ Mittelinsel > 10 MΩ ohne Speisung; mit Speisung 1.96–2.04 V, richtige Polarität.
+3. Dummy-Zelle: Dicke 3.0–3.2 mm an 3 Stellen (PS-W3); Widerstand Oberseite ↔ Mittelinsel > 10 MΩ ohne Speisung; mit Speisung 1.96–2.04 V, richtige Polarität.
 4. **Schleifentest mit Prüfstecker:** Zwei 100-kΩ-Widerstände in Serie zwischen Stift TP2 und Stift TP1 (bildet die
    Barriere des Sensors nach). `picocom -b 57600 /dev/ttyACM0`, Zeichen tippen → Echo. Danach mit 19200. Damit sind
    CH343-TXD, 200 kΩ, Puffer und CH343-RXD gemeinsam geprüft.
@@ -204,7 +235,7 @@ deutlich unter 100 CHF. Die Mindestmengen reichen für 2–5 Adapter.
 
 | Nr | Punkt | Art |
 |---|---|---|
-| PA-1 | Bügel/Gegenhalter und Federstifttyp konstruieren (Geometrie Kap. 4, Clip-3D-Modell, ohne Hülse, Schott unbelastet) | `mechanik` |
+| PA-1 | Bügel/Schwinge/Gegenhalter konstruieren (Konzept Kap. 4, Phase 5); **blockiert durch fehlendes Federstift-Datenblatt** (INDEX P-J3); Einteiligkeit nach PS-W1 durch Sicherheit bestätigen | `mechanik`, `sicherheit` |
 | PA-2 | Sicherheitsprüfung des Adapters (R2-A2 einteilig, R2-L02 Einzelfehler Kap. 2.3) | `sicherheit` |
 | PA-3 | 20 × Flashen bei 57600 und 19200 Baud, Flanke an U4 messen (Kap. 5) | PROTOTYP-PRÜFUNG |
 | PA-4 | VDDS am Sensor während Chip-Erase messen (Erwartung ≥ 1.95 V) | PROTOTYP-PRÜFUNG |

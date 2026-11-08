@@ -47,7 +47,7 @@ freecadcmd mechanical/gen/fluidi_gateway.py          # mechanical/gateway/print/
 | Datei | Teil | Farbe | Ausrichtung (wie exportiert) | Kritische Stellen | g |
 |---|---|---|---|---|---|
 | `huelse_grau` | Hülse | Warmgrau | stehend, Boden auf dem Bett | Logo-Relief 0.25 auf senkrechter Wand (19.4 mm); Warnsymbol innen vertieft 0.3; Kerbe oben offen; 4 Ablaufschlitze 3 × 1.2 hinten (Brücke 3 mm); Furchlippe Ø 1.7 in den ersten 3 Schichten; Höhe 44.7 | 7.5 |
-| `kappe_blau` | Kappe mit Zapfen, Schott, Biegezunge | Hellblau | **kopfüber** (Decke auf dem Bett) | Tastentasche im Bett; Schott = Brücke 5.5 mm; O-Ring-Nut-Flanke 1.35 mm Überhang (ohne Stütze druckbar, Probedruck); Zunge 0.8 mm = 2 Bahnen, wächst vom Block; Ablaufstufe am Zapfen = 0.5 mm Überhang (kopfüber ohne Stütze); dünnste Zapfenwand 0.54 mm hinter den hinteren Nutecken | 4.3 |
+| `kappe_blau` | Kappe mit Zapfen, Schott, Biegezunge | Hellblau | **kopfüber** (Decke auf dem Bett) | Tastentasche im Bett; Schott = Brücke 5.5 mm; O-Ring-Nut-Flanke 1.35 mm Überhang (ohne Stütze druckbar, Probedruck); Zunge 0.8 mm = 2 Bahnen, wächst vom Block; Ablaufstufe am Zapfen = 0.5 mm Überhang (kopfüber ohne Stütze); dünnste Zapfenwand 0.54 mm hinter den hinteren Nutecken; **Phase 5: 45°-Trichter verbindet Zapfen und Kappenwand (P5-M1, vorher 2 getrennte Körper), Mantel 0.8 um die Membran-Senkung (P5-M3)**; Massbild `mechanical/drawings/FL-S-02_kappe_blau.pdf` | 4.7 |
 | `kragen` | Kragen (Vergussform) | beliebig | stehend | Mutterntasche von vorne = Brücke 4.6 mm; Nutflanke 1.35 mm | 0.8 |
 | `fenster_tropfen` | Lichtfenster Sensor | natur transluzent | Tropfenfläche auf dem Bett, Schaft nach oben | Aussenfläche matt (Bettstruktur Engineering Plate = Diffusor) | 0.1 |
 | `taste_blau` | Taste 9 × 6 | Hellblau | Oberseite auf dem Bett | Hals Ø 3.0 | 0.1 |
@@ -94,6 +94,9 @@ Umspritzung des Netzteilsteckers (ANNAHME ≤ 10.6 × 7.0).
 
 ## 4 Toleranzen (FDM P1S, 0.4 mm) – im CAD umgesetzt
 
+Fertigungszeichnungen aller Druckteile (Phase 5): `mechanical/drawings/FL-*.pdf`, erzeugt mit
+`freecadcmd mechanical/gen/fluidi_drawings.py` (Prüfprotokoll `mechanical/drawings/drawings_check.txt`).
+
 | Fügung | Spiel je Seite | Herkunft |
 |---|---|---|
 | Hülse innen ↔ Zapfen / Kragen (Gleitsitz) | 0.20 | Mechanikbericht 2.6 |
@@ -113,7 +116,7 @@ Umspritzung des Netzteilsteckers (ANNAHME ≤ 10.6 × 7.0).
 | G1 v4: Deckel-Gegenrippe zur Trennwand | 0.3 (= Fuge) | |
 
 **Vor der ersten Serie:** `passprobe_huelse_unten` + `kragen` + O-Ring und `passprobe_huelse_oben` + `kappe_blau` drucken
-und prüfen: Hülse gleitet mit Silikonfett ohne Klemmen, O-Ring sichtbar verpresst, Schraube M2 × 4 furcht durch die Lippe und
+und prüfen: Hülse gleitet mit Silikonfett ohne Klemmen, O-Ring sichtbar verpresst, Schraube M2 × 3 (V-K, D-023) furcht durch die Lippe und
 dreht danach frei. Bei Bedarf XY-Lochkompensation anpassen, nicht die Geometrie.
 
 ## 5 Nacharbeit und Montage-Hilfsstoffe

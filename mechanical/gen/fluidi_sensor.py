@@ -31,7 +31,7 @@ import FreeCAD as App
 import Part
 
 import fluidi_params as FP
-from fluidi_cadlib import (V, prism, prism_xz, box, cyl, cyl_y, plan, rrect, rrect_perimeter, drop2, hexagon,
+from fluidi_cadlib import (V, prism, prism_xz, box, cyl, cyl_y, plan, rrect, rrect_wire, rrect_perimeter, drop2, hexagon,
                            logo_solid, text_solid, collide, export_part)
 
 H, PCB, Z, CAP, BTN = FP.HEAD, FP.PCB, FP.Z, FP.CAP, FP.BTN
@@ -155,7 +155,17 @@ def build():
     cap = cap.cut(rrect(FP.SP_IN, Z['BULK1'], H['SLOT_TOP'] + 0.01))
     T_ = FP.TONGUE                                                    # Tasche fuer die Zungenspitze im Zapfen
     cap = cap.cut(box(T_['COL_X0'], T_['COL_X1'], T_['Y0'] - 0.3, FP.SP_IN['Y0'] + 0.1, T_['Z_TIP'] - 1.0, H['SLOT_TOP'] + 0.01))
-    cap = cap.cut(prism(P(CAP['CAV_OFF']), H['SLOT_TOP'], H['H'] - H['CEIL']))
+    # P5-M1 (Phase 5): Innenraum oberhalb SLOT_TOP als 45-Grad-Trichter von SP_IN auf P(CAV_OFF), damit der Zapfen mit der
+    # Kappenwand verbunden ist (Rev C: 0.2 mm Luft -> 2 getrennte Koerper). Kopfueber gedruckt selbsttragend (45 Grad).
+    fu = CAP['FUNNEL']
+    si = FP.SP_IN
+    w0 = rrect_wire(si['X'], si['Y0'], si['Y1'], si['R'], H['SLOT_TOP'])
+    w1 = rrect_wire(si['X'] + fu, si['Y0'] - fu, si['Y1'] + fu, si['R'] + fu, H['SLOT_TOP'] + fu)
+    funnel = Part.makeLoft([w0, w1], True, True).common(prism(P(CAP['CAV_OFF']), H['SLOT_TOP'], H['SLOT_TOP'] + fu))
+    cap = cap.cut(funnel).cut(prism(P(CAP['CAV_OFF']), H['SLOT_TOP'] + fu - 0.01, H['H'] - H['CEIL']))
+    # Zungentasche durch den Trichter verlaengern (Zunge muss frei biegen, Bauteile werden erst danach angefuegt)
+    cap = cap.cut(box(T_['COL_X0'], T_['COL_X1'], T_['Y0'] - 0.3, FP.SP_IN['Y0'] + 0.1, H['SLOT_TOP'] - 0.01,
+                      H['SLOT_TOP'] + fu + 0.01))
     bs = CAP['BULK_SLOT']
     cap = cap.cut(box(-bs['X'], bs['X'], bs['Y0'], bs['Y1'], Z['BULK0'] - 1, Z['BULK1'] + 0.01))
     # Tropfenfenster-Ausschnitt und Lichtschaft-Bohrung
@@ -168,6 +178,10 @@ def build():
     blk = box(-8.0, 0.8, CAP['CAV_OFF'], PCB['Y_F'] - 0.4, BTN['BLOCK_Z0'], H['H'] - H['CEIL'] + 0.01)
     blk = blk.fuse(box(-8.0, 0.8, CAP['CAV_OFF'], PCB['Y_B'] + 0.6, BTN['BLOCK_Z0'] + 0.3, H['H'] - H['CEIL'] + 0.01))  # 0.7 ueber Oberkante
     blk = blk.fuse(cyl(BTN['TUBE_OD'] / 2, BTN['TUBE_Z0'], BTN['BLOCK_Z0'] + 0.01, ax, ay))
+    # P5-M3 (Phase 5): Mantel um die Membran-Senkung (Wand 0.8). Rev C: Senkung Ø6.4 ragte 0.2 mm seitlich aus dem Block
+    # (x 0.8 ... 1.0, z 54.2 ... 55.5) und ihr Boden war fuer y > 6.2 offen -> Leckweg am Membranrand vorbei in den
+    # Elektronikraum. Pruefung: checks() Punkt 12.
+    blk = blk.fuse(cyl(BTN['CB_D'] / 2 + 0.8, BTN['BLOCK_Z0'], H['H'] - H['CEIL'] + 0.01, ax, ay))
     tg = box(FP.TONGUE['X0'], FP.TONGUE['X1'], FP.TONGUE['Y0'], FP.TONGUE['Y1'], FP.TONGUE['Z_TIP'], BTN['BLOCK_Z0'] + 0.01)
     # Rev C: Anschlag + Gabel fuer die Platinenoberkante (links der Antenne), definiert die Lage der Platine in z und y.
     # M-4: vordere Wange = F-Referenz (Luft 0, Einlauffase), hintere Wange mit Quetschrippe (drueckt F an die vordere Wange)
@@ -499,6 +513,19 @@ def main():
     S, sl_plain, s_logo = build()
     log('Logo: Massstab %.4f mm/u -> Strich %.2f mm (2.0 u)' % (s_logo, 2.0 * s_logo))
     mass = checks(S, sl_plain)
+    # 12 Membran-Senkung allseitig geschlossen (P5-M3): Ring 0.3 mm um die Senkung und Boden darunter muessen voll sein
+    ax_, ay_ = BTN['AX_X'], BTN['AX_Y']
+    zpf = H['H'] - BTN['POCKET_D']
+    zcb = zpf - 2.3
+    ring = cyl(BTN['CB_D'] / 2 + 0.3, zcb - 0.3, zpf, ax_, ay_).cut(cyl(BTN['CB_D'] / 2, zcb, zpf + 1, ax_, ay_)).cut(
+        cyl(BTN['BORE_D'] / 2, zcb - 1, zcb + 0.01, ax_, ay_))
+    frac = S['Kappe_blau'].common(ring).Volume / ring.Volume
+    log('12 Membran-Senkung Ø%.1f: Wand + Boden 0.3 mm rundum zu %.1f %% Kunststoff (Soll 100 %%) -> %s'
+        % (BTN['CB_D'], frac * 100, 'dicht' if frac > 0.999 else 'OFFEN'))
+    # 11 Zusammenhang der Druckteile (P5-M1): jedes Druckteil genau 1 Koerper (Rev C: Kappe 2 Koerper, Zapfen lose)
+    nsol = ['%s %d' % (k, len(S[k].Solids)) for k in PRINT]
+    log('11 Druckteile, Anzahl Koerper (Soll je 1): %s -> %s' % (', '.join(nsol),
+        'ok' if all(len(S[k].Solids) == 1 for k in PRINT) else 'FEHLER'))
     placeholder_collision(S)
     # Distanzlehre (Montage Kragen: Abstand Kragen-Oberkante bis Schott-Unterkante), 2 Stueck
     lehre = box(-1.5, 1.5, 0, 2.0, 0, Z['BULK0'] - Z['COL1'])

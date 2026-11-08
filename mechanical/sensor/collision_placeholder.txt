@@ -14,4 +14,4 @@ Band F (CC2340 QFN 4x4, Quarze, L, C 1206, SC70, SOT-23, 0402)         | Huelle 
 U3 TMP1075N + C24 im Kragen                                            | Huelle 4.4 x 2.0 x 0.7 (SOT-563 0.6, 0402 0.55 laut FLOORPLAN 2f)
     Kollision: keine | kleinster Abstand 0.20 mm zu Kragen, 2.60 mm zu Huelse_grau
 AN043-Antenne                                                          | INDEX ANT-AN043: 15.2 x 5.7, Kupfer
-    Kollision: keine | kleinster Abstand 0.76 mm zu Kappe_blau, 1.00 mm zu Membran_Silikon
+    Kollision: keine | kleinster Abstand 0.70 mm zu Kappe_blau, 1.00 mm zu Membran_Silikon

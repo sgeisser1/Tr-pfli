@@ -278,6 +278,13 @@ def build():
     deckel = deckel.cut(box(-big, big, -big, S['_Y_SHADOW'], -1, zf + g2))
     S['Wanne_grau'] = wanne.removeSplitter()
     S['Wanne_grau_OTG'] = wanne.cut(win_otg).removeSplitter()
+    # Phase 5: Der Steg-Schnitt am Lichtschacht liess einen Splitter (0.07 mm3, 0.01 mm dick, z 14.15) als zweiten Koerper
+    # stehen -> nur Koerper > 1 mm3 behalten (Pruefung in checks(): Anzahl Koerper je Druckteil).
+    sl = [so for so in deckel.Solids if so.Volume > 1.0]
+    if len(sl) != len(deckel.Solids):
+        log('Deckel_blau: %d Splitter < 1 mm3 entfernt (%.3f mm3)' % (len(deckel.Solids) - len(sl),
+            sum(so.Volume for so in deckel.Solids if so.Volume <= 1.0)))
+        deckel = sl[0] if len(sl) == 1 else Part.makeCompound(sl)
     S['Deckel_blau'] = deckel          # removeSplitter() macht diesen Koerper ungueltig (OCC 7.6) -> weglassen
     S['RTC_Modul_Option'] = box(rx0, rx1, ry0, ry1, ztop - R['H'], ztop)
     # ---- Pi + Schrauben + Einsaetze
@@ -413,6 +420,7 @@ def checks(S):
         % (C['MW'], C['MH'], km.distToShape(sip)[0], km.distToShape(pwr)[0], km.distToShape(S['Pi_PCB'])[0]))
     log('   Zuluft 2 Bodenschlitze + 3 Stirnschlitze (Wanne), Abluft 1 Stirnschlitz (Deckel); Kabelkanal Ø %.1f x %.1f mm '
         'bei y %.1f z %.1f, vergossen' % (C['HOLE_D'], C['BOSS_L'] + C['WALL'], C['HOLE_Y'], C['HOLE_Z']))
+    log('12 Druckteile, Anzahl Koerper (Soll je 1): %s' % ', '.join('%s %d' % (k, len(S[k].Solids)) for k in PRINT))
     nslots = 5
     log('9 Lueftung: %d Bodenschlitze 1.2 mm unter dem SiP, 4 Kaminschlitze 1.2 x %.1f mm in der Deckel-Rueckwand'
         % (nslots, G['H'] - 1.8 - G['Z_FUGE'] - 1.6))

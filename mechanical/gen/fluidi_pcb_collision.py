@@ -198,7 +198,11 @@ def main():
     board, pcb_gen, comps, src, cell, ant = build_pcb(AX, AY, fps)
     # V-K (D-023): Layout Rev B liegt noch auf der alten Lage. Zelle/Clip und Kragenfeld an die Layoutvorgabe verschieben
     # (Zellmitte z CELL_C, Feld z KCOMP0 statt 4.4), Pads und Courtyards mit.
-    SHIFT = {'BT1': Z['CELL_C'] - fps['BT1']['z'], 'U3': Z['KCOMP0'] - 4.4, 'C24': Z['KCOMP0'] - 4.4}
+    # Phase 5: Layout Rev C (03341e8) hat U3/C24 bereits auf V-K -> nur verschieben, wenn die Pads noch ueber dem Feld K-2
+    # liegen (Layout Rev B); vorher wurde fest um -0.70 verschoben (doppelt, Pads scheinbar ausserhalb des Feldes).
+    def _kshift(ref):
+        return (Z['KCOMP0'] - 4.4) if max(p_['z'][1] for p_ in fps[ref]['pads']) > Z['KCOMP1'] + 1e-6 else 0.0
+    SHIFT = {'BT1': Z['CELL_C'] - fps['BT1']['z'], 'U3': _kshift('U3'), 'C24': _kshift('C24')}
     for ref, dz in SHIFT.items():
         f_ = fps[ref]
         f_['z'] += dz
@@ -215,7 +219,7 @@ def main():
     log('Eingaben: %s, %s; Gehaeuse fluidi_sensor.build()' % (os.path.relpath(STEP, REPO), os.path.relpath(BOARD, REPO)))
 
     # ---------------------------------------------------------------- A Koordinatenbezug
-    log('V-K-Verschiebung gegenueber Layout Rev B: %s' % ', '.join('%s %+.2f mm' % kv for kv in SHIFT.items()))
+    log('V-K-Verschiebung (nur falls Layout noch Rev-B-Lage; Layout Rev C: 0): %s' % ', '.join('%s %+.2f mm' % kv for kv in SHIFT.items()))
     log('Quetschrippen: Ueberdeckung Platine / Rippen %.3f mm3 (gewollt, gequetscht); Kappe sonst ohne Rippen geprueft'
         % pcb_gen.common(FS.RIBS['Rippen']).Volume)
     log('\nA Koordinatenbezug')

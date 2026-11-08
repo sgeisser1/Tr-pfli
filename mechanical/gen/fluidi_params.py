@@ -91,7 +91,12 @@ CAP = dict(CAV_OFF=1.6,                                     # Kappe innen oberha
            BULK_SLOT=dict(X=PCB['W_HEAD'] / 2 + 0.2, Y0=PCB['Y_F'] - 2.2, Y1=PCB['Y_B'] + 0.2),  # Durchfuehrung
            KEIL_CLR=0.15,                                  # Keil seitlich/vorne
            KEIL_REAR=0.0,                                  # M-4: Keil-Rueckseite = F-Referenz y_F (Platine von hinten angedrueckt)
-           RIB_H=0.45, RIB_W=0.6, RIB_X=(-9.0, 9.0))       # M-4: Quetschrippen an der Schott-Rueckwand (y 8.4 -> 7.95)
+           RIB_H=0.45, RIB_W=0.6, RIB_X=(-9.0, 9.0),       # M-4: Quetschrippen an der Schott-Rueckwand (y 8.4 -> 7.95)
+           FUNNEL=3.8)                                     # P5-M1 (Phase 5): 45-Grad-Trichter Zapfen -> Kappenwand ueber SLOT_TOP
+# P5-M1: Bis Rev C (M-4) begann der Kappen-Innenraum P(CAV_OFF) direkt bei SLOT_TOP. Der Zapfen (aussen Versatz 1.8) und die
+# Kappenwand (innen Versatz 1.6) hatten 0.2 mm Luft -> Kappe = 2 getrennte Koerper, Zapfen beim Kopfueber-Druck ohne
+# Verbindung. Jetzt waechst der Innenraum von SP_IN (bei SLOT_TOP) unter 45 Grad bis P(CAV_OFF) (bei SLOT_TOP + FUNNEL):
+# Zapfen haengt am Trichter, im Druck selbsttragend (45 Grad). FUNNEL 3.8 deckt auch die hinteren Fasenecken ab.
 # Ablauf (Spritzwasser zwischen Sichtschale und Kern): Schlitze in der Huelsenrueckwand an der tiefsten Stelle
 DRAIN = dict(XC=(-10.0, -4.0, 4.0, 10.0), W=3.0, H=1.2)    # Unterkante = Z['STEP_BACK']
 
