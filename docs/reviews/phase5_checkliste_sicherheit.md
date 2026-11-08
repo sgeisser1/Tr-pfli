@@ -4,6 +4,7 @@
 |---|---|
 | Verfasser | Sicherheits-Agent |
 | Datum | 2026-11-08, Stand git `b77b29a` (main; im Arbeitsbaum laufende, nicht versionierte Änderungen anderer Fachbereiche) |
+| Runde 3 | 2026-11-08, Stand `cedccd5`: K-01, K-05, K-07, M-07, M-08, CK-W1, CK-W3 nachgeführt (`phase5_sicherheit_runde3.md`) |
 | Status | ✓ erfüllt (Nachweis genannt) · **T** nur am Muster nachweisbar (PROTOTYP-PRÜFUNG, Testplan) · **O** offen · ✗ nicht erfüllt |
 
 ## 1 Energiequelle CR2032 (REQ-SAF-CC-*, REQ-SAF-01…06)
@@ -29,12 +30,13 @@
 
 | Nr | Prüfpunkt | Status | Nachweis / Bemerkung |
 |---|---|---|---|
-| K-01 | Öffnen nur mit Werkzeug, Schraube unverlierbar | ✓ (Konstruktion) / T | M2 × 4 A2 in eingegossener Mutter (K-6), `docs/design/P3_FLUIDI.md`; Masse aus `mechanical/gen/fluidi_params.py` (ANNAHME bis Bestellung) |
+| K-01 | Öffnen nur mit Werkzeug, Schraube unverlierbar | ✓ (Konstruktion) / T | R3: ISO 7045 **M2 × 3** A2 PH1 (Rev C, INDEX MECH-SCR1 (Rev C)) in eingegossener Mutter (K-6), 3.5 Gänge (`check_sensor.txt` 5c); Furchlippe 0.5 mm hält nur, solange nicht weitergedreht wird → R3-W1, ST-K8; Masse ANNAHME bis Bestellung |
 | K-02 | UL-4200A-Prüfwerte (0.5 Nm/90°, 72 N, 136 N) | T | Werte aus `phase3_sleeve_sicherheit.md`; ST-K1…K3 |
 | K-03 | Falltest 1 m: Fach bleibt zu, Zelle bleibt im Clip | T | ST-M3, ST-K5 |
 | K-04 | Warnsymbol am Fach, beim Öffnen sichtbar | ✓ | vertieft innen auf der Hülse (P3_FLUIDI, PRINT_SETTINGS `huelse_grau`); LS-K3 (zusätzlich Silkscreen B) offen, klein |
-| K-05 | Sicherheits-/Batteriewechselanleitung (Verschlucken, Lagerung, Entsorgung, Wasser im Kopf) | **✗** | fehlt (W-5, FMEA F-23 RPZ 288) |
+| K-05 | Sicherheits-/Batteriewechselanleitung (Verschlucken, Lagerung, Entsorgung, Wasser im Kopf) | ✓ (R3) | `docs/manuals/BATTERIEWECHSEL.md` deckt REQ-SAF-DOC-01 ab (F-23 288 → 144); Ergänzungen R3-W1 (Schraubentext), R3-K1…K3 |
 | K-06 | Clip-Lötstellen für Wechselzyklen | T | K-4 Red-Team; ST-K6 (50 Wechsel) |
+| K-07 | Gateway-Knopfzelle CR1220 (RTC Adafruit 4282): nur mit Werkzeug, gesichert, Warnhinweis, Datenblatt | **O** (R3) | Deckel M2.5 ISO 7380 Innensechskant ✓; Datenblatt/Marke, Anleitung, Zugänglichkeit offen → G-R1…G-R5, F-48/F-49, ST-G2/G3 |
 
 ## 3 Mechanik, Dichtung, Verguss
 
@@ -46,7 +48,8 @@
 | M-04 | Kantenversiegelung Sonde (REQ-MECH-07) | **O** | Verfahren nicht gewählt (W-5) |
 | M-05 | Gehäusematerial HDT ≥ 80 °C | ✓ | ASA, `docs/references/BambuLab_ASA_TechnicalDataSheet_V2.0.pdf` |
 | M-06 | Spritzwasser REQ-MECH-13 mit Zelle | T | ST-W1 |
-| M-07 | Montage-/Vergussanleitung mit Reinigung (K-5) | **✗** | fehlt (W-5) |
+| M-07 | Montage-/Vergussanleitung mit Reinigung (K-5) | ✓ (R3) | `docs/manuals/MONTAGE_SENSOR.md` Kap. 5.1 (Isopropanol, Primer), Prüfungen 2–7; Vergussmasse weiter offen (M-03) |
+| M-08 | Kappe Phase 5: einteilig (P5-M1), Membran-Senkung dicht (P5-M3) | ✓ (CAD) / T | `check_sensor.txt` 11 (1 Körper je Teil), 12 (100 % Kunststoff); neu: Klemmring-Befestigung O-4 offen (R3-W2, F-65), Zapfenwand 0.54 mm (R3-W3, F-66); ST-W6 |
 
 ## 4 Firmware und Funk (REQ-FW-04, REQ-RF-05/06)
 
@@ -94,8 +97,8 @@
 | Nr | Stufe | Befund | Vorschlag |
 |---|---|---|---|
 | CK-K1 | kritisch, **VETO aufgehoben (Runde 2)** | = PS-K1: Weg B ohne Dummy-Scheibe erlaubte eine Zelle bei angeschlossenem Netzteil | umgesetzt in `PROGRAMMIEREN_SENSOR.md` v1.1, siehe `phase5_programmer_sicherheit.md` Runde 2 |
-| CK-W1 | wichtig | Sicherheits-, Batteriewechsel- und Montageanleitung fehlen (K-05, M-07; REQ-SAF-DOC-01, REQ-DOC-02) | vor der Nutzung der Muster ausserhalb des Labors erstellen; Prüfung durch Sicherheit |
+| CK-W1 | wichtig → **erledigt (R3)** | Sicherheits-, Batteriewechsel- und Montageanleitung fehlen (K-05, M-07; REQ-SAF-DOC-01, REQ-DOC-02) | umgesetzt: `BATTERIEWECHSEL.md`, `MONTAGE_SENSOR.md`; geprüft in `phase5_sicherheit_runde3.md` (Restpunkte R3-W1, R3-K1…K4) |
 | CK-W2 | wichtig | Vergussmasse und Kantenversiegelung offen (M-03, M-04) | Auswahl mit Datenblatt, dann Sicherheitsprüfung K-4/K-5 |
-| CK-W3 | wichtig | Gateway-Netzteil nicht in einer Einkaufsliste festgelegt (FMEA F-44; REQ-SAF-DOC-02). RTC: Kandidat Adafruit 4282 ohne Ladepfad (von Sicherheit geprüft, FMEA F-45), Typ noch festzuschreiben | Gateway-Stückliste mit geprüftem Netzteil und RTC-Typ; ST-G1 |
+| CK-W3 | wichtig, **teilweise (R3)** | Gateway-Netzteil nicht in einer Einkaufsliste festgelegt (FMEA F-44; REQ-SAF-DOC-02). RTC: Kandidat Adafruit 4282 ohne Ladepfad (von Sicherheit geprüft, FMEA F-45), Typ noch festzuschreiben | R3: `hardware/gateway/BOM_GATEWAY.csv` G2 (Original-Netzteil Raspberry Pi 12.5 W, CE beim Eingang prüfen), G4 Adafruit 4282 festgelegt. Offen: CR1220 (G5) ohne Hersteller/Datenblatt → G-R1…G-R5 |
 | CK-L1 | klein | Nur `firmware/sensor/.gitignore` sperrt `*.pem`. Schlüssel für Gateway-Updates oder eine Rückfall-CA ausserhalb von `firmware/sensor/` würden nicht ignoriert | Wurzel-`.gitignore`: `*.pem`, `*.key`, `*.p8`, `*.p12`, `*.pfx` mit Ausnahme `!firmware/sensor/keys/DEV_ONLY_*.pem`; optional pre-commit-Hook mit `git grep 'PRIVATE KEY'` |
 | CK-L2 | klein | Silkscreen-Warnung auf B im Fach (LS-K3) nicht umgesetzt bzw. nicht entschieden | für Rev D vormerken oder Entscheid dokumentieren |

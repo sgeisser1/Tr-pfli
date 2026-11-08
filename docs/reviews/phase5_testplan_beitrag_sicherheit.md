@@ -37,6 +37,7 @@
 | ST-K5 | Zelle im Clip beim Abziehen und Schütteln | Hülse ab, Sensor kopfüber, schütteln | Zelle bleibt im Clip | S3-W2, F-22 |
 | ST-K6 | **50 Zellwechsel** | Standardablauf nach Anleitung | Clip-Lötstellen ohne Riss (Lupe), Kontakt ok, Schraube unverlierbar | K-4, F-24 |
 | ST-K7 | Nach 65 °C / 168 h und 10 Wechseln: ST-K1…K3 wiederholen | Wärmeschrank | Kriterien weiter erfüllt | S3-W1 |
+| ST-K8 | **Schraube M2 × 3 verliersicher** (Runde 3, R3-W1) | Schraube aus der Mutter drehen, Umdrehungen zählen bis Hülse frei; dann Hülse kopfüber schütteln; nach 50 Wechseln (ST-K6) wiederholen; zusätzlich: wie viele weitere Umdrehungen bis die Schraube aus der Lippe fällt | Hülse frei nach ≈ 3.5 U; Schraube bleibt beim Schütteln in der Lippe; Zahl der Umdrehungen bis zum Herausfallen protokolliert und in BATTERIEWECHSEL Schritt 2 übernommen | F-20, F-28 |
 
 ## 4 Wasser und Dichtung (REQ-SAF-05, REQ-MECH-08/13)
 
@@ -47,6 +48,7 @@
 | ST-W3 | **Elektronikraum geflutet 24 h** (Opfermuster) | gezielt geöffnet | wie ST-W2 | REQ-SAF-05, F-09 |
 | ST-W4 | **Kragen** | 50 Zyklen −10/+65 °C, 168 h 65 °C, je 24 h tauchen und Fach fluten; SENS_PWR dauernd high (Testfirmware); Schliff | Leckstrom SENS_PWR–GND ≤ 1 µA (ANNAHME); I²C ok; keine Lunker/Ablösung | K-7, F-10, F-60, F-63 |
 | ST-W5 | Feuchteindikator im Kopf, 30 Tage nass | Sonde in nasser Erde | Indikator unverändert | REQ-MECH-08, F-11 |
+| ST-W6 | **Taste/Membran und Zapfenwand** (Runde 3, R3-W2/W3) | (a) 10 ml Wasser auf die Taste, 20 × drücken, 1 h stehen lassen; (b) Fach bis über die Zapfen-O-Ring-Nut geflutet 24 h (Opfermuster: Kappe vorher mit Indikatorpapier im Elektronikraum über dem Schott bzw. nachher aufgeschnitten) | Elektronikraum trocken (Indikator unverändert); Ergebnis für O-4 (Klemmring-Befestigung) und die 0.54-mm-Wand protokollieren | F-65, F-66, REQ-UI-06 |
 
 ## 5 Mechanische Belastung
 
@@ -81,13 +83,14 @@
 | ST-N4 | Name Constraint | mit dem Zertifikat einen anderen Namen signieren lassen bzw. prüfen | Handy/Browser lehnt ab | REQ-SAF-NET-04, F-43 |
 | ST-N5 | Dashboard nur lesen | Schreibversuch über Port 8080 | abgelehnt | D-022 |
 | ST-G1 | **RTC-Pufferzelle: kein Ladestrom** | Amperemeter in Serie zur RTC-Zelle, Gateway an | Strom in die Zelle ≤ 0 (nur Entladung) | F-45 |
-| ST-G2 | Gateway-Temperatur 24 h im Gehäuse | Volllast, Raum 25 °C | Pi ohne Drosselung, Netzteil handwarm | F-46 |
+| ST-G2 | Gateway-Temperatur 24 h im Gehäuse | Volllast, Raum 25 °C; **zusätzlich Thermoelement an der CR1220** (Runde 3) | Pi ohne Drosselung, Netzteil handwarm; CR1220 innerhalb des Temperaturbereichs ihres Datenblatts mit ≥ 10 K Reserve (ANNAHME Reserve) | F-46, F-49 |
+| ST-G3 | **CR1220 im Deckel gesichert** (Runde 3) | Gateway geschlossen 1 m Fall auf Holz; Deckel abnehmen und kopfüber schütteln | Zelle bleibt im Halter; Deckel nur mit Innensechskant-Schlüssel zu öffnen | F-48 |
 
 ## 8 Programmieradapter und Behelf
 
 | ID | Test | Aufbau | Kriterium | Herkunft |
 |---|---|---|---|---|
-| ST-P1 | **Einteiligkeit** | Adapter mit und ohne Zelle ansetzen; Dummy verkehrt | Stifte erreichen TP1/TP2 nur mit Dummy ganz im Clip; mit Adapter passt keine Zelle; verkehrt kein Kontakt; Schott unbelastet | PS-W1, F-07 |
+| ST-P1 | **Einteiligkeit / Zwangsfolge** (Runde 3: Bügel + unverlierbare Schwinge) | Adapter mit und ohne Zelle ansetzen; Dummy verkehrt; Dummy 2, 4, 6 mm vor der Endlage; mit eingesetzter CR2032 versuchen, die Stifte von Hand auf TP1/TP2 zu bringen; Schwinge und Gegenhalter ohne Werkzeug abzuziehen versuchen (Zug 20 N, ANNAHME) | (a) Stifte erreichen TP1/TP2 nur mit Dummy ganz im Clip, Gegenhalter schliesst vorher nicht; (b) mit Adapter passt keine Zelle; (c) verkehrt kein Kontakt; (d) Schott unbelastet; (e) mit Zelle im Clip kein Stiftkontakt und keine Berührung Dummy ↔ Zelle/Clip; (f) Schwinge/Gegenhalter nicht abnehmbar; (g) in Offenstellung ≥ 1 mm Luft Stift ↔ Clip | PS-W1, F-07, Runde 3 |
 | ST-P2 | Dummy-Dicke und Isolation | Messschieber; Ober-/Unterseite | 3.0–3.2 mm; > 10 MΩ | PS-W3, README Kap. 7 |
 | ST-P3 | Kurzschluss VDD_DUT 60 s | Dummy-Flächen überbrückt | U1/U2-Temperatur protokolliert; kein Rauch | PS-L1, F-50 |
 | ST-P4 | VIO-Fehler | Jumper H3 gesteckt, ohne Sensor | Prüfschritt 2 erkennt den Fehler (VIO ≠ 2.0 V) | PS-L2, F-51 |
