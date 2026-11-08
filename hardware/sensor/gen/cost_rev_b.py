@@ -51,12 +51,37 @@ POFV = True   # Layout Rev B: Via-in-Pad (Zellfach, U1-EP) -> Epoxy Filled & Cap
 # ASA: Rev A 11 g + 4 g AMS-Spuelung (concept_costs.housing(11)). Kopf V4 34 x 13 x 57.5 statt 28 x 13 x 48 mm:
 # Oberflaechenverhaeltnis 6289/4664 = 1.35 -> +3.8 g (ANNAHME, Masse liefert die Mechanik)
 ASA_EXTRA_G = 11.0 * (2 * (34 * 13 + 13 * 57.5 + 34 * 57.5)) / (2 * (28 * 13 + 13 * 48 + 28 * 48)) - 11.0
+# Vergussmasse (D-030 Vorschlag, docs/concepts/vergussmasse_versiegelung.md Kap. 7, Variante M-A abfuellen/waegen):
+# Electrolube ER2223 Resin Pack 250 g, Simpex CH EER2223RP250G CHF 38.20 exkl. MWST (Abruf 2026-11-08) -> inkl. 8.1 % MWST.
+# Je Bauserie (Bestellung) 1 Beutel, angebrochen max. 3 Monate (MA-3, ANNAHME) -> Einmalkosten je Bestellung (Orchestrator
+# nach D-005). Stueckkosten = Verbrauch: je Sensor 2 Ansaetze (Schott, Kragen+Kanten) a 8 g (MA-4) auf Gruppen von
+# 8 Sensoren (ANNAHME) = 2 g. Einmalkosten = Beutel minus bereits als Verbrauch gerechnete Masse (keine Doppelzaehlung).
+# M-B (ganzer Beutel je Sitzung) nur als Hinweis: Prototyp 3, Serie 15 3 Beutel.
+VERGUSS_BEUTEL_CHF = round(38.20 * (1 + cm.CH_VAT), 2)
+VERGUSS_BEUTEL_G = 250.0
+VERGUSS_G_PRO_SENSOR = 2 * 8.0 / 8
+VERGUSS_CHF_PRO_SENSOR = VERGUSS_BEUTEL_CHF / VERGUSS_BEUTEL_G * VERGUSS_G_PRO_SENSOR
+# Zubehoer Verguss/Schutz (einmalig fuer das Projekt, nicht je Bestellung; Konzept Kap. 7.1, alle Preise ANNAHME,
+# nicht recherchiert; Waage nur falls nicht vorhanden)
+ZUBEHOER_VERGUSS = [("Feinwaage 0.01 g / 200 g (falls nicht vorhanden)", 25.0),
+                    ("Pruefgewichte 1 g + 5 g Klasse F1/M1", 20.0),
+                    ("Laborflaschen HDPE kindergesichert 60 + 250 ml, Etiketten, Farbmarker", 15.0),
+                    ("Sekundaerbehaelter abschliessbar + Vorhaengeschloss + Saugmaterial", 25.0),
+                    ("Auffangwanne/Alu-Schalen, 2 PE-Trichter, Pipetten, Spatel, Becher", 12.0),
+                    ("Spritzen 1/3 ml Luer-Lock, Kanuelen 18/20 G, Pinsel", 15.0),
+                    ("Nitrilhandschuhe >= 0.1 mm (Box)", 12.0),
+                    ("Chemikalien-Schutzbrille EN 166 + Visier", 30.0),
+                    ("Kunststoffschuerze, Augenspuelflasche 500 ml", 25.0),
+                    ("Halbmaske mit Filter A (EN 14387)", 40.0),
+                    ("Thermometer fuer Trockner/Waermeschrank", 10.0)]
+ZUBEHOER_VERGUSS_CHF = sum(v for _, v in ZUBEHOER_VERGUSS)
 LOKAL = [cm.BomLine("Zelle Panasonic CR2032", 1, 0, 1.38, "none", False, 0, 1, 0, "LOKAL"),
          cm.BomLine("Gehaeuse ASA 11 g + 4 g AMS (ANNAHME)", 1, 0, 0.525, "none", False, 0, 1, 0, "LOKAL"),
          cm.BomLine(f"ASA-Mehrmenge Kopf V4 {ASA_EXTRA_G:.1f} g (ANNAHME 0.035 CHF/g)", 1, 0, 0.035 * ASA_EXTRA_G,
                     "none", False, 0, 1, 0, "LOKAL"),
          cm.BomLine("Dichtungen (ANNAHME)", 1, 0, 0.3, "none", False, 0, 1, 0, "LOKAL"),
-         cm.BomLine("Versiegelung Sonde/Kragen (ANNAHME)", 1, 0, 0.4, "none", False, 0, 1, 0, "LOKAL"),
+         cm.BomLine(f"Verguss ER2223 Verbrauch {VERGUSS_G_PRO_SENSOR:.0f} g (M-A, Gruppe 8, ANNAHME)", 1, 0,
+                    VERGUSS_CHF_PRO_SENSOR, "none", False, 0, 1, 0, "LOKAL"),
          cm.BomLine("Schraube/Mutter (ANNAHME)", 1, 0, 0.2, "none", False, 0, 1, 0, "LOKAL")]
 
 
@@ -101,6 +126,19 @@ STD_SCEN = [("ALT W-2 Standard-PCBA Prototyp: 2 Paneele = 6 PCB / 6 bestueckt / 
             ("ALT W-2 Standard-PCBA Serie: 7 Paneele = 21 PCB / 18 bestueckt / 15 Sensoren", 21, 18, 15)]
 
 
+def add_verguss(r):
+    """Vergussmasse als eigene lokale Einmalposition je Bestellung (1 Beutel, M-A) ohne Doppelzaehlung des Verbrauchs."""
+    used = r["sensors"] * VERGUSS_CHF_PRO_SENSOR * (1 + cm.LOCAL_SCRAP)
+    v = max(0.0, VERGUSS_BEUTEL_CHF - used)
+    r["verguss_once_chf"] = v
+    r["once_chf"] += v
+    r["total_chf"] += v
+    r["full_chf"] = r["total_chf"] / r["sensors"]
+    r["notes"] = list(r["notes"]) + [f"EINMALKOSTEN enthalten lokal Vergussmasse ER2223 (1 Beutel {VERGUSS_BEUTEL_CHF:.2f} CHF "
+                                     f"minus Verbrauch in den Stueckkosten) = {v:.2f} CHF"]
+    return r
+
+
 def run(bom, pcb_qty, pcba_qty, sensors, pcba="economic", old_customs=False):
     """PCB-Preis aus dem JLC-Angebot (QUOTE_USD): Fixanteil so gesetzt, dass Fix + ENIG + POFV = PCB_FIX_QUOTE."""
     fix_bak, var_bak = dict(cm.PCB_FIX_USD), dict(cm.PCB_VAR_USD)
@@ -115,8 +153,9 @@ def run(bom, pcb_qty, pcba_qty, sensors, pcba="economic", old_customs=False):
             assert abs(got - usd) < 0.01, (q, got, usd)
         if old_customs:   # Stand vor K-2: nur Vorlagegebuehr max(3 CHF, 2 %), keine 19 CHF Abwicklung
             cm.DHL_CLEARANCE_CHF, cm.DHL_CLEARANCE_IN_VAT_BASE = 0.0, False
-        return cm.compute(bom + copy.deepcopy(LOKAL), 4, 1.6, pcb_qty, pcba_qty, ship="GSDL", pcba=pcba,
-                          enig=True, epoxy_vias=POFV, sensors=sensors)
+        r = cm.compute(bom + copy.deepcopy(LOKAL), 4, 1.6, pcb_qty, pcba_qty, ship="GSDL", pcba=pcba,
+                       enig=True, epoxy_vias=POFV, sensors=sensors)
+        return add_verguss(r)
     finally:
         cm.DHL_CLEARANCE_CHF, cm.DHL_CLEARANCE_IN_VAT_BASE = clr_bak
         cm.PCB_FIX_USD.clear()

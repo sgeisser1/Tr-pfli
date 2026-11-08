@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Stand | Sensor 2026-11-08, Gateway 2026-11-09 (D-028/D-029), erzeugt von `.venv/bin/python scripts/cost_final_phase5.py` (nicht von Hand ändern) |
+| Stand | Sensor 2026-11-08, Vergussmasse 2026-11-09 (Kap. 2.0), Gateway 2026-11-09 (D-028/D-029), erzeugt von `.venv/bin/python scripts/cost_final_phase5.py` (nicht von Hand ändern) |
 | Kurs | 1 USD = 0.8189 CHF, 2026-11-06 (EZB-Referenzkurs, Kreuzkurs); + 1.5 % Kartenaufschlag (ANNAHME) = 0.8312 CHF; 2026-11-08 ist ein Sonntag, neuester EZB-Kurs = 2026-11-06 |
 | Sensor | `hardware/sensor/gen/cost_rev_b.py` → `scripts/cost_model.compute` (D-005), Teilepreise `docs/concepts/bom/jlc_prices.json` (Abruf 2026-11-07), Lager live 2026-11-08 13:06 (`order_check.py --live`) |
 | Gateway | `hardware/gateway/BOM_GATEWAY.csv` (Preise pi-shop.ch/bastelgarage.ch, Abruf 2026-11-08/09, `docs/references/pi-shop_Gateway-Teile_Auszug_2026-11-08.txt`, `docs/references/Haendler_Einkauf_Auszug_2026-11-09.txt`; D-028/D-029) |
@@ -10,8 +10,8 @@
 
 ## 0 Fazit
 
-- **Stückkosten nach D-005** (REQ-FAB-04, Grenzkosten pro Sensor ohne Einmalkosten): Serie **8.38 CHF** → < 10 CHF erfüllt, **unter Vorbehalt**: Berechnet JLC „Pre-reflow Soldering“ (0.016 USD/Lötstelle), steigen sie auf **10.60 CHF** → REQ-FAB-04 **verfehlt** (Kap. 2.1, Stopp-Kriterium im Warenkorb).
-- **Vollkosten** (ganze Bestellung inkl. Einmalkosten / Sensoren): Serie **17.84 CHF/Sensor**; mit Prototyp-Los und Gateway 34.85 CHF/Sensor (15 Sensoren). Das ist, was ein Sensor real kostet.
+- **Stückkosten nach D-005** (REQ-FAB-04, Grenzkosten pro Sensor ohne Einmalkosten): Serie **8.31 CHF** → < 10 CHF erfüllt, **unter Vorbehalt**: Berechnet JLC „Pre-reflow Soldering“ (0.016 USD/Lötstelle), steigen sie auf **10.53 CHF** → REQ-FAB-04 **verfehlt** (Kap. 2.1, Stopp-Kriterium im Warenkorb).
+- **Vollkosten** (ganze Bestellung inkl. Einmalkosten / Sensoren): Serie **20.17 CHF/Sensor**; mit Prototyp-Los und Gateway 55.07 CHF/Sensor (15 Sensoren). Das ist, was ein Sensor real kostet.
 - D-005 (Definition Stückkosten) hat Status „zur Kenntnis“; der Auftraggeber sollte ausdrücklich bestätigen, dass REQ-FAB-04 die Stückkosten nach D-005 meint und nicht die Vollkosten.
 - Gateway: kauffertig 41.86 CHF, offen/nicht lieferbar 27.90 CHF, geplant total 69.76 CHF.
 
@@ -43,13 +43,17 @@ Die Aufschlüsselung bestätigt die Modellannahme D-005: Fixanteil (Engineering 
 
 | Szenario | PCBA | Stück CHF (D-005) | Einmal CHF | Bestellung total CHF | Vollkosten/Sensor CHF | JLC-Rechnung USD |
 |---|---|---|---|---|---|---|
-| Prototyp 5 PCB / 5 bestückt (4 × 100 µF) | economic | **9.23** | 139.34 | 185.47 | 37.09 | 163.23 |
-| Serie 20 PCB / 16 bestückt / 15 Sensoren (4 × 100 µF) | economic | **8.38** | 141.85 | 267.58 | 17.84 | 220.33 |
-| Serie 20 PCB / 16 bestückt / 15 Sensoren (2 × 100 µF) | economic | **8.17** | 141.85 | 264.36 | 17.62 | 216.74 |
-| ALT Standard-PCBA Serie 7 Paneele = 21 PCB / 18 bestückt / 15 Sensoren | standard | **9.31** | 186.13 | 325.80 | 21.72 | 285.20 |
-| ALT Standard-PCBA Prototyp 2 Paneele = 6 PCB / 6 bestückt / 5 Sensoren | standard | **10.72** | 184.26 | 237.86 | 47.57 | 221.61 |
+| Prototyp 5 PCB / 5 bestückt (4 × 100 µF) | economic | **9.15** | 178.90 | 224.66 | 44.93 | 163.23 |
+| Serie 20 PCB / 16 bestückt / 15 Sensoren (4 × 100 µF) | economic | **8.31** | 177.94 | 302.57 | 20.17 | 220.33 |
+| Serie 20 PCB / 16 bestückt / 15 Sensoren (2 × 100 µF) | economic | **8.09** | 177.94 | 299.35 | 19.96 | 216.74 |
+| ALT Standard-PCBA Serie 7 Paneele = 21 PCB / 18 bestückt / 15 Sensoren | standard | **9.24** | 222.22 | 360.79 | 24.05 | 285.20 |
+| ALT Standard-PCBA Prototyp 2 Paneele = 6 PCB / 6 bestückt / 5 Sensoren | standard | **10.65** | 223.82 | 277.05 | 55.41 | 221.61 |
 
-REQ-FAB-04 (< 10 CHF Stückkosten bei 10–15 Stück, D-005): Serie **8.38 CHF** (4 × 100 µF) bzw. **8.17 CHF** (2 × 100 µF) → **erfüllt unter Vorbehalt** „Pre-reflow Soldering“ (falls berechnet: 10.60 CHF, **verfehlt**, Kap. 2.1); mit Standard-PCBA 9.31 CHF (erfüllt, Paneelpreis ANNAHME).
+REQ-FAB-04 (< 10 CHF Stückkosten bei 10–15 Stück, D-005): Serie **8.31 CHF** (4 × 100 µF) bzw. **8.09 CHF** (2 × 100 µF) → **erfüllt unter Vorbehalt** „Pre-reflow Soldering“ (falls berechnet: 10.53 CHF, **verfehlt**, Kap. 2.1); mit Standard-PCBA 9.24 CHF (erfüllt, Paneelpreis ANNAHME).
+
+### 2.0 Vergussmasse (Phase 6, D-030-Vorschlag, Variante M-A)
+
+Electrolube ER2223 Resin Pack 250 g, Simpex CH CHF 38.20 exkl. MWST = **41.29 CHF** inkl. MWST (Abruf 2026-11-08). Variante M-A (abfüllen, 8-g-Ansätze wägen, `docs/manuals/MONTAGE_SENSOR.md` Kap. 3a): **1 Beutel je Bestellung** (angebrochen max. 3 Monate, ANNAHME). Stückkosten = Verbrauch 2 g/Sensor = 0.33 CHF (+5 % Ausschuss); Einmalkosten = Beutelrest (Prototyp 39.56, Serie 36.09 CHF), Einordnung nach D-005 durch den Orchestrator. Zubehör/Schutzausrüstung einmalig je Projekt **229.00 CHF** (ANNAHME-Preise, in der Systemsumme Kap. 4). Hinweis M-B (ganzer Beutel je Sitzung): Prototyp 3 + Serie 3 Beutel = 247.74 CHF statt 82.58 CHF.
 
 ### 2.1 Versteckte Kosten und Empfindlichkeiten
 
@@ -59,8 +63,8 @@ REQ-FAB-04 (< 10 CHF Stückkosten bei 10–15 Stück, D-005): Serie **8.38 CHF**
 | Mindestabnahmen/Verlust LCSC | Prototyp 3.13 / Serie 2.97 USD | im Modell (Einmalkosten) |
 | Ausschuss lokale Teile | 5 % (ANNAHME) | im Modell |
 | Reserveboard Serie | 16 bestückt für 15 Sensoren | im Modell (Stückkosten × 16/15) |
-| „Pre-reflow Soldering“ 0.016 USD/Lötstelle (JLC-Preisseite, Anwendung nicht erklärt) – Prototyp 5 PCB / 5 bestückt (4 × 100 µF) | +10.41 CHF je Bestellung, Stückkosten 9.23 → **11.31 CHF** (D-005: pro Lötstelle = Stückkosten) | **nicht** im Modell; **Stopp-Kriterium** im Warenkorb (Anleitung Schritt 9, ORDER Kap. 4 Nr. 11) |
-| „Pre-reflow Soldering“ 0.016 USD/Lötstelle (JLC-Preisseite, Anwendung nicht erklärt) – Serie 20 PCB / 16 bestückt / 15 Sensoren (4 × 100 µF) | +33.32 CHF je Bestellung, Stückkosten 8.38 → **10.60 CHF** (D-005: pro Lötstelle = Stückkosten) | **nicht** im Modell; **Stopp-Kriterium** im Warenkorb (Anleitung Schritt 9, ORDER Kap. 4 Nr. 11) |
+| „Pre-reflow Soldering“ 0.016 USD/Lötstelle (JLC-Preisseite, Anwendung nicht erklärt) – Prototyp 5 PCB / 5 bestückt (4 × 100 µF) | +10.41 CHF je Bestellung, Stückkosten 9.15 → **11.23 CHF** (D-005: pro Lötstelle = Stückkosten) | **nicht** im Modell; **Stopp-Kriterium** im Warenkorb (Anleitung Schritt 9, ORDER Kap. 4 Nr. 11) |
+| „Pre-reflow Soldering“ 0.016 USD/Lötstelle (JLC-Preisseite, Anwendung nicht erklärt) – Serie 20 PCB / 16 bestückt / 15 Sensoren (4 × 100 µF) | +33.32 CHF je Bestellung, Stückkosten 8.31 → **10.53 CHF** (D-005: pro Lötstelle = Stückkosten) | **nicht** im Modell; **Stopp-Kriterium** im Warenkorb (Anleitung Schritt 9, ORDER Kap. 4 Nr. 11) |
 | Confirm Production File = Yes | Preis unbekannt | ANNAHME 0 USD, am Bestelltag ablesen |
 | Coupons 2 × 20 USD | bis −35.90 CHF | nicht abgezogen (Bedingungen unbekannt) |
 | Lager BT1 C5213768 (629 Stk, sinkend) | Ausfall → Ersatzteil/Layout | Bestand am Bestelltag prüfen |
@@ -95,12 +99,13 @@ Stand Phase 6 (2026-11-09): **D-028** Gateway ohne RTC (G4 PiRTC DS3231 und G5 C
 
 | Weg | Inhalt | CHF |
 |---|---|---|
-| A: direkt Serie | Serie 20 PCB / 16 bestückt / 15 Sensoren + Gateway (geplant total) | **337.34** |
-| B: Prototyp + Serie (geplant) | Prototyp 5 + Serie 15 Sensoren + Gateway (geplant total) | **522.81** |
-| B + Programmieradapter | wie B + Adapter Rev 1 (25–55 CHF, ANNAHME) | 547.81 – 577.81 |
+| A: direkt Serie | Serie 20 PCB / 16 bestückt / 15 Sensoren + Gateway (geplant total) | **601.33** |
+| B: Prototyp + Serie (geplant) | Prototyp 5 + Serie 15 Sensoren + Gateway (geplant total) | **825.99** |
+| davon Verguss-Zubehör/Schutz (A und B je einmal) | Kap. 2.0, ANNAHME-Preise | 229.00 |
+| B + Programmieradapter | wie B + Adapter Rev 1 (25–55 CHF, ANNAHME) | 850.99 – 880.99 |
 
-- Pro Sensor (Weg A, inkl. Gateway-Anteil): 22.49 CHF; Weg B: 34.85 CHF (die 5 Prototypen sind zusätzlich nutzbar, falls sie die Prüfungen bestehen → dann 20 Sensoren: 26.14 CHF).
-- Nicht enthalten: Arbeitszeit, Werkzeug, Verguss-/Dichtmittel über die Sensor-Pauschalen hinaus, Status-LED-Platine Gateway, Ersatzzellen.
+- Pro Sensor (Weg A, inkl. Gateway-Anteil): 40.09 CHF; Weg B: 55.07 CHF (die 5 Prototypen sind zusätzlich nutzbar, falls sie die Prüfungen bestehen → dann 20 Sensoren: 41.30 CHF).
+- Nicht enthalten: Arbeitszeit, Werkzeug (ausser Verguss-Zubehör Kap. 2.0), Dichtmittel über die Sensor-Pauschalen hinaus, Status-LED-Platine Gateway, Ersatzzellen.
 
 ## 5 Annahmen und offene Punkte
 
@@ -123,8 +128,8 @@ Stand Phase 6 (2026-11-09): **D-028** Gateway ohne RTC (G4 PiRTC DS3231 und G5 C
     + MWST-Anteil CH                                         0.45 CHF
     = JLC-Anteil pro Board                                   6.14 CHF
     x Boards / Sensoren                                  5/5
-    + lokal beschaffte Teile inkl. Ausschuss                 3.09 CHF
-    = STUECKKOSTEN pro Sensor (D-005)                        9.23 CHF
+    + lokal beschaffte Teile inkl. Ausschuss                 3.01 CHF
+    = STUECKKOSTEN pro Sensor (D-005)                        9.15 CHF
   Einmalkosten pro Bestellung (USD):
     PCB Fixanteil pro Bestellung (D-005)                    61.51
     Bauteile Mindestabnahme/Verlust-Ueberschuss              3.13
@@ -136,9 +141,10 @@ Stand Phase 6 (2026-11-09): **D-028** Gateway ohne RTC (G4 PiRTC DS3231 und G5 C
     Summe JLC-Rechnung einmalig                            129.02 USD
     + MWST-Anteil CH (einmalig)                             10.10 CHF
     + Verzollungsgebuehr Kurier/Post                        22.00 CHF
-    = EINMALKOSTEN                                         139.34 CHF
-  JLC-Rechnung total 163.23 USD = 133.67 CHF; MWST 12.37 CHF; Bestellung total 185.47 CHF; VOLLKOSTEN pro Sensor 37.09 CHF
+    = EINMALKOSTEN                                         178.90 CHF
+  JLC-Rechnung total 163.23 USD = 133.67 CHF; MWST 12.37 CHF; Bestellung total 224.66 CHF; VOLLKOSTEN pro Sensor 44.93 CHF
   Hinweis: GSDL nicht zulaessig (Warenwert 139.71 USD > 65.0 USD oder Gewicht > 1.5 kg) -> DHL Express gerechnet.
+  Hinweis: EINMALKOSTEN enthalten lokal Vergussmasse ER2223 (1 Beutel 41.29 CHF minus Verbrauch in den Stueckkosten) = 39.56 CHF
 ```
 
 ```
@@ -153,8 +159,8 @@ Stand Phase 6 (2026-11-09): **D-028** Gateway ohne RTC (G4 PiRTC DS3231 und G5 C
     + MWST-Anteil CH                                         0.37 CHF
     = JLC-Anteil pro Board                                   4.96 CHF
     x Boards / Sensoren                                  16/15
-    + lokal beschaffte Teile inkl. Ausschuss                 3.09 CHF
-    = STUECKKOSTEN pro Sensor (D-005)                        8.38 CHF
+    + lokal beschaffte Teile inkl. Ausschuss                 3.01 CHF
+    = STUECKKOSTEN pro Sensor (D-005)                        8.31 CHF
   Einmalkosten pro Bestellung (USD):
     PCB Fixanteil pro Bestellung (D-005)                    61.51
     PCB unbestueckte Reserveplatinen                         2.96
@@ -167,9 +173,10 @@ Stand Phase 6 (2026-11-09): **D-028** Gateway ohne RTC (G4 PiRTC DS3231 und G5 C
     Summe JLC-Rechnung einmalig                            131.82 USD
     + MWST-Anteil CH (einmalig)                             10.28 CHF
     + Verzollungsgebuehr Kurier/Post                        22.00 CHF
-    = EINMALKOSTEN                                         141.85 CHF
-  JLC-Rechnung total 220.33 USD = 180.43 CHF; MWST 16.15 CHF; Bestellung total 267.58 CHF; VOLLKOSTEN pro Sensor 17.84 CHF
+    = EINMALKOSTEN                                         177.94 CHF
+  JLC-Rechnung total 220.33 USD = 180.43 CHF; MWST 16.15 CHF; Bestellung total 302.57 CHF; VOLLKOSTEN pro Sensor 20.17 CHF
   Hinweis: GSDL nicht zulaessig (Warenwert 196.81 USD > 65.0 USD oder Gewicht > 1.5 kg) -> DHL Express gerechnet.
+  Hinweis: EINMALKOSTEN enthalten lokal Vergussmasse ER2223 (1 Beutel 41.29 CHF minus Verbrauch in den Stueckkosten) = 36.09 CHF
 ```
 
 ```
@@ -184,8 +191,8 @@ Stand Phase 6 (2026-11-09): **D-028** Gateway ohne RTC (G4 PiRTC DS3231 und G5 C
     + MWST-Anteil CH                                         0.35 CHF
     = JLC-Anteil pro Board                                   4.76 CHF
     x Boards / Sensoren                                  16/15
-    + lokal beschaffte Teile inkl. Ausschuss                 3.09 CHF
-    = STUECKKOSTEN pro Sensor (D-005)                        8.17 CHF
+    + lokal beschaffte Teile inkl. Ausschuss                 3.01 CHF
+    = STUECKKOSTEN pro Sensor (D-005)                        8.09 CHF
   Einmalkosten pro Bestellung (USD):
     PCB Fixanteil pro Bestellung (D-005)                    61.51
     PCB unbestueckte Reserveplatinen                         2.96
@@ -198,9 +205,10 @@ Stand Phase 6 (2026-11-09): **D-028** Gateway ohne RTC (G4 PiRTC DS3231 und G5 C
     Summe JLC-Rechnung einmalig                            131.82 USD
     + MWST-Anteil CH (einmalig)                             10.28 CHF
     + Verzollungsgebuehr Kurier/Post                        22.00 CHF
-    = EINMALKOSTEN                                         141.85 CHF
-  JLC-Rechnung total 216.74 USD = 177.49 CHF; MWST 15.92 CHF; Bestellung total 264.36 CHF; VOLLKOSTEN pro Sensor 17.62 CHF
+    = EINMALKOSTEN                                         177.94 CHF
+  JLC-Rechnung total 216.74 USD = 177.49 CHF; MWST 15.92 CHF; Bestellung total 299.35 CHF; VOLLKOSTEN pro Sensor 19.96 CHF
   Hinweis: GSDL nicht zulaessig (Warenwert 193.22 USD > 65.0 USD oder Gewicht > 1.5 kg) -> DHL Express gerechnet.
+  Hinweis: EINMALKOSTEN enthalten lokal Vergussmasse ER2223 (1 Beutel 41.29 CHF minus Verbrauch in den Stueckkosten) = 36.09 CHF
 ```
 
 ```
@@ -215,8 +223,8 @@ Stand Phase 6 (2026-11-09): **D-028** Gateway ohne RTC (G4 PiRTC DS3231 und G5 C
     + MWST-Anteil CH                                         0.38 CHF
     = JLC-Anteil pro Board                                   5.19 CHF
     x Boards / Sensoren                                  18/15
-    + lokal beschaffte Teile inkl. Ausschuss                 3.09 CHF
-    = STUECKKOSTEN pro Sensor (D-005)                        9.31 CHF
+    + lokal beschaffte Teile inkl. Ausschuss                 3.01 CHF
+    = STUECKKOSTEN pro Sensor (D-005)                        9.24 CHF
   Einmalkosten pro Bestellung (USD):
     PCB Fixanteil pro Bestellung (D-005)                    61.51
     PCB unbestueckte Reserveplatinen                         2.22
@@ -231,10 +239,11 @@ Stand Phase 6 (2026-11-09): **D-028** Gateway ohne RTC (G4 PiRTC DS3231 und G5 C
     Summe JLC-Rechnung einmalig                            181.16 USD
     + MWST-Anteil CH (einmalig)                             13.56 CHF
     + Verzollungsgebuehr Kurier/Post                        22.00 CHF
-    = EINMALKOSTEN                                         186.13 CHF
-  JLC-Rechnung total 285.20 USD = 233.55 CHF; MWST 20.46 CHF; Bestellung total 325.80 CHF; VOLLKOSTEN pro Sensor 21.72 CHF
+    = EINMALKOSTEN                                         222.22 CHF
+  JLC-Rechnung total 285.20 USD = 233.55 CHF; MWST 20.46 CHF; Bestellung total 360.79 CHF; VOLLKOSTEN pro Sensor 24.05 CHF
   Hinweis: Standard-PCBA: min. 70x70 mm -> Panel (z. B. 3-fach + Raender) noetig; Panelpreis im Rechner pruefen [ANNAHME: hier nicht modelliert].
   Hinweis: GSDL nicht zulaessig (Warenwert 261.68 USD > 65.0 USD oder Gewicht > 1.5 kg) -> DHL Express gerechnet.
+  Hinweis: EINMALKOSTEN enthalten lokal Vergussmasse ER2223 (1 Beutel 41.29 CHF minus Verbrauch in den Stueckkosten) = 36.09 CHF
 ```
 
 ```
@@ -249,8 +258,8 @@ Stand Phase 6 (2026-11-09): **D-028** Gateway ohne RTC (G4 PiRTC DS3231 und G5 C
     + MWST-Anteil CH                                         0.47 CHF
     = JLC-Anteil pro Board                                   6.36 CHF
     x Boards / Sensoren                                  6/5
-    + lokal beschaffte Teile inkl. Ausschuss                 3.09 CHF
-    = STUECKKOSTEN pro Sensor (D-005)                       10.72 CHF
+    + lokal beschaffte Teile inkl. Ausschuss                 3.01 CHF
+    = STUECKKOSTEN pro Sensor (D-005)                       10.65 CHF
   Einmalkosten pro Bestellung (USD):
     PCB Fixanteil pro Bestellung (D-005)                    61.51
     Bauteile Mindestabnahme/Verlust-Ueberschuss              3.11
@@ -264,9 +273,10 @@ Stand Phase 6 (2026-11-09): **D-028** Gateway ohne RTC (G4 PiRTC DS3231 und G5 C
     Summe JLC-Rechnung einmalig                            179.07 USD
     + MWST-Anteil CH (einmalig)                             13.42 CHF
     + Verzollungsgebuehr Kurier/Post                        22.00 CHF
-    = EINMALKOSTEN                                         184.26 CHF
-  JLC-Rechnung total 221.61 USD = 181.47 CHF; MWST 16.24 CHF; Bestellung total 237.86 CHF; VOLLKOSTEN pro Sensor 47.57 CHF
+    = EINMALKOSTEN                                         223.82 CHF
+  JLC-Rechnung total 221.61 USD = 181.47 CHF; MWST 16.24 CHF; Bestellung total 277.05 CHF; VOLLKOSTEN pro Sensor 55.41 CHF
   Hinweis: Standard-PCBA: min. 70x70 mm -> Panel (z. B. 3-fach + Raender) noetig; Panelpreis im Rechner pruefen [ANNAHME: hier nicht modelliert].
   Hinweis: GSDL nicht zulaessig (Warenwert 198.09 USD > 65.0 USD oder Gewicht > 1.5 kg) -> DHL Express gerechnet.
+  Hinweis: EINMALKOSTEN enthalten lokal Vergussmasse ER2223 (1 Beutel 41.29 CHF minus Verbrauch in den Stueckkosten) = 39.56 CHF
 ```
 

@@ -271,3 +271,18 @@ Format: Nr. · Datum · Entscheid · Alternativen · Begründung · Quelle · St
 
 ### Freigabe Phase 5 · 2026-11-08
 - Auftraggeber gibt Phase 5 frei und startet Phase 6. Musterbestellung erst am Schluss (nach Phase 6).
+
+### D-030 · 2026-11-09 · Vergussmasse und Sondenversiegelung (Orchestrator, nach Sicherheit R1+R2 ohne Veto)
+- **Entscheid:** Electrolube **ER2223** (2K-Epoxid, Resin Pack 250 g) für Schott, Kragen und Kantenversiegelung der
+  Sonde; Sondenflächen ohne Zusatzschicht (Feldsimulation `simulation/field/coat_epoxy.py`: 100 µm kosten 12–17 %
+  Spanne). Verarbeitung Variante **M-A** (Beutel einmal ungemischt abfüllen, je Sitzung ≥ 8 g wägen) unter MA-1…MA-5;
+  bis dahin M-B (ganzer Beutel). Kosten: Verbrauch in den Stückkosten (≈ 0.33 CHF), Beutel und Zubehör als
+  Einmalkosten (D-005).
+- **MA-6 (Orchestrator):** M-A gilt auch ohne Antwort von Electrolube, wenn MA-1, MA-2, MA-4 umgesetzt und V-3 und V-6
+  bestanden sind.
+- **Freigabebedingungen:** `docs/concepts/vergussmasse_versiegelung.md` D-030 (1–5): SDB Teil B in Landessprache und
+  Handschuh-Beständigkeitsliste vor dem ersten Beutel; V-1…V-3 vor dem Musterverguss; PT11.19 (≥ 2 Muster), PT11.23
+  und Tg-Nachweis (Electrolube oder V-6) vor der Serie, sonst Rückfallmasse Kap. 9a.
+- **Alternativen:** ER2221 (gefüllt, Tg unbekannt, Rückfall), MG 832HT (H360), Stycast 2651-40 (≈ 300 CHF), ER2188/832B (Tg zu tief).
+- **Quelle:** `docs/reviews/phase6_vergussmasse_sicherheit.md` (R1, R2), Konzept, MONTAGE_SENSOR Kap. 3a.
+- **Status:** gültig mit Auflagen.

@@ -4,7 +4,7 @@
 |---|---|
 | Stand | 2026-11-09, Phase 6, Mechanik-Agent. Runde 2 nach Sicherheitsprüfung `docs/reviews/phase6_vergussmasse_sicherheit.md` (kein Veto, Auflagen A-1 … A-5, W-1 … W-5, K-1 … K-6 – Antworten dort am Ende). Entscheidungsvorlage für den Orchestrator |
 | Offene Punkte | O-1 Vergussmasse, O-2 Kantenversiegelung Sonde (`docs/manuals/MONTAGE_SENSOR.md` Kap. 0), REQ-MECH-07, PROJEKTAUFTRAG Techn. Anf. 1 („Versiegelung der Schnittkanten und der Sonde bewerten … mit Anleitung“) |
-| Ergebnis | Empfehlung **Electrolube ER2223** (2K-Epoxid, Tg 140 °C, 800 mPa·s) für Schott, Kragen **und** Kantenversiegelung der Sonde; Sondenflächen bleiben unbeschichtet. Abweichung von K-4 („mineralisch gefüllt, niedriger CTE“): Sicherheit **zulässig unter A-1 … A-5** (Kap. 9). Kosten: Beutel einmal abfüllen und Kleinmengen wägen (Variante M-A) → **1 Beutel + 1 Reserve statt 6** (Kap. 7) |
+| Ergebnis | Empfehlung **Electrolube ER2223** (2K-Epoxid, Tg 140 °C, 800 mPa·s) für Schott, Kragen **und** Kantenversiegelung der Sonde; Sondenflächen bleiben unbeschichtet. Abweichung von K-4 („mineralisch gefüllt, niedriger CTE“): Sicherheit **zulässig unter A-1 … A-5** (Kap. 9). Kosten: Beutel einmal abfüllen und Kleinmengen wägen (Variante M-A) → **2 Beutel (je Bauserie) statt 6** (Kap. 7); M-A von der Sicherheit in Runde 2 unter MA-1 … MA-5 zugelassen |
 | Rechnung | `simulation/field/coat_epoxy.py` → `simulation/field/results/coat_epoxy.{txt,csv}` (neu), Grundlagen `simulation/field/REPORT.md` |
 | Anleitung | `docs/manuals/MONTAGE_SENSOR.md` Kap. 0, 1, 3a, 4, 5, 5a, 6, 8; `docs/manuals/PROGRAMMIEREN_SENSOR.md` Kap. 5 Schritt 9 (Zelle vor dem Verguss entnehmen) |
 
@@ -151,7 +151,7 @@ Nachteile, offen ausgewiesen:
   K-7 (50 Zyklen −10/+65 °C, Farbeindringprüfung). → Entscheid Sicherheit (Kap. 9).
 - **Kleinste Gebinde 250 g** (Beutel; sonst 5-kg-Kit). Ohne Abfüllen müsste je Sitzung ein Beutel ganz gemischt werden
   (250 g für ≈ 0.2 g je Sensor). Abfüllen (M-A) ist vom Hersteller für Resin Packs nicht beschrieben → Anfrage Anhang A,
-  Sicherheitsprüfung des Abfüllschritts, V-3 je Ansatz. Kosten Kap. 7.
+  Sicherheit Runde 2: zulässig unter MA-1 … MA-5; V-3 je Ansatz. Kosten Kap. 7.
 - **Topfzeit 30 min** (S. 1): Sensoren vor dem Mischen vollständig vorbereiten; ≤ 8 Sensoren pro Ansatz (**ANNAHME**, am
   Muster Zeit pro Sensor messen).
 - Lieferzeit laut Simpex 8 Wochen → früh bestellen.
@@ -169,33 +169,66 @@ sind für 20 Sensoren unsinnig (Haltbarkeit 12 Monate, TDS S. 1). Doppelkartusch
 niedriger Viskosität wurden nicht gefunden (MG 832HD 50 ml: Tg 41 °C; 832FXT: Tg 20 °C; Loctite E-60NC: 13 000 cP, Tg nicht
 angegeben). Der Kostenhebel ist deshalb das **Abfüllen und Wägen kleiner Ansätze** (Variante M-A, MONTAGE Kap. 3a): Das TDS
 beschreibt neben dem Resin Pack ausdrücklich „Bulk Mixing“ im richtigen Verhältnis (S. 3) und das Verhältnis 3.45 : 1 nach
-Gewicht (S. 1). Mit einer Waage 0.01 g und Mindestansatz 4 g (3.45 g A + 1.00 g B) bleibt der Wägefehler ≤ ± 1 %
-(**ANNAHME** Toleranz, das TDS nennt keine). Neu ist nur das Umfüllen aus dem Beutel in dicht schliessende Flaschen.
+Gewicht (S. 1). Wegen der Waagengenauigkeit (Auflösung ≠ Genauigkeit) gilt nach Sicherheit Runde 2 (MA-4) ein **Mindestansatz von 8 g
+(6.90 g A + 2.00 g B)** und eine Kontrolle mit Prüfgewichten vor jeder Sitzung. Neu ist nur das Umfüllen aus dem Beutel in dicht schliessende Flaschen.
 
-| Posten | Variante M-B (ganzer Beutel je Sitzung) | **Variante M-A (Beutel abfüllen, Ansätze wägen)** |
+Sicherheit Runde 2 (`docs/reviews/phase6_vergussmasse_sicherheit.md` R2.2): **M-A ist zulässig unter MA-1 … MA-5**
+(Gebinde kindergesichert, HDPE für den Härter, abgeschlossener Sekundärbehälter, nur ein angebrochener Satz; Etikett mit
+Signalwort, Piktogrammen, H-/P-Sätzen, „Kein Lebensmittel – nicht trinken“, Daten, verantwortlicher Person, 145; Farbdeckel,
+eigene Pipetten, nie beide Flaschen offen; Haltbarkeit 3 Monate (**ANNAHME**), Härter im 40-°C-Wasserbad anwärmen;
+Prüfgewicht, Mindestansatz 8 g; Abfüllen in Auffangwanne mit Trichter, Beutelreste verkneten und aushärten). Umgesetzt in
+`docs/manuals/MONTAGE_SENSOR.md` Kap. 1 und 3a. **MA-6:** Ohne Antwort von Electrolube ist M-A trotzdem zulässig, wenn MA-1,
+MA-2, MA-4 umgesetzt und V-3 an jedem Ansatz sowie V-6 einmal mit einem gewogenen Ansatz bestanden sind (Entscheid
+Orchestrator).
+
+**Mengen M-A:** je Sensor 2 Ansätze (Schott; Kragen + Kanten) à 8 g auf Gruppen von 8 Sensoren (**ANNAHME**) → 2 g je Sensor.
+Prototyp (5 Sensoren, Vorversuche V-1 … V-3, V-6) ≈ 6 Ansätze ≈ 48 g; Serie 15 (2 Gruppen) 4 Ansätze ≈ 32 g. Ein Beutel
+(250 g) reicht je Bauserie mengenmässig; wegen der Haltbarkeit von 3 Monaten nach dem Abfüllen (MA-3) wird **je Bauserie
+(Prototyp, Serie) ein Beutel** gerechnet → **2 Beutel**.
+
+| Posten | **M-A (gerechnet)** | M-B (nur Hinweis) |
 |---|---|---|
-| Beutel ER2223 250 g, Simpex, CHF 38.20 exkl. / **41.29 inkl. 8.1 % MWST**, zzgl. Versand (Betrag nicht angegeben), Lieferzeit 8 Wochen | – | – |
-| Prototyp 5 Sensoren: Vorversuche, Schott, Kragen + Kanten | 3 Beutel (V-4-Kanten in der ersten Serien-Sitzung, sonst 4) | aus Beutel 1 |
-| Serie 15 Sensoren (2 Gruppen ≤ 8, rollierend: Schott G1 / Kragen G1 + Schott G2 / Kragen G2) | 3 Beutel | aus Beutel 1 |
-| Serie 20 Sensoren (3 Gruppen) | 4 Beutel | aus Beutel 1 |
-| Reserve (Lieferzeit, Rückfall M-B, Ablauf nach 12 Monaten) | – | 1 Beutel |
-| **Beutel Prototyp + Serie 15** | **6 Beutel = 247.74 CHF** | **2 Beutel = 82.58 CHF** |
-| Flaschen HDPE/Glas 250 ml + 60 ml, Etiketten | – | ≈ 10 CHF (**ANNAHME**, nicht recherchiert) |
-| Waage 0.01 g | – | in MONTAGE Kap. 1 schon gelistet (**ANNAHME** vorhanden; sonst ≈ 20–30 CHF, nicht recherchiert) |
-| Kleinmaterial (Spritzen, Kanülen, Becher, Spatel, Handschuhe, Visier, Schürze, Augenspülflasche, Filter A) | **ANNAHME** ≈ 40 CHF einmalig, nicht recherchiert | gleich |
-| Verbrauch je Sensor (≈ 0.19 g inkl. Kanten; je Ansatz ≥ 4 g, Rest verworfen) | ≈ 0.03 CHF Masse (Beutel als Einmalkosten) | ≈ 0.17 CHF (2 Ansätze à 4 g – Schott, Kragen – auf je 8 Sensoren, 0.165 CHF/g) |
+| Beutel ER2223 250 g, Simpex, CHF 38.20 exkl. / **41.29 inkl. 8.1 % MWST**, zzgl. Versand (Betrag nicht angegeben), Lieferzeit 8 Wochen | 1 je Bauserie | 1 je Sitzung |
+| Prototyp 5 + Serie 15 | **2 Beutel = 82.58 CHF** | 6 Beutel = 247.74 CHF |
+| Stückkosten (Verbrauch 2 g × 0.165 CHF/g, im Modell + 5 % Ausschuss) | **0.33 CHF/Sensor** | – |
+| Einmalkosten je Bestellung (Beutel minus gerechneter Verbrauch) | Prototyp 39.56 CHF, Serie 36.09 CHF | – |
+| Zubehör und Schutzausrüstung (Kap. 7.1), einmalig je Projekt | 229 CHF (**ANNAHME**) | gleich (ohne Flaschen/Prüfgewichte ≈ 194 CHF) |
 
-**Einordnung nach D-005 (Vorgabe Orchestrator: Einmalkosten):** Beutel, Flaschen und Kleinmaterial sind Einmalkosten pro
-Bauserie; Stückkosten enthalten nur den Verbrauch. Stückkosten Serie damit **8.38 − 0.40 + 0.17 ≈ 8.15 CHF** (ohne
-Ausschussaufschlag; Basis `docs/reviews/phase5_kosten_final.md` Kap. 1, Posten 0.40 in `hardware/sensor/gen/cost_rev_b.py`
-Z. 59) → REQ-FAB-04 bleibt erfüllt (unter dem Vorbehalt „Pre-reflow“ wie bisher). Einmalkosten Vergussmaterial für
-Prototyp + Serie: **M-A ≈ 133 CHF** (82.58 + 10 + 40), M-B ≈ 288 CHF (247.74 + 40). Pro Sensor (20 Sensoren gesamt)
-Vollkosten-Anteil M-A ≈ 6.6 CHF, M-B ≈ 14.4 CHF.
+**Neue Kostenzahlen** (`hardware/sensor/gen/cost_rev_b.py` mit Position „Verguss ER2223 Verbrauch“ statt „Versiegelung
+(ANNAHME) 0.40“ und lokaler Einmalposition Beutel; `scripts/cost_final_phase5.py` neu gerechnet → `docs/reviews/phase5_kosten_final.md`,
+`hardware/sensor/out/COSTS_REV_B.md`), Einordnung als Einmalkosten nach D-005 (Orchestrator):
 
-**Bedingungen für M-A:** (1) Electrolube hat keine Einwände gegen das Umfüllen und nennt die Haltbarkeit der angebrochenen
-Komponenten (Anhang A); (2) die Sicherheit prüft den Abfüllschritt (zusätzlicher Umgang mit dem ätzenden Härter, Etiketten,
-Lagerung unter Verschluss) – neu gegenüber der Prüfung Runde 1; (3) V-3 (Härteprobe) an jedem Ansatz, V-6 einmal für das
-Verfahren. Bis dahin gilt M-B.
+| Szenario | Stückkosten (D-005) vorher → neu | Einmalkosten vorher → neu | Vollkosten/Sensor vorher → neu |
+|---|---|---|---|
+| Prototyp 5 / 5 | 9.23 → **9.15 CHF** | 139.34 → 178.90 CHF | 37.09 → **44.93 CHF** |
+| Serie 20 / 16 / 15 (4 × 100 µF) | 8.38 → **8.31 CHF** | 141.85 → 177.94 CHF | 17.84 → **20.17 CHF** |
+| Serie (2 × 100 µF) | 8.17 → 8.09 CHF | 141.85 → 177.94 CHF | 17.62 → 19.96 CHF |
+| Serie mit „Pre-reflow“ (Vorbehalt) | 10.60 → 10.53 CHF | | |
+| System A (Serie + Gateway + Zubehör 229) | – | – | 601.33 CHF total, 40.09 CHF/Sensor |
+| System B (Prototyp + Serie + Gateway + Zubehör) | – | – | 825.99 CHF total, 55.07 CHF/Sensor (15) |
+
+REQ-FAB-04 (< 10 CHF Stückkosten) bleibt erfüllt (Vorbehalt „Pre-reflow“ wie bisher). Die Systemsummen enthalten auch die
+seit Phase 5 nachgeführten Gateway-Zahlen (D-028/D-029, anderer Agent); der Verguss-Anteil daran ist 229 + 2 × ≈ 38 CHF.
+
+### 7.1 Einkaufspositionen Zubehör (für die Einkaufsliste des Orchestrators; Preise **ANNAHME**, nicht recherchiert)
+
+| Pos | Artikel | Spezifikation | CHF (ANNAHME) |
+|---|---|---|---|
+| V-Z1 | Feinwaage | 0.01 g Auflösung, ≥ 200 g, Justiergewicht; **nur falls nicht vorhanden** | 25 |
+| V-Z2 | Prüfgewichte | 1 g und 5 g, Klasse F1 oder M1 (MA-4) | 20 |
+| V-Z3 | Laborflaschen | B: HDPE ≈ 60 ml, A: HDPE/Glas ≈ 250 ml, je **kindergesicherter Verschluss** (MA-1); Etiketten, Farbmarker rot/blau (MA-2) | 15 |
+| V-Z4 | Sekundärbehälter | dicht schliessende Kunststoffbox, abschliessbar (Vorhängeschloss), Saugmaterial Vermiculit/Katzenstreu (MA-1) | 25 |
+| V-Z5 | Auffang/Abfüllen | Auffangwanne bzw. Alu-Schalen ≥ 20 × 15 cm, 2 PE-Trichter, Einweg-Pipetten, Spatel, Mischbecher (MA-5) | 12 |
+| V-Z6 | Dosieren | Einwegspritzen 1/3 ml Luer-Lock, stumpfe Kanülen 18/20 G, feiner Pinsel | 15 |
+| V-Z7 | Handschuhe | Nitril ≥ 0.1 mm, Box (K-3; Beständigkeitsliste anfordern) | 12 |
+| V-Z8 | Augen/Gesicht | Chemikalien-Schutzbrille EN 166 (dicht) + Visier | 30 |
+| V-Z9 | Körper/Erste Hilfe | Kunststoffschürze, Augenspülflasche 500 ml | 25 |
+| V-Z10 | Atemschutz | Halbmaske mit Filter A (EN 14387) | 40 |
+| V-Z11 | Thermometer | für Trockner/Wärmeschrank (≤ 65 °C Kontrolle, 80 °C für V-3/V-6) | 10 |
+| | **Summe** | | **229** |
+| V-M1 | Vergussmasse | Electrolube ER2223 Resin Pack 250 g, Simpex EER2223RP250G, 2 Stück (Prototyp, Serie) | 82.58 (inkl. MWST, Preis belegt) |
+
+Nicht enthalten: Ventilator, Wärmeschrank/Filamenttrockner, Wärmeschrank ≥ 80 °C (**ANNAHME** vorhanden).
 
 ## 8 Sicherheit nach SDB (für MONTAGE Kap. 1/4/5)
 
@@ -238,19 +271,29 @@ Reihenfolge:
 ## 10 Entscheidungsvorlage (Vorschlag D-030)
 
 - **Entscheid:** Vergussmasse für Schott und Kragen sowie Kantenversiegelung der Sonde: **Electrolube ER2223** (Resin Pack
-  250 g; Verarbeitung M-A „abfüllen und wägen“ nach Bedingungen Kap. 7, sonst M-B). Sondenflächen bleiben ohne Zusatzschicht
-  (Lötstopplack). Aushärtung 24 h RT + 4 h 60 °C. Abweichung von K-4 („gefüllt, niedriger CTE“) unter A-1 … A-5.
-  **Kosten:** Vergussmaterial als **Einmalkosten pro Bauserie nach D-005** (Vorgabe Orchestrator), Stückkosten nur Verbrauch
-  ≈ 0.17 CHF.
-- **Alternativen:** ER2221 (gefüllt, Tg unbekannt), MG 832HT (H360, 22 000 cP), Stycast 2651-40/Cat 9 (≈ 300 CHF),
-  ER2188/832B (Tg < 80 °C); für die Sonde Acryllack, Epoxid vollflächig, Schrumpfschlauch (Kap. 3).
+  250 g). Verarbeitung **M-A** (Beutel abfüllen, 8-g-Ansätze wägen; MONTAGE Kap. 3a), Rückfall M-B (ganzer Beutel je Sitzung).
+  Sondenflächen bleiben ohne Zusatzschicht (Lötstopplack). Aushärtung 24 h RT + 4 h 60 °C. Abweichung von K-4 („gefüllt,
+  niedriger CTE“) unter A-1 … A-5.
+- **Kosten (D-005, Einordnung Orchestrator):** Vergussmasse als **Einmalkosten je Bauserie** (1 Beutel 41.29 CHF minus Verbrauch),
+  Stückkosten nur Verbrauch 0.33 CHF/Sensor; Zubehör/Schutz 229 CHF einmalig je Projekt (**ANNAHME**). Serie: Stückkosten
+  **8.31 CHF**, Vollkosten **20.17 CHF/Sensor** (Kap. 7).
+- **Alternativen:** ER2221 (gefüllt, Tg unbekannt; Rückfall Kap. 9a), MG 832HT (H360, 22 000 cP), Stycast 2651-40/Cat 9
+  (≈ 300 CHF), ER2188/832B (Tg < 80 °C); für die Sonde Acryllack, Epoxid vollflächig, Schrumpfschlauch (Kap. 3).
 - **Begründung:** Tg 140 °C laut TDS (Härtebedingung unbekannt; Tg nach 60-°C-Härtung offen, W-2), 800 mPa·s, kein CMR-Stoff,
-  CH-Bezug; Kantenversiegelung kostet ≈ 1–2 % Spanne statt 12–39 % bei Flächenbeschichtung.
-- **Auflagen:** A-1 … A-5 (Sicherheit); vor dem ersten Beutel MONTAGE Kap. 3a (W-1, W-3, W-4, K-1, K-2) umgesetzt und SDB Teil B
-  in DE/EN/FR/IT vorhanden; Vorversuche V-1 … V-3 vor dem ersten Muster-Verguss; **Tg-Nachweis (W-2: Electrolube oder V-6) vor
-  der Serienfreigabe**; M-A nur nach Kap. 7 Bedingungen.
+  CH-Bezug; Kantenversiegelung kostet ≈ 1–2 % Spanne statt 12–39 % bei Flächenbeschichtung. Sicherheit: kein Veto (Runden 1 und 2).
+- **Freigabebedingungen** (Sicherheit Runde 2, R2.4):
+  1. **Vor dem Öffnen des ersten Beutels** (auch V-1 … V-3): SDB Teil B in DE/EN/FR/IT liegt vor und ist abgelegt;
+     Beständigkeitsliste der Handschuhe abgelegt (K-3); Schutzausrüstung nach MONTAGE Kap. 1/3a vorhanden.
+  2. **Variante M-A** nur mit MA-1 und MA-2 sowie MA-3 … MA-5 (umgesetzt in MONTAGE Kap. 3a); ohne Electrolube-Antwort nach
+     MA-6 (V-3 je Ansatz, V-6 einmal mit gewogenem Ansatz; Entscheid Orchestrator). Sonst M-B.
+  3. **Vor dem Musterverguss:** V-1 … V-3 bestanden.
+  4. **Vor der Serie:** PT11.19 an ≥ 2 Mustern und PT11.23 bestanden (A-1/A-2), sonst Rückfall Kap. 9a (A-3); Tg-Nachweis
+     (Electrolube schriftlich oder V-6) erbracht (W-2).
+  5. FMEA F-63 (S6/O4/D4 = RPZ 96) und F-60 (S6/O3/D6 = RPZ 108) nachgeführt – **erledigt** (`phase5_fmea_light.md`).
 - **Folgeänderungen bei Freigabe:** `docs/interfaces/PCB_OUTLINE.md` Kap. 7 („Epoxid mineralisch gefüllt … ANNAHME Typ“) in
-  der nächsten Revision nachführen; `hardware/sensor/gen/cost_rev_b.py` Z. 59 („Versiegelung Sonde/Kragen (ANNAHME)“ 0.40 CHF) und `scripts/cost_final_phase5.py` neu rechnen; INDEX.csv EP-K (vorläufig eingetragen).
+  der nächsten Revision nachführen (A-5); MONTAGE O-1 auf „ER2223 (Abweichung K-4, D-030)“; Kostenmodell bereits umgestellt
+  (`hardware/sensor/gen/cost_rev_b.py`, `scripts/cost_final_phase5.py`); INDEX.csv EP-K; Einkaufsliste um Kap. 7.1 ergänzen
+  (Orchestrator).
 
 ## 11 Offene Punkte
 
@@ -259,7 +302,7 @@ Reihenfolge:
 2. **SDB Teil B in DE/EN/FR/IT beim Händler anfordern (Anhang B) – Voraussetzung vor dem ersten Beutel.** SDB ER2221 Teil B und
    Stycast/Cat 9 nicht beschafft. Beständigkeitsliste Handschuhe (CAS 1761-71-3, 25068-38-6) beim Handschuhhersteller holen.
 3. Preis/Lager Distrelec CH (301-16-965) und Versandkosten Simpex im Warenkorb prüfen; Lieferzeit 8 Wochen → vor Musterankunft bestellen.
-4. Kosteneinordnung: Einmalkosten nach D-005 (Vorgabe Orchestrator), Kap. 7. Sicherheitsprüfung des Abfüllschritts (M-A) offen.
+4. Kosteneinordnung: Einmalkosten nach D-005 (Vorgabe Orchestrator), Kap. 7; im Kostenmodell umgesetzt. Zubehör (Kap. 7.1) in die Einkaufsliste übernehmen (Orchestrator).
 7. Wärmeschrank ≥ 80 °C für V-3/V-6 vorhanden? (**ANNAHME**; Filamenttrockner reichen oft nicht bis 80 °C, sonst DSC im Labor).
 5. Membranrand (W-1), Fensterkleber (O-3) und Klemmring (O-4) sind **nicht** Teil dieser Wahl (ER2223 ist schwarz und so dünn,
    dass es in die Membran laufen würde).
@@ -291,7 +334,7 @@ electrolube.com prüfen). Versand durch den Auftraggeber bzw. Orchestrator.
 >
 > 1. The TDS (Revision 4, Mar 2019) states Tg 140 °C. Under which cure schedule was this measured? What Tg (and CTE below Tg)
 >    is reached after (a) 24 h at 23 °C and (b) 24 h at 23 °C followed by 4 h at 60 °C? Is a Tg of at least 80 °C reached?
-> 2. We need only small quantities per session (approx. 4 g). Is it acceptable to transfer part A and part B from an
+> 2. We need only small quantities per session (approx. 8 g). Is it acceptable to transfer part A and part B from an
 >    unopened resin pack into separate, tightly closed containers (HDPE or glass) and to mix small batches by weight at
 >    3.45 : 1 (balance resolution 0.01 g)? Which mix-ratio tolerance is acceptable, and how long may the opened components
 >    be stored (15–35 °C, dry)?

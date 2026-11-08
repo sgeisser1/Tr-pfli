@@ -40,7 +40,7 @@ Teile: Pos. 1–17 laut Stückliste FL-S-00 (gedruckt nach `PRINT_SETTINGS.md`, 
 | Kapton-Punkt (Ø ≈ 3 mm) | Gewinde der Mutter vor Epoxid schützen (PCB_OUTLINE Kap. 7) |
 | Dosierspritzen + Kanülen, Mischbecher, Spatel, **Waage 0.01 g** | Verguss (Mengen siehe Kap. 4/5), Variante M-A (Kap. 3a) |
 | Vergussmasse **Electrolube ER2223, Resin Pack 250 g** (Vorschlag O-1), TDS und SDB A/B (**B in DE/EN/FR/IT**, Kap. 3a) ausgedruckt am Arbeitsplatz | Schott, Kragen, Sondenkanten (Kap. 3a) |
-| Weithalsflaschen HDPE oder Glas ≈ 250 ml und ≈ 60 ml mit dicht schliessendem Deckel, Etiketten (Variante M-A) | Harz A und Härter B nach dem Abfüllen (Kap. 3a) |
+| Variante M-A: Laborflaschen mit **kindergesichertem Verschluss** – B: HDPE ≈ 60 ml (kein Glas), A: HDPE/Glas ≈ 250 ml; Farbmarkierung rot/blau; Etiketten nach MA-2; 2 PE-Trichter; Einweg-Pipetten; **Prüfgewichte 1 g und 5 g** (F/M1); **abschliessbarer Sekundärbehälter** mit Saugmaterial (Vermiculit/Katzenstreu); Auffangwanne ≥ 20 × 15 cm | Harz A und Härter B nach dem Abfüllen (Kap. 3a, MA-1 … MA-5) |
 | Einwegspritzen 1 ml und 3 ml Luer-Lock, stumpfe Dosierkanülen 18–20 G, feiner Synthetikpinsel (≤ 3 mm), Wattestäbchen, kleiner Spiegel | Dosieren, Kanten auftragen, Austritt kontrollieren |
 | Einweg-Alu-Schale (**≥ 20 × 15 cm** oder zwei), Schere, **nicht brennbare Unterlage** (Fliese, Blech) | Beutelrest flach aushärten lassen (Variante M-B), Abfüllen (M-A), Kap. 3a |
 | Wärmeschrank oder Filamenttrockner mit separatem Thermometer, einstellbar 60 °C (**ANNAHME** vorhanden) | Nachhärtung 4 h bei 60 °C (Kap. 3a) |
@@ -147,31 +147,58 @@ FR4-Reststreifen 1.6 mm (Füllung, Blasen, Austritt, Zeit pro Sensor), V-2 Haftp
 (Becherrest 1 h bei 80 °C bleibt hart), V-6 Kriechprobe 80 °C (Tg-Ersatznachweis, Konzept Kap. 12). Muster erst
 vergiessen, wenn V-1 … V-3 bestanden sind (V-6 vor der Serie).
 
-**Mischen – zwei Varianten.** Variante **M-A (Vorschlag, spart Beutel)** gilt erst, wenn Electrolube keine Einwände hat
-(Anfrage Konzept Anhang A) und die Sicherheit den Abfüllschritt geprüft hat; bis dahin **Variante M-B**.
+**Mischen – zwei Varianten.** Variante **M-A (abfüllen und wägen)** ist sicherheitlich zulässig unter MA-1 … MA-5
+(`docs/reviews/phase6_vergussmasse_sicherheit.md` Runde 2). Sie gilt, sobald Electrolube keine Einwände hat (Anfrage
+Konzept Anhang A) **oder** – ohne Antwort, nach Entscheid des Orchestrators (MA-6) – MA-1, MA-2, MA-4 umgesetzt und V-3
+an jedem Ansatz sowie V-6 einmal mit einem gewogenen Ansatz bestanden sind. Sonst **Variante M-B**.
 
-*Gemeinsam:* Raum und Material 20–25 °C (Lagerung über 15 °C, TDS S. 1; kristallisierter Härter: bei 40 °C anwärmen, bis
-die Kristalle geschmolzen sind, TDS S. 3). Ablaufdatum prüfen. Uhrzeit des Mischens notieren: **Ende der Verarbeitung =
-Mischzeit + 30 min.** Masse, die bereits zieht (Fäden, deutlich zäher), nicht mehr verwenden. Von jedem Ansatz einen
-Becherrest (≥ 5 mm hoch) für V-3 behalten.
+*Gemeinsam:* Raum und Material 20–25 °C (Lagerung über 15 °C, TDS S. 1). Ablaufdatum prüfen. Uhrzeit des Mischens notieren:
+**Ende der Verarbeitung = Mischzeit + 30 min.** Masse, die bereits zieht (Fäden, deutlich zäher), nicht mehr verwenden. Von
+jedem Ansatz einen Becherrest (≥ 5 mm hoch) für V-3 behalten.
 
 *Variante M-A – Beutel einmal abfüllen, Kleinmengen wägen (TDS S. 3 „Bulk Mixing“):*
-1. Abfüllen (einmal je Beutel, volle Schutzausrüstung inkl. Visier, über der Alu-Schale auf nicht brennbarer Unterlage):
-   Clip **nicht** entfernen. Eine Ecke der Harzkammer A abschneiden, Harz in eine saubere, trockene Weithalsflasche A
-   (HDPE oder Glas mit dicht schliessendem Deckel, ≈ 250 ml) ausdrücken. Dann die Härterkammer B ebenso in eine kleine
-   Flasche B (≈ 60 ml) ausdrücken. Flaschen fast voll, sofort schliessen. **Etiketten:** Produkt (ER2223 Teil A bzw. B),
-   Gefahrenpiktogramme und H-Sätze wie oben, Abfülldatum, Ablaufdatum des Beutels. Leeren Beutel aushärten lassen bzw. als
-   Sonderabfall entsorgen. Lagerung wie oben, unter Verschluss.
-2. Je Ansatz: Flasche A vor der Entnahme gründlich aufrühren (Sediment, TDS S. 3), Mischbecher auf der **Waage 0.01 g**
-   tarieren, **Harz A 3.45 Teile, dann Härter B 1 Teil nach Gewicht** in denselben Becher, z. B. **3.45 g A + 1.00 g B**
-   (Mindestansatz 4 g, damit der Wägefehler ≤ ± 1 % bleibt; **ANNAHME** Toleranz, das TDS nennt keine). Bei Überschiessen
-   nicht zurückschütten, sondern den Partner nachrechnen und nachwägen. Werte in die Musterliste schreiben.
-3. Mit einem Spatel **2 min** langsam rühren, Wand und Boden abstreifen, bis gleichmässig schwarz ohne Schlieren; ≈ 2 min
+
+Gebinde und Lagerung (MA-1, MA-2):
+- **Nie Lebensmittel- oder Getränkeflaschen** verwenden, auch nicht gereinigt; nur Laborflaschen.
+- **Flasche B (Härter): HDPE, ≈ 60 ml, mit kindergesichertem Verschluss** (Drück-Dreh), **kein Glas**. Flasche A (Harz):
+  HDPE oder Glas, ≈ 250 ml, ebenfalls kindergesichert (**ANNAHME** Verfügbarkeit; HDPE-Beständigkeit gegen den Härter mit
+  der Beständigkeitsliste des Flaschenherstellers prüfen).
+- Deckel und Flaschen **farbig markieren: A rot, B blau**; Deckel nie tauschen.
+- **Etikett je Flasche:** „ER2223 Teil A – Harz“ bzw. „ER2223 Teil B – Härter“; Signalwort (A **Achtung**, B **Gefahr**);
+  GHS-Piktogramme und H-Sätze nach SDB Abschn. 2.2 (A: H315, H317, H319, H411; B: H302, H314, H317, H373); P-Sätze P280,
+  P305+P351+P338, bei B zusätzlich P301+P330+P331 und P303+P361+P353; „**Kein Lebensmittel – nicht trinken**“; „Unter
+  Verschluss, für Kinder unzugänglich“; Abfülldatum, Ablaufdatum des Beutels, **Verbrauchen bis = Abfülldatum + 3 Monate**;
+  Name und Telefon der verantwortlichen Person; Notruf Tox Info Suisse **145**.
+- Beide Flaschen stehen in einem **dicht schliessenden Kunststoff-Sekundärbehälter mit Saugmaterial** (Vermiculit oder
+  Katzenstreu, SDB B Abschn. 6.3), **abgeschlossen** (Vorhängeschloss oder abschliessbarer Schrank), nicht bei Lebensmitteln,
+  nicht im Kühlschrank. **Nur ein angebrochener Satz A/B** gleichzeitig.
+- **Haltbarkeit (MA-3):** höchstens **3 Monate** nach dem Abfüllen (**ANNAHME** bis zur Antwort von Electrolube, Anhang A;
+  SDB B Abschn. 10.4: Luft und Feuchte meiden). Härter, der trüb wird oder eine Kruste bildet, nicht verwenden. Kristallisierten
+  Härter (Schmelzbereich 17.7–65.4 °C, SDB B Abschn. 9) in der **geschlossenen** Flasche im **Wasserbad bei 40 °C** anwärmen
+  (TDS S. 3), mit Visier öffnen; **nie Mikrowelle, nie im Trockner** zusammen mit Sensoren.
+
+1. **Abfüllen (MA-5)**, einmal je Beutel, volle Schutzausrüstung inkl. Visier, in einer **Auffangwanne** (≥ 20 × 15 cm) auf
+   nicht brennbarer Unterlage, Saugmaterial bereit: Clip **nicht** entfernen. **Zuerst A:** Ecke der Harzkammer abschneiden,
+   über einen **PE-Trichter** in Flasche A ausdrücken, Flasche schliessen. **Dann B:** Ecke der Härterkammer abschneiden,
+   **langsam** über einen zweiten Trichter in Flasche B ausdrücken (der Beutel kann an der Clip-Kante platzen), schliessen.
+   Danach am leeren Beutel den Clip entfernen und die **Reste von A und B im Beutel verkneten**, im belüfteten Raum
+   aushärten lassen, erst dann in den Kehricht (**ANNAHME**, siehe „Entsorgung“). Trichter ebenso aushärten lassen oder
+   als Sonderabfall abgeben.
+2. **Waage prüfen (MA-4):** vor jeder Sitzung mit den **Prüfgewichten 1 g und 5 g** (Klasse F/M1) kontrollieren, Anzeige in
+   die Musterliste. Abweichung > 0.02 g → nicht wägen, Waage justieren bzw. ersetzen (**ANNAHME** Grenze).
+3. **Ansatz wägen:** Flasche A vor der Entnahme gründlich aufrühren (Sediment, TDS S. 3). Mischbecher tarieren.
+   **Mindestansatz 8 g: 6.90 g A + 2.00 g B** (3.45 : 1 nach Gewicht, TDS S. 1). Je Komponente eine **eigene, beschriftete
+   Einweg-Pipette oder Spritze** (rot A, blau B), nicht aus der Flasche giessen. **Reihenfolge: A wägen, Flasche A
+   schliessen; dann B wägen, Flasche B schliessen – nie beide Flaschen gleichzeitig offen.** Bei Überschiessen nicht
+   zurückgeben, sondern den Partner nachrechnen und nachwägen. Beide Werte in die Musterliste schreiben.
+4. Mit einem Spatel **2 min** langsam rühren, Wand und Boden abstreifen, bis gleichmässig schwarz ohne Schlieren; ≈ 2 min
    stehen lassen, Blasen steigen auf. Spritzen von unten befüllen (Kolben ziehen), Kanüle aufsetzen, Luft ausstossen.
-4. Flaschen nach der Entnahme Gewinde abwischen, sofort schliessen. Härter B, der trüb wird oder eine Kruste bildet, nicht
-   verwenden (**ANNAHME**).
+5. Flaschengewinde mit einem Tuch abwischen, Flaschen in den Sekundärbehälter, abschliessen. **V-3 an jedem Ansatz**
+   (Becherrest).
 
 *Variante M-B – ganzer Beutel (TDS S. 1–2, Resin Pack):*
+0. Kristallisierter Härter: geschlossenen Beutel im Wasserbad bei 40 °C anwärmen, bis die Kristalle geschmolzen sind
+   (TDS S. 3), dann auf Raumtemperatur abkühlen lassen.
 1. Beide Endkappen abnehmen, Clip durch vorsichtiges Auseinanderziehen entfernen; Harz und Härter im Beutel **3–4 min**
    durchkneten, mit dem Clip das Material aus den Ecken streichen, bis die Farbe gleichmässig schwarz ohne Schlieren ist.
 2. Eine Ecke abschneiden und sofort 3–5 Spritzen à 1–3 ml füllen. **Den Rest sofort ausgiessen (K-1):** in eine Alu-Schale

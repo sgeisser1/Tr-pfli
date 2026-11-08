@@ -99,8 +99,9 @@ def main():
 
     # --- 4 System
     s4, pr = res["serie4"], res["proto"]
-    sysA = s4["total_chf"] + gw_plan
-    sysB = pr["total_chf"] + s4["total_chf"] + gw_plan
+    zub = cr.ZUBEHOER_VERGUSS_CHF     # Verguss-Zubehoer/Schutz einmalig je Projekt (ANNAHME-Preise, Konzept Kap. 7.1)
+    sysA = s4["total_chf"] + gw_plan + zub
+    sysB = pr["total_chf"] + s4["total_chf"] + gw_plan + zub
     unit_pre = pre["serie4"]["unit_chf"]
     sysB_lo, sysB_hi = sysB + PROG_ADAPTER_CHF[0], sysB + PROG_ADAPTER_CHF[1]
 
@@ -108,7 +109,7 @@ def main():
     w = md.write
     w("# Phase 5 – Kostenrechnung final (Sensor, Gateway, System)\n\n")
     w("| | |\n|---|---|\n")
-    w("| Stand | Sensor 2026-11-08, Gateway 2026-11-09 (D-028/D-029), erzeugt von `.venv/bin/python scripts/cost_final_phase5.py` (nicht von Hand ändern) |\n")
+    w("| Stand | Sensor 2026-11-08, Vergussmasse 2026-11-09 (Kap. 2.0), Gateway 2026-11-09 (D-028/D-029), erzeugt von `.venv/bin/python scripts/cost_final_phase5.py` (nicht von Hand ändern) |\n")
     w(f"| Kurs | 1 USD = {cm.USD_TO_CHF:.4f} CHF, {cm.FX_DATE}; + {cm.FX_CARD_MARKUP*100:.1f} % Kartenaufschlag (ANNAHME) "
       f"= {fx():.4f} CHF; 2026-11-08 ist ein Sonntag, neuester EZB-Kurs = 2026-11-06 |\n")
     w("| Sensor | `hardware/sensor/gen/cost_rev_b.py` → `scripts/cost_model.compute` (D-005), Teilepreise "
@@ -157,6 +158,15 @@ def main():
       f"bzw. **{res['serie2']['unit_chf']:.2f} CHF** (2 × 100 µF) → **erfüllt unter Vorbehalt** „Pre-reflow Soldering“ "
       f"(falls berechnet: {unit_pre:.2f} CHF, **verfehlt**, Kap. 2.1); mit Standard-PCBA "
       f"{res['std_serie']['unit_chf']:.2f} CHF (erfüllt, Paneelpreis ANNAHME).\n\n")
+    w("### 2.0 Vergussmasse (Phase 6, D-030-Vorschlag, Variante M-A)\n\n")
+    w(f"Electrolube ER2223 Resin Pack 250 g, Simpex CH CHF 38.20 exkl. MWST = **{cr.VERGUSS_BEUTEL_CHF:.2f} CHF** inkl. MWST "
+      f"(Abruf 2026-11-08). Variante M-A (abfüllen, 8-g-Ansätze wägen, `docs/manuals/MONTAGE_SENSOR.md` Kap. 3a): **1 Beutel je "
+      f"Bestellung** (angebrochen max. 3 Monate, ANNAHME). Stückkosten = Verbrauch {cr.VERGUSS_G_PRO_SENSOR:.0f} g/Sensor = "
+      f"{cr.VERGUSS_CHF_PRO_SENSOR:.2f} CHF (+5 % Ausschuss); Einmalkosten = Beutelrest (Prototyp "
+      f"{pr['verguss_once_chf']:.2f}, Serie {s4['verguss_once_chf']:.2f} CHF), Einordnung nach D-005 durch den Orchestrator. "
+      f"Zubehör/Schutzausrüstung einmalig je Projekt **{zub:.2f} CHF** (ANNAHME-Preise, in der Systemsumme Kap. 4). "
+      "Hinweis M-B (ganzer Beutel je Sitzung): Prototyp 3 + Serie 3 Beutel = "
+      f"{6 * cr.VERGUSS_BEUTEL_CHF:.2f} CHF statt {2 * cr.VERGUSS_BEUTEL_CHF:.2f} CHF.\n\n")
     w("### 2.1 Versteckte Kosten und Empfindlichkeiten\n\n")
     w("| Punkt | Wirkung | Behandlung |\n|---|---|---|\n")
     w(f"| Extended-Gebühr je Teiletyp | 10 × 3.07 = 30.70 USD je Bestellung | im Modell (Einmalkosten) |\n")
@@ -196,11 +206,12 @@ def main():
     w("| Weg | Inhalt | CHF |\n|---|---|---|\n")
     w(f"| A: direkt Serie | Serie 20 PCB / 16 bestückt / 15 Sensoren + Gateway (geplant total) | **{sysA:.2f}** |\n")
     w(f"| B: Prototyp + Serie (geplant) | Prototyp 5 + Serie 15 Sensoren + Gateway (geplant total) | **{sysB:.2f}** |\n")
+    w(f"| davon Verguss-Zubehör/Schutz (A und B je einmal) | Kap. 2.0, ANNAHME-Preise | {zub:.2f} |\n")
     w(f"| B + Programmieradapter | wie B + Adapter Rev 1 ({PROG_ADAPTER_CHF[0]:.0f}–{PROG_ADAPTER_CHF[1]:.0f} CHF, ANNAHME) | "
       f"{sysB_lo:.2f} – {sysB_hi:.2f} |\n\n")
     w(f"- Pro Sensor (Weg A, inkl. Gateway-Anteil): {sysA / 15:.2f} CHF; Weg B: {sysB / 15:.2f} CHF "
       f"(die 5 Prototypen sind zusätzlich nutzbar, falls sie die Prüfungen bestehen → dann 20 Sensoren: {sysB / 20:.2f} CHF).\n")
-    w("- Nicht enthalten: Arbeitszeit, Werkzeug, Verguss-/Dichtmittel über die Sensor-Pauschalen hinaus, "
+    w("- Nicht enthalten: Arbeitszeit, Werkzeug (ausser Verguss-Zubehör Kap. 2.0), Dichtmittel über die Sensor-Pauschalen hinaus, "
       "Status-LED-Platine Gateway, Ersatzzellen.\n\n")
 
     w("## 5 Annahmen und offene Punkte\n\n")
