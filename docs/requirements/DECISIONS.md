@@ -229,7 +229,7 @@ Format: Nr. · Datum · Entscheid · Alternativen · Begründung · Quelle · St
 - **Quelle:** `hardware/programmer/README.md`, `simulation/spice/programmer/prog_uart_report.txt` (Kapazitäten ANNAHME).
 - Offen: Sicherheitsprüfung des Adapters und Mechanik des Federstiftkopfs (Phase 5); Bootloader-Strom (W-10) PROTOTYP-PRÜFUNG.
 
-### D-025 · 2026-11-08 · Auslegungen für den Prototyp-Test (Projektleiter, **Freigabe Auftraggeber ausstehend**)
+### D-025 · 2026-11-08 · Auslegungen für den Prototyp-Test (Projektleiter, **vom Auftraggeber freigegeben 2026-11-08**)
 - **Abschaltschwelle (WS-06):** Abnahme gegen FW-5 (2.4 V VDD unter Last, `docs/interfaces/PINMAP_SENSOR.md`) statt
   2.0 V aus REQ-ENE-06, weil REQ-ENE-06 den Wert ausdrücklich als ANNAHME bis zur Chipwahl führt. 2.4 V ist strenger
   (mehr Reserve für Flash-Schreiben und Funk) und kostet rechnerisch Restkapazität (`phase5_energiebudget_final.md`).
@@ -255,3 +255,19 @@ Format: Nr. · Datum · Entscheid · Alternativen · Begründung · Quelle · St
 - **Entscheid:** Vorschlag `docs/reviews/phase5_gateway_led.md` vorläufig angenommen: Blitz alle 5 s = ok, schnelles
   Blinken = Kopplung, aus = Fehler/Nacht; 3-mm-LED an GPIO17 ohne Platine.
 - **Alternativen:** siehe Vorlage. **Status:** gültig „für den Moment“, Anpassung nach Mustertest möglich.
+
+### D-028 · 2026-11-08 · Gateway ohne RTC (Auftraggeber)
+- **Entscheid:** Kein RTC-Modul im Gateway (weder Muster noch Serie). Zeit per NTP über das Geschäfts-WLAN; ohne
+  Netz greift der vorhandene Rückfall (Handyzeit beim Öffnen der App, nachträgliche Korrektur, `phase5_gateway_zeit.md`).
+- **Alternativen:** Adafruit 4282 DS3231 (≈ 15 CHF, Platzproblem F-5, CR1220 im Gerät).
+- **Begründung:** Gateway steht dauerhaft im Geschäfts-WLAN; spart Kosten, eine Knopfzelle und Platz.
+- **Status:** gültig. Folge: G4/G5 aus BOM_GATEWAY, RTC-Platzhalter aus dem Gehäuse, CR1220 entfällt.
+
+### D-029 · 2026-11-08 · Klimasensor Gateway: kleineres SHT4x-Breakout (Auftraggeber, Variante c)
+- **Entscheid:** Statt Grove SHT41 (20 × 40 mm, nicht an Lager) ein kleineres SHT4x-Breakout, das in die Klimakammer
+  passt (I2C 0x44, D-017). Auswahl mit Datenblatt, Massen und Bezugsquelle in Phase 6.
+- **Alternativen:** (a) Sensor aussen am Kabel, (b) Gateway grösser.
+- **Status:** gültig, Teilewahl offen (Phase 6).
+
+### Freigabe Phase 5 · 2026-11-08
+- Auftraggeber gibt Phase 5 frei und startet Phase 6. Musterbestellung erst am Schluss (nach Phase 6).
