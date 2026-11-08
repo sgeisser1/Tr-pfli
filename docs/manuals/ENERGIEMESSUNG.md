@@ -9,7 +9,7 @@
 
 **Sicherheit (CONCEPTS 2.7, Auflage R2-A2):** Strommessung nur ueber den **Mess-Zwischenadapter im Zellhalter
 (nur Amperemeter/Shunt, keine Quelle in Serie zur Zelle)**. Speisung aus dem Labornetzteil nur ueber den
-Dummy-Zellen-Adapter **ohne** Zelle. Strombegrenzung des Netzteils ≤ 20 mA. Keine Speisung ueber TP1/TP2.
+Dummy-Zellen-Adapter **ohne** Zelle. Strombegrenzung des Netzteils: Programmieren 10 mA, Funktions-/Energietests 3.0 V / 30 mA, nur ueber die Dummy-Scheibe, nie mit Zelle im Clip (Testplan EP-03). Keine Speisung ueber TP1/TP2 (einzige Ausnahme PT11.06/ST-Z5).
 
 ## 1 Messaufbauten
 

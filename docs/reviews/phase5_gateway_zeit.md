@@ -10,7 +10,7 @@ Stand 2026-11-08 · Verfasser: Software-Agent · Status: **Vorlage für den Auft
 | Pi Zero 2 W hat keine RTC | `docs/datasheets/INDEX.csv` Zeile GW-SBC1 (Product Brief), Red-Team W-8 (`phase4_redteam_gesamt.md` Z. 185 ff.) |
 | RTC-Baustein: Stand Phase 4 offen (OP-GW-3). **Parallel in Phase 5** hat die Hardware lokal abgelegt: `docs/datasheets/Maxim_DS3231_Datasheet_19-5170Rev10.pdf`, Adafruit PiRTC 4282 (Schaltplan + `hardware/gateway/check_rtc_schematic.py`: VBAT nur an der CR1220, kein Ladepfad), Adafruit-Anleitung `docs/appnotes/Adafruit_AddingRTC-RaspberryPi_Guide_2026-04-07.pdf`, Preise `docs/references/pi-shop_Gateway-Teile_Auszug_2026-11-08.txt`. Auswahl/BOM/Kosten: Hardware (W-8, `phase5_kosten_final.md`) | `INDEX.csv` GW-RTC (Stand beim Lesen noch „offen“), ARCHITECTURE Z. 331 |
 | Sensor hat keine Uhrzeit, nur `boot_id` + `uptime` (32.768-kHz-Quarz, Budget 48 ppm); Gateway rechnet mit Synchronpunkten um | `firmware/PROTOCOL.md` Kap. 7 |
-| Ohne RTC stellt `systemd-timesyncd` die Uhr beim Start auf die zuletzt gespeicherte Zeit (`/var/lib/systemd/timesync/clock`, Speicherung alle `SaveIntervalSec` = 60 s); sie läuft also „ungefähr monoton“, ist aber nach einem Ausfall um die Ausfalldauer zu spät | `man systemd-timesyncd`, `man timesyncd.conf` (systemd 255 in WSL). **ANNAHME:** Raspberry Pi OS verhält sich gleich (dort andere systemd-Version) → **PROTOTYP-PRÜFUNG T-Z1** |
+| Ohne RTC stellt `systemd-timesyncd` die Uhr beim Start auf die zuletzt gespeicherte Zeit (`/var/lib/systemd/timesync/clock`, Speicherung alle `SaveIntervalSec` = 60 s); sie läuft also „ungefähr monoton“, ist aber nach einem Ausfall um die Ausfalldauer zu spät | `man systemd-timesyncd`, `man timesyncd.conf` (systemd 255 in WSL). **ANNAHME:** Raspberry Pi OS verhält sich gleich (dort andere systemd-Version) → **PROTOTYP-PRÜFUNG GZ-1** |
 
 ## 2 Verhalten des Codes (geprüft)
 
@@ -80,10 +80,10 @@ sondern an der **Sensor-Laufzeit** (`timesync.py`). Nach einem Stromausfall ohne
 
 | Nr. | Prüfung |
 |---|---|
-| T-Z1 | Pi ohne Netz 1 h und 25 h stromlos; danach `timedatectl`, `GET /system` (`time.valid=false`, `source=none`), Systemzeit ≈ letzte Speicherung |
-| T-Z2 | App öffnen und anmelden → `source=browser`, Ereignis „Zeit von der PWA übernommen“, Werte der Ausfallzeit nach der nächsten Sitzung ohne Flag 2, Abweichung zu einer Referenzuhr ≤ 2 s je Sensor |
-| T-Z3 | (nach V-1) wie T-Z1 ohne App: `source=sensor` nach dem ersten Sensorkontakt, Abweichung ≤ 5 s nach 25 h |
-| T-Z4 | Handyuhr auf 2001 stellen → API 400, Ereignis `time_browser_rejected`, kein TIME_SET |
+| GZ-1 | Pi ohne Netz 1 h und 25 h stromlos; danach `timedatectl`, `GET /system` (`time.valid=false`, `source=none`), Systemzeit ≈ letzte Speicherung |
+| GZ-2 | App öffnen und anmelden → `source=browser`, Ereignis „Zeit von der PWA übernommen“, Werte der Ausfallzeit nach der nächsten Sitzung ohne Flag 2, Abweichung zu einer Referenzuhr ≤ 2 s je Sensor |
+| GZ-3 | (nach V-1) wie GZ-1 ohne App: `source=sensor` nach dem ersten Sensorkontakt, Abweichung ≤ 5 s nach 25 h |
+| GZ-4 | Handyuhr auf 2001 stellen → API 400, Ereignis `time_browser_rejected`, kein TIME_SET |
 
 ## 7 Geänderte Dateien und Tests
 

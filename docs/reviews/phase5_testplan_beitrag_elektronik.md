@@ -10,7 +10,7 @@
 | Ablage | Protokoll je Muster (Nr. 1–5, Datum, Temperatur, Messmittel, Messwert, OK/NOK, Foto) unter `docs/reviews/phase5_inbetriebnahme/` |
 
 **Grundregel (R2-A2, REQ-SAF-CC-03):** Fremdspeisung nur über die Dummy-Scheibe bzw. den Dummy-Zellen-Adapter in der
-Zellposition **ohne Zelle**, Strombegrenzung ≤ 10 mA (bei Programmierung ≤ 20 mA). Nie eine Quelle in Serie zu einer
+Zellposition **ohne Zelle**, Strombegrenzung nach Testplan EP-03: Programmieren 10 mA, Funktionstests 3.0 V / 30 mA nur über die Dummy-Scheibe. Nie eine Quelle in Serie zu einer
 echten Zelle, nie Speisung über TP1/TP2. Abbruch bei Erwärmung, Geruch oder Strom an der Begrenzung.
 
 ## 1 Messmittel
@@ -77,7 +77,7 @@ Plan: `hardware/sensor/out/pdf/fluidi_sensor_masszeichnung.pdf` Blatt 2 (Höhenz
 | EI-10 | Netzteil 3.0 V, Begrenzung **10 mA**, über Dummy-Scheibe; Strom beim Einschalten und nach 10 s ablesen | Begrenzung nicht erreicht; kein Bauteil warm (Finger/Thermometer). Unprogrammiert ist der Strom unbekannt (ROM-Bootloader, W-10) → Wert protokollieren | **ST-E2**; W-10 |
 | EI-11 | VDD an C1, Spannungsabfall VBAT–VDD an Q1 | VDD ≈ VBAT; Abfall über Q1 mit RDS(on) < 85 mΩ bei −2.5 V (`AOS_AO3401A_Datasheet_Rev3.1.pdf` S.2) bei mA-Strömen < 5 mV | Verpolschutz leitet |
 | EI-12 | **Verpolschutz kurz:** gleiche Speisung verpolt (Minus an Clip-Pad), 10 s | Strom ≤ 1 µA (Bereich µA über 1 kΩ-Shunt), keine Erwärmung, danach normaler Start | **ST-E2**; Dauertest 24 h mit Zelle = **ST-Z1** (REQ-SAF-CC-01, ≤ 5 µA) |
-| EI-13 | Programmieren (Behelf Weg B, 2.0 V, ≤ 20 mA) | Programmieren + Verifizieren OK, Neustart zeigt L11 | **T-P1**, D-024, `PROGRAMMIEREN_SENSOR.md` |
+| EI-13 | Programmieren (Behelf Weg B, 2.0 V, 10 mA) | Programmieren + Verifizieren OK, Neustart zeigt L11 | **T-P1**, D-024, `PROGRAMMIEREN_SENSOR.md` |
 | EI-14 | **Bootloader-Strom (W-10)**: Taster beim Einschalten gehalten, Strom über 60 s mitteln, bei 3.0 V und 2.0 V | Wert in PROGRAMMIEREN_SENSOR Kap. 6 eintragen; nach ≥ 10 s ohne Speisung startet das Muster ohne Taster mit L11 | **E15** (Firmware-Beitrag 2.2) |
 
 ### 3.4 Ruhestrom und Leckstrom C1–C4

@@ -18,7 +18,7 @@ App `node --test tests/` **11/11**, `unittest tests.test_calc tests.test_pwa` **
 | P-4 | ACK erst nach COMMIT, nur bis zur lückenlos gespeicherten seq (6.2 Regel 2) | `model.contiguous_ack`, WAL + `synchronous=FULL` (`store.py` Z. 69–70), Test Nachlieferung | E |
 | P-5 | Ring-Überlauf gemeldet (`lost_records`) | `test_ring_overflow_reported` | E |
 | P-6 | Zeitsprung Sensor (Batteriewechsel ohne Gateway) | `test_reboot_without_gateway`, `TimeSync.*` | E |
-| P-7 | Gateway ohne gültige Zeit: kein TIME_SET, Flag 2, Rückrechnung nach Abgleich | `test_time.py`, `phase5_gateway_zeit.md` | E (Gerät: T-Z1/T-Z2) |
+| P-7 | Gateway ohne gültige Zeit: kein TIME_SET, Flag 2, Rückrechnung nach Abgleich | `test_time.py`, `phase5_gateway_zeit.md` | E (Gerät: GZ-1/GZ-2) |
 | P-8 | Unbekannter Sensor ausserhalb Kopplungsfenster: kein Verbindungsaufbau | `test_session.Pairing` „Fremder Sensor“ | E |
 | P-9 | Klartext-ERROR ändert keinen Zustand (2.5 Nr. 6, Ä-15) | `central.py` Z. 281–288 (nur Anzeige, Kommentar Befund W-8) | E |
 | P-10 | Fristen/Sperre (4.5): Fristüberschreitung ≠ Fehlversuch, 10 → Sperre | `test_session.SensorRules.*` | E |

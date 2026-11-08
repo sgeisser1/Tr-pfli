@@ -228,3 +228,14 @@ Format: Nr. · Datum · Entscheid · Alternativen · Begründung · Quelle · St
   SN74LVC1G17 (Leckstrom ±5 µA über 200 kΩ → bis 1 V).
 - **Quelle:** `hardware/programmer/README.md`, `simulation/spice/programmer/prog_uart_report.txt` (Kapazitäten ANNAHME).
 - Offen: Sicherheitsprüfung des Adapters und Mechanik des Federstiftkopfs (Phase 5); Bootloader-Strom (W-10) PROTOTYP-PRÜFUNG.
+
+### D-025 · 2026-11-08 · Auslegungen für den Prototyp-Test (Projektleiter, **Freigabe Auftraggeber ausstehend**)
+- **Abschaltschwelle (WS-06):** Abnahme gegen FW-5 (2.4 V VDD unter Last, `docs/interfaces/PINMAP_SENSOR.md`) statt
+  2.0 V aus REQ-ENE-06, weil REQ-ENE-06 den Wert ausdrücklich als ANNAHME bis zur Chipwahl führt. 2.4 V ist strenger
+  (mehr Reserve für Flash-Schreiben und Funk) und kostet rechnerisch Restkapazität (`phase5_energiebudget_final.md`).
+- **Leckstrom-Grenze REQ-ENE-08 (W-6):** „Maximalwert“ der MLCC-Leckströme wird am Muster bestimmt: gemessener
+  Höchstwert (E14, 25/50 °C, Sonnenprofil) × 1.5 ersetzt die Katalog-Leckgrenze; Entscheidungsregel 2 oder 4 × 100 µF
+  nach `docs/reviews/phase5_energiebudget_final.md` Kap. W-6.
+- **Testplan-Widersprüche WS-01…WS-18:** entschieden in `docs/reviews/phase5_testplan_prototyp.md` Kap. 10 (EP-01…EP-18).
+- Alternativen: Anforderungen wörtlich (2.0 V; Katalog-Maximalwert → REQ-ENE-02 mit 4 × 100 µF nicht erfüllbar).
+- Quelle: Testplan Entwurf 2, Firmware-Bericht Phase 5, Sicherheit Runde 3.
