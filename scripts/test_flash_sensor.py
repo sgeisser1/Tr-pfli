@@ -240,6 +240,11 @@ class TestRealBuild(unittest.TestCase):
     @unittest.skipUnless(os.path.exists(FACTORY), "Werks-Hex fehlt")
     def test_factory_with_dev_key_cannot_be_locked(self):
         flash, _, _ = fs.load_hex(FACTORY)
+        if fs.dev_key_fp() not in fs.mcuboot_key_fps(flash):
+            # make release SIGN_KEY=<eigener Schluessel>: Hex traegt den Produktionsschluessel -> DEV-Sperrtest entfaellt
+            # (Schutz fuer den DEV-Fall bleibt in allen DEV-Builds; Produktionsschluessel prueft test_lock_* synthetisch)
+            self.skipTest("Werks-Hex nicht mit dem DEV-Schluessel signiert (MCUboot-Schluessel %s)"
+                          % ", ".join(fs.mcuboot_key_fps(flash)))
         self.assertEqual(fs.mcuboot_key_fps(flash), [fs.dev_key_fp()])
         self.assertIn(fs.dev_key_fp(), os.path.basename(FACTORY))          # Fingerabdruck im Dateinamen
         with self.assertRaises(fs.BootloaderError):
