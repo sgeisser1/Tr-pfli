@@ -324,3 +324,6 @@ Format: Nr. · Datum · Entscheid · Alternativen · Begründung · Quelle · St
 - **Quelle:** `docs/reviews/phase6_sicherheit_schluss.md` Abschnitt „REQ-SAF-CC-04 Schraube“; UL 4200A-Auszug (Intertek)
   noch lokal abzulegen.
 - **Status:** gültig für Muster und Kleinserie.
+
+### Freigabe Phase 6 · 2026-11-09
+- Auftraggeber gibt Phase 6 frei (Entwicklung abgeschlossen). Einwegartikel (Pipetten, Spritzen, Trichter) sind nicht vorhanden und bleiben in der Einkaufsliste.
