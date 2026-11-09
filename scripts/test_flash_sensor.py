@@ -32,14 +32,18 @@ def dev_key():
     return serialization.load_pem_private_key(open(fs.DEV_KEY, "rb").read(), None)
 
 
-def make_hex(path, with_ccfg=True, key=None):
+def make_hex(path, with_ccfg=True, key=None, build=None):
     from intelhex import IntelHex
     ih = IntelHex()
     boot = bytearray((i * 7) & 0xFF for i in range(5000))
     if key is not None:
         boot[0x800:0x800 + 91] = spki(key)                 # eingebauter oeffentlicher Schluessel (wie fluidi_keys.c)
     ih.frombytes(bytes(boot), offset=0)
-    ih.frombytes(bytes((i * 3 + 1) & 0xFF for i in range(3000)), offset=0x6000)
+    slot0 = bytearray((i * 3 + 1) & 0xFF for i in range(3000))
+    if build is not None:                                  # MCUboot-Kopf: Magic, ih_ver (0.1.1+build) ab +20
+        struct.pack_into("<I", slot0, 0, 0x96F3B83D)
+        struct.pack_into("<BBHI", slot0, 20, 0, 1, 1, build)
+    ih.frombytes(bytes(slot0), offset=0x6000)
     if with_ccfg:
         c = bytearray(b"\xff" * fs.CCFG_SIZE)
         struct.pack_into("<IIII", c, 0, 0xFFFFFFF0, 0x00150003, 0, 0)
@@ -168,6 +172,54 @@ class TestProgram(unittest.TestCase):
         self.assertEqual(fs.main(["program", "--dry-run", "--hex", self.hex, "--lock"]), 2)   # ohne Fingerabdruck
 
 
+class TestTestfirmware(unittest.TestCase):
+    """Sicherheit W-2: Testfirmware-Hex nur mit ausdruecklicher Bestaetigung --testfw n, nie mit --lock."""
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+
+    def _hex(self, name, build):
+        p = os.path.join(self.tmp, name)
+        make_hex(p, build=build)
+        return p
+
+    def test_detect(self):
+        flash, _, _ = fs.load_hex(self._hex("a.hex", 9201))
+        self.assertEqual(fs.image_version(flash), (0, 1, 1, 9201))
+        self.assertEqual(fs.testfw_variant(flash), 2)
+        flash, _, _ = fs.load_hex(self._hex("b.hex", 1))
+        self.assertIsNone(fs.testfw_variant(flash))
+        self.assertEqual(fs.testfw_variant(flash, "/x/fluidi-sensor-tf3-factory-0.1.1+9301-keyab.hex"), 3)  # Dateiname
+        flash, _, _ = fs.load_hex(self._hex("c.hex", None))       # ohne Kopf
+        self.assertIsNone(fs.image_version(flash))
+
+    def test_program_requires_confirmation(self):
+        h = self._hex("tf.hex", 9401)
+        with self.assertRaises(fs.BootloaderError):
+            fs.program(fs.Link(fs.SimDevice()), h, lock=False, out=lambda m: None)
+        with self.assertRaises(fs.BootloaderError):                      # falsche Nummer
+            fs.program(fs.Link(fs.SimDevice()), h, lock=False, out=lambda m: None, testfw=2)
+        msgs = []
+        dev = fs.SimDevice()
+        fs.program(fs.Link(dev), h, lock=False, out=msgs.append, testfw=4)
+        self.assertTrue(dev.reset_done and any("TESTFIRMWARE TF-4" in m for m in msgs))
+
+    def test_lock_and_serial_confirm_refused(self):
+        h = self._hex("tf.hex", 9101)
+        with self.assertRaises(fs.BootloaderError):
+            fs.check_testfw(fs.load_hex(h)[0], h, 1, lock=True)
+        s = self._hex("serie.hex", 1)
+        with self.assertRaises(fs.BootloaderError):                      # --testfw an einer Serien-Datei
+            fs.check_testfw(fs.load_hex(s)[0], s, 1, lock=False)
+        self.assertIsNone(fs.check_testfw(fs.load_hex(s)[0], s, None, lock=False))
+
+    def test_cli(self):
+        h = self._hex("tf.hex", 9201)
+        self.assertEqual(fs.main(["program", "--sim", "--yes", "--hex", h]), 2)        # --yes genuegt nicht
+        self.assertEqual(fs.main(["program", "--sim", "--hex", h, "--testfw", "2"]), 0)
+        self.assertEqual(fs.main(["program", "--dry-run", "--hex", h]), 0)             # Plan zeigt nur die Warnung
+
+
 @unittest.skipUnless(os.path.exists(MCUBOOT_HEX), "MCUboot-Build fehlt (make in firmware/sensor)")
 class TestRealBuild(unittest.TestCase):
     def test_ccfg_crc_matches_sdk_crc_tool(self):
@@ -198,6 +250,23 @@ class TestRealBuild(unittest.TestCase):
         dev = fs.SimDevice()
         fs.program(fs.Link(dev), FACTORY, lock=False, out=lambda m: None)
         self.assertEqual(struct.unpack_from("<I", dev.flash, 0x6000)[0], 0x96F3B83D)   # MCUboot-Kopf in Slot 0
+
+    @unittest.skipUnless(os.path.exists(FACTORY), "Werks-Hex fehlt")
+    def test_real_factory_is_not_testfw(self):
+        flash, _, _ = fs.load_hex(FACTORY)
+        v = fs.image_version(flash)
+        self.assertTrue(v is not None and v[3] < 9000)
+        self.assertIsNone(fs.testfw_variant(flash, FACTORY))
+
+    def test_real_tf_factory_detected(self):
+        tf = sorted(glob.glob(os.path.join(HERE, "..", "firmware", "sensor", "build-tf*", "fluidi-sensor-tf*-factory-*.hex")))
+        if not tf:
+            self.skipTest("kein TF-Build (make TESTFW=n)")
+        for p in tf:
+            flash, _, _ = fs.load_hex(p)
+            n = int(os.path.basename(os.path.dirname(p))[-1])
+            self.assertEqual(fs.testfw_variant(flash), n, p)                       # aus dem Kopf, nicht dem Namen
+            self.assertEqual(fs.testfw_variant(flash, ""), n)
 
 
 if __name__ == "__main__":

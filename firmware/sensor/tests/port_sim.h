@@ -28,6 +28,9 @@ typedef struct {
     uint32_t flash_writes, flash_erases;
     /* Testfirmware (FLUIDI_TESTFW) */
     uint32_t tf_hangs, tf_fatal_series, tf_fatal_hf, tf3_reads;
+    /* C-1: IO-Latches nach Shutdown (TRM S. 261/343/350): Ausgaenge eingefroren und RSTSTA.SDDET klebt bis zur Freigabe */
+    bool latched, sddet;
+    uint32_t rr_reads, io_releases, rr_reads_at_release, latched_violations;
     uint8_t tf3_fail_stage;              /* 0 = TMP antwortet, sonst Fehlerstufe 1..3 */
 } sim_t;
 

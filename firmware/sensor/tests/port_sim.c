@@ -78,6 +78,7 @@ int fl_port_measure(fl_meas_raw_t *raw, uint8_t n, bool with_t2)
     const double cvdd = -5.333 * (3000 - sim.vbat) / 1000.0;   /* scheinbare C-Verschiebung */
     memset(raw, 0, sizeof *raw);
     sim.meas_calls++;
+    if (sim.latched) sim.latched_violations++;                  /* C-1: Messkette (DIO11/SENS_PWR) eingefroren */
     raw->n = n; raw->temp_ok = sim.temp_ok; raw->temp_c100 = sim.temp; raw->vbat_load_mv = sim.vbat_load ? sim.vbat_load : sim.vbat;
     raw->vdd_ref_mv = sim.vbat;
     if (sim.osc_dead) { raw->osc_timeout = true; return -1; }
@@ -100,6 +101,7 @@ uint16_t fl_port_vbat_mv(void) { return sim.vbat; }   /* Ruhewert; Lastwert nur 
 void fl_port_led(uint8_t col, uint8_t level)
 {
     (void)level;
+    if (sim.latched) { sim.latched_violations++; return; }      /* C-1: LED-Pins eingefroren, keine Anzeige */
     if (col && col != sim.led_col) { sim.led_on_events++; sim.led_last_on = col; }
     sim.led_col = col;
 }
@@ -167,9 +169,18 @@ bool fl_port_image_confirmed(void) { return sim.image_confirmed; }
 void fl_port_fw_version(uint8_t v[4], uint32_t *b, uint32_t *sc) { memcpy(v, sim.fw_ver, 4); *b = sim.fw_build; *sc = sim.sec_cnt; }
 
 /* ---- System ---- */
-uint8_t fl_port_reset_reason(void) { return sim.reset_reason; }
+/* Hardware-Modell C-1: solange SDDET/IOWUSD kleben (nach Shutdown, ohne SLPN), liefert der Gleichheitsvergleich in
+ * fl_hw.c fuer jeden Systemreset POWER_ON; nur das Wecken selbst (Pin) wird richtig erkannt. fl_hw.c haelt RSTSTA
+ * je Start einmal fest -> hier liefert jeder weitere Aufruf denselben Wert (sim.reset_reason). */
+uint8_t fl_port_reset_reason(void)
+{
+    sim.rr_reads++;
+    if (sim.sddet && sim.reset_reason != FL_RR_PIN && sim.reset_reason != FL_RR_POWER_ON) return FL_RR_POWER_ON;
+    return sim.reset_reason;
+}
+void fl_port_io_release(void) { sim.io_releases++; sim.rr_reads_at_release = sim.rr_reads; sim.latched = false; sim.sddet = false; }
 void fl_port_reboot(void) { sim.reboots++; }
-void fl_port_shutdown(void) { sim.shutdowns++; sim.shutdown_wake = !sim.button_level; sim.pullup = !sim.button_level; }
+void fl_port_shutdown(void) { sim.shutdowns++; sim.latched = true; sim.sddet = true; sim.shutdown_wake = !sim.button_level; sim.pullup = !sim.button_level; }
 uint32_t fl_port_retained_get(void) { return sim.retained; }
 void fl_port_retained_set(uint32_t v) { sim.retained = v & 0x3FFFFu; }
 /* Nachbildung von fl_fault_handler: AONRCLR1 = FL_RET_PLANNED, AONRSET1 = FL_RET_FAULT, PMCTLResetSystem

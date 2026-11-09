@@ -191,11 +191,29 @@ Handler nur FAULT → ABN-Zähler verloren (Abschaltung einen Zyklus später). F
 
 | Befund | Stufe | Antwort Ersteller |
 |---|---|---|
-| C-1 IO-Latches nach Shutdown | kritisch | |
-| W-1 REG3V3 bei VDDS-Brownout | wichtig | |
-| W-2 Fehler vor `fl_app_init` | wichtig | |
-| W-3 TF-3-Leckauswertung | wichtig | |
-| K-1 noreturn-Warnung | klein | |
-| K-2 tCONV 15 ms | klein | |
-| K-3 TF-1 ohne UV-Überwachung | klein | |
-| K-4 Retention-Schreiben nicht atomar | klein | |
+| C-1 IO-Latches nach Shutdown | kritisch | umgesetzt |
+| W-1 REG3V3 bei VDDS-Brownout | wichtig | umgesetzt (1, 2); (3) nach Messergebnis |
+| W-2 Fehler vor `fl_app_init` | wichtig | umgesetzt |
+| W-3 TF-3-Leckauswertung | wichtig | umgesetzt |
+| K-1 noreturn-Warnung | klein | umgesetzt |
+| K-2 tCONV 15 ms | klein | umgesetzt |
+| K-3 TF-1 ohne UV-Überwachung | klein | umgesetzt |
+| K-4 Retention-Schreiben nicht atomar | klein | umgesetzt |
+
+## Antwort Ersteller (Firmware, 2026-11-09, Stand nach `42fb7cd`, nicht committet)
+
+Nachweis: `make`, `make TESTFW=1..4`, `make check` seriell, alle RC 0, **keine Compiler-Warnung** mehr. Host-Tests Serie
+1589 (vorher 1569; neu `[latch]` und `[early]`), TF-1 24, TF-2 77, TF-3 25, TF-4 14; `test_flash_sensor.py` 23,
+`test_testfw_eval.py` 13, `test_pairing_mitm.py` 3. `check_fault_vectors.py` in allen 5 Builds [ok].
+
+| Befund | Antwort | Umsetzung / Beleg |
+|---|---|---|
+| **C-1** | **umgesetzt** | `fl_platform_early_init` (`platform/cc23/fl_hw.c`): RSTSTA zuerst einmal lesen und speichern (`fl_port_reset_reason` gibt danach immer den gespeicherten Wert zurück), dann `GPIO_init`, `pins_sleep_state`, `BatteryMonitor_init`, dann `fl_app_early()` (`core/fl_app.c`). Dieses liest den Grund **vor** `fl_port_io_release()` = `PowerLPF3_releaseLatches()` (SDK `PowerCC23X0.h` Z. 446–449, schreibt SLPCTL 0x4000000C ← 1, im Disassemblat geprüft; TRM S. 343 Tab. 6-76, S. 350 Tab. 6-83). Die Freigabe läuft bei jedem Start; ohne vorherigen Shutdown hat der Boot-Code SLPN schon gesetzt. **MCUboot:** greift nicht auf die Latches zu (grep `SLPCTL`/`releaseLatches` im SDK-MCUboot und in `firmware/sensor/mcuboot`: keine Treffer) und darf es nicht: Sonst fielen DIO11/SENS_PWR/LEDs schon vor der Pin-Konfiguration der Anwendung in den Reset-Zustand (Glitch, TRM S. 343 „reconfigure … before setting“). Folge: Die rote Fehler-LED von MCUboot (`fluidi_led_debug.c`) bleibt im Start direkt nach einem Shutdown-Wecken unsichtbar; das ist hingenommen und dokumentiert. **Host-Test** `test_latch`: Die Simulation bildet nach, dass Ausgänge eingefroren bleiben und SDDET klebt (dann liefert jeder Systemreset POWER_ON). Geprüft: Grund vor der Freigabe gelesen, LED (L11) und Messung nach dem Wecken, danach Absturz → hardfault, REBOOT → software. Gegenprobe: Ohne den Aufruf schlagen 8 Prüfungen fehl. **PROTOTYP-PRÜFUNG:** Testplan PT11.07a, TESTFIRMWARE O-8 |
+| **W-1** | **umgesetzt** (Punkte 1 und 2); Punkt 3 entscheidet sich nach dem Messergebnis | (1) Kommentare `fl_app.h` (Retention-Bits) und `fl_hw.c` (`fl_port_retained_*`): „VDDS-Brownout unklar (TRM S. 265 gegen Tab. 8-1 S. 419)“; die TRM-Stellen habe ich selbst nachgelesen. (2) PROTOTYP-PRÜFUNG mit TF-4 (`ret_boot`, `reset_reason`): TESTFIRMWARE O-9, Testplan PT11.07c. (3) NV-Zähler bzw. aufgeschobenes Schreiben erst, wenn die Messung den Verlust von REG3V3 zeigt (Entscheid Firmware/Sicherheit) |
+| **W-2** | **umgesetzt** | Zählung und Abschaltung in `fl_app_early` (`core/fl_app.c`), aufgerufen aus `fl_platform_early_init` **vor** `BLEAppUtil_init` (`fl_ble.c` `appMain`), nur Register und Pins, kein Flash, keine RTOS-Dienste. Abnormale Neustarts (Watchdog, Brownout, hardfault/FAULT-Bit, ungeplanter Software-Reset) werden sofort im Retention-Register gezählt; beim 3. Start Abschaltung (BACKOFF, Tasterwecken). `fl_app_init` übernimmt das Ergebnis ohne Doppelzählung (ruft `fl_app_early` selbst nur auf, wenn es noch nicht lief, z. B. in den Host-Tests). Gegenüber dem Vorschlag „Handler erhöht den Zähler“ deckt das auch Watchdog- und Lockup-Neustarts vor der Initialisierung ab. **Host-Test** `test_early`: 3 Abstürze nur mit Frühstart → Abschaltung, 0 NV-, Flash-Schreib- und Löschvorgänge; Früh- plus Spätstart zählen einmal; Watchdog plus Absturz gemischt. FMEA F-67 (`phase5_fmea_light.md`). PROTOTYP-PRÜFUNG PT11.07b, TESTFIRMWARE O-10: TF-2 hat keinen freien Modus, daher Prüfung mit SWD am offenen Muster. `Power_shutdown` vor dem Scheduler ist erst am Muster belegt (Teil von PT11.07b) |
+| **W-3** | **umgesetzt** | TESTFIRMWARE 7.1 und Kap. 7 sowie Testplan PT11.19: Leck = Δ(nach) − Δ(t0) am selben Muster, t0 nach dem Verguss vor den Zyklen, beide bei 25 °C; Auswertung nur im flachen Abschnitt (≥ 2 s nach bzw. vor einem Ereignis); Begründung mit IIN ≤ 1 µA und IDD_SD bei 25 °C ([TMP] S. 7 Tab. 6.6) |
+| **K-1** | **umgesetzt** | `__builtin_unreachable()` nach `PMCTLResetSystem()` (das in `pmctl.h` Z. 171 mit `while (1)` endet). Code unverändert und stackfrei, Warnung weg |
+| **K-2** | **umgesetzt** | `FLUIDI_TMP_CONV_MS` 16 (`config/fluidi_board.h`), gilt für Serie und TF-3 |
+| **K-3** | **umgesetzt** | TESTFIRMWARE Kap. 7 PT5.12 und Testplan PT5.12: frische Zelle bzw. 3.0 V über die Dummy-Scheibe; Grund „brownout“ = Versorgung prüfen und wiederholen |
+| **K-4** | **umgesetzt** | `fl_port_retained_set`: erst AONRSET1 = v, dann AONRCLR1 = ~v. Damit ist zu keinem Zeitpunkt ein Bit gelöscht, das bleiben soll |
+

@@ -429,9 +429,14 @@ void fl_port_fw_version(uint8_t v[4], uint32_t *b, uint32_t *sec_cnt)
 static Watchdog_Handle s_wdt;
 void fl_port_wdt_kick(void) { if (s_wdt) Watchdog_clear(s_wdt); }
 
+/* C-1: RSTSTA einmal festhalten (fl_platform_early_init, vor der IO-Freigabe): PMCTL.SLPCTL.SLPN loescht SDDET/IOWUSD
+ * (TRM SWCU193A S. 350 Tab. 6-83; SDK PowerCC23X0.h Z. 433-449, Hinweis zu PowerLPF3_releaseLatches) */
+static uint32_t s_rststa;
+static bool s_rststa_valid;
 uint8_t fl_port_reset_reason(void)
 {
-    uint32_t r = PMCTLGetResetReason();
+    if (!s_rststa_valid) { s_rststa = PMCTLGetResetReason(); s_rststa_valid = true; }
+    uint32_t r = s_rststa;
     if (r == PMCTL_RESET_WATCHDOG) return FL_RR_WATCHDOG;
     if (r == PMCTL_RESET_SYSTEM || r == PMCTL_RESET_CPU) return FL_RR_SOFTWARE;
     if (r == PMCTL_RESET_LOCKUP) return FL_RR_HARDFAULT;
@@ -440,6 +445,13 @@ uint8_t fl_port_reset_reason(void)
     return FL_RR_POWER_ON;
 }
 void fl_port_reboot(void) { PMCTLResetSystem(); }
+/* C-1: Nach dem Wecken aus Shutdown bleiben alle IOs verriegelt (TRM SWCU193A S. 261 Kap. 6.4.2), bis die Anwendung
+ * nach dem Konfigurieren der Pins PMCTL.SLPCTL.SLPN setzt (TRM S. 343 Tab. 6-76: der Boot-Code setzt es sonst selbst,
+ * "unless waking up from a SHUTDOWN"). SDK: PowerLPF3_releaseLatches (PowerCC23X0.h Z. 446-449), Beispiel
+ * examples/rtos/LP_EM_CC2340R5/drivers/gpioshutdown/gpioshutdown.c Z. 66-69. Ohne Shutdown ist SLPN schon gesetzt;
+ * erneutes Setzen aendert nichts. MCUboot fasst die Latches nicht an (grep SLPCTL/releaseLatches: keine Treffer) und
+ * darf es nicht: sonst fielen die Pins vor fl_platform_early_init in den Reset-Zustand (DIO11 offen usw.). */
+void fl_port_io_release(void) { (void)fl_port_reset_reason(); PowerLPF3_releaseLatches(); }
 void fl_port_shutdown(void)
 {
     /* Unterspannung (FW-5) / Reset-Schleife (F-W3): alles aus, Wecken ueber Taster (Shutdown-Wakeup low an DIO21).
@@ -457,12 +469,16 @@ void fl_port_shutdown(void)
     Power_shutdown(0, 0);
 }
 
-/* Retention-Register PMCTL.AONRSTA1 (18 bit, ueberlebt Reset/Shutdown, Power-on = 0; TRM 8.4.2, S.459-460) */
+/* Retention-Register PMCTL.AONRSTA1 (18 bit, Power-on = 0; TRM 8.4.2, S.459-460). Ueberlebt Reset, Shutdown,
+ * VDDR-Brownout (TRM S. 419-420 Tab. 8-1); VDDS-Brownout UNKLAR: TRM S. 265 Kap. 6.8 "only reset on POR" gegen
+ * Tab. 8-1 S. 419 "retention: None" -> PROTOTYP-PRUEFUNG mit TF-4 (TESTFIRMWARE.md, Elektronik-Pruefung W-1).
+ * K-4: erst setzen, dann loeschen -> zu keinem Zeitpunkt sind Bits geloescht, die in v bleiben (Ausnahme dazwischen
+ * verliert den Reset-Schleifen-Zaehler nicht). */
 uint32_t fl_port_retained_get(void) { return HWREG(PMCTL_BASE + PMCTL_O_AONRSTA1) & PMCTL_AONRSTA1_FLAG_M; }
 void fl_port_retained_set(uint32_t v)
 {
-    HWREG(PMCTL_BASE + PMCTL_O_AONRCLR1) = PMCTL_AONRSTA1_FLAG_M & ~v;
     HWREG(PMCTL_BASE + PMCTL_O_AONRSET1) = v & PMCTL_AONRSTA1_FLAG_M;
+    HWREG(PMCTL_BASE + PMCTL_O_AONRCLR1) = PMCTL_AONRSTA1_FLAG_M & ~v;
 }
 
 /* ======================= Zeitplanung ======================= */
@@ -502,9 +518,13 @@ void fl_platform_early_init(void)
 {
     /* FW-6: SWDIO (DIO16, Pull-up) / SWDCK (DIO17, Pull-down) sofort als Ausgang low -> keine Pulls, kein Strom
      * ueber R4/R5 in den abgeschalteten TMP. Serie: SWD zusaetzlich per CCFG sperren (README). */
+    (void)fl_port_reset_reason();          /* C-1: RSTSTA festhalten, bevor irgendetwas SLPN setzt */
     GPIO_init();
-    pins_sleep_state();
+    pins_sleep_state();                    /* Pins konfigurieren, solange die IOs noch verriegelt sind (C-1) */
     BatteryMonitor_init();
+    /* C-1 + W-2: Latches freigeben, Neustartgrund/Retention auswerten, bei >= 3 abnormalen Starts Abschaltung ohne
+     * Flash - alles VOR BLEAppUtil_init, damit Fehler in der Stack-Initialisierung mitgezaehlt werden */
+    (void)fl_app_early();
 }
 
 /* fataler Fehler: Neustart OHNE 'geplant'-Bit -> zaehlt als abnormal, nach 3 Abschaltung (F-W3c) */
@@ -526,6 +546,7 @@ void fl_fault_handler(void)
     HWREG(PMCTL_BASE + PMCTL_O_AONRCLR1) = FL_RET_PLANNED;
     HWREG(PMCTL_BASE + PMCTL_O_AONRSET1) = FL_RET_FAULT;
     PMCTLResetSystem();
+    __builtin_unreachable();             /* K-1: PMCTLResetSystem endet in while (1) (pmctl.h Z. 171), SDK ohne noreturn */
 }
 
 #if FLUIDI_TESTFW

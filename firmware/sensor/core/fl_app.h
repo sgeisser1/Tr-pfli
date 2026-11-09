@@ -35,7 +35,8 @@ typedef struct {
     uint16_t pad2;
 } fl_counters_t;
 
-/* Bits im Retention-Register (PMCTL.AONRSTA1, 18 bit, ueberlebt Reset und Shutdown, nicht Power-on; TRM 8.4.2) */
+/* Bits im Retention-Register (PMCTL.AONRSTA1, 18 bit, ueberlebt Reset und Shutdown, nicht Power-on; TRM 8.4.2).
+ * VDDS-Brownout: TRM widerspruechlich (S. 265 Kap. 6.8 gegen S. 419 Tab. 8-1) -> PROTOTYP-PRUEFUNG mit TF-4 */
 #define FL_RET_ABN_MASK   0x0Fu      /* Zaehler aufeinanderfolgender abnormaler Neustarts (F-W3) */
 #define FL_RET_PLANNED    0x10u      /* gewollter Neustart (REBOOT, OTA, Werkseinstellung, Rueckfall) */
 #define FL_RET_UV         0x20u      /* Abschaltung wegen Unterspannung */
@@ -130,6 +131,9 @@ typedef struct {
 
 extern fl_app_t g_fl;
 
+bool     fl_app_early(void);   /* frueh, vor BLE-Init: Neustartgrund, IO-Freigabe, Reset-Schleifen-Zaehler (W-2);
+                                * true = abgeschaltet (Hardware: kehrt nicht zurueck). fl_app_init ruft es selbst,
+                                * falls noch nicht geschehen. */
 void     fl_app_init(void);
 void     fl_app_on_connect(void);
 void     fl_app_on_notify_enabled(void);    /* CCCD von TX auf Notify geschrieben (K-1) */

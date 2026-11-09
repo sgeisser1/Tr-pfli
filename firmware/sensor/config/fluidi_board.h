@@ -55,7 +55,8 @@
 
 /* ---- Zeiten (ANNAHME, am Muster messen -> PROTOTYP-PRUEFUNG) ---- */
 #define FLUIDI_SENS_PWR_SETTLE_US   1000u  /* PINMAP Rev B DIO12: >= 1 ms nach SENS_PWR ein */
-#define FLUIDI_TMP_CONV_MS          15u    /* FW-1: TMP1075N One-Shot tCONV 10-15 ms (SBOS854F S.7 Tab. 6.6) */
+#define FLUIDI_TMP_CONV_MS          16u    /* FW-1: TMP1075N One-Shot tCONV max 15 ms (SBOS854F S.7 Tab. 6.6); +1 ms, weil
+                                                  * vTaskDelay(15) bei 1-ms-Tick nur 14-15 ms wartet (K-2) */
 #define FLUIDI_OSC_SETTLE_US        50u    /* FW-2: >= 50 us nach DIO11 low (ANNAHME, am Muster messen) */
 /* FW-2: Messkette nur in Bursts: Kette an <= 0.6 ms, danach >= 30 ms Pause, hoechstens 4 Bursts je Messung */
 #define FLUIDI_BURST_MAX_US         600u

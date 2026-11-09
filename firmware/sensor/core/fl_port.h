@@ -52,7 +52,8 @@ bool     fl_port_image_confirmed(void);
 void     fl_port_fw_version(uint8_t ver[4], uint32_t *build, uint32_t *sec_cnt);   /* aus eigenem MCUboot-Kopf/TLV */
 
 /* ---- System ---- */
-uint8_t  fl_port_reset_reason(void);         /* FL_RR_* */
+uint8_t  fl_port_reset_reason(void);         /* FL_RR_*; Hardware: RSTSTA beim ersten Aufruf festgehalten (C-1) */
+void     fl_port_io_release(void);           /* IO-Latches nach Shutdown freigeben (Pins vorher konfiguriert, C-1) */
 void     fl_port_reboot(void);
 void     fl_port_shutdown(void);             /* Shutdown; Wecken per Taster, AUSSER der Taster ist gerade gedrueckt
                                               * (dann Pull-up aus, kein Wecken -> nur Zellwechsel, F-W3b) */

@@ -752,6 +752,54 @@ static void boot_shutdown(void)
     fl_port_shutdown();
 }
 
+/* Fruehstart (W-2 Elektronik = W-1 Sicherheit, C-1): laeuft auf der Hardware in fl_platform_early_init VOR der
+ * BLE-Stack-Initialisierung und vor dem Scheduler, nur Register und Pins, kein Flash, keine RTOS-Dienste.
+ * Damit zaehlen auch Abstuerze/Asserts/Watchdog-Neustarts waehrend Board-/Stack-Init (vorher: Schleife ohne Zaehler). */
+static struct {
+    bool done;
+    uint8_t rr;
+    uint32_t abn, tfret;
+    bool planned, was_uv, was_backoff;
+} s_boot;
+
+bool fl_app_early(void)
+{
+    memset(&s_boot, 0, sizeof s_boot);
+    /* C-1: Neustartgrund lesen, BEVOR die IO-Latches freigegeben werden (Freigabe loescht RSTSTA.SDDET/IOWUSD,
+     * TRM SWCU193A S. 350 Tab. 6-83); die Pins hat die Plattform vorher in den Ruhezustand gesetzt */
+    uint8_t rr = fl_port_reset_reason();
+    fl_port_io_release();
+    uint32_t ret = fl_port_retained_get();
+    /* O-5: Systemreset aus der Ausnahmebehandlung (FL_RET_FAULT) = Absturz */
+    if (rr == FL_RR_SOFTWARE && (ret & FL_RET_FAULT)) rr = FL_RR_HARDFAULT;
+    uint32_t tfret = 0;
+#if FLUIDI_TESTFW
+    tfret = fl_tf_boot(ret, rr);
+#endif
+    uint32_t abn = ret & FL_RET_ABN_MASK;
+    bool planned = (ret & FL_RET_PLANNED) != 0;
+    bool abnormal = rr == FL_RR_WATCHDOG || rr == FL_RR_BROWNOUT || rr == FL_RR_HARDFAULT || (rr == FL_RR_SOFTWARE && !planned);
+    if (rr == FL_RR_POWER_ON || rr == FL_RR_PIN) abn = 0;            /* Zellwechsel / Nutzer */
+    else if (abnormal && abn < FL_RET_ABN_MASK) abn++;
+    s_boot.rr = rr; s_boot.abn = abn; s_boot.tfret = tfret; s_boot.planned = planned;
+    s_boot.was_uv = (ret & FL_RET_UV) != 0; s_boot.was_backoff = (ret & FL_RET_BACKOFF) != 0;
+    /* Reset-Schleife: >= 3 abnormale Neustarts ohne 10 min stabilen Betrieb -> Abschaltung ohne Flash (F-W3a/c) */
+    if (abn >= FL_ABN_MAX) {
+        uint32_t newret = abn | tfret;
+#if FLUIDI_TESTFW
+        newret = fl_tf_shutdown_boot(newret);
+#endif
+        fl_port_retained_set((newret & ~FL_RET_ABN_MASK) | FL_RET_BACKOFF);
+        boot_shutdown();
+        return true;
+    }
+    /* Zaehler sofort sichern (Absturz vor fl_app_init zaehlt beim naechsten Start); PLANNED/FAULT verbraucht,
+     * UV/BACKOFF bleiben bis fl_app_init (Hysterese, backoffs-Zaehler). K-4: Registerfolge in fl_port_retained_set */
+    fl_port_retained_set(abn | (ret & (FL_RET_UV | FL_RET_BACKOFF)) | tfret);
+    s_boot.done = true;
+    return false;
+}
+
 void fl_app_init(void)
 {
     uint32_t now;
@@ -759,20 +807,15 @@ void fl_app_init(void)
     fl_led_init(&A->led);
     fl_btn_init(&A->btn);
 
-    /* 1) Spannung und Neustartgrund ZUERST, vor jedem Flash-Schreiben (F-W3a) */
-    A->reset_reason = fl_port_reset_reason();
-    uint32_t ret = fl_port_retained_get();
-    /* O-5: Systemreset aus der Ausnahmebehandlung (FL_RET_FAULT) = Absturz; das Bit faellt mit newret weg */
-    if (A->reset_reason == FL_RR_SOFTWARE && (ret & FL_RET_FAULT)) A->reset_reason = FL_RR_HARDFAULT;
+    /* 1) Spannung und Neustartgrund ZUERST, vor jedem Flash-Schreiben (F-W3a); Zaehler aus fl_app_early */
+    if (!s_boot.done && fl_app_early()) return;
+    s_boot.done = false;
+    A->reset_reason = s_boot.rr;
+    uint32_t abn = s_boot.abn;
+    bool was_uv = s_boot.was_uv, was_backoff = s_boot.was_backoff;
 #if FLUIDI_TESTFW
-    uint32_t tfret = fl_tf_boot(ret, A->reset_reason);
+    uint32_t tfret = s_boot.tfret;
 #endif
-    uint32_t abn = ret & FL_RET_ABN_MASK;
-    bool planned = (ret & FL_RET_PLANNED) != 0, was_uv = (ret & FL_RET_UV) != 0, was_backoff = (ret & FL_RET_BACKOFF) != 0;
-    bool abnormal = A->reset_reason == FL_RR_WATCHDOG || A->reset_reason == FL_RR_BROWNOUT ||
-                    A->reset_reason == FL_RR_HARDFAULT || (A->reset_reason == FL_RR_SOFTWARE && !planned);
-    if (A->reset_reason == FL_RR_POWER_ON || A->reset_reason == FL_RR_PIN) abn = 0;   /* Zellwechsel / Nutzer */
-    else if (abnormal && abn < FL_RET_ABN_MASK) abn++;
     A->vbat_rest = fl_port_vbat_mv();
     if (A->vbat_rest == 0) A->vbat_rest = fl_port_vbat_mv();       /* N-4: Lesefehler einmal wiederholen */
     A->vbat_load = A->vbat_rest;
@@ -792,15 +835,6 @@ void fl_app_init(void)
         newret = fl_tf_shutdown_boot(newret);
 #endif
         fl_port_retained_set(newret | FL_RET_UV);
-        boot_shutdown();
-        return;
-    }
-    /* Reset-Schleife: >= 3 abnormale Neustarts ohne 10 min stabilen Betrieb -> Abschaltung (F-W3a/c) */
-    if (abn >= FL_ABN_MAX) {
-#if FLUIDI_TESTFW
-        newret = fl_tf_shutdown_boot(newret);
-#endif
-        fl_port_retained_set((newret & ~FL_RET_ABN_MASK) | FL_RET_BACKOFF);
         boot_shutdown();
         return;
     }

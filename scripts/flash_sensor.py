@@ -27,6 +27,10 @@ vergleicht den Fingerabdruck und lehnt den DEV-Schluessel ab. Serien-CCFG:
 CRCs werden neu berechnet. Danach ist eine Neuprogrammierung ueber die Pads NICHT mehr moeglich (nur OTA).
 Wirksamkeit am Muster: PROTOTYP-PRUEFUNG PP-9.
 
+Testfirmware (Sicherheit W-2, phase6_sicherheit_schluss.md): ein Hex mit TESTFIRMWARE (Build-Nummer 9000-9999 im
+MCUboot-Kopf von Slot 0, Makefile TESTFW=n -> 9<n><bb>, bzw. "-tf<n>-" im Dateinamen) wird nur mit --testfw <n>
+programmiert (ausdrueckliche Bestaetigung, auch mit --yes); --lock mit Testfirmware wird immer abgelehnt.
+
 Ohne Hardware: --sim (simuliertes Geraet, gleicher Bytestrom) bzw. --dry-run (nur Plan ausgeben).
 Unit-Tests: scripts/test_flash_sensor.py.
 """
@@ -35,6 +39,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import os
+import re
 import struct
 import sys
 import time
@@ -180,6 +185,43 @@ def load_hex(path: str):
         else:
             raise ValueError("Segment %#x..%#x ausserhalb Flash/CCFG" % (start, end))
     return flash, sorted(used), ccfg
+
+
+SLOT0_BASE = 0x6000                  # Slot 0 (config/fluidi_flash_layout.h, Werks-Hex make_factory_hex.py --slot0-base)
+IMAGE_MAGIC = 0x96F3B83D             # MCUboot bootutil/image.h Z. 49
+TESTFW_BUILD_MIN, TESTFW_BUILD_MAX = 9000, 9999   # Makefile: Serie < 9000, TESTFW=n -> 9<n><bb>
+
+
+def image_version(flash: bytes, base: int = SLOT0_BASE):
+    """(major, minor, revision, build) aus dem MCUboot-Kopf (bootutil/image.h Z. 141-146 und 159-168: ih_ver ab +20)
+    oder None, wenn in Slot 0 kein Kopf steht."""
+    if struct.unpack_from("<I", flash, base)[0] != IMAGE_MAGIC:
+        return None
+    return struct.unpack_from("<BBHI", flash, base + 20)
+
+
+def testfw_variant(flash: bytes, hexfile: str = ""):
+    """TF-Nummer (1..9), wenn das Abbild Testfirmware ist, sonst None. Quellen: Build-Nummer im Kopf und Dateiname."""
+    v = image_version(flash)
+    if v is not None and TESTFW_BUILD_MIN <= v[3] <= TESTFW_BUILD_MAX:
+        return (v[3] // 100) % 10
+    m = re.search(r"-tf(\d)-", os.path.basename(hexfile or ""))
+    return int(m.group(1)) if m else None
+
+
+def check_testfw(flash: bytes, hexfile: str, confirm, lock: bool):
+    """Sicherheit W-2: Testfirmware nur mit passender ausdruecklicher Bestaetigung (--testfw n), nie mit --lock."""
+    n = testfw_variant(flash, hexfile)
+    if n is None:
+        if confirm is not None:
+            raise BootloaderError("--testfw %s angegeben, aber das Hex ist keine Testfirmware" % confirm)
+        return None
+    if lock:
+        raise BootloaderError("TESTFIRMWARE TF-%d mit --lock abgelehnt (nie als Serie sperren)" % n)
+    if confirm != n:
+        raise BootloaderError("TESTFIRMWARE TF-%d erkannt (Build 9xxx bzw. '-tf%d-'): nie an Nutzersensoren; "
+                              "zum Programmieren ausdruecklich --testfw %d angeben" % (n, n, n))
+    return n
 
 
 def sector_runs(used):
@@ -396,10 +438,13 @@ class SimDevice:
 # ----------------------------------------------------------------------------------------------------------
 # Ablauf
 # ----------------------------------------------------------------------------------------------------------
-def program(link: Link, hexfile: str, lock: bool, out=print, do_reset: bool = True, expect_fp=None):
+def program(link: Link, hexfile: str, lock: bool, out=print, do_reset: bool = True, expect_fp=None, testfw=None):
     flash, used, ccfg = load_hex(hexfile)
     if ccfg is None:
         raise BootloaderError("Hex enthaelt keine CCFG (MCUboot-Build pruefen)")
+    n = check_testfw(flash, hexfile, testfw, lock)
+    if n is not None:
+        out("[flash] WARNUNG: TESTFIRMWARE TF-%d (bestaetigt mit --testfw %d) – nur Muster/Labor, nie ausliefern" % (n, n))
     if lock:
         out("[flash] Produktionsschluessel %s bestaetigt" % check_lock_key(flash, expect_fp))
         ccfg = ccfg_lock(ccfg)
@@ -437,6 +482,8 @@ def main(argv=None):
     ap.add_argument("--sim", action="store_true", help="simuliertes Geraet statt Hardware")
     ap.add_argument("--dry-run", action="store_true", help="nur Plan anzeigen, nichts senden")
     ap.add_argument("--yes", action="store_true", help="Sicherheitsabfrage ueberspringen")
+    ap.add_argument("--testfw", type=int, metavar="N",
+                    help="Testfirmware TF-N ausdruecklich bestaetigen (sonst wird ein TF-Hex abgelehnt; --yes genuegt nicht)")
     a = ap.parse_args(argv)
     if a.action in ("program", "verify") or a.dry_run:
         if not a.hex:
@@ -445,6 +492,10 @@ def main(argv=None):
         ap.error("hoechstens %d Baud (2 x 100 kOhm je Pad, CONCEPTS 2.7)" % MAX_BAUD)
     if a.dry_run:
         flash, used, ccfg = load_hex(a.hex)
+        n = testfw_variant(flash, a.hex)
+        if n is not None:
+            print("[plan] TESTFIRMWARE TF-%d erkannt – program nur mit --testfw %d%s" % (
+                n, n, "" if a.testfw == n else " (fehlt)"))
         for addr, size in sector_runs(used):
             print("[plan] DOWNLOAD_CRC %#07x %6d B crc32=%08x" % (addr, size, crc32(bytes(flash[addr:addr + size]))))
         if a.lock:
@@ -457,6 +508,12 @@ def main(argv=None):
             c = ccfg_lock(ccfg) if a.lock else ccfg
             print("[plan] CCFG %s crc32=%08x" % (ccfg_describe(c), crc32(bytes(c))))
         return 0
+    if a.action == "program":
+        try:                                       # vor jeder Abfrage/Verbindung pruefen (W-2)
+            check_testfw(load_hex(a.hex)[0], a.hex, a.testfw, a.lock)
+        except BootloaderError as e:
+            print("[flash] FEHLER:", e)
+            return 2
     if a.sim:
         port = SimDevice()
     else:
@@ -479,7 +536,7 @@ def main(argv=None):
         elif a.action == "erase":
             link.sync(); link.chip_erase(); print("[erase] ok")
         elif a.action == "program":
-            program(link, a.hex, a.lock, expect_fp=a.expect_key_fp)
+            program(link, a.hex, a.lock, expect_fp=a.expect_key_fp, testfw=a.testfw)
         elif a.action == "verify":
             flash, used, ccfg = load_hex(a.hex)
             link.sync()

@@ -902,6 +902,65 @@ static void test_assert(void)
     CHECK(g_fl.cnt.wdt_resets == 0);
 }
 
+/* ---------------- C-1: IO-Latches nach Shutdown, W-2: Zaehlung vor fl_app_init ---------------- */
+static void test_latch(void)
+{
+    puts("[latch] C-1: nach Shutdown-Wecken Grund vor Freigabe lesen, Latches freigeben; LED/Messung danach, Gruende stimmen");
+    sim_reset_all(); sim.outlier_block = -1;
+    fl_app_init(); advance(3000);
+    CHECK(sim.io_releases == 1 && sim.rr_reads_at_release >= 1 && !sim.latched);
+    /* Modell: ohne Freigabe kleben SDDET/IOWUSD -> ein spaeterer Systemreset wuerde als POWER_ON erkannt */
+    sim.sddet = true; sim.reset_reason = FL_RR_SOFTWARE; CHECK(fl_port_reset_reason() == FL_RR_POWER_ON); sim.sddet = false;
+    /* Abschaltung (Reset-Schleife), Wecken per Taster */
+    for (int k = 0; k < 3; k++) { sim.reset_reason = FL_RR_SOFTWARE; fl_app_init(); }
+    CHECK(sim.shutdowns == 1 && sim.latched && sim.sddet);
+    uint32_t rel = sim.io_releases, rd = sim.rr_reads, led0 = sim.led_on_events, mc = sim.meas_calls;
+    sim.latched_violations = 0;
+    sim.reset_reason = FL_RR_PIN; fl_app_init(); advance(3000);
+    CHECK(sim.io_releases == rel + 1 && sim.rr_reads_at_release > rd);    /* Grund gelesen, DANN freigegeben */
+    CHECK(!sim.latched && !sim.sddet && sim.latched_violations == 0);
+    CHECK(g_fl.reset_reason == FL_RR_PIN && sim.meas_calls > mc && sim.led_on_events > led0);  /* L11 sichtbar, Messung */
+    CHECK(g_fl.mode != FL_MODE_UNDERVOLTAGE);
+    /* danach: Absturz -> hardfault (nicht power_on), geplanter Neustart -> software */
+    sim_fault(); sim.reset_reason = FL_RR_SOFTWARE; fl_app_init(); advance(3000);
+    CHECK(g_fl.reset_reason == FL_RR_HARDFAULT && (sim.retained & FL_RET_ABN_MASK) == 1);
+    sim.retained = (sim.retained & ~FL_RET_ABN_MASK) | FL_RET_PLANNED;      /* wie planned_reboot (REBOOT) */
+    sim.reset_reason = FL_RR_SOFTWARE; fl_app_init(); advance(3000);
+    CHECK(g_fl.reset_reason == FL_RR_SOFTWARE && (sim.retained & FL_RET_ABN_MASK) == 0);
+    /* Unterspannungs-Abschaltung, Wecken, erholt: ebenfalls freigegeben */
+    sim.vbat_load = 2250; { fl_record_t r; fl_app_measure(FL_CAUSE_AUTO, &r); }
+    CHECK(sim.latched);
+    sim.vbat_load = 0; sim.latched_violations = 0; sim.reset_reason = FL_RR_PIN; fl_app_init(); advance(3000);
+    CHECK(!sim.latched && sim.latched_violations == 0 && g_fl.mode != FL_MODE_UNDERVOLTAGE);
+}
+
+static void test_early(void)
+{
+    puts("[early] W-2: Absturz/Assert/Watchdog vor fl_app_init (BLE-Init) zaehlt, 3. Start schaltet ohne Flash ab");
+    sim_reset_all(); sim.outlier_block = -1;
+    fl_app_init(); advance(3000);                                /* Normalbetrieb */
+    uint32_t nvw = sim.nv_writes, fw = sim.flash_writes, fe = sim.flash_erases;
+    /* Absturz waehrend der Stack-Initialisierung: nur fl_app_early laeuft (fl_platform_early_init), dann Fehler */
+    sim_fault(); sim.reset_reason = FL_RR_SOFTWARE;
+    CHECK(!fl_app_early() && (sim.retained & FL_RET_ABN_MASK) == 1 && !(sim.retained & FL_RET_FAULT));
+    sim_fault(); sim.reset_reason = FL_RR_SOFTWARE;
+    CHECK(!fl_app_early() && (sim.retained & FL_RET_ABN_MASK) == 2);
+    sim_fault(); sim.reset_reason = FL_RR_SOFTWARE;
+    CHECK(fl_app_early() && sim.shutdowns == 1 && (sim.retained & FL_RET_BACKOFF) && !(sim.retained & FL_RET_ABN_MASK));
+    CHECK(sim.nv_writes == nvw && sim.flash_writes == fw && sim.flash_erases == fe);   /* kein Flash im ganzen Ablauf */
+    /* Wecken per Taster: Normalbetrieb, Abschaltung einmal gezaehlt */
+    sim.reset_reason = FL_RR_PIN; fl_app_init(); advance(3000);
+    CHECK(g_fl.mode != FL_MODE_UNDERVOLTAGE && g_fl.cnt.backoffs == 1 && (sim.retained & FL_RET_ABN_MASK) == 0);
+    /* Hardware-Ablauf mit Erfolg: fl_app_early (frueh) + fl_app_init (spaet) zaehlen EINMAL */
+    sim_fault(); sim.reset_reason = FL_RR_SOFTWARE;
+    CHECK(!fl_app_early());
+    fl_app_init(); advance(3000);
+    CHECK(g_fl.reset_reason == FL_RR_HARDFAULT && (sim.retained & FL_RET_ABN_MASK) == 1 && sim.io_releases > 0);
+    /* Watchdog (MCUboot-/Init-Haenger) vor fl_app_init zaehlt ebenso; gemischt mit Absturz -> Abschaltung */
+    sim.reset_reason = FL_RR_WATCHDOG; CHECK(!fl_app_early() && (sim.retained & FL_RET_ABN_MASK) == 2);
+    sim_fault(); sim.reset_reason = FL_RR_SOFTWARE; CHECK(fl_app_early() && sim.shutdowns == 2);
+}
+
 /* ---------------- Image-Pruefung nach OTA_END (W-6, F-L1) ---------------- */
 static void put_img(uint8_t maj, uint8_t min, uint16_t rev, uint32_t build, uint32_t sc, int hw)
 {
@@ -948,6 +1007,8 @@ int main(void)
     test_resets();
     test_fault();
     test_assert();
+    test_latch();
+    test_early();
     test_img_check();
     printf("\nErgebnis: %d Pruefungen bestanden, %d fehlgeschlagen\n", g_pass, g_fail);
     return g_fail ? 1 : 0;

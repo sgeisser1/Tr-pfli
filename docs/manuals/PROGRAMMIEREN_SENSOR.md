@@ -19,7 +19,7 @@ fehlt: am **offenen Board vor dem Verguss**, mit Labornetzteil und gelöteten Dr
    (Veto PS-K1, `docs/reviews/phase5_programmer_sicherheit.md`). Keine Prüfklemme am Clip, kein Draht am Minuspad,
    keine Speisung über TP1/TP2. Einzige Ausnahme: Sicherheitstest PT11.06/ST-Z5 nach den Bedingungen Z5-1…Z5-7
    (`docs/reviews/phase5_sicherheit_runde3.md`, Entscheid WS-13).
-2. Labornetzteil (Weg B): **2.0 V** (höchstens 2.2 V, mit dem **PL2303-Board höchstens 2.1 V**), Strombegrenzung **10 mA** (höchstens 20 mA, EP-03), Polarität vor dem Anschliessen messen.
+2. Labornetzteil (Weg B): **2.0 V** (höchstens 2.2 V, mit dem **PL2303-Board höchstens 2.1 V**), Strombegrenzung **10 mA** (EP-03), Polarität vor dem Anschliessen messen.
 3. Der USB-UART (CH343 oder PL2303) bekommt seine I/O-Spannung (VIO bzw. VCCIO) immer aus **derselben 2.0-V-Speisung**
    (Weg A: Adapter-Regler U3, Weg B: dasselbe Labornetzteil). **Jumper H3** (CH343-Board) bzw. **Jumper J1**
    (PL2303-Board) **abziehen**. Mit 3.3-V- oder 5-V-Pegeln wird das Low am Sensor-RX nicht sicher erkannt, und die Pins
@@ -140,7 +140,7 @@ Ablauf:
    Kaptonband zugentlasten.
 4. CH343-TXD: an TP2 (Ø 1.5 mm) **nur mit Prüfspitze oder Federstift mit flachem/gerundetem Kopf**, nicht löten:
    TP2 ist eine gefüllte Via-in-Pad-Fläche im Fach (PS-W2).
-5. Netzteil auf 2.0 V, **10 mA** (höchstens 20 mA) einstellen, **erst dann** anschliessen (PS-L3). VIO am Waveshare-Board messen: 2.0 V.
+5. Netzteil auf 2.0 V, **10 mA** einstellen, **erst dann** anschliessen (PS-L3). VIO am Waveshare-Board messen: 2.0 V.
    **PL2303-Board:** zuerst die **USB einstecken**, erst danach das Netzteil einschalten (VCCIO nie ohne USB).
 6. **Taster drücken und halten**, Netzteil einschalten, nach ≈ 1 s loslassen (leerer Chip: Taster unnötig).
 7. `flash_sensor.py info …`, dann `program …` wie Weg A Schritt 4–5. Bei Fehlern `--baud 19200`.
