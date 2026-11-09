@@ -99,11 +99,27 @@ def main():
 
     # --- 4 System
     s4, pr = res["serie4"], res["proto"]
-    zub = cr.ZUBEHOER_VERGUSS_CHF     # Verguss-Zubehoer/Schutz einmalig je Projekt (ANNAHME-Preise, Konzept Kap. 7.1)
+    # Verguss-Zubehoer/Schutz und Programmieradapter einmalig je Projekt: Phase 6 aus der Einkaufsliste
+    # (docs/manuals/EINKAUFSLISTE.csv, teils CH-Shopbelege, Rest ANNAHME Konzept Kap. 7.1); Rueckfall: cost_rev_b-Pauschale
+    zub, zub_ann, prog, prog_ann, zub_src = cr.ZUBEHOER_VERGUSS_CHF, cr.ZUBEHOER_VERGUSS_CHF, None, None, "Konzept Kap. 7.1 (ANNAHME)"
+    try:
+        import einkaufsliste as ek
+        ekr = [r for r in ek.load() if r["Status"] not in ek.NICHT_SUMMIEREN]
+        vz = [r for r in ekr if r["ID"].startswith("V-Z")]
+        zub = round(sum(r["_sum"] for r in vz), 2)
+        zub_ann = round(sum(r["_sum"] for r in vz if r["_annahme"]), 2)
+        pz = [r for r in ekr if r["Bereich"] == "Programmieradapter" or r["ID"] == "W1"]
+        lcsc_v = ek.VERSAND["LCSC (mit JLC-Bestellung buendeln, ANNAHME)"][0]
+        prog = round(sum(r["_sum"] for r in pz) + lcsc_v, 2)
+        prog_ann = round(sum(r["_sum"] for r in pz if r["_annahme"]) + lcsc_v, 2)
+        zub_src = "Einkaufsliste V-Z (`docs/manuals/EINKAUFSLISTE.csv`)"
+    except (ImportError, OSError, KeyError):
+        pass
     sysA = s4["total_chf"] + gw_plan + zub
     sysB = pr["total_chf"] + s4["total_chf"] + gw_plan + zub
     unit_pre = pre["serie4"]["unit_chf"]
     sysB_lo, sysB_hi = sysB + PROG_ADAPTER_CHF[0], sysB + PROG_ADAPTER_CHF[1]
+    sysB_prog = sysB + prog if prog is not None else None
 
     md = io.StringIO()
     w = md.write
@@ -164,7 +180,8 @@ def main():
       f"Bestellung** (angebrochen max. 3 Monate, ANNAHME). Stückkosten = Verbrauch {cr.VERGUSS_G_PRO_SENSOR:.0f} g/Sensor = "
       f"{cr.VERGUSS_CHF_PRO_SENSOR:.2f} CHF (+5 % Ausschuss); Einmalkosten = Beutelrest (Prototyp "
       f"{pr['verguss_once_chf']:.2f}, Serie {s4['verguss_once_chf']:.2f} CHF), Einordnung nach D-005 durch den Orchestrator. "
-      f"Zubehör/Schutzausrüstung einmalig je Projekt **{zub:.2f} CHF** (ANNAHME-Preise, in der Systemsumme Kap. 4). "
+      f"Zubehör/Schutzausrüstung einmalig je Projekt **{zub:.2f} CHF** ({zub_src}, davon {zub_ann:.2f} CHF ANNAHME; "
+      f"in der Systemsumme Kap. 4). "
       "Hinweis M-B (ganzer Beutel je Sitzung): Prototyp 3 + Serie 3 Beutel = "
       f"{6 * cr.VERGUSS_BEUTEL_CHF:.2f} CHF statt {2 * cr.VERGUSS_BEUTEL_CHF:.2f} CHF.\n\n")
     w("### 2.1 Versteckte Kosten und Empfindlichkeiten\n\n")
@@ -206,9 +223,13 @@ def main():
     w("| Weg | Inhalt | CHF |\n|---|---|---|\n")
     w(f"| A: direkt Serie | Serie 20 PCB / 16 bestückt / 15 Sensoren + Gateway (geplant total) | **{sysA:.2f}** |\n")
     w(f"| B: Prototyp + Serie (geplant) | Prototyp 5 + Serie 15 Sensoren + Gateway (geplant total) | **{sysB:.2f}** |\n")
-    w(f"| davon Verguss-Zubehör/Schutz (A und B je einmal) | Kap. 2.0, ANNAHME-Preise | {zub:.2f} |\n")
-    w(f"| B + Programmieradapter | wie B + Adapter Rev 1 ({PROG_ADAPTER_CHF[0]:.0f}–{PROG_ADAPTER_CHF[1]:.0f} CHF, ANNAHME) | "
-      f"{sysB_lo:.2f} – {sysB_hi:.2f} |\n\n")
+    w(f"| davon Verguss-Zubehör/Schutz (A und B je einmal) | Kap. 2.0, {zub_src}, davon {zub_ann:.2f} ANNAHME | {zub:.2f} |\n")
+    if sysB_prog is not None:
+        w(f"| B + Programmieradapter | wie B + Adapter Rev 1 inkl. PL2303-Board und LCSC-Versand (Einkaufsliste P1–P9, W1; "
+          f"{prog:.2f} CHF, davon {prog_ann:.2f} ANNAHME) | {sysB_prog:.2f} |\n\n")
+    else:
+        w(f"| B + Programmieradapter | wie B + Adapter Rev 1 ({PROG_ADAPTER_CHF[0]:.0f}–{PROG_ADAPTER_CHF[1]:.0f} CHF, ANNAHME) | "
+          f"{sysB_lo:.2f} – {sysB_hi:.2f} |\n\n")
     w(f"- Pro Sensor (Weg A, inkl. Gateway-Anteil): {sysA / 15:.2f} CHF; Weg B: {sysB / 15:.2f} CHF "
       f"(die 5 Prototypen sind zusätzlich nutzbar, falls sie die Prüfungen bestehen → dann 20 Sensoren: {sysB / 20:.2f} CHF).\n")
     w("- Nicht enthalten: Arbeitszeit, Werkzeug (ausser Verguss-Zubehör Kap. 2.0), Dichtmittel über die Sensor-Pauschalen hinaus, "
@@ -222,7 +243,7 @@ def main():
     w("- Versandpreis mit PCBA (Gewicht höher) erst am Checkout sichtbar (ANNAHME pauschal 23.52 USD).\n")
     w("- Gateway: Netzteil-Konformität nicht lokal (Sicherheits-Agent beim Wareneingang); microSD-Datenblatt "
       "(`Kingston_SDCIT2_Datasheet_MKD-02122026.pdf`) und SHT40-Breakout-Schaltplan/Masse (`DFRobot_SEN0428_*`) seit 2026-11-09 lokal; "
-      "RTC/CR1220 entfallen (D-028). Klimakammer: Nutpfosten auf 17 mm Modulbreite nachführen (Mechanik).\n\n")
+      "RTC/CR1220 entfallen (D-028). Klimakammer mit Bodenschiene + Deckelrippe für SEN0428 (D-032).\n\n")
     w("## 6 Einzelposten Sensor (cost_model.report)\n\n")
     from contextlib import redirect_stdout
     for k, (n, *_r) in scen.items():
@@ -241,7 +262,7 @@ def main():
               f"voll {r['full_chf']:.2f} CHF")
     print(f"Gateway kauffertig {gw_buy:.2f} CHF (ANNAHME-Anteil {gw_annahme:.2f}), offen {gw_pend:.2f}, geplant {gw_plan:.2f}, "
           f"Neuwert {gw_new:.2f} CHF; Serie mit Pre-reflow {unit_pre:.2f} CHF")
-    print(f"System A {sysA:.2f} CHF, B {sysB:.2f} CHF, B+Adapter {sysB_lo:.2f}-{sysB_hi:.2f} CHF")
+    print(f"System A {sysA:.2f} CHF, B {sysB:.2f} CHF, B+Adapter " + (f"{sysB_prog:.2f}" if sysB_prog is not None else f"{sysB_lo:.2f}-{sysB_hi:.2f}") + f" CHF (Zubehoer Verguss {zub:.2f}, Adapter {prog})")
     print("->", os.path.relpath(OUT, ROOT))
 
 

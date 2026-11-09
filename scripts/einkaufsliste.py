@@ -26,13 +26,18 @@ VERSAND = {
     "pi-shop.ch": (7.90, None, "pi-shop.ch/versandkosten (2026-11-08): B-Post 7.90, A-Post 9.90 "
                    "(docs/references/pi-shop_Gateway-Teile_Auszug_2026-11-08.txt)"),
     "galaxus.ch": (9.90, None, "ANNAHME (Versandseite nicht abrufbar, Bot-Sperre)"),
-    "offen (Normteile-/Dichtungs-Fachhandel)": (10.00, None, "ANNAHME (Haendler offen, eine Sammelbestellung S2/S3/S5/S6/G8b)"),
+    "offen (Normteile-/Dichtungs-Fachhandel)": (10.00, None, "ANNAHME (Haendler offen, eine Sammelbestellung S2/S5/S6/G8b/P8)"),
     "offen (Platzhalter)": (0.00, None, "Platzhalter"),
     "Digi-Key CH (laut phase5_gateway_led.md)": (0.00, None, "nicht einzeln bestellen (23 CHF Versand unter 70 CHF, "
                                                  "docs/reviews/phase5_gateway_led.md): mit LCSC-Bestellung Programmieradapter buendeln"),
     "Werkstattbestand": (0.00, None, "-"),
     "LCSC + Fachhandel (siehe README)": (0.00, None, "im Werkzeugbudget hardware/programmer/README.md Kap. 6"),
+    "LCSC (mit JLC-Bestellung buendeln, ANNAHME)": (20.00, None, "ANNAHME (README Kap. 6: 10-25 CHF), Kombination mit der "
+                                                    "JLC-Sendung im Warenkorb pruefen"),
+    "Simpex Electronic AG": (15.00, None, "ANNAHME (Versandbetrag laut Konzept Kap. 7 nicht angegeben)"),
+    "offen (Labor-/Arbeitsschutz-Fachhandel)": (10.00, None, "ANNAHME (Haendler offen, eine Sammelbestellung V-Z2...V-Z11)"),
 }
+BEREICHE = ["Sensor", "Sensor+Werkstatt", "Sensor+Gateway", "Gateway", "Werkstatt", "Verguss", "Programmieradapter"]
 NICHT_SUMMIEREN = {"vorhanden", "separat", "Platzhalter"}
 REQ = ["ID", "Bereich", "Teil", "Spezifikation_Soll", "Bedarf_Stk", "Haendler", "Packung_Stk", "Preis_CHF_Packung",
        "Packungen", "Preisbasis", "Lager", "Abruf", "Status"]
@@ -46,8 +51,9 @@ def load():
         r["_n"] = float(r["Packungen"])
         r["_preis"] = float(r["Preis_CHF_Packung"])
         r["_sum"] = round(r["_n"] * r["_preis"], 2)
-        r["_annahme"] = "ANNAHME" in r["Preisbasis"] or r["Status"] in ("Quelle offen", "Platzhalter")
-        r["_jetzt"] = r["Lager"] not in ("nicht an Lager", "Ausverkauft") and not r["Status"].startswith("Quelle offen")
+        r["_annahme"] = r["Preisbasis"].startswith("ANNAHME") or r["Status"] in ("Quelle offen", "Platzhalter")
+        r["_jetzt"] = (r["Lager"] not in ("nicht an Lager", "Ausverkauft") and not r["Status"].startswith("Quelle offen")
+                      and not r["Haendler"].startswith("offen"))
     return rows
 
 
@@ -67,6 +73,8 @@ def check(rows):
                 err.append(f"{r['ID']}: Pflichtfeld {k} leer")
         if r["Status"] not in NICHT_SUMMIEREN and r["_n"] * r["_pack"] < r["_bedarf"]:
             err.append(f"{r['ID']}: Packungen x Inhalt {r['_n'] * r['_pack']:g} < Bedarf {r['_bedarf']:g}")
+        if r["Bereich"] not in BEREICHE:
+            err.append(f"{r['ID']}: Bereich '{r['Bereich']}' unbekannt")
         if r["Haendler"] not in VERSAND:
             err.append(f"{r['ID']}: Haendler '{r['Haendler']}' ohne Versandregel")
         b = r["Beleg"].strip()
@@ -103,9 +111,8 @@ TEXT_SHT = """## 2 Klimasensor-Breakout Gateway (D-029, G6)
 
 Platz (CAD `mechanical/gen/fluidi_gateway_pi.py`, Konstante `CLIMA`, Prüfung 11/14 in
 `mechanical/gateway_pi/check_gateway_pi.txt`): Klimakammer innen **x 8.0 × y 38.0 × z 16.0 mm** (x 32…40, Wand 2 mm).
-Das Modul steht hochkant in der y-z-Ebene in zwei Nutpfosten (Nut 1.6 + 0.3 mm, 1.5 mm tief), Sensorseite +x zur
-Stirnwand; Platzhalter `MW` 24 (y) × `MH` 14 (z), Unterkante z 3.0, Bauteile vorn ≤ 2.5 mm (`PART_F`), hinten ≤ 1.0 mm
-(`PART_B`). Hochkant ist z ≤ 14 nutzbar (z 3…17 in 2…18), flach liegend nur 8 mm (x).
+Das Modul steht hochkant in der y-z-Ebene, Sensorseite +x zur Stirnwand. Hochkant ist z ≤ 14 nutzbar (z 3…17 in 2…18),
+flach liegend nur 8 mm (x).
 
 | Kandidat | Masse (Quelle) | Elektrik (Quelle) | Bezug CH (Abruf 2026-11-09) | Passt? |
 |---|---|---|---|---|
@@ -119,12 +126,10 @@ pi-shop.ch führt kein weiteres SHT4x-Breakout (Suche „sht40“ 2026-11-09: nu
 **Empfehlung: DFRobot SEN0428** – einziges gefundenes SHT4x-Breakout mit Herstellermass und Schaltplan, das in die
 Kammer passt, ab Lager in der Schweiz, beim selben Händler wie Muttern/Einsätze/Kleber (kein zusätzlicher Versand).
 
-**Masse für die Mechanik (CAD nicht geändert):** Platine 14.0 × 17.0 mm; hochkant **17.0 in y, 14.0 in z** → `CLIMA['MW']`
-24 → 17 (Nutpfosten nachführen), `MH` 14 bleibt; Bohrungen Ø2.0 im Abstand 10.0 an der Kante gegenüber den Lötaugen
-(alternativ Befestigung M2 statt Nut); Lötaugenreihe an einer 14-mm-Kante → die Litzen verlassen das Modul an einem
-y-Ende (Kabelkanal y −3.5/z 10.5 → Lötaugen zur Kammermitte bzw. zum Kanal legen). **Platinendicke und Bauteilhöhe
-sind nicht angegeben** (Händler „0.5 mm“ unplausibel) → am Muster messen, bis dahin Platzhalter 1.6 mm + 2.5 mm
-Bauteile behalten. Bauteile laut Masszeichnung nur auf der Sensorseite.
+**Umsetzung Mechanik (D-032, `mechanical/gateway_pi/check_gateway_pi.txt` Pkt. 14):** SEN0428 hochkant 17.0 (y) × 14.0 (z),
+gehalten von einer **Bodenschiene** (Nut 1.90 breit, Eingriff 1.00) und einer **Deckelrippe** (Eingriff 0.80, 0.30 Luft über
+der Oberkante), Endanschläge mit je 0.30 Luft in y; Bauteilfreiheit zur Schiene 0.45 mm, zur Deckelrippe 0.65 mm.
+**Platinendicke 1.6 mm und Bauteilhöhen sind ANNAHME** (Hersteller gibt sie nicht an) → am Muster messen.
 
 **Befund (klein):** Der vom DFRobot-Wiki für SEN0428 verlinkte Schaltplan trägt Titel und Bauteil „SHTC3“
 (SKU-D008, Schwesterprodukt SEN0414). Topologie (LDO, 2N7002, 10 kΩ) plausibel, die Sensor-Pinbelegung im Plan gilt
@@ -162,6 +167,24 @@ Prüfung Elektronik 2026-11-09 (`hardware/programmer/README.md` Kap. 9, SPICE `s
 
 **Empfehlung:** Variante B (ein Händler weniger, 8.90 CHF) unter den Bedingungen B1–B6 (README Kap. 9.5); A nur noch,
 falls ohnehin eine Auslandsbestellung bei waveshare.com nötig ist.
+
+"""
+
+TEXT_VERG = """## 5 Verguss (D-030) und Programmieradapter (D-031)
+
+**Verguss:** Electrolube ER2223 Resin Pack 250 g, **2 Beutel** (je Bauserie einer, Haltbarkeit nach dem Abfüllen 3 Monate,
+MA-3) bei Simpex, CHF 41.29 inkl. MWST, **Lieferzeit 8 Wochen** → sofort nach Freigabe bestellen; vorher SDB Teil B in
+Landessprache anfordern (D-030 Bed. 1). Zubehör nach `docs/concepts/vergussmasse_versiegelung.md` Kap. 7.1 (V-Z1…V-Z11):
+mit Schweizer Shopbeleg bei bastelgarage.ch (ohnehin in der Liste) Feinwaage, Mischbecher, Rührstäbe, Trichter, Pinsel,
+Nitrilhandschuhe; der Rest (Prüfgewichte, kindergesicherte Flaschen, Sekundärbehälter, Spritzen/Kanülen, Schutzbrille/Visier,
+Schürze/Augenspülflasche, Halbmaske A, Thermometer bis 80 °C) hat **keine abrufbare CH-Quelle** (Laborhandel/Baumarkt-Seiten
+gesperrt oder JS) und bleibt **ANNAHME** aus Kap. 7.1. **Entfällt, falls vorhanden:** Feinwaage (V-Z1), Schutzbrille/Visier
+(V-Z8), Wärmeschrank (V-Z12). Abweichungen zur Freigabe durch die Sicherheit: Silikon- statt PE-Trichter (V-Z5c),
+Handschuhe ohne Angabe von Dicke/EN 374 (V-Z7), Waage ohne Justiergewicht (Prüfgewichte V-Z2 nötig).
+
+**Programmieradapter:** Teile nach `hardware/programmer/README.md` Kap. 2.1/6 (inkl. R2 470 Ω C17710, D-031/PA-6) bei LCSC,
+Preise der JLC/LCSC-Teilesuche umgerechnet mit dem Kurs aus `scripts/cost_model.py`; LCSC-Mindestmengen und Versand
+**ANNAHME** (README: 10–25 CHF) – mit der JLC-Bestellung im selben Warenkorb prüfen. USB-UART = W1 (PL2303, pi-shop.ch).
 
 """
 
@@ -218,16 +241,19 @@ def main():
     tot_v = sum(h["vers"] for h in hs)
     ann = sum(r["_sum"] for r in rows if r["_annahme"] and r["Status"] not in NICHT_SUMMIEREN)
     w(f"- Warenwert geplant **{tot:.2f} CHF** + Versand **{tot_v:.2f} CHF** = **{tot + tot_v:.2f} CHF** "
-      f"(davon {ann:.2f} CHF Preis-ANNAHME; ohne Vergussmasse S8 = Platzhalter, ohne Programmieradapter-Teile W2, ohne JLC).\n")
+      f"(davon {ann:.2f} CHF Preis-ANNAHME; ohne JLC, ohne Werkstattbestand; Summen je Bereich Kap. 8).\n")
     w(f"- **Händler mit Bestellung: {sum(1 for h in hs if h['ware'] > 0)}** "
-      f"({', '.join(h['h'] for h in hs if h['ware'] > 0)}). Kern sind **zwei** CH-Händler: bastelgarage.ch und pi-shop.ch.\n")
+      f"({', '.join(h['h'] for h in hs if h['ware'] > 0)}). Kern sind **zwei** CH-Händler: bastelgarage.ch und pi-shop.ch; "
+      "dazu Simpex (Verguss, 8 Wochen Lieferzeit) und LCSC (mit JLC bündeln).\n")
     w("- Ein Händler weniger möglich: Zellen bei bastelgarage.ch (Varta statt Panasonic, Entscheid Auftraggeber, S1).\n")
-    w("- Offen: Quelle O-Ringe AS568-019 Silikon, Schrauben ISO 7045 M2×3 PH1 und ISO 7380 M2.5×8, Silikonplatte, "
-      "Silikonfett (ein Normteile-/Dichtungshändler, Kap. 6); Filament grau nicht an Lager; microSD nicht an Lager.\n\n")
+    w("- Offen: Quelle O-Ringe AS568-019 Silikon, ISO 7380 M2.5×8, Silikonplatte, Silikonfett, Federstifte "
+      "(ein Normteile-/Dichtungshändler) und Labor-/Schutzzubehör Verguss (ein Laborhändler); Filament grau und microSD "
+      "nicht an Lager.\n\n")
     w(TEXT_SHT)
     w(TEXT_UART)
     w(TEXT_SD)
-    w("## 5 Liste\n\n")
+    w(TEXT_VERG)
+    w("## 6 Liste\n\n")
     w("| ID | Teil | Soll | Bedarf | Händler | Art.-Nr. | Angebot | Pack. × Inhalt | CHF/Pack. | Summe CHF | Lager | Abruf | Status |\n")
     w("|---|---|---|---|---|---|---|---|---|---|---|---|---|\n")
     for r in rows:
@@ -241,7 +267,7 @@ def main():
     for r in rows:
         if r["Bemerkung"].strip():
             w(f"- **{r['ID']}** ({r['Bedarf_Herleitung']}): {r['Bemerkung']}\n")
-    w("\n## 6 Händlergruppierung und Versand\n\n")
+    w("\n## 7 Händlergruppierung und Versand\n\n")
     w("| Händler | Positionen | Ware CHF | Versand CHF | Total CHF | davon jetzt lieferbar | Versandregel |\n|---|---|---|---|---|---|---|\n")
     for h in hs:
         w(f"| {h['h']} | {', '.join(r['ID'] for r in h['rows'])} | {h['ware']:.2f} | {h['vers']:.2f} | "
@@ -251,15 +277,24 @@ def main():
     if bg:
         w(f"- bastelgarage.ch: geplant {bg['ware']:.2f} CHF → {'versandkostenfrei' if bg['vers'] == 0 else 'Versand 6.90'}; "
           f"jetzt lieferbar {bg['ware_jetzt']:.2f} CHF (ohne ausverkauftes Grau) → "
-          f"{'frei' if bg['vers_jetzt'] == 0 else 'unter 80 CHF, Versand 6.90'}. Ohne S11 (PETG) fällt die Bestellung unter 80 CHF.\n")
+          f"{'frei' if bg['vers_jetzt'] == 0 else 'unter 80 CHF, Versand 6.90'}.\n")
     w("- pi-shop.ch: G2 + W1 + G3 in **einer** Sendung, sobald G3 an Lager ist; getrennt bestellt kostet die zweite Sendung "
       "nochmals 7.90 CHF.\n")
-    w("- Normteile/Dichtungen (S2, S3, S5, S6, G8b): **ein** Fachhändler für alles; noch keiner mit abrufbarem Angebot "
+    w("- Normteile/Dichtungen (S2, S5, S6, G8b, P8): **ein** Fachhändler für alles; noch keiner mit abrufbarem Angebot "
       "(Versand ANNAHME 10 CHF).\n")
     w("- G9 (Gateway-LED, D-027): nicht bei Digi-Key einzeln bestellen (23 CHF Versand), sondern in die LCSC-Bestellung des "
       "Programmieradapters legen (Teilewahl Elektronik).\n")
     w("- JLC (PCBA Sensor) und Verguss (S8) sind separat (ORDER_JLC_REV_C.md bzw. Material-Agent).\n\n")
-    w("## 7 Prüfhinweise (`scripts/einkaufsliste.py --check`)\n\n")
+    w("## 8 Summen je Bereich (Ware, ohne Versand)\n\n| Bereich | Positionen | Ware CHF | davon ANNAHME CHF |\n|---|---|---|---|\n")
+    for b in BEREICHE:
+        rb = [r for r in rows if r["Bereich"] == b and r["Status"] not in NICHT_SUMMIEREN]
+        if rb:
+            w(f"| {b} | {len(rb)} | {sum(r['_sum'] for r in rb):.2f} | {sum(r['_sum'] for r in rb if r['_annahme']):.2f} |\n")
+    w("\nVerguss-Zubehör (V-Z…) ohne Beutel: "
+      f"**{sum(r['_sum'] for r in rows if r['ID'].startswith('V-Z') and r['Status'] not in NICHT_SUMMIEREN):.2f} CHF** "
+      "(geht als Einmalkosten in `scripts/cost_final_phase5.py`); Programmieradapter (P…, W1, LCSC-Versand ANNAHME) siehe "
+      "Kap. 7.\n\n")
+    w("## 9 Prüfhinweise (`scripts/einkaufsliste.py --check`)\n\n")
     for x in warn:
         w(f"- {x}\n")
     os.makedirs(os.path.dirname(OUT), exist_ok=True)

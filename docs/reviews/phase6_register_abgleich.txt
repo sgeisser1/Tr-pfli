@@ -1,5 +1,5 @@
-fluidi Registerabgleich, 2026-11-09 00:37, scripts/check_register.py
-INDEX.csv: 207 Zeilen
+fluidi Registerabgleich, 2026-11-09 01:06, scripts/check_register.py
+INDEX.csv: 212 Zeilen
 
 == 1 JLC-BOM production/rev-C/1_jlc_upload/fluidi_sensor_bom_jlc.csv
    Kopie hardware/sensor/out/fluidi_sensor_bom_jlc.csv inhaltsgleich: ja
@@ -72,38 +72,73 @@ INDEX.csv: 207 Zeilen
    ok   G3   Kingston SDCIT2/16GB (microSDHC Industrial UHS-I 1 -> docs/datasheets/Kingston_SDCIT2_Datasheet_MKD-02122026.pdf
    ok   G6   DFRobot Fermion SHT40 Breakout (SEN0428) -> docs/datasheets/DFRobot_SEN0428_Schematic_V0.1.pdf + docs/datasheets/DFRobot_SEN0428_Dimensions_V0.1.png, docs/datasheets/Sensirion_SHT4x_Datasheet_V7.3.pdf
    ok   G7   Eigendruck Bambu (mechanical/gateway_pi/print) -> docs/references/BambuLab_ASA_TechnicalDataSheet_V2.0.pdf
-   n/a  G8   Handelsware (Handelsware/Bestand, kein Register noetig)
+   ok   G8a  Messing M2.5 x 4 x Ø4.6 (bastelgarage.ch Art. 4256 -> docs/references/bastelgarage_Gewindeeinsatz-Schraube_Auszug_2026-11-09.txt
+   n/a  G8b  Handelsware (Quelle offen) (Handelsware/Bestand, kein Register noetig)
    ok   G9   Kingbright WP710A10GD + YAGEO MFR-25FBF52-470R -> docs/datasheets/Kingbright_WP710A10GD_Datasheet_V10B.pdf, docs/datasheets/Yageo_MFR_Datasheet_V4.pdf
    n/a  G10  Werkstattbestand (Handelsware/Bestand, kein Register noetig)
    n/a  G11  Seeed XIAO nRF52840 Sense (Handelsware/Bestand, kein Register noetig)
    n/a  V1   Versand pi-shop.ch (B-Post Economy, Sammelbestellung G2, G3, (Versand)
    n/a  V2   Versand bastelgarage.ch (PostPac Economy, entfaellt ab CHF 8 (Versand)
 
+== 3b Programmieradapter hardware/programmer/README.md Kap. 2.1
+   ok   U1     C5446     -> Zeile 187 docs/datasheets/Torex_XC6206_Datasheet_ETR0305-004b.pdf
+   ok   U2     C2891260  -> Zeile 188 docs/datasheets/Torex_XC6206_Datasheet_ETR0305-004b.pdf
+   ok   U3     C2891260  -> Zeile 188 docs/datasheets/Torex_XC6206_Datasheet_ETR0305-004b.pdf
+   ok   C1–C4  C28323    -> Zeile 191 docs/datasheets/Samsung_CL31A107MQHNNNE_Catalog_2015-11.pdf
+   ok   U4     C183012   -> Zeile 189 docs/datasheets/TI_SN74AUP1G17_Datasheet_SCES579J.pdf
+   ok   C5     C1711     -> Zeile 192 docs/datasheets/Samsung_CL31A107MQHNNNE_Catalog_2015-11.pdf
+   ok   R2     C17710    -> Zeile 194 docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf
+   ok   R1     C26082    -> Zeile 193 docs/datasheets/UNI-ROYAL_0402WGF-Serie_Datasheet_LCSC-2024-11.pdf
+
 == 4 Einkaufsliste docs/manuals/EINKAUFSLISTE.csv
    ok   S1   BT1 (Vergleich)
    ok   S2   MECH-OR1 (Rev B)
-   ok   S3   MECH-SCR1 (Rev C)  (ohne lokale Datei)
+   ok   S3   MECH-SCR1 (Phase 6, Vorschlag Mechanik)
    ok   S4   MECH-NUT1  (ohne lokale Datei)
    ok   S5   MECH-MEM1  (ohne lokale Datei)
-   --   S6   Silikonfett fuer O-Ringe (kein Register angegeben)
-   --   S7   Kleber Lichtfenster (kein Register angegeben)
-   ok   S8   EP-K (Rev B)
-   ok   S9   MAT-ASA
-   ok   S10  MAT-ASA
-   --   S11  Filament Lichtfenster transluzent natur (kein Register angegeben)
+   ok   S6   MECH-GREASE1 (Sensor S6)  (ohne lokale Datei)
+   ok   S7   MAT-ADH1 (Sensor S7, Kandidat)
+   ok   S9   MAT-ASA, MAT-ASA2 (Phase 6, Alternative zu MAT-ASA)
+   ok   S10  MAT-ASA, MAT-ASA2 (Phase 6, Alternative zu MAT-ASA)
+   ok   S11  MAT-WIN1 (Sensor S11, Kandidat)
    ok   G2   GW-PSU  (ohne lokale Datei)
    ok   G3   GW-SD
    ok   G6   GW-CLIM1-BRD2 (Gateway G6, Empfehlung D-029)
-   --   G8a  Gewindeeinsaetze M2.5 (4 je Gateway) (kein Register angegeben)
-   --   G8b  Schrauben M2.5 x 8 (4 je Gateway) (kein Register angegeben)
+   ok   G8a  GW-MECH-INS1 (Gateway G8a)
+   ok   G8b  GW-MECH-SCR2 (Gateway G8b)  (ohne lokale Datei)
    ok   G9   GW-LED1 (Gateway, Vorschlag), GW-R1 (Gateway, Vorschlag)
    --   G10  Litze AWG 28, Schrumpfschlauch (kein Register angegeben)
    ok   W1   TOOL-UART2 (Werkzeug, Alternative zu TOOL-UART1)
-   ok   W2   P-U1 (Programmieradapter), P-U2 P-U3 (Programmieradapter), P-U4 (Progr
+   ok   V-M1 EP-K (Rev B)
+   ok   V-Z1 VERG-ZUB (Werkzeug, Verguss)
+   ok   V-Z2 VERG-ZUB (Werkzeug, Verguss)
+   ok   V-Z3 VERG-ZUB (Werkzeug, Verguss)
+   ok   V-Z4 VERG-ZUB (Werkzeug, Verguss)
+   ok   V-Z5a VERG-ZUB (Werkzeug, Verguss)
+   ok   V-Z5b VERG-ZUB (Werkzeug, Verguss)
+   ok   V-Z5c VERG-ZUB (Werkzeug, Verguss)
+   ok   V-Z5d VERG-ZUB (Werkzeug, Verguss)
+   ok   V-Z6a VERG-ZUB (Werkzeug, Verguss)
+   ok   V-Z6b VERG-ZUB (Werkzeug, Verguss)
+   ok   V-Z7 VERG-ZUB (Werkzeug, Verguss)
+   ok   V-Z8 VERG-ZUB (Werkzeug, Verguss)
+   ok   V-Z9 VERG-ZUB (Werkzeug, Verguss)
+   ok   V-Z10 VERG-ZUB (Werkzeug, Verguss)
+   ok   V-Z11 VERG-ZUB (Werkzeug, Verguss)
+   ok   V-Z12 VERG-ZUB (Werkzeug, Verguss)
+   ok   P1   P-U1 (Programmieradapter)
+   ok   P2   P-U2 P-U3 (Programmieradapter)
+   ok   P3   P-U4 (Programmieradapter)
+   ok   P4   P-C1..C4 (Programmieradapter)
+   ok   P5   P-C5 (Programmieradapter)
+   ok   P6   P-R1 (Programmieradapter)
+   ok   P7   P-R2 (Programmieradapter)
+   ok   P8   P-J3 (Programmieradapter)  (ohne lokale Datei)
+   --   P9   FR4/Lochraster, SOT-23-Adapter, Litze, Steckbruecken, A (kein Register angegeben)
 
 == 5 Format INDEX.csv
    ok: alle Zeilen 12 Spalten
    Pfade angegeben, Datei fehlt: 0
-   Zeilen ohne lokale Datei (Normteile, nicht herunterladbar, Handelsware): 22
+   Zeilen ohne lokale Datei (Normteile, nicht herunterladbar, Handelsware): 24
 
 ERGEBNIS: 1 Luecke(n)

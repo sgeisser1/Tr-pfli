@@ -1,11 +1,11 @@
 Quelle: Schweizer Haendler (bastelgarage.ch, pi-shop.ch, play-zone.ch, mediamarkt.ch, alltron.ch) und Herstellerwikis (Waveshare, DFRobot)
-Abgerufen: 2026-11-09 00:01 (CET) mit curl (User-Agent Browser), Textauszug (Tags entfernt), je Seite gekuerzt; sha256 des Roh-HTML
+Abgerufen: 2026-11-09 01:04 (CET) mit curl (User-Agent Browser), Textauszug (Tags entfernt), je Seite gekuerzt; sha256 des Roh-HTML
 Preise CHF inkl. MWST laut Shop; Verfuegbarkeit = Anzeige am Abrufzeitpunkt. Nicht abrufbar (Bot-Sperre/403): digitec/galaxus, mouser.ch, distrelec.ch, digikey.ch, conrad.ch, brack.ch, toppreise.ch
-Verwendung: docs/manuals/EINKAUFSLISTE.md/.csv, hardware/gateway/BOM_GATEWAY.csv (G3, G6), docs/manuals/INSTALL_FIRMWARE_TOOLS.md (FW-T3)
+Verwendung (Stand Phase 6, inkl. Verguss-Zubehoer): docs/manuals/EINKAUFSLISTE.md/.csv, hardware/gateway/BOM_GATEWAY.csv (G3, G6), docs/manuals/INSTALL_FIRMWARE_TOOLS.md (FW-T3)
 ======================================================================
 
 ### URL: https://www.bastelgarage.ch/fermion-temperatur-und-feuchtigkeitssensor-sht40
-HTTP 200, sha256 Roh-HTML: 2dc9516552f6da3be66024014a152243c38b5e31cb3dcd02841c4498e9abf2b8
+HTTP 200, sha256 Roh-HTML: f35bf4d85fcfc2f9ab2198c88392a6df7c30208c92aef6b53438ba4e01f7da64
 Artikelnr. 421989 | Verfügbarkeit Lagernd | CHF11,90 | Netto CHF11,01 | Menge | + Warenkorb | 0 Bewertungen | / | + Bewertung | Ähnliche P
 Beschreibung
 Bewertungen (0)
@@ -55,7 +55,7 @@ CHF11,90
 Netto 
 
 ### URL: https://www.bastelgarage.ch/cr2032-knopfzellen-batterie-3v
-HTTP 200, sha256 Roh-HTML: cddb4435aa36c1b8884cfb00f5365cf350d0cc5048178160063d19da77f999af
+HTTP 200, sha256 Roh-HTML: 961190dc75da1d145a1d5216169d0489e71c471cef418742e1952b73a2a91dba
 Artikelnr. 420504 | Verfügbarkeit Lagernd | CHF1,30 | Netto CHF1,20 | Menge | + Warenkorb | 0 Bewertungen | / | + Bewertung | Ähnliche Pro
 Beschreibung
 Bewertungen (0)
@@ -106,7 +106,7 @@ Menge
 + Warenko
 
 ### URL: https://www.bastelgarage.ch/varta-knopfzelle-cr2032-5-stuck
-HTTP 200, sha256 Roh-HTML: a16d5ea305320301d5fb8a0d8d351be01090b1e2812b37b32ccd0d1d9fb353c3
+HTTP 200, sha256 Roh-HTML: 50b1df1049111f8f4c228806733b5d7b8752126fb34dcd9bc86bb2669c1a5fcc
 Artikelnr. 424382 | Verfügbarkeit Lagernd | CHF8,90 | Netto CHF8,23 | Menge | + Warenkorb | 0 Bewertungen | / | + Bewertung | Ähnliche Pro
 Beschreibung
 Bewertungen (0)
@@ -119,7 +119,7 @@ Standard-Spannung: 3 V für universelle Kompatibilität mit vielen Geräten.
 Kompakte Bauweise: Ideal für kleine Geräte wie Uhren, Fernbedienungen und Taschen
 
 ### URL: https://www.bastelgarage.ch/10-stuck-m2x3mm-linsenkopfschrauben-set-rostfrei
-HTTP 200, sha256 Roh-HTML: daea7330c0ea7fee40e14ca2a625636a5849519baa3000c7a11319a892b15bc4
+HTTP 200, sha256 Roh-HTML: 5313d0a705b39abe6a8ac68f64a76b726bf86445e02d7abd57961266c438f9d3
 Artikelnr. 422191 | Verfügbarkeit Lagernd | CHF3,90 | Netto CHF3,61 | Menge | + Warenkorb | 0 Bewertungen | / | + Bewertung | Ähnliche Pro
 Beschreibung
 Bewertungen (0)
@@ -173,7 +173,7 @@ Netto CHF3,61
 1
 
 ### URL: https://www.bastelgarage.ch/10-stuck-m2-mutter-set-rostfrei
-HTTP 200, sha256 Roh-HTML: a007b1b1638d9864cf5e0c50b932b136a341968fdce0867ebd18a8b7ebaae35e
+HTTP 200, sha256 Roh-HTML: 8341aa43ef96ed93263e2519d29867e3c48269aa6632560340be19a4cf0d1107
 Artikelnr. 422198 | Verfügbarkeit Lagernd | CHF2,90 | Netto CHF2,68 | Menge | + Warenkorb | 0 Bewertungen | / | + Bewertung | Ähnliche Pro
 Beschreibung
 Bewertungen (0)
@@ -225,7 +225,7 @@ Netto CHF3,61
 Diese rostfreien M2x10mm Torx Linsenkopfschrauben eignen sich perfekt für jeden Maker und Bastl
 
 ### URL: https://www.bastelgarage.ch/m2-5-4mm-gewindeeinsatze-messing-heat-insert-100stk
-HTTP 200, sha256 Roh-HTML: d22951c5c963f4f06569ed957ffc9927529ac4e5502f713948eb0c38143254dd
+HTTP 200, sha256 Roh-HTML: c19f675921edb99167023396b3f58ec8c0afb94fa345fabe53bd1ff2652a5cd1
 Artikelnr. 425681 | Verfügbarkeit Lagernd | CHF15,90 | Netto CHF14,71 | Menge | + Warenkorb | 0 Bewertungen | / | + Bewertung | Ähnliche P
 Beschreibung
 Bewertungen (0)
@@ -243,7 +243,7 @@ Standardgrösse M2.5 × 4 × 4.6 mm (Innengewinde × Höhe × Aussendurchmesser)
 Montage mit handelsü
 
 ### URL: https://www.bastelgarage.ch/asa-grau-filament-1-75mm-1kg-esun
-HTTP 200, sha256 Roh-HTML: da08a1363499e869423ff46b652a08f870e64d0648844cb67e8566b6c6271f43
+HTTP 200, sha256 Roh-HTML: 61bd527c0efdc26bf0f7cd697fa725ff9ea78e5efa2e31adefeb6e27cb6488fb
 Artikelnr. 424233 | Verfügbarkeit Ausverkauft | CHF19,90 | Netto CHF18,41 | Menge | + Warenkorb | 0 Bewertungen | / | + Bewertung | Ähnlic
 Beschreibung
 Bewertungen (0)
@@ -253,7 +253,7 @@ Fazit:
 ASA+ von Esun eignet sich für fortgeschrittene Anwender, ist im Vergleich zu ABS leicht zu drucken und bietet dir auch gute Hafteigenschaften! ASA ist die perfekte Alternative zu ABS und PETG. ASA verfügt über sehr gute Zähigkeit und Schlagzähigkeit, um Stürzen, Stössen und
 
 ### URL: https://www.bastelgarage.ch/asa-blau-filament-1-75mm-1kg-esun
-HTTP 200, sha256 Roh-HTML: d904d71ea9501e85f0b980611301ccaec034ca10c460b5a9983181bc44141a0f
+HTTP 200, sha256 Roh-HTML: 3fe4ff055b6becb3116ae2cf256183391b746a3e28b23bc0a4b6b07412896165
 Artikelnr. 424238 | Verfügbarkeit Lagernd | CHF19,90 | Netto CHF18,41 | Menge | + Warenkorb | 0 Bewertungen | / | + Bewertung | Ähnliche P
 Beschreibung
 Bewertungen (0)
@@ -263,7 +263,7 @@ Fazit:
 ASA+ von Esun eignet sich für fortgeschrittene Anwender, ist im Vergleich zu ABS leicht zu drucken und bietet dir auch gute Hafteigenschaften! ASA ist die perfekte Alternative zu ABS und PETG. ASA verfügt über sehr gute Zähigkeit und Schlagzähigkeit, um Stürzen, Stössen und
 
 ### URL: https://www.bastelgarage.ch/asa-kaltweiss-filament-1-75mm-1kg-esun
-HTTP 200, sha256 Roh-HTML: fc36a424941813ced853f0d4f05e21ce5907b93e197afa9353593fccf0b73d20
+HTTP 200, sha256 Roh-HTML: 5ae74671d4dae6ab35fcc1d17dc911428c9e86540f3bd73a056032b3469d7661
 Artikelnr. 424234 | Verfügbarkeit Lagernd | CHF19,90 | Netto CHF18,41 | Menge | + Warenkorb | 0 Bewertungen | / | + Bewertung | Ähnliche P
 Beschreibung
 Bewertungen (0)
@@ -273,7 +273,7 @@ Fazit:
 ASA+ von Esun eignet sich für fortgeschrittene Anwender, ist im Vergleich zu ABS leicht zu drucken und bietet dir auch gute Hafteigenschaften! ASA ist die perfekte Alternative zu ABS und PETG. ASA verfügt über sehr gute Zähigkeit und Schlagzähigkeit, um Stürzen, Stösse
 
 ### URL: https://www.bastelgarage.ch/uhu-plus-endfest-zweikomponenten-epoxidkleber-33g
-HTTP 200, sha256 Roh-HTML: 86a50165cbed91e3171445f14a64ffd492f7d9f56c9a45eb7061c7001e595f12
+HTTP 200, sha256 Roh-HTML: b4107f1766db44e559747daf8bfc44e52ce7ae5cd3c280784f8e77a558b0cf59
 Artikelnr. 422137 | Verfügbarkeit Lagernd | CHF12,90 | Netto CHF11,93 | Menge | + Warenkorb | 0 Bewertungen | / | + Bewertung | Gefahr | GHS
 Beschreibung
 Bewertungen (0)
@@ -314,8 +314,303 @@ Hinweis:
 HTML ist nicht verfügbar!
 Bewert
 
+### URL: https://www.bastelgarage.ch/digitale-feinwaage-mh-500-0-01g-500g
+HTTP 200, sha256 Roh-HTML: 060118966794ac35af6de279abc45bd2e4acea1063b4521e27bf9ba3f85c36f9
+Artikelnr. 424394 | Verfügbarkeit Lagernd | CHF17,90 | Netto CHF16,56 | Menge | + Warenkorb | 0 Bewertungen | / | + Bewertung | Ähnliche P
+Beschreibung
+Bewertungen (0)
+Digitale Feinwaage MH-500 0.01g-500g
+Die Digitale Feinwaage MH-500 ist eine kompakte und praktische Waage für den Alltag. Sie bietet eine Auflösung von 0.01g und kann bis zu 500g wiegen, ideal für den Einsatz in der Küche, für Schmuck oder andere feine Wiegungen. Dank ihrer handlichen Grösse kannst Du sie einfach mitnehmen und verstauen. Das beleuchtete LCD-Display sorgt für eine klare Ablesbarkeit der Messwerte, selbst bei schlechten Lichtverhältnissen. Du kannst zwischen verschiedenen Gewichtseinheiten (g, tl, oz, ct) wechseln, um flexibel zu arbeiten. Die Tara-Funktion erlaubt Dir, das Eigengewicht von Behältern abzuziehen, sodass nur das tatsächliche Gewicht des Inhalts gewogen wird. Die Waage verfügt zudem über eine praktische Stückzählfunktion, mit der Du kleine Objekte wie Münzen, Perlen oder Schrauben einfach zählen kannst. Der Überlastungsschutz bewahrt die Waage vor Schäden durch zu hohe Lasten. Zudem schaltet sie sich nach 60 Sekunden automatisch ab, um Batterie zu sparen. Betrieben wird sie mit 2 AAA-Batterien (nicht enthalten). Die Auto-Kalibrierung sorgt dafür, dass die Messwerte immer genau bleiben.
+Empfohlenes Zubehör:
+2x AAA-Batterien
+Eigenschaften:
+Feine Auflösung: Zeigt Gewichte in 0.01g-Schritten an.
+Maximale Kapazität: Kann bis zu
+
+### URL: https://www.bastelgarage.ch/pp-einweg-mischbecher-50ml
+HTTP 200, sha256 Roh-HTML: 3ed6c7ae90efb2015237a3340832d607be5efa78c1e021e050c9d28d69e34ca2
+Artikelnr. 421219 | Verfügbarkeit Lagernd | CHF0,30 | Netto CHF0,28 | Menge | + Warenkorb | 0 Bewertungen | / | + Bewertung | Ähnliche Pro
+Beschreibung
+Bewertungen (0)
+PP Einweg-Mischbecher 50ml
+Diese 50ml PP Einweg-Mischbecher kannst du zum Vermischen von Epoxidharz einsetzen.
+Technische Details:
+Material: PP
+Nicht Lösungsmittelbeständig
+Füllmenge: 50ml
+Höhe: 20mm
+Durchmesser oben: 70mm
+Gewicht: 1g
+Lieferumfang:
+1x 50ml Einweg-Mischbecher
++ Bewertung
+Mein Name
+Meine Bewertung
+Hinweis:
+HTML ist nicht verfügbar!
+Bewertung
+Weniger Gut
+Gut
+test
+test2
+Weiter
+PP Einweg-Mischbecher 50ml
+Artikelnr. 421219
+Verfügbarkeit Lagernd
+CHF0,30
+Netto CHF0,28
+Menge
++ Warenkorb
+0 Bewertungen
+/
++ Bewertung
+Ähnliche Produkte
+Rührstäbe Buche 100 Stk.
+Diese gerundeten Einweg-Holz-Rührstäbe kannst du zum Vermischen von Epoxidharz einsetzen. Techn..
+CHF6,90
+Netto CHF6,38
++ Warenkorb
+5-Minuten Epoxy Kleber 2-Komponenten 2x100g
+Mit diesem R&G 2-Komponenten Epoxidharz-Kleber kannst du unterschiedliche Teile miteinander verk..
+CHF17,90
+Netto CHF16,56
++ Warenkorb
+PP Mischbecher 120ml
+Der PP Mischbecher mit einer Füllmenge von 120ml ist dein idealer Begleiter für präzise und saubere ..
+CHF0,85
+Netto CHF0,79
++ Warenkorb
+5-Min Epoxy Kleber 2-Komponenten 2x50g
+Mit diesem R&G 2-Komponenten Epoxidharz-Kleber kannst du unterschiedliche Teile miteinander verk..
+CHF12,90
+Netto CHF11,93
++ Warenkorb
+5-Min Epoxy Kleber 2-Komponenten Doppelspritze 25g
+Entdec
+
+### URL: https://www.bastelgarage.ch/ruhrstabe-buche-100-stk
+HTTP 200, sha256 Roh-HTML: ac5b426ef5af3f7fa94de835898af6ea266a03df10d803479e7f40f7589964fa
+Artikelnr. 421217 | Verfügbarkeit Lagernd | CHF6,90 | Netto CHF6,38 | Menge | + Warenkorb | 0 Bewertungen | / | + Bewertung | Ähnliche Pro
+Beschreibung
+Bewertungen (0)
+Rührstäbe Buche 100 Stk.
+Diese gerundeten Einweg-Holz-Rührstäbe kannst du zum Vermischen von Epoxidharz einsetzen.
+Technische Details:
+Material: Holz Buche
+Gewicht: 256g
+Lieferumfang:
+100x Rührstäbe Buche
++ Bewertung
+Mein Name
+Meine Bewertung
+Hinweis:
+HTML ist nicht verfügbar!
+Bewertung
+Weniger Gut
+Gut
+test
+test2
+Weiter
+Rührstäbe Buche 100 Stk.
+Hersteller
+purecrea
+Artikelnr. 421217
+Verfügbarkeit Lagernd
+CHF6,90
+Netto CHF6,38
+Menge
++ Warenkorb
+0 Bewertungen
+/
++ Bewertung
+Ähnliche Produkte
+PP Einweg-Mischbecher 50ml
+Diese 50ml PP Einweg-Mischbecher kannst du zum Vermischen von Epoxidharz einsetzen.Technische Detail..
+CHF0,30
+Netto CHF0,28
++ Warenkorb
+5-Minuten Epoxy Kleber 2-Komponenten 2x100g
+Mit diesem R&G 2-Komponenten Epoxidharz-Kleber kannst du unterschiedliche Teile miteinander verk..
+CHF17,90
+Netto CHF16,56
++ Warenkorb
+Epoxy Kit 280g mit Epoxidharz L und Härter L
+Dieses Epoxy-Kit umfasst 200g Epoxidharz und 80g Härter, mit denen du insgesamt 280g Mischung anfert..
+CHF12,90
+Netto CHF11,93
++ Warenkorb
+Nitril Schutzhandschuhe L 100er Pack
+Diese Einweg- Nitrilhandschuhe empfehlen wir zum Schutz, wenn du mit Epoxidharz, Kleber oder UV Resi..
+CHF15,90
+Netto CHF14,71
++ Warenkorb
+Nitril Schutzhandschuhe XL 100er Pack
+Diese Einweg- Nitrilhandschuhe empfeh
+
+### URL: https://www.bastelgarage.ch/silikon-resin-trichter-mit-edelstahl-feinfilter
+HTTP 200, sha256 Roh-HTML: 63ecf0709c8cadce10f87e1b3401a12e023b96593cf2794b5ee76e0d5318dba1
+Artikelnr. 424244 | Verfügbarkeit Lagernd | CHF10,90 | Netto CHF10,08 | Menge | + Warenkorb | 0 Bewertungen | / | + Bewertung | Ähnliche P
+Beschreibung
+Bewertungen (0)
+Silikon-Resin-Trichter mit Edelstahl-Feinfilter
+Erleichtere Deine 3D-Druck-Projekte mit unserem Silikon-Resin-Trichter, der mit einem hochwertigen Edelstahl-Feinfilter ausgestattet ist. Dieser Trichter wurde speziell entwickelt, um ungenutztes Harz effizient und sauber zurück in die Flasche zu füllen, wobei Verunreinigungen zuverlässig herausgefiltert werden. Der flexible Silikontrichter passt sich verschiedenen Flaschenhälsen an und lässt sich für eine platzsparende Aufbewahrung zusammenklappen. Der herausnehmbare Edelstahlfilter ist langlebig und leicht zu reinigen, was eine wiederholte Nutzung ermöglicht und den Bedarf an Einwegfiltern reduziert. Durch die feine Maschenstruktur des Filters werden selbst kleinste Partikel effektiv entfernt, sodass Dein Harz frei von unerwünschten Rückständen bleibt. Dieses Set ist ideal für alle, die Wert auf Sauberkeit und Effizienz beim Umgang mit Resin legen. Es eignet sich sowohl für den professionellen Einsatz als auch für Hobbyanwender im 3D-Druck-Bereich. Mit diesem Trichter- und Filtersystem trägst Du zudem zur Nachhaltigkeit bei, indem Du auf wiederverwendbare Materialien setzt.
+Empfohlenes Zubehör:
+Nitril Schutzhandschuhe L 100er Pack
+Creality Resin Filter 20 Stück
+1 Liter Isopropylalkohol / Isopropanol 99
+
+### URL: https://www.bastelgarage.ch/synthetik-tabletop-pinsel-grosse-0
+HTTP 200, sha256 Roh-HTML: cfed03a1c07b0ec0c235f3f0965e2159afaee0242b9004689cd6289425e85e39
+Artikelnr. 425342 | Verfügbarkeit Lagernd | CHF6,90 | Netto CHF6,38 | Menge | + Warenkorb | 0 Bewertungen | / | + Bewertung | Ähnliche Pro
+Beschreibung
+Bewertungen (0)
+Synthetik-Tabletop-Pinsel Grösse 0
+Der Synthetik-Tabletop-Pinsel Grösse 0 von AK Interactive ist ein Detailpinsel aus der Tabletop-Serie, der speziell für die Bemalung von Miniaturen und Spielfiguren entwickelt wurde. Als kleinster Pinsel der Tabletop-Reihe eignet er sich ideal für feinste Details wie Augen, Schmuckstücke und kleine Akzente. Die weissen Synthetikborsten sind weicher und feiner als bei regulären Synthetikpinseln und ermöglichen eine besonders hohe Farbaufnahme. Sowohl Einsteiger, die ihre ersten Brettspiel-Miniaturen bemalen, als auch erfahrene Tabletop-Spieler profitieren von der Qualität dieses Pinsels.
+Eigenschaften:
+Feinster Pinsel der Tabletop-Serie für präzise Detailarbeiten
+Weisse Synthetikborsten sind weicher und feiner als Standard-Synthetik
+Hohe Farbaufnahmekapazität für gleichmässige Farbabgabe
+Weisses Griffende zur schnellen Identifikation der Tabletop-Familie
+Kompatibel mit Acryl-, Emaille-, Öl- und Effektfarben
+Konstruktion verhindert Farbeindringen in die Zwinge
+Anwendungsbeispiele:
+Augen und Pupillen auf Miniaturen detailliert malen
+Feine Schmuckdetails und Edelsteine auf Figuren hervorheben
+Kleine Wappen und Symbole auf Schilden auftragen
+Präzise Highlights auf Gesichtszügen setzen
+Feine Linien und Muster auf Kleidung 
+
+### URL: https://www.bastelgarage.ch/nitril-schutzhandschuhe-l-100er-pack
+HTTP 200, sha256 Roh-HTML: 03c492c5ec7054eb0e7a9d49d700f8b7e9ad361b7818caf9120bb765a319b70d
+Artikelnr. 421782 | Verfügbarkeit Lagernd | CHF15,90 | Netto CHF14,71 | Menge | + Warenkorb | 0 Bewertungen | / | + Bewertung | Ähnliche P
+Beschreibung
+Bewertungen (0)
+Nitril Schutzhandschuhe L 100er Pack
+Diese Einweg- Nitrilhandschuhe empfehlen wir zum Schutz, wenn du mit Epoxidharz, Kleber oder UV Resin bei 3D Druckern arbeitest. Das zähe, elastische Nitril-Butadien-Material bietet eine hervorragende Beständigkeit gegen Risse, Schnitte und Abrieb für einen enganliegenden Barriereschutz. Die Nitril Handschuhe sind Pulverfrei und 100% latexfrei und eignen sich für Latex Allergiker.
+Technische Details:
+Material: Nitril
+Farbe: Blau
+Armabschluss: Rollrand
+Produkteigenschaft: Beidseitig tragbar
+Grösse: L
+Gewicht: 430g
+Lieferumfang:
+100x Nitril Schutzhandschuhe L 100er Pack
++ Bewertung
+Mein Name
+Meine Bewertung
+Hinweis:
+HTML ist nicht verfügbar!
+Bewertung
+Weniger Gut
+Gut
+test
+test2
+Weiter
+Nitril Schutzhandschuhe L 100er Pack
+Hersteller
+purecrea
+Artikelnr. 421782
+Verfügbarkeit Lagernd
+CHF15,90
+Netto CHF14,71
+Menge
++ Warenkorb
+0 Bewertungen
+/
++ Bewertung
+Ähnliche Produkte
+Rührstäbe Buche 100 Stk.
+Diese gerundeten Einweg-Holz-Rührstäbe kannst du zum Vermischen von Epoxidharz einsetzen. Techn..
+CHF6,90
+Netto CHF6,38
++ Warenkorb
+5-Minuten Epoxy Kleber 2-Komponenten 2x100g
+Mit diesem R&G 2-Komponenten Epoxidharz-Kleber kannst du unterschiedliche Teile miteinander verk..
+CHF17,90
+Netto CHF16,56
++ Warenkorb
+Epoxy Kit 280g mit Ep
+
+### URL: https://www.bastelgarage.ch/digitales-thermometer-hygrometer-mit-verlangerung-schwarz
+HTTP 200, sha256 Roh-HTML: 682eb162090ec6c6d32a640fd6dfbcc017cb04aaed956575622cd011c7552b48
+Artikelnr. 422448 | Verfügbarkeit Lagernd | CHF6,90 | Netto CHF6,38 | Menge | + Warenkorb | 0 Bewertungen | / | + Bewertung | Ähnliche Pro
+Beschreibung
+Bewertungen (0)
+Digitales Thermometer Hygrometer mit Verlängerung Schwarz
+Mit diesem kompakten Hygrometer kannst du die Temperatur und Luftfeuchtigkeit zum Beispiel in deiner Aufbewahrungsbox für Filament, oder deinem Raum, in dem du deine 3D-Drucker hast Überwachen. Natürlich kannst du es auch für andere Anwendungen in der Wohnung usw. gebrauchen. Das Hygrometer wird mit zwei LR44 Knopfzellen betrieben. Diese sind nicht im Lieferumfang enthalten.
+Empfohlenes Zubehör:
+2x
+LR44 Knopfzellen Batterie 1.5V
+Technische Details:
+Farbe: Schwarz
+Messzeit: 10s
+Temperatur:
+Messbereich: -50°C – 70°C
+Toleranz: ±1°C
+Auflösung: 0.1°C
+Feuchtigkeit:
+Messbereich: 10% RH – 99% RH
+Toleranz: ±5%
+Auflösung: 1%
+Abmessung Ausschnitt bei Einbau: 45 x 26mm
+Abmessung: 44.6 x 25.6 x 16mm
+Kabellänge: 1.5m
+Gewicht: 37g
+Lieferumfang:
+1x Digitales Thermometer/ Hygrometer mit Verlängerung Schwarz
++ Bewertung
+Mein Name
+Meine Bewertung
+Hinweis:
+HTML ist nicht verfügbar!
+Bewertung
+Weniger Gut
+Gut
+test
+test2
+Weiter
+Digitales Thermometer Hygrometer mit Verlängerung Schwarz
+Hersteller
+purecrea
+Artikelnr. 422448
+Verfügbarkeit Lagernd
+CHF6,90
+Netto CHF6,38
+Menge
++ Warenkorb
+0 Bewertungen
+/
++ Bewertung
+Ähnliche Produkte
+LR44 Knopfzellen Batterie 1.5V
+Die LR44/AG13 Knopfzellen Batterie mit 1.5V wird oft bei Ki
+
+### URL: https://www.bastelgarage.ch/petg-natural-transparent-filament-1-75mm-1kg-esun
+HTTP 200, sha256 Roh-HTML: 21ebf522398b988af7f822aaa18ea559a465f2fadc51879b1aca23d218899adf
+Artikelnr. 421094 | Verfügbarkeit Lagernd | CHF13,90 | Netto CHF12,86 | Menge | + Warenkorb | 0 Bewertungen | / | + Bewertung | Ähnliche P
+Beschreibung
+Bewertungen (0)
+PETG Natural Transparent Filament 1.75mm 1Kg eSun
+Der grosse Vorteil von PETG gegenüber ABS oder PLA Filament ist die Haltbarkeit sowie der robuste Aufbau des Materials. Das bedeutet das PETG Filament wesentlicher schlagfester als ABS ist. Der bekannteste Vorteil von PETG ist aber, dass Warping grösstenteils verhindert wird. Somit kannst du ohne erheblichen Aufwand Teile drucken, die sich nicht verziehen.
+Fazit:
+PETG Solid von Esun eignet sich sehr gut für Anfänger und Profis, ist leicht zu drucken und bietet dir auch gute Hafteigenschaften und fast keinen Wrap Effekt beim Drucken! PETG ist die perfekte Alternative zu ABS. PETG verfügt über sehr gute Zähigkeit und Schlagzähigkeit, um Stürzen, Stössen und Brüchen durch Dehnung zu widerstehen. Beim Drucken entstehen beim PETG auch keine Gerüche, so wie das bei ABS der Fall ist.
+Eigenschaften:
+Sehr widerstandsfähig
+Wasserbeständig und für Aquarien geeignet (100% Infill)
+Top Druck Ergebnisse und super Preis-Leistungs-Verhältnis
+Geringe Schrumpfrate deshalb auch geringes Warping
+Optimale Schichthaftung
+Gute Schlagzähigkeit
+Hitzebeständig
+Sehr gute Witterungsbeständigkeit
+Hohe UV-Beständigkeit
+Beständig gegen viele Chemikalien und Öl
+PETG vereint die Vorteile von PLA und ABS
+Baustoffklasse B1, schwer entfla
+
 ### URL: https://www.bastelgarage.ch/lieferung-versandkosten
-HTTP 200, sha256 Roh-HTML: a08b85a7b0319ab44bfcf268528b24668ab79369161a14f8178f10e6084f751a
+HTTP 200, sha256 Roh-HTML: 3229ed138a3b232e6197983d5c04c2afd9a3fc006c04cb07ac1db2be30c76645
 Versand in der Schweiz & Liechtenstein
 Alles, was im Shop bestellbar ist, ist bei uns am Lager.
 Falls ein Artikel nicht verfügbar ist, kann er nicht bestellt werden – du erhältst also garantiert sofort lieferbare Produkte.
@@ -341,7 +636,7 @@ für eine schnelle Zustellung.
 *Wir versenden unsere Pakete zuve
 
 ### URL: https://www.pi-shop.ch/raspberry-pi-12-5w-micro-usb-power-supply-2254
-HTTP 200, sha256 Roh-HTML: e31b7fb710dc62706132302485d18ae5d4707e2277fdd1d5d5c20b6d655fb042
+HTTP 200, sha256 Roh-HTML: 4844c6632f6cdd4219b313b1b6d3f46e76fb93e497ebbccfae605de523ff9fdb
 Artikelnummer:
 11715
 Delivery Time: ab Lager
@@ -389,7 +684,7 @@ video title
 video content
 
 ### URL: https://www.pi-shop.ch/kingston-microsdhc-karte-industrial-uhs-i-16-gb
-HTTP 200, sha256 Roh-HTML: 2e41a9984a0143bd1e7c39d82e20b0faa2e88486fb8d5a5d215e9735192a8f7b
+HTTP 200, sha256 Roh-HTML: 4a209925ebb2fc4376af82cde5b3f376c88738316992fb0106f1f29528a65963
 Artikelnummer:
 10951
 Wir schicken Ihnen eine Email sobald das Produkt wieder verfügbar ist.
@@ -419,7 +714,7 @@ Video Speed Class
 Die Video Speed Class umfasst die fünf Geschwindigkeitsstufen V6, V10, V30, V60 und V90, wobei die Zahl jeweils die Mindestschreibrate in Megabyte pro Sekunde (MB/s) angibt. Indem Sie ein Gerät mit Video Speed Class-Kennzeichen und eine SD-Speicherkarte mit dem gleichen Video Speed Class-Kennzeichen kombinieren, lassen sic
 
 ### URL: https://www.pi-shop.ch/grove-temperature-humidity-sensor-sht41
-HTTP 200, sha256 Roh-HTML: 929f059049c55f971ee02d3bd91380a41261e8294f9387c7bbabdc0cffd44627
+HTTP 200, sha256 Roh-HTML: 3606e1ebe4e93a03b3f8203849401fbacc972f0ba729792a700520f1ce665e22
 Artikelnummer:
 12042
 Wir schicken Ihnen eine Email sobald das Produkt wieder verfügbar ist.
@@ -452,7 +747,7 @@ Fully functional in condensing or environment close to saturation. (with a varia
 St
 
 ### URL: https://www.pi-shop.ch/pl2303-usb-to-uart-ttl-communication-module-v2
-HTTP 200, sha256 Roh-HTML: 24024d3f92e02878a1b658d9c097bf911a6f260c2d29d734caf971b358cc7756
+HTTP 200, sha256 Roh-HTML: 76a35c69ef0c0818a2b89effda85f6e759eceb9b2ab941710bb0f3005d73ff57
 Artikelnummer:
 11757
 Delivery Time: ab Lager
@@ -514,7 +809,7 @@ Impressum
 Ser
 
 ### URL: https://www.pi-shop.ch/industrial-usb-to-ttl-converter
-HTTP 200, sha256 Roh-HTML: 7e77778fcfab2aaed3b628c26761c7e10afe3771f272074846e7e79718124384
+HTTP 200, sha256 Roh-HTML: 2c282effa2a828c86786943a8a9feac76c70addf4b5bff21f3bd0da2f16ac3fc
 Artikelnummer:
 11854
 Delivery Time: ab Lager
@@ -569,7 +864,7 @@ PWR: power indicator, turns red when USB voltage is detected
 TXD: TX indicator, turns red while the USB port is sending d
 
 ### URL: https://www.pi-shop.ch/adafruit-wch-ch9102f-friend-usb-to-serial-converter
-HTTP 200, sha256 Roh-HTML: 0741f43c935f5e6c9061637fce70604c5170e41b15d80977755038faac615940
+HTTP 200, sha256 Roh-HTML: cfacc98af45a1c9c7c0b711b21dcfde59264ec5d0a702e7064c089ce3f192c5a
 Artikelnummer:
 11975
 Delivery Time: ab Lager
@@ -592,32 +887,32 @@ The RX LED blinks as you expect when data is received, however the TX LED does n
 On Linux, the CTS pin is not supported by the built in Linux kernel driver. Oddly enough, all the other flow control pins work perfectly fine - its 
 
 ### URL: https://www.pi-shop.ch/catalogsearch/result/?q=ch343
-HTTP 200, sha256 Roh-HTML: 158e97a59b43b1d38118c89ec013082e342e6c5a687ad86409b45b5c57caee3d
+HTTP 200, sha256 Roh-HTML: 28c4dba52a92875fbad052febb2de69fa7675dd1247b47914aaa39d57780c21f
 Treffer: Industrial USB TO TTL Converter <https://www.pi-shop.ch/industrial-usb-to-ttl-converter>; 7.3inch E6 Full Color E-Paper With Solid Wood Photo Frame For Raspberry Pi Zero <https://www.pi-shop.ch/7-3inch-e6-full-color-e-paper-with-solid-wood-photo-frame-for-raspberry-pi-zero>; ESP32-H2 Microcontroller <https://www.pi-shop.ch/esp32-h2-microcontroller>; 13.3inch Full Color E-Paper Display With ESP32-S3 E-Paper Driver Board <https://www.pi-shop.ch/13-3inch-full-color-e-paper-display-with-esp32-s3-e-paper-driver-board>; ESP32-S3 SIM7670G 4G Development Board <https://www.pi-shop.ch/esp32-s3-sim7670g-4g-development-board>; ESP32-H2 Microcontroller with pinheader, 96MHz Processor <https://www.pi-shop.ch/esp32-h2-microcontroller-with-pinheader-96mhz-processor>; Industrial Isolated USB To RS232/485 Converter, Original FT4232HL Chip <https://www.pi-shop.ch/industrial-isolated-usb-to-rs232-485-converter-original-ft4232hl-chip>; ESP32-S3 Development Board, 32-bit LX7 Dual-core Processor, With 1.28inch IPS Round LCD <https://www.pi-shop.ch/esp32-s3-development-board-32-bit-lx7-dual-core-processor-with-1-28inch-ips-round-lcd>; ESP32-S3 2.1inch Capacitive Touch Round Display Development Board <https://www.pi-shop.ch/esp32-s3-2-1inch-capacitive-touch-round-display-development-board>; ESP32-S3 2.8inch Round Display Development Board <https://www.pi-shop.ch/esp32-s3-2-8inch-round-display-development-board>; ESP32-S3 4.3inch Capacitive Touch Display Development Board, 800×480, 5-point Touch, 32-bit LX7 Dual-core Processor <https://www.pi-shop.ch/esp32-s3-4-3inch-capacitive-touch-display-development-board-800-480-5-point-touch-32-bit-lx7-dual-core-processor>; Industrial USB TO RS485 Bidirectional Converter <https://www.pi-shop.ch/industrial-usb-to-rs485-bidirectional-converter>; ESP32-S3 Development Board, with 1.28inch Round Touch LCD <https://www.pi-shop.ch/esp32-s3-development-board-with-1-28inch-round-touch-lcd>
 
 ### URL: https://www.pi-shop.ch/catalogsearch/result/?q=sht40
-HTTP 200, sha256 Roh-HTML: 16608caabff1f862d214e933628c570a183e2bef20b18165772192cdb23c6f3f
+HTTP 200, sha256 Roh-HTML: 11cd5928d95afb6d47129b16a2d2c931aff1d6110d1c47fc56e37e966341faa0
 Treffer: Gravity: STCC4 True Carbon Dioxide (CO2) Sensor (3-in-1 Air Quality Monitoring, 400 ~ 5000ppm) <https://www.pi-shop.ch/gravity-stcc4-true-carbon-dioxide-co2-sensor-3-in-1-air-quality-monitoring-400-5000ppm>; XIAO ePaper DIY Kit EE03 for 10.3" Monochrome ePaper Display <https://www.pi-shop.ch/xiao-epaper-diy-kit-ee03-for-10-3-monochrome-epaper-display>
 
 ### URL: https://www.play-zone.ch/de/adafruit-sensirion-sht41-temperature-humidity-sensor-stemma-qt-qwiic.html
-HTTP 200, sha256 Roh-HTML: 169e6829ab7ec721ae2193682243af53e5bf5be1ea85cd047c92509ed2475b81
+HTTP 200, sha256 Roh-HTML: 8fce5d27a7f785ae0829699c4bf532ba4d0cf70ccc427686124d86dc8443e7a2
 JSON-LD Offer: price CHF 9.9, availability http:\/\/schema.org\/InStock
 Artikelnummer: ada-5776 über 10 Stk. ab eigenem Lager sofort
 ab eigenem Lager sofort lieferbar CHF 9.90 Menge: In den Warenkorb Auf den Wunsc
 Schneller Versand ab eigenem Lager in Steinhausen/ZG. Ab CHF 300.00 portofrei! Produkte können auch abgeholt werden. Fra
 
 ### URL: https://www.mediamarkt.ch/de/product/_kingston-technology-industrial-micro-sdhc-speicherkarte-16-gb-200-mbs-101764486.html
-HTTP 200, sha256 Roh-HTML: 8eb5658ef66dad16120005884786492c12d50e233cb172cddb306e22b76fdb3a
+HTTP 200, sha256 Roh-HTML: db9f937af3dababd27217dbc5e5b37cd29e3d23294582c722eb0d18829ca6e1f
 Titel: KINGSTON microSDHC-Karte Industrial UHS-I, Micro-SDHC Speicherkarte Industrial, 16 GB, 100 MB/s | MediaMarkt
 JSON-LD Offer: ('63.95', 'https://schema.org/InStock'); Verkaeufer (Marktplatz): Ultimus.ch; Lieferfenster: ('2026-11-19T21:59:59.999Z', '2026-11-23T21:59:59.999Z'); Versandkosten CHF 0
 
 ### URL: https://www.mediamarkt.ch/de/product/_kingston-technology-sdcit28gb-micro-sdhc-speicherkarte-8-gb-170-mbs-101764378.html
-HTTP 200, sha256 Roh-HTML: 7a1a0d059b0c23eac7c88de0e362a611cc25eda93e97dc9789dd5146d884a8e0
+HTTP 200, sha256 Roh-HTML: e649690a746154337cbfa46a91261414eb7d6cbb2a5363b2dabed525dc3b2dea
 Titel: KINGSTON SDCIT2/8GB, Micro-SDHC Speicherkarte, 8 GB, 100 MB/s | MediaMarkt
 JSON-LD Offer: ('56.95', 'https://schema.org/InStock'); Verkaeufer (Marktplatz): Ultimus.ch; Lieferfenster: ('2026-11-27T21:59:59.999Z', '2026-12-01T21:59:59.999Z'); Versandkosten CHF 0
 
 ### URL: https://alltron.ch/de/product/1256228
-HTTP 200, sha256 Roh-HTML: 19380e8918ac237b19f4a1f673237c37f0a43658128b064e608f660d340b976a
+HTTP 200, sha256 Roh-HTML: 6be5cc8571800799b9087fcc46821aac4823ac144a8263e4f668983099e4f0a0
 Titel: Kingston microSDHC-Karte Industrial UHS-I 16 GB | Alltron (Alltron = Grosshandel der Brack-Gruppe, Bestellung nur fuer Geschaeftskunden - ANNAHME)
   Variante 8 GB (Art. 1256223): Lager 12, bestellt 
   Variante 16 GB (Art. 1256228): Lager 0, bestellt {"deliveryDate":"23.11.2026","quantityOrdered":100}
@@ -626,7 +921,7 @@ Titel: Kingston microSDHC-Karte Industrial UHS-I 16 GB | Alltron (Alltron = Gros
   Variante 128 GB (Art. 2052219): Lager 0, bestellt 
 
 ### URL: https://www.waveshare.com/wiki/PL2303_USB_UART_Board_(type_A)_V2
-HTTP 200, sha256 Roh-HTML: 1ce85ee0e8ba674ac093d5ded3d28c67fd9aa98da0579a2c0740ded055afe7ec
+HTTP 200, sha256 Roh-HTML: bc9c9a92b0814693ea41de6b7462e9f75cd899c4c33e148b9cdf6728d607c320
 Features
 1.2
 Parameter
@@ -667,7 +962,7 @@ Technical Support
 If you
 
 ### URL: https://wiki.dfrobot.com/sen0428/
-HTTP 200, sha256 Roh-HTML: c45b1970c78baedb4c5c2443d1d94fb712eb07cae65103e4949c54069f82a5a5
+HTTP 200, sha256 Roh-HTML: 987f3456b9ccb9287793d92b5bd67dddd415e25b3ffa358db2eef09fd262499d
 Specification
 Parameter
 Specification

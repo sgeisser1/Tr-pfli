@@ -9,6 +9,8 @@ Prueft:
   2. bom_extra (hardware/sensor/out/fluidi_sensor_bom_extra.csv): Leiterplattenstrukturen/DNP brauchen keinen
      Registereintrag; zugekaufte Teile (Zeilen ohne Designator, z. B. Zelle) brauchen Register + Datei.
   3. Gateway (hardware/gateway/BOM_GATEWAY.csv): Zuordnung Pos -> Register-Ref (GW_MAP unten); Datei muss existieren.
+  3b. Programmieradapter (hardware/programmer/README.md Kap. 2.1): jede LCSC-Nummer hat eine Registerzeile
+     'Programmieradapter' mit gleicher LCSC und vorhandener Datei.
   4. Einkaufsliste (docs/manuals/EINKAUFSLISTE.csv, falls vorhanden): Spalte 'Register' -> Ref vorhanden.
   5. Format INDEX.csv: 12 Spalten (unquotiertes ';' in der Bemerkung), lokale Pfade vorhanden.
 Ausgabe: Konsole + docs/reviews/phase6_register_abgleich.txt (Protokoll, erzeugt)
@@ -29,6 +31,7 @@ BOM_JLC_OUT = P("hardware", "sensor", "out", "fluidi_sensor_bom_jlc.csv")
 BOM_EXTRA = P("hardware", "sensor", "out", "fluidi_sensor_bom_extra.csv")
 BOM_GW = P("hardware", "gateway", "BOM_GATEWAY.csv")
 EINKAUF = P("docs", "manuals", "EINKAUFSLISTE.csv")
+PROG = P("hardware", "programmer", "README.md")
 LOG = P("docs", "reviews", "phase6_register_abgleich.txt")
 
 # Gateway-Position -> Register-Refs (alle muessen existieren, mind. eine mit lokaler Datei); None = kein Register noetig
@@ -38,7 +41,8 @@ GW_MAP = {
     "G3": ["GW-SD"],
     "G6": ["GW-CLIM1", "GW-CLIM1-BRD2 (Gateway G6, Empfehlung D-029)"],
     "G7": ["MAT-ASA"],
-    "G8": None,     # Normteile (Handelsware), Masse ANNAHME im CAD
+    "G8a": ["GW-MECH-INS1 (Gateway G8a)"],
+    "G8b": None,    # Normteile (Handelsware), Masse ANNAHME im CAD
     "G9": ["GW-LED1 (Gateway, Vorschlag)", "GW-R1 (Gateway, Vorschlag)"],
     "G10": None,    # Werkstattbestand
     "G11": None,    # vorhanden, optional
@@ -169,6 +173,24 @@ def main():
                 if not f[2][0]:
                     o(f"        (Hinweis: {f[0]} ohne Datei: {f[1]})")
     o("")
+
+    # 3b Programmieradapter (README Kap. 2.1, Tabelle mit LCSC-Spalte)
+    if os.path.exists(PROG):
+        o("== 3b Programmieradapter " + os.path.relpath(PROG, ROOT) + " Kap. 2.1")
+        txt = open(PROG, encoding="utf-8").read()
+        sec = txt[txt.find("### 2.1"):txt.find("### 2.2")]
+        for line in sec.splitlines():
+            m = re.match(r"\|\s*([A-Z][^|]*?)\s*\|\s*([^|]*?)\s*\|\s*(C\d+)", line)
+            if not m:
+                continue
+            ref, part, lcsc = m.group(1), m.group(2), m.group(3)
+            hits = [r for r in reg if "Programmieradapter" in r["ref"] and r["lcsc"] == lcsc and paths_ok(r["path"])[0]]
+            if hits:
+                o(f"   ok   {ref:6s} {lcsc:9s} -> Zeile {hits[-1]['n']} {hits[-1]['path']}")
+            else:
+                gaps += 1
+                o(f"   LUECKE {ref} {lcsc} ({part[:40]}): keine Registerzeile 'Programmieradapter' mit dieser LCSC und Datei")
+        o("")
 
     # 4 Einkaufsliste
     if os.path.exists(EINKAUF):

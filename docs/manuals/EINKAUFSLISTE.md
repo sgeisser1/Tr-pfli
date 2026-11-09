@@ -10,18 +10,17 @@
 
 ## 1 Fazit
 
-- Warenwert geplant **220.93 CHF** + Versand **27.80 CHF** = **248.73 CHF** (davon 68.84 CHF Preis-ANNAHME; ohne Vergussmasse S8 = Platzhalter, ohne Programmieradapter-Teile W2, ohne JLC).
-- **Händler mit Bestellung: 5** (bastelgarage.ch, pi-shop.ch, galaxus.ch, offen (Normteile-/Dichtungs-Fachhandel), Digi-Key CH (laut phase5_gateway_led.md)). Kern sind **zwei** CH-Händler: bastelgarage.ch und pi-shop.ch.
+- Warenwert geplant **569.67 CHF** + Versand **72.80 CHF** = **642.47 CHF** (davon 251.34 CHF Preis-ANNAHME; ohne JLC, ohne Werkstattbestand; Summen je Bereich Kap. 8).
+- **Händler mit Bestellung: 8** (bastelgarage.ch, offen (Labor-/Arbeitsschutz-Fachhandel), Simpex Electronic AG, pi-shop.ch, galaxus.ch, offen (Normteile-/Dichtungs-Fachhandel), LCSC (mit JLC-Bestellung buendeln, ANNAHME), Digi-Key CH (laut phase5_gateway_led.md)). Kern sind **zwei** CH-Händler: bastelgarage.ch und pi-shop.ch; dazu Simpex (Verguss, 8 Wochen Lieferzeit) und LCSC (mit JLC bündeln).
 - Ein Händler weniger möglich: Zellen bei bastelgarage.ch (Varta statt Panasonic, Entscheid Auftraggeber, S1).
-- Offen: Quelle O-Ringe AS568-019 Silikon, Schrauben ISO 7045 M2×3 PH1 und ISO 7380 M2.5×8, Silikonplatte, Silikonfett (ein Normteile-/Dichtungshändler, Kap. 6); Filament grau nicht an Lager; microSD nicht an Lager.
+- Offen: Quelle O-Ringe AS568-019 Silikon, ISO 7380 M2.5×8, Silikonplatte, Silikonfett, Federstifte (ein Normteile-/Dichtungshändler) und Labor-/Schutzzubehör Verguss (ein Laborhändler); Filament grau und microSD nicht an Lager.
 
 ## 2 Klimasensor-Breakout Gateway (D-029, G6)
 
 Platz (CAD `mechanical/gen/fluidi_gateway_pi.py`, Konstante `CLIMA`, Prüfung 11/14 in
 `mechanical/gateway_pi/check_gateway_pi.txt`): Klimakammer innen **x 8.0 × y 38.0 × z 16.0 mm** (x 32…40, Wand 2 mm).
-Das Modul steht hochkant in der y-z-Ebene in zwei Nutpfosten (Nut 1.6 + 0.3 mm, 1.5 mm tief), Sensorseite +x zur
-Stirnwand; Platzhalter `MW` 24 (y) × `MH` 14 (z), Unterkante z 3.0, Bauteile vorn ≤ 2.5 mm (`PART_F`), hinten ≤ 1.0 mm
-(`PART_B`). Hochkant ist z ≤ 14 nutzbar (z 3…17 in 2…18), flach liegend nur 8 mm (x).
+Das Modul steht hochkant in der y-z-Ebene, Sensorseite +x zur Stirnwand. Hochkant ist z ≤ 14 nutzbar (z 3…17 in 2…18),
+flach liegend nur 8 mm (x).
 
 | Kandidat | Masse (Quelle) | Elektrik (Quelle) | Bezug CH (Abruf 2026-11-09) | Passt? |
 |---|---|---|---|---|
@@ -35,12 +34,10 @@ pi-shop.ch führt kein weiteres SHT4x-Breakout (Suche „sht40“ 2026-11-09: nu
 **Empfehlung: DFRobot SEN0428** – einziges gefundenes SHT4x-Breakout mit Herstellermass und Schaltplan, das in die
 Kammer passt, ab Lager in der Schweiz, beim selben Händler wie Muttern/Einsätze/Kleber (kein zusätzlicher Versand).
 
-**Masse für die Mechanik (CAD nicht geändert):** Platine 14.0 × 17.0 mm; hochkant **17.0 in y, 14.0 in z** → `CLIMA['MW']`
-24 → 17 (Nutpfosten nachführen), `MH` 14 bleibt; Bohrungen Ø2.0 im Abstand 10.0 an der Kante gegenüber den Lötaugen
-(alternativ Befestigung M2 statt Nut); Lötaugenreihe an einer 14-mm-Kante → die Litzen verlassen das Modul an einem
-y-Ende (Kabelkanal y −3.5/z 10.5 → Lötaugen zur Kammermitte bzw. zum Kanal legen). **Platinendicke und Bauteilhöhe
-sind nicht angegeben** (Händler „0.5 mm“ unplausibel) → am Muster messen, bis dahin Platzhalter 1.6 mm + 2.5 mm
-Bauteile behalten. Bauteile laut Masszeichnung nur auf der Sensorseite.
+**Umsetzung Mechanik (D-032, `mechanical/gateway_pi/check_gateway_pi.txt` Pkt. 14):** SEN0428 hochkant 17.0 (y) × 14.0 (z),
+gehalten von einer **Bodenschiene** (Nut 1.90 breit, Eingriff 1.00) und einer **Deckelrippe** (Eingriff 0.80, 0.30 Luft über
+der Oberkante), Endanschläge mit je 0.30 Luft in y; Bauteilfreiheit zur Schiene 0.45 mm, zur Deckelrippe 0.65 mm.
+**Platinendicke 1.6 mm und Bauteilhöhen sind ANNAHME** (Hersteller gibt sie nicht an) → am Muster messen.
 
 **Befund (klein):** Der vom DFRobot-Wiki für SEN0428 verlinkte Schaltplan trägt Titel und Bauteil „SHTC3“
 (SKU-D008, Schwesterprodukt SEN0414). Topologie (LDO, 2N7002, 10 kΩ) plausibel, die Sensor-Pinbelegung im Plan gilt
@@ -96,30 +93,70 @@ mouser.ch. Andere Industrial-Serien (SanDisk Industrial, Swissbit) ohne CH-Angeb
 **Empfehlung:** bei pi-shop.ch auf Lagereingang warten (Grosshandel meldet Lieferung 23.11.) und G2 + W1 + G3 in **einer**
 Sendung bestellen. Nur wenn der Termin drängt: SDCIT2/8GB über mediamarkt.ch (gleiche Serie, +29 CHF).
 
-## 5 Liste
+## 5 Verguss (D-030) und Programmieradapter (D-031)
+
+**Verguss:** Electrolube ER2223 Resin Pack 250 g, **2 Beutel** (je Bauserie einer, Haltbarkeit nach dem Abfüllen 3 Monate,
+MA-3) bei Simpex, CHF 41.29 inkl. MWST, **Lieferzeit 8 Wochen** → sofort nach Freigabe bestellen; vorher SDB Teil B in
+Landessprache anfordern (D-030 Bed. 1). Zubehör nach `docs/concepts/vergussmasse_versiegelung.md` Kap. 7.1 (V-Z1…V-Z11):
+mit Schweizer Shopbeleg bei bastelgarage.ch (ohnehin in der Liste) Feinwaage, Mischbecher, Rührstäbe, Trichter, Pinsel,
+Nitrilhandschuhe; der Rest (Prüfgewichte, kindergesicherte Flaschen, Sekundärbehälter, Spritzen/Kanülen, Schutzbrille/Visier,
+Schürze/Augenspülflasche, Halbmaske A, Thermometer bis 80 °C) hat **keine abrufbare CH-Quelle** (Laborhandel/Baumarkt-Seiten
+gesperrt oder JS) und bleibt **ANNAHME** aus Kap. 7.1. **Entfällt, falls vorhanden:** Feinwaage (V-Z1), Schutzbrille/Visier
+(V-Z8), Wärmeschrank (V-Z12). Abweichungen zur Freigabe durch die Sicherheit: Silikon- statt PE-Trichter (V-Z5c),
+Handschuhe ohne Angabe von Dicke/EN 374 (V-Z7), Waage ohne Justiergewicht (Prüfgewichte V-Z2 nötig).
+
+**Programmieradapter:** Teile nach `hardware/programmer/README.md` Kap. 2.1/6 (inkl. R2 470 Ω C17710, D-031/PA-6) bei LCSC,
+Preise der JLC/LCSC-Teilesuche umgerechnet mit dem Kurs aus `scripts/cost_model.py`; LCSC-Mindestmengen und Versand
+**ANNAHME** (README: 10–25 CHF) – mit der JLC-Bestellung im selben Warenkorb prüfen. USB-UART = W1 (PL2303, pi-shop.ch).
+
+## 6 Liste
 
 | ID | Teil | Soll | Bedarf | Händler | Art.-Nr. | Angebot | Pack. × Inhalt | CHF/Pack. | Summe CHF | Lager | Abruf | Status |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | S1 | Knopfzelle CR2032 (Sensor 20 + Tests 28) | Panasonic CR2032 (D-006) | 48 | [galaxus.ch](https://www.galaxus.ch/en/s1/product/panasonic-cr2032-lithium-48-knopfbatterien-48-pcs-cr2032-225-mah-batteries-61927007) | 61927007 | Panasonic CR2032 Lithium 48 Knopfbatterien | 1 × 48 | 39.84 | 39.84 (A) | ANNAHME (Auszug: wenige Packungen, Drittanbieter) | 2026-11-08 | Preis pruefen |
 | S2 | O-Ring Huelse/Kragen + Zapfen | AS568-019 = ID 20.35 x CS 1.78 mm, Silikon oder EPDM ohne Russ (rot/transluzent) | 50 | offen (Normteile-/Dichtungs-Fachhandel) | - | - | 50 × 1 | 0.15 | 7.50 (A) | - | 2026-11-09 | Quelle offen |
-| S3 | Schraube unverlierbar Batteriefach | ISO 7045 M2 x 3 A2 Linsenkopf PH1 (Kopf Ø3.8 x 1.3) | 25 | offen (Normteile-/Dichtungs-Fachhandel) | - | - | 25 × 1 | 0.10 | 2.50 (A) | - | 2026-11-09 | Quelle offen |
+| S3 | Schraube unverlierbar Batteriefach | M2 x 3 A2 Linsenkopf Torx TX6, Kopfhoehe 1.6 (D-032, ersetzt ISO 7045 PH1) | 25 | [bastelgarage.ch](https://www.bastelgarage.ch/10-stuck-m2x3mm-linsenkopfschrauben-set-rostfrei) | 422191 | 10 Stueck M2x3mm Linsenkopfschrauben Set rostfrei (A2, Torx TX6, Kopfhoehe 1.6) | 3 × 10 | 3.90 | 11.70 | Lagernd | 2026-11-09 | kauffertig |
 | S4 | Mutter im Kragen eingegossen | ISO 4032 M2 A2 SW4 x 1.6 | 30 | [bastelgarage.ch](https://www.bastelgarage.ch/10-stuck-m2-mutter-set-rostfrei) | 422198 | 10 Stueck M2 Mutter Set rostfrei (A2, SW4, Hoehe 1.6) | 3 × 10 | 2.90 | 8.70 | Lagernd | 2026-11-09 | kauffertig |
 | S5 | Tastenmembran | Silikonplatte 0.5 mm Shore A 40-60, Ø6.4 gestanzt | 1 | offen (Normteile-/Dichtungs-Fachhandel) | - | - | 1 × 1 | 10.00 | 10.00 (A) | - | 2026-11-09 | Quelle offen |
 | S6 | Silikonfett fuer O-Ringe | silikonbasiert, fuer Silikon/EPDM vertraeglich | 1 | offen (Normteile-/Dichtungs-Fachhandel) | - | - | 1 × 1 | 8.00 | 8.00 (A) | - | 2026-11-09 | Quelle offen |
 | S7 | Kleber Lichtfenster | 2K-Epoxid transparent oder UV-Kleber (PRINT_SETTINGS Kap. 5, ANNAHME Typ) | 1 | [bastelgarage.ch](https://www.bastelgarage.ch/uhu-plus-endfest-zweikomponenten-epoxidkleber-33g) | 422137 | UHU Plus Endfest 2K-Epoxid 33 g (-40...+100 C laut Shop) | 1 × 1 | 12.90 | 12.90 | Lagernd | 2026-11-09 | Typ durch Mechanik bestaetigen |
-| S8 | Vergussmasse Kragen/Schott/Sondenkante | Epoxid 2K Tg >= 80 C (Vorschlag EP-K Electrolube ER2223, Wahl parallel durch anderen Agenten) | 1 | offen (Platzhalter) | - | - | 1 × 1 | 0.00 | – | - | 2026-11-09 | Platzhalter |
-| S9 | Filament ASA grau (Huelse, Wanne) | Bambu ASA (MAT-ASA, TDS lokal), Farbton Warmgrau nach Musterdruck, Pigment ohne Russ | 1 | [bastelgarage.ch](https://www.bastelgarage.ch/asa-grau-filament-1-75mm-1kg-esun) | 424233 | eSun ASA+ Grau 1.75 mm 1 kg | 1 × 1 | 19.90 | 19.90 | Ausverkauft | 2026-11-09 | nicht an Lager |
-| S10 | Filament ASA blau (Kappe, Taste, Deckel) | wie S9, Hellblau, Pigment ohne Russ/Metall (Antennenbereich) | 1 | [bastelgarage.ch](https://www.bastelgarage.ch/asa-blau-filament-1-75mm-1kg-esun) | 424238 | eSun ASA+ Blau 1.75 mm 1 kg | 1 × 1 | 19.90 | 19.90 | Lagernd | 2026-11-09 | Freigabe Mechanik |
-| S11 | Filament Lichtfenster transluzent natur | ASA natur bevorzugt, PETG nur mit Nachweis 7 d 65 C (PRINT_SETTINGS Kap. 1) | 1 | [bastelgarage.ch](https://www.bastelgarage.ch/petg-natural-transparent-filament-1-75mm-1kg-esun) | 421094 | eSun PETG Natural Transparent 1.75 mm 1 kg | 1 × 1 | 13.90 | 13.90 | Lagernd | 2026-11-09 | Entscheid Mechanik |
+| S9 | Filament ASA grau (Huelse, Wanne) | Vorgabe Bambu ASA (MAT-ASA, TDS lokal), Warmgrau nach Musterdruck (D-010), Pigment ohne Russ, bedingte Alternative eSun ASA+ (MAT-ASA2, D-032) | 1 | [bastelgarage.ch](https://www.bastelgarage.ch/asa-grau-filament-1-75mm-1kg-esun) | 424233 | eSun ASA+ Grau 1.75 mm 1 kg | 1 × 1 | 19.90 | 19.90 | Ausverkauft | 2026-11-09 | nicht an Lager |
+| S10 | Filament ASA blau (Kappe, Taste, Deckel) | Vorgabe Bambu ASA Hellblau (MAT-ASA), Pigment ohne Russ/Metall (Antennenbereich), bedingte Alternative eSun ASA+ Blau (MAT-ASA2, D-032) | 1 | [bastelgarage.ch](https://www.bastelgarage.ch/asa-blau-filament-1-75mm-1kg-esun) | 424238 | eSun ASA+ Blau 1.75 mm 1 kg | 1 × 1 | 19.90 | 19.90 | Lagernd | 2026-11-09 | bedingt (D-032) |
+| S11 | Filament Lichtfenster transluzent natur | ASA natur/transluzent bevorzugt (PRINT_SETTINGS Kap. 1), PETG nur mit Nachweis 7 d 65 C | 1 | [bastelgarage.ch](https://www.bastelgarage.ch/asa-kaltweiss-filament-1-75mm-1kg-esun) | 424234 | eSun ASA+ Kaltweiss 1.75 mm 1 kg | 1 × 1 | 19.90 | 19.90 | Lagernd | 2026-11-09 | Entscheid Mechanik |
 | G2 | Netzteil 5 V 2.5 A Micro-USB | Raspberry Pi 12.5 W Micro-USB Original | 1 | [pi-shop.ch](https://www.pi-shop.ch/raspberry-pi-12-5w-micro-usb-power-supply-2254) | 11715 | Raspberry Pi 12.5W Micro USB Power Supply | 1 × 1 | 11.90 | 11.90 | Sofort-Versand ab Lager | 2026-11-09 | kauffertig |
 | G3 | microSD Industrial | Industrial/pSLC >= 8 GB (GATEWAY_SETUP Kap. 1) | 1 | [pi-shop.ch](https://www.pi-shop.ch/kingston-microsdhc-karte-industrial-uhs-i-16-gb) | 10951 | Kingston microSDHC Industrial UHS-I 16 GB (SDCIT2/16GB) | 1 × 1 | 27.90 | 27.90 | nicht an Lager | 2026-11-09 | nicht an Lager |
-| G6 | Klimasensor-Breakout (D-029) | SHT40/41/45, I2C 0x44, 3.3 V, <= 24 x 14 mm hochkant | 1 | [bastelgarage.ch](https://www.bastelgarage.ch/fermion-temperatur-und-feuchtigkeitssensor-sht40) | 421989 | DFRobot Fermion SHT40 Breakout SEN0428 (14 x 17 mm) | 1 × 1 | 11.90 | 11.90 | Lagernd | 2026-11-09 | kauffertig |
-| G8a | Gewindeeinsaetze M2.5 (4 je Gateway) | M2.5, CAD-ANNAHME Ø3.5 x 4 (Bohrung 3.2) | 4 | [bastelgarage.ch](https://www.bastelgarage.ch/m2-5-4mm-gewindeeinsatze-messing-heat-insert-100stk) | 425681 | Gewindeeinsaetze Messing M2.5 x 4 x Ø4.6, 100 Stk | 1 × 100 | 15.90 | 15.90 | Lagernd | 2026-11-09 | Freigabe Mechanik |
+| G6 | Klimasensor-Breakout (D-029) | SHT40/41/45, I2C 0x44, 3.3 V, hochkant <= 17 x 14 mm (Bodenschiene + Deckelrippe, D-032) | 1 | [bastelgarage.ch](https://www.bastelgarage.ch/fermion-temperatur-und-feuchtigkeitssensor-sht40) | 421989 | DFRobot Fermion SHT40 Breakout SEN0428 (14 x 17 mm) | 1 × 1 | 11.90 | 11.90 | Lagernd | 2026-11-09 | kauffertig |
+| G8a | Gewindeeinsaetze M2.5 (4 je Gateway) | M2.5 x 4 x Ø4.6 Messing, Bohrung 3.9 (Haendlerangabe, D-032) | 4 | [bastelgarage.ch](https://www.bastelgarage.ch/m2-5-4mm-gewindeeinsatze-messing-heat-insert-100stk) | 425681 | Gewindeeinsaetze Messing M2.5 x 4 x Ø4.6, 100 Stk | 1 × 100 | 15.90 | 15.90 | Lagernd | 2026-11-09 | kauffertig |
 | G8b | Schrauben M2.5 x 8 (4 je Gateway) | ISO 7380 Linsenkopf M2.5 x 8 A2 (Nylon als Option, PRINT_SETTINGS Kap. 4) | 4 | offen (Normteile-/Dichtungs-Fachhandel) | - | - | 4 × 1 | 0.25 | 1.00 (A) | - | 2026-11-09 | Quelle offen |
 | G9 | Status-LED 3 mm gruen + Vorwiderstand 470 Ohm (D-027) | Kingbright WP710A10GD + YAGEO MFR-25FBF52-470R | 1 | [Digi-Key CH (laut phase5_gateway_led.md)](https://www.digikey.ch) | 754-1603-ND / MFR-25FBF52-470R | docs/reviews/phase5_gateway_led.md Kap. 4 | 1 × 1 | 0.29 | 0.29 | Lager 24503 / 19960 (2026-11-08) | 2026-11-08 | buendeln |
 | G10 | Litze AWG 28, Schrumpfschlauch | - | 1 | Werkstattbestand | - | - | 1 × 1 | 0.00 | – | vorhanden | 2026-11-08 | vorhanden |
 | W1 | USB-UART mit externem VIO 2.0 V (FW-T3) | VIO extern 1.8-2.0 V, kein Rueckstrom, ROM-Bootloader 19200-57600 Baud | 1 | [pi-shop.ch](https://www.pi-shop.ch/pl2303-usb-to-uart-ttl-communication-module-v2) | 11757 | Waveshare PL2303 USB UART Board (type A) V2 (PL2303GS) | 1 × 1 | 8.90 | 8.90 | Sofort-Versand ab Lager | 2026-11-09 | kauffertig |
-| W2 | Programmieradapter Rev 1 Teile | hardware/programmer/README.md Kap. 6 (LCSC, Federstifte, Platine) | 1 | LCSC + Fachhandel (siehe README) | - | - | 1 × 1 | 0.00 | – | - | 2026-11-08 | separat |
+| V-M1 | Vergussmasse Schott/Kragen/Sondenkante (D-030) | Electrolube ER2223 Resin Pack 250 g (EER2223RP250G) | 2 | [Simpex Electronic AG](https://www.simpex.ch) | EER2223RP250G | ER2223 Resin Pack 250 g, CHF 38.20 exkl. MWST | 2 × 1 | 41.29 | 82.58 | In stock: available to order, LIEFERZEIT 8 WOCHEN | 2026-11-08 | kauffertig (frueh bestellen) |
+| V-Z1 | Feinwaage (MA-4) | 0.01 g Aufloesung, >= 200 g (Konzept 7.1 V-Z1) | 1 | [bastelgarage.ch](https://www.bastelgarage.ch/digitale-feinwaage-mh-500-0-01g-500g) | 424394 | Digitale Feinwaage MH-500 0.01-500 g (Mindestgewicht 0.05 g, ohne Justiergewicht) | 1 × 1 | 17.90 | 17.90 | Lagernd | 2026-11-09 | entfaellt, falls vorhanden |
+| V-Z2 | Pruefgewichte 1 g und 5 g (MA-4) | Klasse F1 oder M1 | 1 | offen (Labor-/Arbeitsschutz-Fachhandel) | - | - | 1 × 1 | 20.00 | 20.00 (A) | - | 2026-11-09 | Quelle offen |
+| V-Z3 | Laborflaschen kindergesichert, Etiketten, Farbmarker (MA-1/MA-2) | B: HDPE ca. 60 ml, A: HDPE/Glas ca. 250 ml | 1 | offen (Labor-/Arbeitsschutz-Fachhandel) | - | - | 1 × 1 | 15.00 | 15.00 (A) | - | 2026-11-09 | Quelle offen |
+| V-Z4 | Sekundaerbehaelter abschliessbar + Saugmaterial (MA-1) | dichte Kunststoffbox, Vorhaengeschloss, Vermiculit/Katzenstreu | 1 | offen (Labor-/Arbeitsschutz-Fachhandel) | - | - | 1 × 1 | 25.00 | 25.00 (A) | - | 2026-11-09 | Quelle offen |
+| V-Z5a | Mischbecher PP 50 ml (MA-5) | Einweg-Mischbecher | 20 | [bastelgarage.ch](https://www.bastelgarage.ch/pp-einweg-mischbecher-50ml) | 421219 | PP Einweg-Mischbecher 50 ml | 20 × 1 | 0.30 | 6.00 | Lagernd | 2026-11-09 | kauffertig |
+| V-Z5b | Ruehrstaebe (MA-5) | Einweg, Holz | 100 | [bastelgarage.ch](https://www.bastelgarage.ch/ruhrstabe-buche-100-stk) | 421217 | Ruehrstaebe Buche 100 Stk | 1 × 100 | 6.90 | 6.90 | Lagernd | 2026-11-09 | kauffertig |
+| V-Z5c | Trichter Abfuellen (MA-5) | Konzept: 2 PE-Trichter | 1 | [bastelgarage.ch](https://www.bastelgarage.ch/silikon-resin-trichter-mit-edelstahl-feinfilter) | 424244 | Silikon-Resin-Trichter mit Edelstahl-Feinfilter | 1 × 1 | 10.90 | 10.90 | Lagernd | 2026-11-09 | Freigabe Sicherheit |
+| V-Z5d | Auffangwanne/Alu-Schalen, Pipetten, Spatel, PE-Trichter (MA-5) | Alu-Schalen >= 20 x 15 cm, Einweg-Pipetten, Spatel, PE-Trichter | 1 | offen (Labor-/Arbeitsschutz-Fachhandel) | - | - | 1 × 1 | 6.00 | 6.00 (A) | - | 2026-11-09 | Quelle offen |
+| V-Z6a | Feiner Pinsel Kantenversiegelung | feiner Pinsel (Konzept 7.1 V-Z6) | 1 | [bastelgarage.ch](https://www.bastelgarage.ch/synthetik-tabletop-pinsel-grosse-0) | 425342 | Synthetik-Tabletop-Pinsel Groesse 0 (AK Interactive) | 1 × 1 | 6.90 | 6.90 | Lagernd | 2026-11-09 | kauffertig |
+| V-Z6b | Einwegspritzen 1/3 ml Luer-Lock, stumpfe Kanuelen 18/20 G | Konzept 7.1 V-Z6 | 1 | offen (Labor-/Arbeitsschutz-Fachhandel) | - | - | 1 × 1 | 8.00 | 8.00 (A) | - | 2026-11-09 | Quelle offen |
+| V-Z7 | Nitrilhandschuhe (K-3) | Nitril >= 0.1 mm, Box, Bestaendigkeitsliste anfordern | 100 | [bastelgarage.ch](https://www.bastelgarage.ch/nitril-schutzhandschuhe-l-100er-pack) | 421782 | Nitril Schutzhandschuhe L 100er Pack (puderfrei) | 1 × 100 | 15.90 | 15.90 | Lagernd | 2026-11-09 | Freigabe Sicherheit |
+| V-Z8 | Chemikalien-Schutzbrille EN 166 (dicht) + Visier | EN 166, dicht schliessend | 1 | offen (Labor-/Arbeitsschutz-Fachhandel) | - | - | 1 × 1 | 30.00 | 30.00 (A) | - | 2026-11-09 | entfaellt, falls vorhanden |
+| V-Z9 | Kunststoffschuerze, Augenspuelflasche 500 ml | Konzept 7.1 V-Z9 | 1 | offen (Labor-/Arbeitsschutz-Fachhandel) | - | - | 1 × 1 | 25.00 | 25.00 (A) | - | 2026-11-09 | Quelle offen |
+| V-Z10 | Halbmaske mit Filter A (EN 14387) | Konzept 7.1 V-Z10 | 1 | offen (Labor-/Arbeitsschutz-Fachhandel) | - | - | 1 × 1 | 40.00 | 40.00 (A) | - | 2026-11-09 | Quelle offen |
+| V-Z11 | Thermometer Trockner/Waermeschrank | Kontrolle <= 65 C und 80 C (V-3/V-6) | 1 | offen (Labor-/Arbeitsschutz-Fachhandel) | - | - | 1 × 1 | 10.00 | 10.00 (A) | - | 2026-11-09 | Quelle offen |
+| V-Z12 | Waermeschrank/Filamenttrockner >= 80 C | Haertung 4 h 60 C, V-3/V-6 80 C | 1 | Werkstattbestand | - | - | 1 × 1 | 0.00 | – | vorhanden | 2026-11-09 | vorhanden |
+| P1 | LDO 3.3 V (U1) | Torex XC6206P332MR-G | 2 | [LCSC (mit JLC-Bestellung buendeln, ANNAHME)](https://www.lcsc.com/search?q=C5446) | C5446 | USD 0.15 je Stk | 1 × 2 | 0.25 | 0.25 | Basic, 492937 (2026-11-08) | 2026-11-08 | kauffertig |
+| P2 | LDO 2.0 V (U2, U3) | Torex XC6206P202MR-G | 3 | [LCSC (mit JLC-Bestellung buendeln, ANNAHME)](https://www.lcsc.com/search?q=C2891260) | C2891260 | USD 0.21 je Stk | 1 × 3 | 0.52 | 0.52 | Extended, 1963 (2026-11-08) | 2026-11-08 | kauffertig |
+| P3 | Schmitt-Puffer (U4) | TI SN74AUP1G17DBVR | 2 | [LCSC (mit JLC-Bestellung buendeln, ANNAHME)](https://www.lcsc.com/search?q=C183012) | C183012 | USD 0.31 je Stk | 1 × 2 | 0.52 | 0.52 | Extended, 1280 (2026-11-08) | 2026-11-08 | kauffertig |
+| P4 | MLCC 1 uF 50 V 0805 (C1-C4) | Samsung CL21B105KBFNNNE | 5 | [LCSC (mit JLC-Bestellung buendeln, ANNAHME)](https://www.lcsc.com/search?q=C28323) | C28323 | USD 0.03 je Stk | 1 × 5 | 0.12 | 0.12 | Basic | 2026-11-08 | kauffertig |
+| P5 | MLCC 100 nF 0805 (C5) | Samsung CL21B104KBCNNNC | 2 | [LCSC (mit JLC-Bestellung buendeln, ANNAHME)](https://www.lcsc.com/search?q=C1711) | C1711 | USD 0.01 je Stk | 1 × 2 | 0.02 | 0.02 | - | 2026-11-08 | kauffertig |
+| P6 | R 10 MOhm 1 % 0402 (R1) | UNI-ROYAL 0402WGF1005TCE | 2 | [LCSC (mit JLC-Bestellung buendeln, ANNAHME)](https://www.lcsc.com/search?q=C26082) | C26082 | USD 0.01 je Stk | 1 × 2 | 0.02 | 0.02 | - | 2026-11-08 | kauffertig |
+| P7 | R 470 Ohm 1 % 0805 (R2, D-031/PA-6) | UNI-ROYAL 0805W8F4700T5E | 2 | [LCSC (mit JLC-Bestellung buendeln, ANNAHME)](https://www.lcsc.com/search?q=C17710) | C17710 | USD 0.0048 je Stk | 1 × 2 | 0.01 | 0.01 | Basic, 1871834 (2026-11-09) | 2026-11-08 | kauffertig |
+| P8 | Federkontaktstifte TP1/TP2 (J3) | Ø <= 1.5 mm, Hub >= 1 mm (README Kap. 4) | 3 | offen (Normteile-/Dichtungs-Fachhandel) | - | - | 1 × 3 | 6.00 | 6.00 (A) | - | 2026-11-09 | Quelle offen |
+| P9 | FR4/Lochraster, SOT-23-Adapter, Litze, Steckbruecken, ASA-Buegel | README Kap. 6 Pos. 9/10 | 1 | Werkstattbestand | - | - | 1 × 1 | 0.00 | – | vorhanden | 2026-11-09 | vorhanden |
 
 (A) = Preis ANNAHME bzw. Quelle offen. Bedarf-Herleitung, Register-Ref und Bemerkungen: Spalten in der CSV.
 
@@ -127,49 +164,99 @@ Bemerkungen:
 
 - **S1** (5 Prototyp + 15 Serie + 28 Testzellen (Auftrag ca. 30)): Datenblatt docs/datasheets/Panasonic_CR2032_Datasheet_2026-02.pdf. Ausweichen ohne eigenen Haendler: bastelgarage.ch Varta CR2032 5 Stk Art. 424382 CHF 8.90 lagernd (10 Packungen = 89.00) - weicht von D-006 ab, Varta-Datenblatt fehlt, Energiebudget mit Panasonic gerechnet -> Entscheid Auftraggeber
 - **S2** (2 je Sensor x 20 + 10 Passproben/Reserve): Mass belegt docs/references/GTWeed_AS568_StandardOringSizing.pdf S. 2 (Dash -019 0.801 in). Kein CH-Angebot fuer 20.35 x 1.78 Silikon gefunden (Suche 2026-11-09). Werkstoffdatenblatt des Lieferanten ablegen
-- **S3** (1 je Sensor x 20 + 5 Reserve): bastelgarage.ch Art. 422191 (10 Stk M2x3 A2 Linsenkopf CHF 3.90, lagernd) ist Torx TX6 mit Kopfhoehe 1.6 mm -> weicht ab (PH1, 1.3 mm, Werkzeug REQ-MECH-15) -> nur nach Freigabe Mechanik
+- **S3** (1 je Sensor x 20 + 5 Reserve): D-032: TX6 handelsueblich (REQ-MECH-15), CAD Kopfhoehe 1.6 nachgefuehrt, Werkzeug TX6 in BATTERIEWECHSEL/MONTAGE
 - **S4** (1 je Sensor x 20 + Reserve): Masse laut Shop = Nennmasse ISO 4032 (SW4 x 1.6)
 - **S5** (1 Platte fuer 20 + Reserve): Betaetigungskraft PROTOTYP-PRUEFUNG
 - **S6** (1 Tube): Datenblatt beim Kauf ablegen
-- **S7** (1 Packung): TDS/SDS nicht lokal -> beim Kauf ablegen. Klebefuge dicht nach 7 d 65 C = PROTOTYP-PRUEFUNG
-- **S8** (Platzhalter): Wahl, Menge, Haendler und Preis durch den Material-Agenten (Phase 6)
-- **S9** (20 x 13 g + Gateway 14 g + Passproben, < 1 kg): Zuerst Werkstattbestand pruefen (ANNAHME vorhanden). Bambu ASA Gray (45102) im Bambu Lab EU Store 14.99 EUR, nicht an Lager (ld+json 2026-11-09), Gratisversand CH erst ab 119 EUR. eSun ASA+ ist ein anderes Material als MAT-ASA -> TDS ablegen, HDT >= 80 C belegen (REQ-MECH-12)
-- **S10** (20 x ca. 5 g + Gateway 10 g, < 1 kg): Nur falls kein Bambu ASA blau vorhanden. Farbton/Pigment und TDS (HDT) vor dem Kauf pruefen
-- **S11** (wenige g): ASA natur bei bastelgarage/pi-shop nicht gefunden. PETG nur mit PROTOTYP-PRUEFUNG
+- **S7** (1 Packung): TDS S. 1: Binder OPAK, Haerter honigfarben -> nicht transparent (PRINT_SETTINGS verlangt transparentes 2K-Epoxid oder UV-Kleber, Klebstoff nicht auf die Sichtflaeche) -> Entscheid Mechanik. -40...+100 C, Topfzeit 90 min. SDB V62 (H315/H317/H319) lokal. Klebefuge dicht nach 7 d 65 C = PROTOTYP-PRUEFUNG
+- **S9** (20 x 13 g + Gateway 14 g + Passproben, < 1 kg): Vorgabe Bambu ASA: Werkstattbestand pruefen (ANNAHME vorhanden), Bambu Lab EU Store ASA Gray (45102) 14.99 EUR nicht an Lager (2026-11-09), Gratisversand CH ab 119 EUR. Bedingte Alternative eSun ASA+ (TDS docs/references/eSUN_ASAplus_TDS_V1.0-2024-06.pdf, HDT 95.5 C bei 0.45 MPa, erst nach PROTOTYP-PRUEFUNG 7 d 65 C, mechanical/PRINT_SETTINGS.md Kap. 1): Grau 424233 ausverkauft, Kaltweiss 424234 lagernd = Abweichung D-010 -> Auftraggeber
+- **S10** (20 x ca. 5 g + Gateway 10 g, < 1 kg): Nur falls kein Bambu ASA blau vorhanden (Bambu EU Store Blue 45600 nicht an Lager 2026-11-09). eSun ASA+ erst nach PROTOTYP-PRUEFUNG 7 d 65 C (PRINT_SETTINGS Kap. 1), Farbton/Pigment pruefen
+- **S11** (wenige g): ASA natur nicht gefunden. PETG natur (bastelgarage 421094, CHF 13.90) nicht empfohlen: eSUN-TDS nicht herunterladbar (404), Haendler nennen HDT 64 C (0.45 MPa, unbestaetigt) < 65 C-Pruefung. Kaltweiss = opak, Diffusorwirkung bei 1 mm PROTOTYP-PRUEFUNG, bedingt wie MAT-ASA2
 - **G2** (1 Gateway): Konformitaet beim Wareneingang (Sicherheits-Agent), Datenblatt fehlt (F-8)
 - **G3** (1 Gateway): Datenblatt docs/datasheets/Kingston_SDCIT2_Datasheet_MKD-02122026.pdf. Grosshandel alltron.ch: 100 Stk auf 23.11.2026 bestellt. Sofort-Alternative gleicher Serie: mediamarkt.ch Marktplatz Ultimus.ch SDCIT2/8GB CHF 56.95 (Lieferung 27.11.-01.12.) bzw. 16 GB CHF 63.95, versandkostenfrei
-- **G6** (1 Gateway): Masszeichnung/Schaltplan lokal (docs/datasheets/DFRobot_SEN0428_*). Mechanik: Nutpfosten 17 mm
-- **G8a** (4 je Gateway): Aussen-Ø 4.6 statt 3.5 -> Bohrung im Deckel anpassen (Mechanik). Kleinere Packung nicht gefunden
+- **G6** (1 Gateway): Masszeichnung/Schaltplan lokal (docs/datasheets/DFRobot_SEN0428_*). Halter im Gehaeuse: Bodenschiene Nut 1.90 + Deckelrippe (mechanical/gateway_pi/check_gateway_pi.txt Pkt. 14). Platinendicke 1.6 ANNAHME -> am Muster messen
+- **G8a** (4 je Gateway): D-032: Rohr Ø7.0 mit Fuss Ø5.6, Bohrung 3.9, Tiefe 5.2 (check_gateway_pi.txt Pkt. 33). Kleinere Packung nicht gefunden
 - **G8b** (4 je Gateway): bastelgarage M2.5-Sortiment DIN 912 ausverkauft (2026-11-09) und Zylinderkopf statt Linsenkopf
 - **G9** (1 Gateway): Digi-Key-Versand unter 70 CHF = 23 CHF -> nicht einzeln bestellen: mit LCSC-Bestellung Programmieradapter buendeln (LCSC-Teile durch Elektronik waehlen) oder Werkstattbestand. BOM_GATEWAY G9 nachfuehren = Elektronik
 - **G10** (Werkstatt): bastelgarage Schrumpfschlauch-Set 140 Stk ausverkauft (2026-11-09)
 - **W1** (1 Programmierplatz): Elektronik 2026-11-09: freigegeben mit Bedingungen B1-B6 (hardware/programmer/README.md Kap. 9, EINKAUFSLISTE.md Kap. 3). Original CH343 (TOOL-UART1): waveshare.com USD 3.49 + Versand (nicht ablesbar) bzw. eckstein-shop.de EUR 4.15 (ca. 3 Wochen) -> eigener Auslandsversand
-- **W2** (1 Adapter): Nicht in dieser Summe (Werkzeugbudget). G9-LED in dieselbe LCSC-Bestellung legen
+- **V-M1** (1 Beutel je Bauserie (Prototyp, Serie), Haltbarkeit 3 Monate nach Abfuellen (MA-3)): LIEFERZEIT 8 WOCHEN -> sofort nach Freigabe bestellen. Vor dem ersten Beutel SDB Teil B in DE/EN/FR/IT anfordern (D-030 Bed. 1). Versand Simpex nicht angegeben (ANNAHME 15 CHF). simpex.ch fuer automatischen Abruf gesperrt (403, 2026-11-09)
+- **V-Z1** (1 Arbeitsplatz): ENTFAELLT, FALLS VORHANDEN. Kein Justiergewicht im Lieferumfang -> Kontrolle mit Pruefgewichten V-Z2 vor jeder Sitzung (MA-4), Genauigkeit nicht angegeben
+- **V-Z2** (1 Satz): Keine CH-Quelle mit abrufbarem Preis (bastelgarage: Kalibriergewicht nur im Set der ausverkauften CX-Waage)
+- **V-Z3** (1 Satz): -
+- **V-Z4** (1 Satz): -
+- **V-Z5a** (ca. 10 Ansaetze + Abfuellen + Reserve): Shop: nicht loesungsmittelbestaendig
+- **V-Z5b** (1 Packung): -
+- **V-Z5c** (1 hier + 1 PE-Trichter in V-Z5d): Silikon statt PE (Konzept) -> Bestaendigkeit gegen Haerter B (Amin) durch Sicherheit bestaetigen, sonst nur PE-Trichter (V-Z5d)
+- **V-Z5d** (1 Satz): -
+- **V-Z6a** (1 Stk): -
+- **V-Z6b** (1 Satz): -
+- **V-Z7** (1 Box): Wandstaerke und Norm (EN 374) im Shop nicht angegeben -> Sicherheit pruefen, Groesse L (XL in der Suche ebenfalls gefuehrt)
+- **V-Z8** (1 Satz): ENTFAELLT, FALLS VORHANDEN. bastelgarage fuehrt nur Laserschutzbrillen (ungeeignet)
+- **V-Z9** (1 Satz): -
+- **V-Z10** (1 Stk): -
+- **V-Z11** (1 Stk): bastelgarage 422448 misst nur bis 70 C -> ungeeignet fuer 80 C
+- **V-Z12** (Werkstatt): ENTFAELLT, FALLS VORHANDEN (ANNAHME vorhanden, nicht gerechnet), sonst Beschaffung klaeren
+- **P1** (1 + Reserve): -
+- **P2** (2 + Reserve): -
+- **P3** (1 + Reserve): -
+- **P4** (4 + Reserve): -
+- **P5** (1 + Reserve): -
+- **P6** (1 + Reserve): -
+- **P7** (1 + Reserve): -
+- **P8** (2 + Reserve): Typ mit Mechanik festlegen (P-J3)
+- **P9** (Werkstatt): ENTFAELLT, FALLS VORHANDEN
 
-## 6 Händlergruppierung und Versand
+## 7 Händlergruppierung und Versand
 
 | Händler | Positionen | Ware CHF | Versand CHF | Total CHF | davon jetzt lieferbar | Versandregel |
 |---|---|---|---|---|---|---|
-| bastelgarage.ch | S4, S7, S9, S10, S11, G6, G8a | 103.10 | 0.00 | 103.10 | 83.20 (+0.00 Versand) | bastelgarage.ch/lieferung-versandkosten (2026-11-09): PostPac Economy 6.90, Priority 8.90, ab CHF 80 Warenwert gratis (docs/references/Haendler_Einkauf_Auszug_2026-11-09.txt) |
+| bastelgarage.ch | S3, S4, S7, S9, S10, S11, G6, G8a, V-Z1, V-Z5a, V-Z5b, V-Z5c, V-Z6a, V-Z7 | 185.30 | 0.00 | 185.30 | 165.40 (+0.00 Versand) | bastelgarage.ch/lieferung-versandkosten (2026-11-09): PostPac Economy 6.90, Priority 8.90, ab CHF 80 Warenwert gratis (docs/references/Haendler_Einkauf_Auszug_2026-11-09.txt) |
+| offen (Labor-/Arbeitsschutz-Fachhandel) | V-Z2, V-Z3, V-Z4, V-Z5d, V-Z6b, V-Z8, V-Z9, V-Z10, V-Z11 | 179.00 | 10.00 | 189.00 | 0.00 (+0.00 Versand) | ANNAHME (Haendler offen, eine Sammelbestellung V-Z2...V-Z11) |
+| Simpex Electronic AG | V-M1 | 82.58 | 15.00 | 97.58 | 82.58 (+15.00 Versand) | ANNAHME (Versandbetrag laut Konzept Kap. 7 nicht angegeben) |
 | pi-shop.ch | G2, G3, W1 | 48.70 | 7.90 | 56.60 | 20.80 (+7.90 Versand) | pi-shop.ch/versandkosten (2026-11-08): B-Post 7.90, A-Post 9.90 (docs/references/pi-shop_Gateway-Teile_Auszug_2026-11-08.txt) |
 | galaxus.ch | S1 | 39.84 | 9.90 | 49.74 | 39.84 (+9.90 Versand) | ANNAHME (Versandseite nicht abrufbar, Bot-Sperre) |
-| offen (Normteile-/Dichtungs-Fachhandel) | S2, S3, S5, S6, G8b | 29.00 | 10.00 | 39.00 | 0.00 (+0.00 Versand) | ANNAHME (Haendler offen, eine Sammelbestellung S2/S3/S5/S6/G8b) |
+| offen (Normteile-/Dichtungs-Fachhandel) | S2, S5, S6, G8b, P8 | 32.50 | 10.00 | 42.50 | 0.00 (+0.00 Versand) | ANNAHME (Haendler offen, eine Sammelbestellung S2/S5/S6/G8b/P8) |
+| LCSC (mit JLC-Bestellung buendeln, ANNAHME) | P1, P2, P3, P4, P5, P6, P7 | 1.46 | 20.00 | 21.46 | 1.46 (+20.00 Versand) | ANNAHME (README Kap. 6: 10-25 CHF), Kombination mit der JLC-Sendung im Warenkorb pruefen |
 | Digi-Key CH (laut phase5_gateway_led.md) | G9 | 0.29 | 0.00 | 0.29 | 0.29 (+0.00 Versand) | nicht einzeln bestellen (23 CHF Versand unter 70 CHF, docs/reviews/phase5_gateway_led.md): mit LCSC-Bestellung Programmieradapter buendeln |
-| **Summe** | | **220.93** | **27.80** | **248.73** | | |
+| **Summe** | | **569.67** | **72.80** | **642.47** | | |
 
-- bastelgarage.ch: geplant 103.10 CHF → versandkostenfrei; jetzt lieferbar 83.20 CHF (ohne ausverkauftes Grau) → frei. Ohne S11 (PETG) fällt die Bestellung unter 80 CHF.
+- bastelgarage.ch: geplant 185.30 CHF → versandkostenfrei; jetzt lieferbar 165.40 CHF (ohne ausverkauftes Grau) → frei.
 - pi-shop.ch: G2 + W1 + G3 in **einer** Sendung, sobald G3 an Lager ist; getrennt bestellt kostet die zweite Sendung nochmals 7.90 CHF.
-- Normteile/Dichtungen (S2, S3, S5, S6, G8b): **ein** Fachhändler für alles; noch keiner mit abrufbarem Angebot (Versand ANNAHME 10 CHF).
+- Normteile/Dichtungen (S2, S5, S6, G8b, P8): **ein** Fachhändler für alles; noch keiner mit abrufbarem Angebot (Versand ANNAHME 10 CHF).
 - G9 (Gateway-LED, D-027): nicht bei Digi-Key einzeln bestellen (23 CHF Versand), sondern in die LCSC-Bestellung des Programmieradapters legen (Teilewahl Elektronik).
 - JLC (PCBA Sensor) und Verguss (S8) sind separat (ORDER_JLC_REV_C.md bzw. Material-Agent).
 
-## 7 Prüfhinweise (`scripts/einkaufsliste.py --check`)
+## 8 Summen je Bereich (Ware, ohne Versand)
+
+| Bereich | Positionen | Ware CHF | davon ANNAHME CHF |
+|---|---|---|---|
+| Sensor | 6 | 58.80 | 25.50 |
+| Sensor+Werkstatt | 1 | 39.84 | 39.84 |
+| Sensor+Gateway | 3 | 59.70 | 0.00 |
+| Gateway | 6 | 68.89 | 1.00 |
+| Werkstatt | 1 | 8.90 | 0.00 |
+| Verguss | 16 | 326.08 | 179.00 |
+| Programmieradapter | 8 | 7.46 | 6.00 |
+
+Verguss-Zubehör (V-Z…) ohne Beutel: **243.50 CHF** (geht als Einmalkosten in `scripts/cost_final_phase5.py`); Programmieradapter (P…, W1, LCSC-Versand ANNAHME) siehe Kap. 7.
+
+## 9 Prüfhinweise (`scripts/einkaufsliste.py --check`)
 
 - S1: Preis ANNAHME/Quelle offen (39.84 CHF)
 - S2: Preis ANNAHME/Quelle offen (7.50 CHF)
-- S3: Preis ANNAHME/Quelle offen (2.50 CHF)
 - S5: Preis ANNAHME/Quelle offen (10.00 CHF)
 - S6: Preis ANNAHME/Quelle offen (8.00 CHF)
 - S9: bastelgarage.ch Ausverkauft (Abruf 2026-11-09)
 - G3: pi-shop.ch nicht an Lager (Abruf 2026-11-09)
 - G8b: Preis ANNAHME/Quelle offen (1.00 CHF)
+- V-Z2: Preis ANNAHME/Quelle offen (20.00 CHF)
+- V-Z3: Preis ANNAHME/Quelle offen (15.00 CHF)
+- V-Z4: Preis ANNAHME/Quelle offen (25.00 CHF)
+- V-Z5d: Preis ANNAHME/Quelle offen (6.00 CHF)
+- V-Z6b: Preis ANNAHME/Quelle offen (8.00 CHF)
+- V-Z8: Preis ANNAHME/Quelle offen (30.00 CHF)
+- V-Z9: Preis ANNAHME/Quelle offen (25.00 CHF)
+- V-Z10: Preis ANNAHME/Quelle offen (40.00 CHF)
+- V-Z11: Preis ANNAHME/Quelle offen (10.00 CHF)
+- P8: Preis ANNAHME/Quelle offen (6.00 CHF)

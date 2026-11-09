@@ -51,7 +51,52 @@ ITEMS = [
     ("4_gateway", "hardware/gateway/BOM_GATEWAY.csv", "Gateway-Stückliste mit Preisen und Quellen (W-8)"),
     ("4_gateway", "docs/manuals/GATEWAY_SETUP.md", "Gateway einrichten"),
     ("5_firmware", "docs/manuals/PROGRAMMIEREN_SENSOR.md", "Erstprogrammierung Sensor"),
+    # Phase 6 (2026-11-09): Anleitungen, Einkauf, Zeichnungen, Programmieradapter, Verguss, Renderings, Quellcode
+    ("2_bestellung", "docs/manuals/EINKAUFSLISTE.md", "Einkaufsliste ausser JLC (Händlergruppierung, Versand)"),
+    ("2_bestellung", "docs/manuals/EINKAUFSLISTE.csv", "Einkaufsliste Datenquelle (Preise, Lager, Abrufdatum, Beleg)"),
+    ("3_druck/zeichnungen", "mechanical/drawings/*.pdf", "Massbilder Druckteile Sensor/Gateway"),
+    ("4_gateway", "docs/manuals/APP.md", "PWA: Aufbau, Installation, Betrieb (Quellcode in 8_quellcode)"),
+    ("5_firmware", "docs/manuals/TESTFIRMWARE.md", "Testfirmware (Musterprüfung)"),
+    ("5_firmware", "docs/manuals/INSTALL_FIRMWARE_TOOLS.md", "Build-Werkzeuge installieren (Firmware Sensor)"),
+    ("5_firmware/sensor", "firmware/sensor/README.md", "Build-Anleitung Firmware Sensor (make, Signierung)"),
+    ("5_firmware/sensor/keys", "firmware/sensor/keys/README.md", "Schlüsselregeln (DEV/Produktion, Fingerabdruck)"),
+    ("5_firmware", "firmware/PROTOCOL.md", "Funkprotokoll Sensor <-> Gateway"),
+    ("6_anleitungen", "docs/manuals/MONTAGE_SENSOR.md", "Montage Sensor inkl. Verguss (Kap. 3a)"),
+    ("6_anleitungen", "docs/manuals/BATTERIEWECHSEL.md", "Batteriewechsel"),
+    ("6_anleitungen", "docs/manuals/INBETRIEBNAHME.md", "Inbetriebnahme"),
+    ("6_anleitungen", "docs/manuals/PAIRING_KALIBRIERUNG.md", "Pairing und Kalibrierung"),
+    ("6_anleitungen", "docs/manuals/FEHLERSUCHE.md", "Fehlersuche"),
+    ("6_anleitungen", "docs/concepts/vergussmasse_versiegelung.md", "Konzept Vergussmasse/Versiegelung (D-030)"),
+    ("7_programmieradapter", "hardware/programmer/README.md", "Programmieradapter Rev 1 (Schaltung, Bezug, PL2303 Kap. 9)"),
+    ("7_programmieradapter", "hardware/programmer/out/fluidi_programmer_schematic.pdf", "Schaltplan Programmieradapter"),
+    ("9_renderings", "renders/final/*.png", "Produktrenderings"),
+    ("9_renderings/pcb", "renders/pcb/*.png", "Leiterplatten-Renderings"),
 ]
+
+# Quellarchiv aus dem Git-Stand (git archive, nur versionierte Dateien), ohne Schluesseldateien
+SRC_ARCHIVE = os.path.join("8_quellcode", "fluidi_quellcode_firmware_app.tar.gz")
+SRC_PATHS = ["firmware", "app", "scripts/flash_sensor.py"]
+SRC_EXCLUDE = [":(exclude)*.pem", ":(exclude)*.key", ":(exclude)*.der"]
+GENERATED = {"README.md", "SHA256SUMS", os.path.join("5_firmware", "FIRMWARE_HINWEIS.md"), SRC_ARCHIVE,
+             os.path.join("8_quellcode", "QUELLCODE.md")}
+
+
+def make_archive(rev, dst):
+    """git archive (deterministisch fuer gleichen Commit); prueft, dass kein privater Schluessel enthalten ist."""
+    os.makedirs(os.path.dirname(dst), exist_ok=True)
+    with open(dst, "wb") as fh:
+        r = subprocess.run(["git", "-C", ROOT, "archive", "--format=tar.gz", rev, "--", *SRC_PATHS, *SRC_EXCLUDE],
+                           stdout=fh)
+    if r.returncode != 0:
+        raise SystemExit("FEHLER: git archive")
+    import tarfile
+    with tarfile.open(dst, "r:gz") as tf:
+        for m in tf.getmembers():
+            if m.isfile():
+                data = tf.extractfile(m).read()
+                if m.name.endswith((".pem", ".key", ".der")) or b"PRIVATE KEY-----" in data:
+                    raise SystemExit(f"FEHLER: Schluesselmaterial im Quellarchiv: {m.name}")
+    return sha(dst)
 
 
 def sha(p):
@@ -96,7 +141,7 @@ def check():
         elif sha(src) != sha(d):
             bad.append(f"veraltet: {rel} (Quelle {os.path.relpath(src, ROOT)} geaendert)")
     have = {os.path.relpath(os.path.join(dp, f), DST) for dp, _, fs in os.walk(DST) for f in fs}
-    extra = have - want - {"README.md", "SHA256SUMS", os.path.join("5_firmware", "FIRMWARE_HINWEIS.md")}
+    extra = have - want - GENERATED
     bad += [f"nicht mehr in der Quellliste: {x}" for x in sorted(extra)]
     readme = open(os.path.join(DST, "README.md"), encoding="utf-8").read()
     m = re.search(r"Git-Stand \| `([0-9a-f]+)`", readme)
@@ -111,6 +156,19 @@ def check():
             bad.append(f"Quellen seit Stand {m.group(1)} geaendert: {changed.split()}")
         if git("status", "--porcelain", "--", *srcs):
             bad.append("Quellen haben nicht committete Aenderungen")
+        # Quellarchiv: aus dem Stand neu erzeugen und vergleichen; Quellcode seit dem Stand unveraendert?
+        arc = os.path.join(DST, SRC_ARCHIVE)
+        if not os.path.isfile(arc):
+            bad.append(f"fehlt im Paket: {SRC_ARCHIVE}")
+        else:
+            import tempfile
+            with tempfile.TemporaryDirectory() as td:
+                ref = make_archive(m.group(1), os.path.join(td, "a.tar.gz"))
+            if ref != sha(arc):
+                bad.append(f"{SRC_ARCHIVE} entspricht nicht git archive {m.group(1)}")
+        ch_src = git("diff", "--name-only", m.group(1), "HEAD", "--", *SRC_PATHS)
+        if ch_src:
+            bad.append(f"Quellcode seit Stand {m.group(1)} geaendert ({len(ch_src.split())} Dateien) -> Archiv veraltet")
     if "+ **nicht committete" in readme:
         bad.append("Paket wurde aus einer Arbeitskopie mit nicht committeten Aenderungen erzeugt")
     for b_ in bad:
@@ -154,6 +212,30 @@ def main():
             dirty = bool(git("status", "--porcelain", "--", rel_s))
             rows.append((os.path.relpath(d, DST), rel_s, hd, os.path.getsize(d), purpose, dirty))
 
+    # Quellarchiv (Projektauftrag: Firmware Sensor/Gateway und PWA im Quellcode) aus HEAD, ohne Schluessel
+    head_full = git("rev-parse", "HEAD")
+    arc = os.path.join(DST, SRC_ARCHIVE)
+    h_arc = make_archive(head_full, arc)
+    rows.append((SRC_ARCHIVE, f"git archive {head_full[:7]} -- {' '.join(SRC_PATHS)} (ohne *.pem/*.key/*.der)", h_arc,
+                 os.path.getsize(arc), "Quellcode Firmware Sensor + Gateway, PWA, Flash-Werkzeug", False))
+    qhint = os.path.join(DST, "8_quellcode", "QUELLCODE.md")
+    with open(qhint, "w", encoding="utf-8") as fh:
+        fh.write("# Quellcode – Hinweis zum Release Rev C\n\n")
+        fh.write(f"Archiv `fluidi_quellcode_firmware_app.tar.gz` = `git archive {head_full}` der Pfade "
+                 f"`{'`, `'.join(SRC_PATHS)}` (nur versionierte Dateien, deterministisch: gleicher Commit → gleicher sha256).\n\n")
+        fh.write("- **Ohne Schlüssel:** `*.pem`, `*.key`, `*.der` ausgeschlossen, Inhalt beim Erzeugen auf „PRIVATE KEY“ geprüft. "
+                 "Der Entwicklungsschlüssel `firmware/sensor/keys/DEV_ONLY_*.pem` liegt nur im Repository (öffentlich, kein Schutz); "
+                 "Produktionsschlüssel sind nie im Repository (`firmware/sensor/keys/README.md`).\n")
+        fh.write("- Firmware Sensor: Bau und Signierung `5_firmware/sensor/README.md`, Werkzeuge `5_firmware/INSTALL_FIRMWARE_TOOLS.md`, "
+                 "Flashen `5_firmware/PROGRAMMIEREN_SENSOR.md` (`scripts/flash_sensor.py` im Archiv).\n")
+        fh.write("- Gateway (Python, keine Binärdateien): `firmware/gateway/` im Archiv, Installation `4_gateway/GATEWAY_SETUP.md` "
+                 "(`firmware/gateway/install/install_gateway.sh`).\n")
+        fh.write("- PWA (statisch, kein Build-Schritt): `app/` im Archiv, Anleitung `4_gateway/APP.md`; das Gateway liefert die PWA aus.\n")
+        fh.write("- Prüfen: `git archive --format=tar.gz <Commit> -- " + " ".join(SRC_PATHS) + " " + " ".join(f"'{x}'" for x in SRC_EXCLUDE)
+                 + " | sha256sum` muss dem Wert in `README.md` entsprechen (`make_release_rev_c.py --check` macht das).\n")
+    rows.append((os.path.relpath(qhint, DST), "(erzeugt von production/make_release_rev_c.py)", sha(qhint),
+                 os.path.getsize(qhint), "Hinweis Quellcode", False))
+
     # Firmware-Hinweis (Text, keine Binaerdateien: Build-Artefakte sind nicht versioniert und schluesselgebunden)
     fw_dir = os.path.join(ROOT, "firmware", "sensor", "build")
     fw = sorted(glob.glob(os.path.join(fw_dir, "fluidi-sensor-factory-*.hex")) +
@@ -161,9 +243,14 @@ def main():
     hint = os.path.join(DST, "5_firmware", "FIRMWARE_HINWEIS.md")
     with open(hint, "w", encoding="utf-8") as fh:
         fh.write("# Firmware Sensor – Hinweis zum Release Rev C\n\n")
-        fh.write("Das Paket enthält **keine** Firmware-Binärdateien. Gründe: Die Build-Artefakte in "
-                 "`firmware/sensor/build/` sind nicht versioniert, das Werks-Hex ist an den Signierschlüssel gebunden "
-                 "(Dateiname `…-key<Fingerabdruck>.hex`), und die Firmware wird erst am Muster freigegeben.\n\n")
+        fh.write("Das Paket enthält **bewusst keine** Firmware-Binärdateien. Gründe: (1) Die vorhandenen Build-Artefakte "
+                 "in `firmware/sensor/build/` sind mit dem öffentlichen **DEV-Schlüssel** signiert (`DEV_ONLY_*`): ein damit "
+                 "gebauter MCUboot nimmt jedes Image an, das irgendjemand mit dieser Datei signiert – solche Binärdateien "
+                 "dürfen nicht als Lieferstand erscheinen (`5_firmware/sensor/README.md` der Schlüssel, Regel 1). (2) Sie sind "
+                 "nicht versioniert, also nicht an den Git-Stand dieses Pakets gebunden. (3) Die Firmware ist **nicht "
+                 "freigegeben** (Musterstand); der Serienstand wird mit dem Produktionsschlüssel offline gebaut "
+                 "(`make release SIGN_KEY=…`), der nie ins Repository oder in dieses Paket gelangt. Für den Musterbau wird "
+                 "aus `8_quellcode/` gebaut (`5_firmware/sensor/README.md`).\n\n")
         fh.write("- Quelle: `firmware/sensor` (Bau: `make`, siehe `firmware/sensor/README.md`).\n")
         fh.write("- Programmieren: `5_firmware/PROGRAMMIEREN_SENSOR.md` (ROM-UART-Bootloader, Programmieradapter Rev 1 "
                  "oder Behelf, Sicherheitsregeln Kap. 1).\n")
@@ -185,7 +272,7 @@ def main():
         for r in rows:
             fh.write(f"{r[2]}  {r[0]}\n")
     with open(os.path.join(DST, "README.md"), "w", encoding="utf-8") as fh:
-        fh.write("# fluidi – Release-Paket Rev C (Sensor + Gateway-Druckteile)\n\n")
+        fh.write("# fluidi – Release-Paket Rev C (Sensor, Gateway, Anleitungen, Quellcode; Stand Phase 6)\n\n")
         fh.write("| | |\n|---|---|\n")
         fh.write(f"| Erzeugt | {now} von `.venv/bin/python production/make_release_rev_c.py` |\n")
         fh.write(f"| Git-Stand | `{head}`{' + **nicht committete Änderungen** in markierten Quellen (Spalte „geändert“)' if any_dirty else ''} |\n")
@@ -201,8 +288,9 @@ def main():
             fh.write(f"| `{r[0]}` | `{r[1]}` | `{r[2]}` | {r[3]} | {r[4]} | {'ja' if r[5] else ''} |\n")
         fh.write("\n*geändert = Quelle hat beim Erzeugen nicht committete Änderungen (Arbeitskopie). Nach dem Commit "
                  "das Paket neu erzeugen, damit Git-Stand und Inhalt übereinstimmen.\n\n")
-        fh.write("Nicht im Paket: Programmieradapter (`hardware/programmer/`), Gateway-Software (`firmware/gateway/`), "
-                 "PWA (`app/`), alte ESP32-Gateway-Druckteile (`mechanical/gateway/`, durch D-014 ersetzt).\n")
+        fh.write("Quellcode Firmware Sensor/Gateway und PWA: `8_quellcode/` (git archive des Git-Stands, ohne Schlüssel, "
+                 "Hinweis `8_quellcode/QUELLCODE.md`). Firmware-Binärdateien bewusst nicht enthalten (`5_firmware/FIRMWARE_HINWEIS.md`). "
+                 "Nicht im Paket: alte ESP32-Gateway-Druckteile (`mechanical/gateway/`, durch D-014 ersetzt), Simulationen, Prüfberichte.\n")
     print(f"{len(rows)} Dateien -> {os.path.relpath(DST, ROOT)}; Git {head}, Arbeitskopie geändert: {any_dirty}")
     for r in rows[:3]:
         print(f"  {r[0]}  {r[2]}")
