@@ -3,8 +3,8 @@
 | | |
 |---|---|
 | Dokument | `docs/manuals/INBETRIEBNAHME.md` |
-| Version | 0.1 (Phase 6) |
-| Datum | 2026-11-08 |
+| Version | 0.2 (Phase 6: Sicherheit W-3/K-6, Red Team W-5) |
+| Datum | 2026-11-09 |
 | Für wen | Alle, die fluidi im Büro einrichten. Keine Fachkenntnisse nötig. |
 | Gilt für | Gateway-Software `firmware/gateway/` 0.5.0, App `app/`, Sensor-Firmware 0.1.0 |
 | Status | Erstellt nach dem Programmcode, **noch nicht am echten Gerät durchgespielt** (PROTOTYP-PRÜFUNG) |
@@ -27,20 +27,34 @@ die SD-Karte bringen) steht in `GATEWAY_SETUP.md` und ist Sache einer technisch 
 
 ## 1 Was Sie brauchen
 
-- das **Gateway** mit eingesetzter SD-Karte und dem **Netzteil** (5 V, Micro-USB)
+- das **Gateway** mit eingesetzter SD-Karte und dem **mitgelieferten Netzteil** (Raspberry Pi Original 12.5 W,
+  5 V, Micro-USB). **Nur dieses Netzteil verwenden** – kein anderes Handy-Ladegerät, keine Mehrfachsteckdose am
+  Fensterbrett.
 - den **Zettel aus der Installation** mit **Einrichtungscode** (6 Ziffern, z. B. `123-456`) und
   **CA-Fingerabdruck** (lange Zeichenfolge). Beides zeigt das Installationsskript am Ende an (`GATEWAY_SETUP.md`
   Kap. 4). **ANNAHME:** Wer das Gateway installiert, übergibt diesen Zettel zusammen mit dem Gerät.
 - ein **Handy** (Android mit Chrome oder iPhone mit Safari) oder einen PC, im **gleichen WLAN** wie das Gateway
 - mindestens einen **Sensor** und eine neue Knopfzelle **CR2032** (falls noch keine eingesetzt ist)
-- eine Steckdose in der Nähe der Pflanzen und mit gutem WLAN-Empfang
+- eine Steckdose mit gutem WLAN-Empfang, **ausserhalb des Giessbereichs** (Kap. 2)
+- im **Firmen-WLAN:** die Vorabprüfung aus `GATEWAY_SETUP.md` Kap. 1.1 ist gemacht (Geräte im WLAN dürfen sich
+  gegenseitig erreichen, `fluidi.local` wird aufgelöst). Für das Büro-WLAN des Auftraggebers hat der Auftraggeber
+  mDNS bestätigt; nach einem WLAN-Wechsel oder an einem anderen Standort die Prüfung wiederholen.
 
 Das Gateway hat **keine eigene Uhr mit Batterie**. Es holt die Uhrzeit aus dem Internet (NTP) über das WLAN. Fällt
 das einmal aus, übernimmt es die Uhrzeit Ihres Handys, sobald Sie die App öffnen und angemeldet sind (Kap. 8).
 
 ## 2 Gateway aufstellen und einschalten
 
-1. Gateway in die Nähe der Pflanzen stellen, nicht direkt auf einen Heizkörper und nicht in die pralle Sonne.
+1. Gateway im selben Raum wie die Pflanzen aufstellen, aber **nicht im Giessbereich**:
+
+   > **Achtung – Netzteil und Wasser.** Das Netzteil ist das einzige Teil mit Netzspannung (230 V).
+   > - Gateway, Netzteil und Steckdose **nicht zwischen Töpfe, nicht auf oder neben Untersetzer, nicht unter
+   >   hängende Pflanzen** und nicht auf die Fensterbank, wo gegossen wird oder Kondenswasser steht.
+   > - Kabel nicht durch nasse Bereiche führen. Gateway nicht abdecken, nicht auf einen Heizkörper und nicht in die
+   >   pralle Sonne stellen.
+   > - Ist Wasser auf Netzteil oder Steckdose gelangt: **nicht anfassen**, zuerst den Stromkreis an der Sicherung
+   >   abschalten, erst dann ausstecken. Netzteil ersetzen (nicht trocknen und weiterverwenden).
+
    Die Funkreichweite zu den Sensoren hängt vom Raum ab; ob sie genügt, sehen Sie später in der App (Kap. 7).
 2. Netzteil einstecken. Das Gateway hat keinen Schalter.
 3. **Status-LED am Gateway beobachten** (grüner Tropfen):
@@ -97,6 +111,10 @@ Nach 5 falschen Passwörtern sperrt die App die Anmeldung für eine Weile und ze
 
 1. Ist die Knopfzelle noch nicht eingesetzt: nach `BATTERIEWECHSEL.md` einsetzen (Sicherheitshinweise dort zuerst
    lesen). **Beim Einsetzen die Taste oben am Sensor nicht berühren.**
+
+   > **Warnung – Knopfzelle verschlucken ist lebensgefährlich.** Neue und alte Zellen **ausser Reichweite von
+   > Kindern und Haustieren** aufbewahren. Besteht der Verdacht, dass eine Zelle verschluckt wurde: **sofort**
+   > ärztliche Hilfe holen (Notruf **144**, Tox Info Suisse **145**), nicht auf Beschwerden warten.
 2. Direkt nach dem Einsetzen zeigt die Sensor-LED:
    - **grün kurz** (0.2 s) = Selbsttest in Ordnung, danach **2 × kurz gelb** = noch nicht gekoppelt → weiter mit
      Kap. 6
@@ -125,6 +143,9 @@ Ausführlich mit allen Varianten: `PAIRING_KALIBRIERUNG.md` Kap. 2.
 1. Sensor **senkrecht bis zur Markierung** in die Erde stecken. In fester Erde vorher mit einem Stab vorstechen.
    **Am Kopf seitlich bzw. an der Hülse greifen, nicht auf die Taste drücken** (die Taste ist dafür nicht
    ausgelegt).
+   **Nur die Sonde gehört in die Erde.** Beim Giessen den **Sensorkopf nicht übergiessen**; den Sensor **nie
+   untertauchen**, nicht unter fliessendem Wasser und nie in der Spülmaschine reinigen – nur die Sonde mit einem
+   feuchten Tuch abwischen. Kam Wasser in den Kopf: `FEHLERSUCHE.md` Kap. 3.8.
 2. In der App auf der Seite der Pflanze **„Jetzt messen“** antippen. Die App zeigt „Warte auf Sensor“ →
    „Sensor misst“ → „Wert empfangen“. Das dauert bis etwa 1 Minute (Werkseinstellung „Reaktionszeit 1 min“).
 3. **Funksignal prüfen:** *Einstellungen → Sensoren & Firmware*: Bei jedem Sensor steht der Empfang in dBm.

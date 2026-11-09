@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Stand | 2026-11-08, Phase 5, Gehäuse Rev C mit V-K/M-4 (D-019, D-023) und P5-M1/M2/M3; **Phase 6: Vergussmasse und Kantenversiegelung (Kap. 3a, 4, 5, 5a) nach `docs/concepts/vergussmasse_versiegelung.md` – Vorschlag, Freigabe offen** |
+| Stand | 2026-11-08, Phase 5, Gehäuse Rev C mit V-K/M-4 (D-019, D-023) und P5-M1/M2/M3; **Phase 6: Vergussmasse und Kantenversiegelung (Kap. 3a, 4, 5, 5a) nach `docs/concepts/vergussmasse_versiegelung.md` – D-030 gültig mit Auflagen: Verguss nur nach den Vorbedingungen Kap. 3a (D-030 Bed. 1–5) und nach Programmieren + Funktionsprüfung + OTA-Update am Muster (Kap. 3b)**; Mechanik-Nachträge Phase 6 (R W-1/W-8/K-l2/K-l5, S K-5) 2026-11-09 |
 | Zeichnungen | `mechanical/drawings/FL-S-00_zusammenbau_sensor.pdf` (Positionen 1–17), Einzelteile FL-S-01 … FL-S-10 |
 | Bilder | `renders/final/fluidi_03_explosion.png` (alle Teile), `renders/final/fluidi_04_batteriewechsel.png` (Hülse abgezogen) |
 | Grundlage | `docs/interfaces/PCB_OUTLINE.md` Kap. 7, `mechanical/PRINT_SETTINGS.md` Kap. 4–5, `docs/reviews/phase4_sicherheit_kragen_firmware.md` K-4/K-5/K-7, `docs/reviews/phase3_sleeve_sicherheit.md`, `docs/reviews/phase5_fmea_light.md` |
@@ -17,9 +17,9 @@ sondern die Projektleitung fragen.
 
 | Nr | Punkt | Stand |
 |---|---|---|
-| O-1 | **Vergussmasse** (Kragen, Schott): Epoxid 2K, mineralisch gefüllt, Tg ≥ 80 °C, niedriger CTE, *ein* Material für den ganzen Kragen (K-4, Wortlaut gilt bis zum Entscheid D-030) | **Vorschlag Electrolube ER2223** (Tg 140 °C laut TDS, Härtebedingung unbekannt; ungefüllt **ANNAHME**; `docs/concepts/vergussmasse_versiegelung.md`, INDEX.csv EP-K). **Abweichung von K-4** („gefüllt, niedriger CTE“): Sicherheit kein Veto, zulässig unter Auflagen A-1 … A-5 (`docs/reviews/phase6_vergussmasse_sicherheit.md`). **Freigabe D-030 offen.** Vor dem ersten Beutel (auch Vorversuche V-1 … V-3): SDB Teil B in DE/EN/FR/IT liegt vor (Kap. 3a). Bis zur Freigabe **kein Verguss an Mustern**. Ohne Datenblatt und SDB keine andere Masse verwenden. |
-| O-2 | **Kantenversiegelung der Sonde** (REQ-MECH-07) | **Vorschlag:** ER2223 nur auf Schnittkante und Spitze, Flächen frei (Kap. 5a; Feldsimulation `simulation/field/results/coat_epoxy.txt`). Freigabe wie O-1 |
-| O-3 | Klebstoff Lichtfenster | **ANNAHME** transparentes 2K-Epoxid oder UV-Kleber (PRINT_SETTINGS Kap. 5) |
+| O-1 | **Vergussmasse** (Kragen, Schott): Epoxid 2K, Tg ≥ 80 °C, *ein* Material für den ganzen Kragen | **Electrolube ER2223 (D-030, gültig mit Auflagen; Abweichung von K-4 „mineralisch gefüllt, niedriger CTE“)** – Tg 140 °C laut TDS (Härtebedingung unbekannt), ungefüllt (**ANNAHME**); `docs/concepts/vergussmasse_versiegelung.md` Kap. 10, INDEX.csv EP-K. Abweichung zulässig unter A-1 … A-5 (`docs/reviews/phase6_vergussmasse_sicherheit.md`). **Vorbedingungen, keine offene Freigabe:** D-030 Bed. 1–5, abzuhaken in Kap. 3a („Vor dem ersten Beutel“, „Vor dem Musterverguss“, „Vor der Serie“). Mischen: **M-B (ganzer Beutel), bis M-A nach Bed. 2 bestätigt ist** (Kap. 3a). Zusätzlich Reihenfolge Kap. 3b (erst programmieren, prüfen, OTA, dann vergiessen). Ohne Datenblatt und SDB keine andere Masse verwenden. |
+| O-2 | **Kantenversiegelung der Sonde** (REQ-MECH-07) | ER2223 nur auf Schnittkante und Spitze, Flächen frei (D-030; Kap. 5a; Feldsimulation `simulation/field/results/coat_epoxy.txt`). Vorbedingungen wie O-1 |
+| O-3 | Klebstoff Lichtfenster | **Vorschlag Mechanik (2026-11-09): UHU plus endfest 300** (2K-Epoxid, Tuben 33 g, INDEX MAT-ADH1). Transparenz nicht nötig: Klebstoff nur im Spalt 0.1 mm an Tropfenrand und Schaftmantel, nicht im Lichtweg (PRINT_SETTINGS Kap. 5). Haftung auf ASA im TDS nicht belegt → **PROTOTYP-PRÜFUNG** Klebeprobe und Dichtheit nach 7 d 65 °C. **Härter ätzend (H314/H318)**, Schutzmassnahmen Kap. 3 Schritt 1. Freigabe Orchestrator offen |
 | O-4 | Klemmring (Pos. 6): **Presssitz** 0.05 je Seite in der Senkung Ø 6.4, Schürze verpresst die Membran um 0.1 mm (20 %) – Phase 5 R3-W2 (`check_sensor.txt` 2e) | Auszugskraft und Dichtheit am Muster: PROTOTYP-PRÜFUNG ST-W6 (a), M-W3; Klebung nur, wenn ein Kleber mit Datenblatt gewählt ist |
 | O-5 | Tastermechanik (P5-M2, Runde 2): 60°-Keil am Finger auf einer Nase der Zunge in Höhe SW1, Führungsrippe und D-Bohrung gegen Verdrehen. SW1 schaltet im CAD nominal bei 0.3 mm Tastenhub, worst bei 0.65 mm (Reserve +0.17); Tastenkraft nominal ≈ 8 N, worst ≈ 12 N (+ Membran, μ 0.3 ANNAHME) (`check_sensor.txt` 2a–2e) | **Überlast:** nach dem Schalten trägt SW1 die Tastenkraft; bei 20 N und μ ≥ 0.3 Zunge SF ≥ 1.15, bei kleinerer Reibung < 1 → PROTOTYP-PRÜFUNG M-T2; Taste nicht mit Kraft drücken |
 | O-6 | Anzugsmoment Schraube M2 × 3 in ASA/Mutter | nicht festgelegt; „handfest mit TX6“ (**ANNAHME**), am Muster prüfen (ST-K1) |
@@ -36,7 +36,9 @@ Teile: Pos. 1–17 laut Stückliste FL-S-00 (gedruckt nach `PRINT_SETTINGS.md`, 
 | 2 × Distanzlehre 24.2 (FL-S-10) | Abstand Kragen ↔ Schott beim Kragenverguss |
 | Isopropanol (**leicht entzündlich**: keine offene Flamme, Lötkolben aus, lüften), fusselfreie Tücher | Flussmittelreste im Kragenbereich entfernen (K-5) |
 | 600er Schleifpapier | FDM-Naht auf den O-Ring-Gleitflächen der Hülse glätten (PRINT_SETTINGS Kap. 5) |
-| Silikonfett | O-Ringe (Pos. 11) |
+| Silikonfett (S6) – nur **dünner Film**; O-Ringe aus **EPDM** (S2, Kap. 7 Schritt 2) | O-Ringe (Pos. 11) |
+| Etikettendrucker mit **laminiertem Schriftband 9 mm** (z. B. Brother TZe, schwarz auf weiss, **ANNAHME** Werkstattbestand, Einkaufsliste S12), Isopropanol | Kennungsetikett (Kap. 7a) |
+| Fensterkleber **UHU plus endfest 300** (Tuben Binder + Härter 33 g, O-3), SDB Binder und Härter ausgedruckt am Arbeitsplatz; Zahnstocher, PE-Folie (Gefrierbeutel), 120er Schleifpapier, Mischunterlage (PE-Deckel) | Lichtfenster (Pos. 4) in die Kappe kleben (Kap. 3 Schritt 1) |
 | Kapton-Punkt (Ø ≈ 3 mm) | Gewinde der Mutter vor Epoxid schützen (PCB_OUTLINE Kap. 7) |
 | Dosierspritzen + Kanülen, Mischbecher, Spatel, **Waage 0.01 g** | Verguss (Mengen siehe Kap. 4/5), Variante M-A (Kap. 3a) |
 | Vergussmasse **Electrolube ER2223, Resin Pack 250 g** (Vorschlag O-1), TDS und SDB A/B (**B in DE/EN/FR/IT**, Kap. 3a) ausgedruckt am Arbeitsplatz | Schott, Kragen, Sondenkanten (Kap. 3a) |
@@ -45,7 +47,7 @@ Teile: Pos. 1–17 laut Stückliste FL-S-00 (gedruckt nach `PRINT_SETTINGS.md`, 
 | Einweg-Alu-Schale (**≥ 20 × 15 cm** oder zwei), Schere, **nicht brennbare Unterlage** (Fliese, Blech) | Beutelrest flach aushärten lassen (Variante M-B), Abfüllen (M-A), Kap. 3a |
 | Wärmeschrank oder Filamenttrockner mit separatem Thermometer, einstellbar 60 °C (**ANNAHME** vorhanden) | Nachhärtung 4 h bei 60 °C (Kap. 3a) |
 | Vakuumkammer (falls vorhanden) | blasenfreier Verguss (K-4), sonst kopfüber mit Entlüftung; bei ER2223 (800 mPa·s) nicht nötig |
-| Nitrilhandschuhe ≥ 0.1 mm, zwei Paar übereinander (Einweg, **ANNAHME** Material: das SDB nennt nur „EN 374“), **dicht schliessende Chemikalien-Schutzbrille (EN 166)** und **Gesichtsschutz (Visier)**, langärmlige Kleidung, **Kunststoffschürze**, **Augenspülflasche**, Halbmaske mit **Filter A (EN 14387)** bereit, Ventilator | Epoxid: Härter B ist **ätzend (H314) und hautsensibilisierend (H317)**, Harz A reizend und sensibilisierend (Kap. 3a) |
+| Nitrilhandschuhe **MAPA Solo 977** (0.13 mm, EN ISO 374-1 Typ B; Einkaufsliste V-Z7; freigegeben als Spritzschutz unter HS-1 … HS-5, Kap. 3a), zwei Paar übereinander; für M-A empfohlen Butyl-/Laminat-Überhandschuh (HS-4), **dicht schliessende Chemikalien-Schutzbrille (EN 166)** und **Gesichtsschutz (Visier)**, langärmlige Kleidung, **Kunststoffschürze**, **Augenspülflasche**, Halbmaske mit **Filter A (EN 14387)** bereit, Ventilator | Epoxid: Härter B ist **ätzend (H314) und hautsensibilisierend (H317)**, Harz A reizend und sensibilisierend (Kap. 3a) |
 | Halter „kopfüber“ (z. B. Lochplatte, Schraubstock mit Schutzbacken) | Kappe bzw. Sensor beim Aushärten senkrecht halten |
 
 ## 2 Vorbereitung der Druckteile
@@ -67,6 +69,25 @@ Geometrie.
 
 1. **Lichtfenster (Pos. 4)** von aussen in den Tropfenausschnitt kleben, Lichtschaft nach innen (Spalt 0.1 je Seite).
    Klebstoff nur auf den Rand, nicht auf die Sichtfläche und nicht in den Innenraum (O-3).
+   - **Schutz (UHU plus endfest 300):** Der **Härter ist ätzend** (SDB Härter V35, PDF S. 14: H314, H318, H317, Signalwort
+     „Gefahr“), der Binder reizend und sensibilisierend (SDB Binder V62, S. 1–2: H315, H317, H319, H411, EUH205). Darum gilt
+     dieselbe Grundausrüstung wie Kap. 3a: Nitrilhandschuhe **> 0.12 mm** (SDB Härter PDF S. 18; zwei Paar übereinander),
+     **dicht schliessende Schutzbrille**, Augenspülflasche bereit, gelüfteter Raum, keine Kinder/Haustiere im Raum, Tuben nach
+     Gebrauch sofort verschliessen und wie Kap. 3a unter Verschluss lagern. Hände mit Wasser und Seife, **nie mit Lösungsmittel**
+     reinigen (TDS S. 5). Erste Hilfe wie Kap. 3a (Augen ≥ 15 min spülen, Arzt; SDB Härter PDF S. 15: P305+P351+P338,
+     P301+P330+P331), Tox Info Suisse 145. Flüssige Reste und angebrochene Tuben nicht in Hausmüll oder Abfluss (SDB Binder
+     S. 9, Abschn. 13) → Sammelstelle Sonderabfälle; Mischreste auf der Unterlage aushärten lassen, dann wie Kap. 3a
+     (**ANNAHME**).
+   - Klebeflächen (Tropfenrand und Schaftmantel am Fenster, Wand des Tropfenausschnitts und der Bohrung Ø 3.2 in der Kappe) mit
+     120er Papier leicht anrauen, mit Isopropanol entfetten, ablüften. **Kein Aceton** (löst ASA an, **ANNAHME**).
+   - Gleich lange Stränge Binder und Härter (1 : 1 Volumen, TDS S. 5) auf der PE-Unterlage gut mischen (gleichmässige Farbe),
+     Raum ≥ 18 °C (TDS S. 2). Mit dem Zahnstocher eine **dünne** Schicht nur auf den Tropfenrand des Fensters und rundum auf den
+     Schaftmantel (nicht auf die Schaft-Stirnfläche = Lichteintritt) auftragen; Topfzeit ≈ 90 min (TDS S. 1).
+   - Kappe mit der Front nach unten auf PE-Folie legen (UHU haftet nicht auf PE, TDS S. 1), Fenster von aussen einsetzen → Sichtfläche
+     bündig und sauber. Ausgetretenen Kleber innen an der Schaft-Stirnfläche mit Zahnstocher entfernen; die Fuge muss rundum
+     geschlossen sein (Dichtlinie).
+   - Liegend aushärten: ≥ 24 h bei Raumtemperatur (Endfestigkeit, TDS S. 1), danach erst Kap. 3 Schritt 2 ff. Optional
+     45 min bei 70 °C (TDS S. 2) im Wärmeschrank – unbelastet unter der HDT der Kappe (Bambu ASA 92 °C bei 1.8 MPa).
 2. **Stössel (Pos. 8)** von unten in die D-Bohrung des Führungsrohrs stecken (D-Fläche nach vorne, passt nur so),
    Finger links zwischen Führungsrippe (vorne) und Zungennase (hinten).
 3. **Membran (Pos. 10)** flach auf den Grund der Senkung Ø 6.4 legen.
@@ -76,7 +97,9 @@ Geometrie.
 
 **Prüfung 3:** Taste federt zurück (Membran), Stössel gleitet ohne Klemmen und lässt sich **nicht verdrehen** (C-1).
 Membran rundum unter dem Klemmring geklemmt, Klemmring sitzt bündig und fest (R3-W2). Ohne Platine: beim Drücken bewegt
-sich die Zunge sichtbar nach hinten (Nase), in Ruhe ist sie nicht vorgespannt. Fenster bündig, keine Kleberspuren.
+sich die Zunge sichtbar nach hinten (Nase), in Ruhe ist sie nicht vorgespannt. Fenster bündig, keine Kleberspuren auf
+Sichtfläche und Schaft-Stirnfläche, Klebefuge aussen rundum geschlossen (Lupe); gegen eine Taschenlampe von innen
+leuchtet der Tropfen gleichmässig.
 
 ## 3a Vergussmasse: Schutzmassnahmen, Sitzungsplan, Mischen, Aushärten (gilt für Kap. 4, 5, 5a)
 
@@ -86,7 +109,38 @@ Grundlage: `docs/references/Electrolube_ER2223_TDS_Rev4-2019-03.pdf` (TDS), SDB 
 Sicherheitsprüfung `docs/reviews/phase6_vergussmasse_sicherheit.md`.
 
 **Geltung (K-2):** Gefahren, Schutzmassnahmen, Erste Hilfe, Lagerung und Entsorgung gelten **ab dem ersten Beutel, auch
-für die Vorversuche V-1 … V-3**. Der Verguss an Mustern ist erst nach Freigabe von O-1/O-2 (D-030) erlaubt.
+für die Vorversuche V-1 … V-3**. D-030 ist gültig mit Auflagen: Verguss an Mustern nur, wenn die Abhakliste unten bis
+„Vor dem Musterverguss“ vollständig erfüllt ist **und** Kap. 3b am betreffenden Muster bestanden ist.
+
+**Abhakliste D-030 (Freigabebedingungen 1–5, `docs/concepts/vergussmasse_versiegelung.md` Kap. 10; ausdrucken, abhaken,
+in der Musterliste ablegen):**
+
+*Vor dem Öffnen des ersten Beutels (Bed. 1) – auch für V-1 … V-3:*
+- [ ] SDB Teil B in Deutsch, Englisch, Französisch oder Italienisch unter `docs/references/` abgelegt und ausgedruckt am
+  Arbeitsplatz; SDB Teil A und TDS ebenfalls ausgedruckt.
+- [ ] Handschuhe **MAPA Solo 977** vorhanden, Datenblatt und Beständigkeitstabelle abgelegt
+  (`docs/references/MAPA_Solo977_TechnicalSheet_DE_2026-09.pdf`, `…_Bestaendigkeitstabelle_2024-04-11.pdf`) – von der
+  Sicherheit als Spritzschutz unter HS-1 … HS-5 freigegeben, Bed. 1 damit erfüllt (`docs/reviews/phase6_sicherheit_schluss.md`,
+  Abschnitt „Handschuhe V-Z7“). Andere Handschuhe nur mit gleicher Prüfung.
+- [ ] Schutzausrüstung nach Kap. 1 vorhanden (Korbbrille EN 166, Visier, Augenspülflasche, Schürze, Halbmaske A bereit,
+  Auffangwanne, abschliessbarer Sekundärbehälter); **zwei PE-Trichter** (je einer für A und B; kein Silikontrichter mit
+  Filter für Teil B, Sicherheit Schlussprüfung W-4).
+
+*Mischvariante (Bed. 2):*
+- [ ] **M-B (ganzer Beutel je Sitzung)** ist der Weg, solange M-A nicht bestätigt ist.
+- [ ] M-A erst, wenn MA-1 … MA-5 umgesetzt sind **und** entweder Electrolube keine Einwände hat (Konzept Anhang A) oder
+  nach MA-6 V-3 an jedem Ansatz und V-6 einmal mit einem gewogenen Ansatz bestanden sind – **Bestätigung durch den
+  Orchestrator** in der Musterliste vermerkt.
+
+*Vor dem Musterverguss (Bed. 3):*
+- [ ] V-1 … V-3 bestanden (Protokoll in der Musterliste).
+- [ ] Am betreffenden Muster Kap. 3b bestanden (Programmieren, Funktionsprüfung, OTA-Update).
+
+*Vor der Serie (Bed. 4):*
+- [ ] PT11.19 an ≥ 2 Mustern und PT11.23 bestanden (A-1/A-2), sonst Rückfallmasse (Konzept Kap. 9a, A-3).
+- [ ] Tg-Nachweis erbracht (Electrolube schriftlich oder V-6).
+
+*FMEA (Bed. 5):* F-60 und F-63 nachgeführt – erledigt (`docs/reviews/phase5_fmea_light.md`).
 
 **Voraussetzung vor dem Öffnen des ersten Beutels (W-3):** Das SDB Teil B liegt in **Deutsch, Englisch, Französisch oder
 Italienisch** vor (abgelegt unter `docs/references/`, ausgedruckt am Arbeitsplatz). Heute liegt Teil B nur ungarisch vor.
@@ -99,9 +153,19 @@ Verätzungen der Haut und schwere Augenschäden**, H302, H317, H318, H373 (SDB B
 **Schutzausrüstung (SDB A S. 6, SDB B S. 2/6, P280):**
 1. **Chemikalien-Schutzbrille** (dicht schliessend, EN 166) und darüber ein **Gesichtsschutz (Visier)** beim Aufschneiden,
    Ausdrücken, Abfüllen und Kneten (SDB B Abschn. 8.2, S. 6).
-2. **Handschuhe** (K-3): Nitril ≥ 0.1 mm (**ANNAHME** Material; das SDB nennt nur EN 374 und „dicht schliessend“), **zwei Paar
-   übereinander**, das äussere bei Kontakt sofort wechseln; nicht mit Handschuhen ins Gesicht fassen. Beständigkeitsliste des
-   Handschuhherstellers für CAS 1761-71-3 (Härter) und 25068-38-6 (Harz) vor dem ersten Beutel ablegen (offen).
+2. **Handschuhe** (K-3): **MAPA Solo 977** (Nitril 0.13 mm, EN ISO 374-1 Typ B, Datenblatt S. 1–2), freigegeben **nur als
+   Spritzschutz** unter den Auflagen der Sicherheit (`docs/reviews/phase6_sicherheit_schluss.md`, „Handschuhe V-Z7“):
+   - **HS-1:** **zwei Paar übereinander.** Das äussere Paar **sofort** wechseln bei sichtbarem Kontakt, spätestens nach
+     **15 min** Arbeit mit offener Masse oder offenem Härter; danach Hände waschen.
+   - **HS-2:** **kein Vollkontakt** – nicht eintauchen, Härter nicht mit dem Handschuh abwischen; Verschüttetes nur mit
+     Saugmaterial und Spatel aufnehmen (V-Z4).
+   - **HS-3:** Reinigen **nur mit Isopropanol** (Beständigkeit 48 min); **kein Aceton und kein anderes Keton**.
+   - **HS-4:** Bei grösserem Verschütten (z. B. platzender Beutel beim Abfüllen M-A) zuerst Handschuhe wechseln. Für das
+     Abfüllen **M-A** wird ein **Butyl- oder Laminat-Überhandschuh empfohlen** (nicht Pflicht).
+   - **HS-5:** Bei MAPA (bzw. Electrolube) die Permeationsdaten für **CAS 1761-71-3** (Härter B) anfragen (Textvorlage wie
+     Konzept Anhang B). Liefert MAPA eine Durchbruchzeit < 10 min, wird der Überhandschuh nach HS-4 **Pflicht**. Die
+     Anfrage ist keine Voraussetzung für den ersten Beutel.
+   Nicht mit Handschuhen ins Gesicht fassen. Für Harz A (CAS 25068-38-6) und den UHU-Härter gelten dieselben Auflagen.
 3. Langärmlige Kleidung und **chemikalienbeständige Kunststoffschürze**; geschlossene Schuhe.
 4. **Augenspülflasche** (oder fliessendes Wasser in Griffnähe) am Arbeitsplatz (SDB A S. 6 „eyewash“).
 5. Wer bereits auf Epoxid allergisch reagiert, verarbeitet die Masse nicht (H317).
@@ -147,7 +211,7 @@ FR4-Reststreifen 1.6 mm (Füllung, Blasen, Austritt, Zeit pro Sensor), V-2 Haftp
 (Becherrest 1 h bei 80 °C bleibt hart), V-6 Kriechprobe 80 °C (Tg-Ersatznachweis, Konzept Kap. 12). Muster erst
 vergiessen, wenn V-1 … V-3 bestanden sind (V-6 vor der Serie).
 
-**Mischen – zwei Varianten.** Variante **M-A (abfüllen und wägen)** ist sicherheitlich zulässig unter MA-1 … MA-5
+**Mischen – zwei Varianten. Bis zur Bestätigung von M-A (Abhakliste Bed. 2) gilt M-B.** Variante **M-A (abfüllen und wägen)** ist sicherheitlich zulässig unter MA-1 … MA-5
 (`docs/reviews/phase6_vergussmasse_sicherheit.md` Runde 2). Sie gilt, sobald Electrolube keine Einwände hat (Anfrage
 Konzept Anhang A) **oder** – ohne Antwort, nach Entscheid des Orchestrators (MA-6) – MA-1, MA-2, MA-4 umgesetzt und V-3
 an jedem Ansatz sowie V-6 einmal mit einem gewogenen Ansatz bestanden sind. Sonst **Variante M-B**.
@@ -211,6 +275,30 @@ Gebinde und Lagerung (MA-1, MA-2):
 „post-cure … if required“) im Wärmeschrank/Filamenttrockner. Temperatur mit eigenem Thermometer prüfen, **nie über 65 °C**
 (ASA, Fenster, Membran). **Clip leer** (W-1, siehe oben). Die Nachhärtung entfällt nur, wenn Electrolube schriftlich
 einen Tg ≥ 80 °C nach Raumtemperatur-Härtung bestätigt (offen). Erst danach Lehren entfernen, prüfen, weiter.
+
+## 3b Reihenfolge: erst programmieren, prüfen und ein OTA-Update, dann vergiessen (R W-1)
+
+Nach dem Verguss (Schott Kap. 4, Kragen Kap. 5) gibt es **keinen Rückweg über Weg B** (Lötdraht an R9, Dummy-Scheibe im
+Clip; `PROGRAMMIEREN_SENSOR.md` Kap. 5), und Weg A (Federstiftkopf) ist noch nicht gebaut (`hardware/programmer/README.md`
+Kap. 4). Ein Muster mit einer Firmware, die BLE oder OTA nicht beherrscht, wäre nach dem Verguss verloren. Darum gilt für
+**jedes Muster vor Kap. 4**:
+
+1. **Programmieren nach Weg B** (`PROGRAMMIEREN_SENSOR.md` Kap. 5, nur mit Dummy-Scheibe `hardware/dummy_cell/`).
+   Mit Draht an R9 (z 41.6, im Kappenbereich) nur an der **losen** Platine, also vor Kap. 4 (Kappe, Gabel, Schottkeil noch
+   nicht montiert). Die Lasche der Scheibe hat in jedem Zustand ohne Hülse Platz (`hardware/dummy_cell/README.md` Kap. 6a).
+2. **Funktionsprüfung mit Zelle** (`PROGRAMMIEREN_SENSOR.md` Kap. 5 Schritt 9): L11-Startsignal, Advertising
+   `fluidi-XXXX`, Taster, Messung.
+3. **Ein erfolgreiches OTA-Update:** Muster mit dem Gateway koppeln (`PAIRING_KALIBRIERUNG.md`), ein signiertes Abbild
+   mit **höherer Version** (z. B. `make VERSION=0.1.1`, Tabelle `TESTFIRMWARE.md` Kap. 4) in der App unter *Sensoren &
+   Firmware* hochladen und an genau dieses Muster verteilen. **Bestanden**, wenn der Sensor danach die neue Version meldet,
+   eine Messung liefert und gekoppelt bleibt. Zellspannung ≥ 3.0 V (OTA-Schwelle 2.7 V, `ENERGIEMESSUNG.md`, FW-P6).
+   Ein Downgrade per OTA ist nicht möglich (MCUboot); der Stand nach dem Test bleibt drauf oder wird vor dem Verguss
+   nochmals nach Weg B geflasht.
+4. **Zelle wieder entnehmen** (kein Metallwerkzeug), **Clip leer** kontrollieren (W-1), Kennung für das Etikett notieren
+   (Kap. 7a). Eintrag in der Musterliste: Version, OTA bestanden, Datum.
+
+Fällt 2 oder 3 durch: **nicht vergiessen**, melden (Firmware/Elektronik). Erst wenn 1–4 bestanden sind und die Abhakliste
+Kap. 3a bis „Vor dem Musterverguss“ erfüllt ist, weiter mit Kap. 4.
 
 ## 4 Platine einsetzen und Schott vergiessen (Pos. 9, 15, 16)
 
@@ -320,8 +408,8 @@ Nach Kap. `docs/manuals/PROGRAMMIEREN_SENSOR.md`, **Weg A** (Programmieradapter,
 Zellfach). Keine Zelle im Clip. Danach Dummy-Zelle entnehmen.
 
 **Solange Weg A nicht freigegeben ist** (Test ST-P1, Sicherheitsauflagen PS-W1/A1–A5): Muster **vor dem Verguss**
-nach Weg B (Kap. 5 der Programmieranleitung, nur mit Dummy-Scheibe) programmieren, d. h. diesen Schritt vor Kap. 5
-dieser Anleitung ausführen (R3-K4). **Nach der Funktionsprüfung mit Zelle (PROGRAMMIEREN Kap. 5 Schritt 9) die Zelle
+nach Weg B (Kap. 5 der Programmieranleitung, nur mit Dummy-Scheibe) programmieren, d. h. diesen Schritt **vor Kap. 4**
+dieser Anleitung ausführen (R3-K4), zusammen mit Funktionsprüfung und OTA-Update nach **Kap. 3b**. **Nach der Funktionsprüfung mit Zelle (PROGRAMMIEREN Kap. 5 Schritt 9) die Zelle
 wieder entnehmen** (kein Metallwerkzeug); erst mit leerem Clip vergiessen (W-1). Eine geprüfte Zelle ≥ 3.0 V darf in
 Kap. 7 wieder eingesetzt werden, Zellen < 2.6 V entsorgen (PROGRAMMIEREN Kap. 6).
 
@@ -330,12 +418,18 @@ Kap. 7 wieder eingesetzt werden, Zellen < 2.6 V entsorgen (PROGRAMMIEREN Kap. 6)
 1. **Zelle (Pos. 17)** einsetzen: Pluspol zur Front (−y), von der offenen Clip-Seite (+x, von vorne gesehen rechts)
    flach einschieben bis zum Anschlag. **Taste dabei nicht berühren** (sonst startet der ROM-Bootloader, W-10).
    Erwartet: LED-Startsignal L11 (Grün 200 ms; Fehler Rot 3 × 100 ms; PROGRAMMIEREN Kap. 6/7).
-2. **O-Ringe AS568-019 (Pos. 11)** dünn mit Silikonfett einreiben und in die Nut am Kragen und am Zapfen legen. Nicht
-   verdrehen, nicht über scharfe Kanten ziehen.
+2. **O-Ringe AS568-019 (Pos. 11), Werkstoff EPDM** (Einkaufsliste S2) mit einem **dünnen Film** Silikonfett versehen
+   (Fingerspitze, Ring glänzt, keine Fettwülste) und in die Nut am Kragen und am Zapfen legen. Nicht verdrehen, nicht über
+   scharfe Kanten ziehen. Begründung: `docs/references/Parker_ORD5700_ORingHandbook_2007.pdf` PDF-S. 206 (Verträglichkeit
+   „Silicone Greases“: EPDM **1** = zufriedenstellend, Silikon VMQ **3** = zweifelhaft; Legende S. 162 ff.) und S. 68 (Abschn. 3.14.2: Silikonöle
+   und -fette mit allen Dichtwerkstoffen ausser Silikon); S. 50 (Tab. 3-1, Hinweis: Montagefett immer sparsam, ein leichter
+   Film genügt). **Keine Silikon-O-Ringe** mit Silikonfett verwenden; kein Vaseline/Mineralfett an EPDM (S. 16: EPDM nicht
+   verträglich mit Mineralölprodukten).
 3. **Hülse (Pos. 2)** mit gereinigter Sonde von der Sondenspitze her aufschieben, bis der Rand im Dachziegelschlitz der
    Kappe sitzt. Gleichmässig schieben, nicht auf die Taste drücken.
 4. **Schraube M2 × 3 (Pos. 12)** von unten durch den Hülsenboden eindrehen. Beim ersten Mal furcht sie durch die
-   Lippe Ø 1.7 (danach unverlierbar), dann in die Mutter. Handfest anziehen (O-6). Einschraubtiefe 1.4 mm = 3.5 Gänge
+   Lippe Ø 1.7 (die Lippe hält sie beim Lösen fest, sie ist aber **nicht unverlierbar**: weiter herausgedreht fällt sie
+   heraus, S K-5), dann in die Mutter. Handfest anziehen (O-6). Einschraubtiefe 1.4 mm = 3.5 Gänge
    (`check_sensor.txt` 5c; UL-4200A-Massstab ≥ 2 volle Gänge, `phase3_sleeve_sicherheit.md`).
 
 **Prüfung 7 (Pflicht, FMEA F-21/F-62):**
@@ -345,6 +439,29 @@ Kap. 7 wieder eingesetzt werden, Zellen < 2.6 V entsorgen (PROGRAMMIEREN Kap. 6)
 - Funktion: Taste **mit normaler Fingerkraft** kurz drücken (≈ 8 N, klickt nach ≈ 0.3 mm) → Messung/Statusanzeige
   (REQ-UI-04). Nicht mit Kraft nachdrücken: nach dem Klick trägt SW1 die Tastenkraft (O-5). L11 war nach dem Einsetzen sichtbar.
 - Eintrag in der Musterliste: Seriennummer `fluidi-XXXX`, Prüfungen 2–7, Datum.
+
+## 7a Kennungsetikett (R K-l5)
+
+Die Anleitungen für Nutzer verlangen den Vergleich der Kennung in der App mit dem **Aufkleber am Sensor**
+(`INBETRIEBNAHME.md` Kap. 5 Schritt 3 und Kap. 6 Schritt 3, `PAIRING_KALIBRIERUNG.md` Kap. 2.1 Schritt 3).
+
+- **Kennung:** `fluidi-XXXX` = Gerätename im Advertising (zwei niederwertigste Bytes der BLE-Adresse,
+  `firmware/sensor/core/fl_proto.c` `fl_device_name`). Ablesen nach Kap. 3b Schritt 2/3: in der App beim Koppeln oder mit
+  einer BLE-Scanner-App am Telefon (**ANNAHME** beliebige App). **Nur von der Werksfirmware** ablesen – Testfirmware heisst
+  `fl-tf<n>-XXXX` und darf nie auf ein Etikett.
+- **Herstellung:** Etikettendrucker mit **laminiertem** Kunststoff-Schriftband 9 mm, schwarz auf weiss (z. B. Brother TZe,
+  **ANNAHME** Typ und Werkstattbestand; Einkaufsliste S12). Text einzeilig `fluidi-XXXX`, Schrift ≈ 4 mm hoch,
+  Bandlänge ≤ 26 mm (Rand des Druckers so klein wie möglich einstellen), Ecken rund schneiden. Kein metallisiertes oder
+  Silber-Etikett (Antenne in der Kappe). Ersatz ohne Drucker: wetterfestes Laser-Folienetikett (Polyester/PP),
+  **ANNAHME**, Haftung wie unten prüfen.
+- **Ort:** **Rückseite der blauen Kappe** (y = 13, gegenüber dem Tropfenfenster), mittig in x, zwischen Sichtfuge
+  (z 43.5) und Oberkante (z 57.5) im Feld z ≈ 46 … 55 (≥ 2 mm über der Fuge, damit Giesswasser an der Fuge nicht unter
+  die Kante zieht). Die Kappe gehört fest zum Sensor (vergossen), die Hülse ist ein Tauschteil → **nicht** auf die Hülse
+  kleben. Antennenkupfer liegt innen auf der Platine (Abstand > 4 mm, Etikett ohne Metall, **ANNAHME** ohne Einfluss).
+- **Kleben:** Fläche mit Isopropanol entfetten, ablüften, Etikett ohne Blasen andrücken, 30 s fest reiben.
+- **PROTOTYP-PRÜFUNG:** Haftung auf der gedruckten ASA-Oberfläche nach 7 d 65 °C und nach dem Giesstest (Kanten heben
+  nicht ab), Lesbarkeit; RSSI mit/ohne Etikett gleich (Elektronik).
+- Eintrag in der Musterliste: Kennung = Etikett (zweite Person liest gegen).
 
 ## 8 Batteriewechsel (Werkstatt / Muster)
 
@@ -358,7 +475,8 @@ Ablauf für Nutzer: `docs/manuals/BATTERIEWECHSEL.md` (mit Sicherheitshinweisen)
    Lupe prüfen (Pads am Katalogminimum, Red-Team K-4).
 3. Nur neue Markenzellen (Panasonic CR2032) mit **≥ 3.0 V Leerlauf** einsetzen; Zellen < 2.6 V nicht wieder verwenden,
    abkleben, entsorgen (PS-K1 Bed. 3). Taste nicht berühren, L11 beobachten.
-4. O-Ringe prüfen und fetten, beschädigte ersetzen. Hülse aufschieben, Schraube handfest.
+4. O-Ringe prüfen, mit dünnem Film Silikonfett versehen (nur EPDM-Ringe, Kap. 7 Schritt 2), beschädigte oder
+   gequollene ersetzen. Hülse aufschieben, Schraube handfest.
 5. Prüfung 7 wiederholen. Wechsel in der Musterliste zählen (Testplan: 50 Wechsel ST-K6, Spritzwasser nach 10 Wechseln).
 
 **Nacharbeit an Kantenversiegelung oder Hohlkehle (W-1):** nur nach Rücksprache mit der Projektleitung (eigener Ansatz,

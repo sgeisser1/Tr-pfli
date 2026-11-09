@@ -3,8 +3,8 @@
 | | |
 |---|---|
 | Dokument | `docs/manuals/GATEWAY_SETUP.md` |
-| Version | 0.2 (Phase 6: ohne RTC, Status-LED) |
-| Datum | 2026-11-08 |
+| Version | 0.3 (Phase 6: ohne RTC, Status-LED; Firmennetz-Vorabprüfung, Aufstellung, Testfirmware-Schalter) |
+| Datum | 2026-11-09 |
 | Gilt für | Gateway-Software `firmware/gateway/` (Version 0.5.0), PWA `app/`, D-014 (Pi Zero 2 W), D-017/D-029 (Klimasensor), D-020, D-027 (Status-LED, vorläufig), D-028 (keine RTC) |
 | Status | Anleitung **ohne Test am echten Pi** erstellt: Software und Installationsskript sind in WSL/Simulation geprüft; die Schritte am Gerät sind **PROTOTYP-PRÜFUNG** (Kap. 10). |
 
@@ -30,6 +30,41 @@ Status-LED (grüne 3-mm-LED + Widerstand 470 Ω, Kap. 5.2). **Keine** Echtzeituh
 Gateway (D-028): Das Gateway steht dauerhaft im WLAN und holt die Zeit per NTP.
 
 Zeitbedarf: ca. 45 min (davon 15–20 min Paketinstallation auf dem Pi).
+
+**Aufstellung und Strom (Sicherheit W-3):** nur das Original-Netzteil (Raspberry Pi 12.5 W, 5 V, Micro-USB,
+`BOM_GATEWAY.csv` G2). Gateway, Netzteil und Steckdose **nicht im Giessbereich** (nicht zwischen Töpfen, auf
+Untersetzern oder unter hängenden Pflanzen; Kabel nicht durch nasse Bereiche). Ist Wasser auf Netzteil oder
+Steckdose gelangt: nicht anfassen, Sicherung aus, dann ausstecken, Netzteil ersetzen (`INBETRIEBNAHME.md` Kap. 2).
+
+### 1.1 Vorabprüfung Firmen-WLAN (Red Team W-5)
+
+Die App funktioniert nur, wenn das Handy das Gateway im WLAN **direkt** erreicht und den Namen `fluidi.local`
+auflöst (mDNS). Für das Büro-WLAN des Auftraggebers ist mDNS bestätigt (Auftraggeber). In anderen Netzen oder nach
+einem WLAN-Wechsel **vor dem Aufstellen** prüfen bzw. mit der IT klären:
+
+| Frage | Prüfung ohne Gateway | Prüfung mit Gateway |
+|---|---|---|
+| WLAN mit Passwort (PSK) oder Firmenanmeldung (802.1X)? | WLAN-Einstellungen am Handy | Das Installationsskript kennt nur PSK über NetworkManager; 802.1X ist **nicht** vorbereitet → IT fragen |
+| Dürfen Geräte im WLAN einander erreichen (keine **Client-Isolation**)? | Laptop im WLAN: `python -m http.server 8000`; am Handy `http://<IP des Laptops>:8000` öffnen → Ordnerliste erscheint | am Handy `http://<IP des Gateways>/ca` öffnen (IP aus dem Router) → Fingerabdruckseite erscheint |
+| Wird mDNS (`.local`) weitergegeben? | am Handy `http://<Laptopname>.local:8000` (Windows beantwortet mDNS für den eigenen Namen, **ANNAHME**) | am Handy `http://fluidi.local/ca` öffnen; am PC `ping fluidi.local` |
+| Ist NTP (UDP 123) ins Internet erlaubt? | – | App → *System → Zeit*: Quelle „Internet-Zeit (NTP)“ (ohne NTP: Handyzeit, `FEHLERSUCHE.md` 4.4) |
+
+**Ausweichwege, wenn eine Prüfung scheitert (ehrlich):**
+
+- **mDNS gefiltert, Geräte erreichen sich aber:** Es gibt einen vorbereiteten Weg (CONCEPTS 5.2), am echten Gerät
+  aber **noch nicht erprobt (PROTOTYP-PRÜFUNG):** Die IT vergibt dem Gateway eine feste Adresse (DHCP-Reservierung)
+  und **genau einen** DNS-Namen, z. B. `fluidi.firma.ch`. Dann in `/etc/fluidi/gateway.toml` `hostname =
+  "fluidi.firma.ch"` setzen, ein neues Zertifikat erzeugen
+  (`cd /opt/fluidi/current/gateway && sudo -u fluidi /opt/fluidi/venv/bin/python -m fluidi_gw pki-init -c
+  /etc/fluidi/gateway.toml --force`), den Dienst neu starten (`sudo systemctl restart fluidi-gateway`) und das **neue** CA-Zertifikat samt
+  Fingerabdruck auf allen Geräten installieren. Die CA gilt dann nur für diesen einen Namen. Ein Aufruf über die
+  IP-Adresse ist **kein** Ausweichweg: Das Zertifikat gilt absichtlich nicht für IP-Adressen, und eine
+  Zertifikatswarnung darf nicht weggeklickt werden.
+- **Client-Isolation aktiv:** **Es gibt keinen Ausweichweg in der Software.** Das Gateway arbeitet weiter
+  (Sensoren, Speicherung), aber ohne direkte Verbindung vom Handy ist die App nicht bedienbar. Lösung nur über die IT:
+  Ausnahme für das Gateway, ein eigenes WLAN/VLAN ohne Isolation (z. B. für Geräte) oder ein separater Access Point.
+  Ein Handy-Hotspot ist kein Dauerbetrieb (Zeit, Erreichbarkeit).
+- **802.1X:** nicht vorbereitet; eigenes WLAN (PSK) für das Gateway bei der IT anfragen.
 
 ## 2 SD-Karte vorbereiten (Raspberry Pi Imager)
 
@@ -90,6 +125,12 @@ Den **öffentlichen** Schlüssel (PEM) vom Entwickler nach `/etc/fluidi/keys/sen
 (`sudo install -m 0644 sensor-fw.pem /etc/fluidi/keys/`). Ohne Schlüssel nimmt das Gateway **keine** Firmware an.
 Der private Schlüssel bleibt offline beim Entwickler (REQ-FW-04).
 
+**Testfirmware (Sicherheit W-2):** Abbilder mit Build-Nummer 9000–9999 (bzw. Dateiname `-tf<n>-`) sind
+Testfirmware (`TESTFIRMWARE.md`). Das Gateway nimmt sie nur an, wenn in `/etc/fluidi/gateway.toml`
+`allow_testfw = true` steht (Werk: `false`), zeigt sie rot „TESTFIRMWARE“ und verteilt sie nur an **einen** einzeln
+gewählten Sensor nach ausdrücklicher Bestätigung. Nach der Musterprüfung `allow_testfw = false` setzen und am
+Nutzer-Gateway **nicht** den DEV-Schlüssel als `sensor-fw.pem` belassen, sobald Produktionsschlüssel vorliegen.
+
 ### 4.3 Prüfen
 Nach der **Erstinstallation einmal neu starten** (`sudo reboot`), damit das LED-Overlay geladen wird (Kap. 5.2).
 ```bash
@@ -141,8 +182,9 @@ und speichert sie erst nach dem Zeitabgleich mit korrigierter Zeit; ein Neustart
 Schaltung nach `docs/reviews/phase5_gateway_led.md` Kap. 3 (Variante B): **J8 Pin 11 (GPIO17) → Widerstand 470 Ω →
 Anode** der grünen 3-mm-LED (langes Bein), **Kathode** (kurzes Bein, Abflachung) → **J8 Pin 14 (GND)**. Widerstand
 direkt am Anodenbein, beide Lötstellen mit Schrumpfschlauch. **Vor dem Einschalten** den Widerstand zwischen Pin 11
-und Pin 14 messen (ohne Widerstand wäre GPIO17 bei leuchtender LED fast kurzgeschlossen). LED in den Lichtschacht des
-Deckels (Mechanik).
+und Pin 14 messen (ohne Widerstand wäre GPIO17 bei leuchtender LED fast kurzgeschlossen). LED von innen in das LED-Rohr der
+Wanne stecken (Flansch liegt an der Rohrstirn, Klebesitz), Litzen durch die zwei Kabelhalter am Boden führen
+(`mechanical/PRINT_SETTINGS.md` Kap. 5).
 
 | LED | Bedeutung | Quelle |
 |---|---|---|

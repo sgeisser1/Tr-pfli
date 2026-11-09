@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | Dokument | `docs/manuals/PROGRAMMIEREN_SENSOR.md` |
-| Version | 1.2, 2026-11-09 (Elektronik; Red-Team B-4 / W-4 / W-10; 1.1: Veto PS-K1, Weg B nur mit Dummy-Scheibe; 1.2: PL2303-Board als Alternative zum CH343, `hardware/programmer/README.md` Kap. 9) |
+| Version | 1.3, 2026-11-09 (Elektronik; Red-Team B-4 / W-4 / W-10; 1.1: Veto PS-K1, Weg B nur mit Dummy-Scheibe; 1.2: PL2303-Board als Alternative zum CH343, `hardware/programmer/README.md` Kap. 9; 1.3: Dummy-Scheibe als JLC-Platinenpaar, Variante B2 in Kap. 5, Sicherheit DS-B1…B5/DS-K1…K5) |
 | Gilt für | Sensor Rev C (`hardware/sensor/`), Firmware `firmware/sensor` (Werks-Hex), Werkzeug `scripts/flash_sensor.py` |
 | Adapter | `hardware/programmer/README.md` (Programmieradapter Rev 1: Dummy-Zelle 2.0 V + TX-Puffer) |
 | Ersetzt | `docs/manuals/INSTALL_FIRMWARE_TOOLS.md` Kap. 5 (dort: XIAO-Gateway und `cc23_bsl.py`, beides veraltet) |
@@ -19,7 +19,7 @@ fehlt: am **offenen Board vor dem Verguss**, mit Labornetzteil und gelöteten Dr
    (Veto PS-K1, `docs/reviews/phase5_programmer_sicherheit.md`). Keine Prüfklemme am Clip, kein Draht am Minuspad,
    keine Speisung über TP1/TP2. Einzige Ausnahme: Sicherheitstest PT11.06/ST-Z5 nach den Bedingungen Z5-1…Z5-7
    (`docs/reviews/phase5_sicherheit_runde3.md`, Entscheid WS-13).
-2. Labornetzteil (Weg B): **2.0 V** (höchstens 2.2 V, mit dem **PL2303-Board höchstens 2.1 V**), Strombegrenzung **10 mA** (höchstens 20 mA, EP-03), Polarität vor dem Anschliessen messen.
+2. Labornetzteil (Weg B): **2.0 V** (höchstens 2.2 V, mit dem **PL2303-Board höchstens 2.1 V**), Strombegrenzung **10 mA** (EP-03), Polarität vor dem Anschliessen messen.
 3. Der USB-UART (CH343 oder PL2303) bekommt seine I/O-Spannung (VIO bzw. VCCIO) immer aus **derselben 2.0-V-Speisung**
    (Weg A: Adapter-Regler U3, Weg B: dasselbe Labornetzteil). **Jumper H3** (CH343-Board) bzw. **Jumper J1**
    (PL2303-Board) **abziehen**. Mit 3.3-V- oder 5-V-Pegeln wird das Low am Sensor-RX nicht sicher erkannt, und die Pins
@@ -38,8 +38,8 @@ fehlt: am **offenen Board vor dem Verguss**, mit Labornetzteil und gelöteten Dr
 | Waveshare CH343 USB UART Board, Jumper H3 abgezogen | ✓ | ✓ | `WCH_CH343_Datasheet_V1E.pdf`; Belegung `docs/references/Waveshare_CH343-USB-UART-Board_Schematic_2026-11-08.pdf` |
 | **oder** Waveshare PL2303 USB UART Board (type A) V2, Jumper J1 abgezogen, Eingangsprüfung bestanden | ✓ | ✓ | `Prolific_PL2303GS_Datasheet_Rev1.0.4.pdf`; Belegung `docs/references/Waveshare_PL2303-USB-UART-Board-TypeA-V2_Schematic_2026-11-08.pdf`; Bedingungen `hardware/programmer/README.md` Kap. 9.5 |
 | Programmieradapter Rev 1 (Dummy-Zelle + Federstiftkopf + Puffer) | ✓ | – | `hardware/programmer/README.md` |
-| Labornetzteil mit Strombegrenzung, Kupferlackdraht 0.1–0.2 mm, Lötstation mit feiner Spitze, Lupe/Mikroskop, Isopropanol | – | ✓ | |
-| Dummy-Scheibe (nur die Dummy-Zelle des Adapters, ohne Federstiftkopf; Dicke 3.0–3.2 mm, PS-W3) | – | **Pflicht** | Kap. 5 Schritt 2 (Veto PS-K1) |
+| Labornetzteil mit Strombegrenzung, Kupferlackdraht 0.1–0.2 mm, Lötstation mit feiner Spitze, Lupe/Mikroskop, Isopropanol | – | ✓ | vollständige Werkstattliste WB-1…WB-24: `hardware/dummy_cell/README.md` Kap. 7 |
+| Dummy-Scheibe (JLC-Platinenpaar PLUS 1.0 + MINUS 2.0 mm, Dicke 3.0–3.2 mm, PS-W3; Litzen und Brücke J3–J9 fest angelötet) | – | **Pflicht** | Kap. 5 Schritt 2 (Veto PS-K1); `hardware/dummy_cell/README.md` (Bau Kap. 4). Sicherheit Runde 1 ohne Veto, **Variante B2 unter DS-B1…B5** (`docs/reviews/phase6_sicherheit_schluss.md`); Mechanik DC-1: Freiraum der Lasche passt (README Kap. 6a) |
 | Werks-Hex `firmware/sensor/build/fluidi-sensor-factory-<ver>-key<fp>.hex` | ✓ | ✓ | erzeugt mit `make` in `firmware/sensor` (`firmware/sensor/README.md`) |
 
 ## 3 Software vorbereiten
@@ -117,7 +117,7 @@ unterhalb der RGB-LED D1; Pad 1 ist das **linke** Pad (F-Seite, Antenne oben), P
 |---|---|---|---|---|
 | Speisung + | Dummy-Scheibe im Clip (VBAT, über Q1 auf VDD) | Netzteil + 2.0 V | Netzteil + 2.0 V (höchstens 2.1 V) | Speisung wie mit einer Zelle; Q1 bleibt Verpolschutz |
 | Speisung − | Dummy-Scheibe auf dem Minuspad (GND) | Netzteil −, CH343 GND (H2.2) | Netzteil −, P2.2 GND | gemeinsame Masse |
-| VIO | – | H3 Mittelstift (Jumper weg) an Netzteil + | P2.1 VCCIO (Jumper J1 weg) an Netzteil + | VIO = VDD. CH343: kein Rückspeisen, wenn das Netzteil aus ist. PL2303: VCCIO nur bei gesteckter USB (Schritt 5/8) |
+| VIO | – | H3 Mittelstift (Jumper weg) an **J7** der Dummy-Scheibe (= Netzteil +) | P2.1 VCCIO (Jumper J1 weg) an **J7** der Dummy-Scheibe (= Netzteil +) | VIO = VDD. CH343: kein Rückspeisen, wenn das Netzteil aus ist. PL2303: VCCIO nur bei gesteckter USB (Schritt 5/8) |
 | Sensor-TX | **R9 Pad 1** (DIO6) | H2.4 **RXD** | P2.4 **RXD** | direkt, ohne die 200 kΩ |
 | Sensor-RX | TP2 (UART_RX_PAD) | H2.3 **TXD** | P2.3 **TXD** | über die 200 kΩ des Sensors (SPICE B) |
 
@@ -132,15 +132,18 @@ CH343, 0.13 V am Sensor-RX). **PL2303-Board:** VIL ≤ 0.4 V und RXD-LED 1 kΩ �
 Ablauf:
 
 1. Board liegt offen, Hülse und Verguss fehlen noch, **keine Zelle**.
-2. Speisung **nur** mit der **Dummy-Scheibe** des Adapters (`hardware/programmer/README.md` Kap. 4, Dicke 3.0–3.2 mm)
-   im Clip und den zwei Litzen ans Netzteil. **Ohne Scheibe kein Weg B** (Veto PS-K1): Eine Prüfklemme am Clip liesse
+2. Speisung **nur** mit der **Dummy-Scheibe** (`hardware/dummy_cell/README.md`, Dicke 3.0–3.2 mm, Aufdruck „PLUS“ oben)
+   im Clip und den zwei Litzen ans Netzteil. VIO/VCCIO des USB-UART nur an **J7** der Scheibe (fest mit + verbunden).
+   **Ohne Scheibe kein Weg B** (Veto PS-K1): Eine Prüfklemme am Clip liesse
    den Clip frei, eine Zelle könnte parallel zum Netzteil eingesetzt und geladen werden. Nicht auf dem Minuspad oder
    den gefüllten Via-in-Pad-Flächen im Fach löten (PS-W2).
 3. CH343-RXD: Kupferlackdraht 0.1–0.2 mm auf **R9 Pad 1** löten (wenig Zinn, kurz, R9 nicht ablöten), Draht mit
    Kaptonband zugentlasten.
 4. CH343-TXD: an TP2 (Ø 1.5 mm) **nur mit Prüfspitze oder Federstift mit flachem/gerundetem Kopf**, nicht löten:
    TP2 ist eine gefüllte Via-in-Pad-Fläche im Fach (PS-W2).
-5. Netzteil auf 2.0 V, **10 mA** (höchstens 20 mA) einstellen, **erst dann** anschliessen (PS-L3). VIO am Waveshare-Board messen: 2.0 V.
+5. Netzteil auf 2.0 V, **10 mA** einstellen, **erst dann** anschliessen (PS-L3). VIO am Waveshare-Board messen: 2.0 V.
+   **Zeigt das Netzteil Strombegrenzung (CC) → sofort aus**, Scheibe und Polung prüfen (verkehrt eingesetzte Scheibe
+   schliesst das Netzteil über Clip und Minuspad kurz, DS-K2).
    **PL2303-Board:** zuerst die **USB einstecken**, erst danach das Netzteil einschalten (VCCIO nie ohne USB).
 6. **Taster drücken und halten**, Netzteil einschalten, nach ≈ 1 s loslassen (leerer Chip: Taster unnötig).
 7. `flash_sensor.py info …`, dann `program …` wie Weg A Schritt 4–5. Bei Fehlern `--baud 19200`.
@@ -159,6 +162,38 @@ Folgen und Grenzen von Weg B:
 - Barriere 2 ist auf dem TX-Pfad während der Programmierung überbrückt; zulässig nur ohne Zelle (Regel 1).
 - Thermische Belastung des 0402-Pads; ein abgehobenes Pad zerstört den TX-Pfad (dann R6 Pad 1 nehmen).
 - Nach dem Verguss ist Weg B nicht mehr möglich; dann nur noch Weg A über TP1/TP2.
+
+### Variante B2: Weg B ohne Draht an R9 (Puffer auf der Dummy-Scheibe)
+
+Freigegeben durch `sicherheit` (Runde 1, DS-B1…B5, `docs/reviews/phase6_sicherheit_schluss.md`). Voraussetzung: Scheibe
+mit bestücktem U1/R1/C1 und Brücke J3–J9 (`hardware/dummy_cell/README.md` Kap. 3/4), USB-UART-Eingangsprüfung nach
+`hardware/programmer/README.md` Kap. 9.3 mit der **Weg-A-Grenze RXD-Strom ≤ 2.1 mA** (DS-B3). Keine Lötstelle am
+Sensor; beide 100-kΩ-Barrieren bleiben im TX-Pfad (PS-W4 entfällt). Die Regeln 1–4 und PS-K1 gelten **unverändert**.
+
+| Anschluss | Sensor | Dummy-Scheibe | USB-UART |
+|---|---|---|---|
+| Speisung | Clip/Minuspad über die Scheibe | J3 (+, rot) / J4 (−, schwarz) ans Netzteil | – |
+| VIO | – | J7 (fest = +) | VIO (CH343 H3 Mitte) bzw. VCCIO (PL2303 P2.1), Jumper ab |
+| GND | – | J5 | GND |
+| Sensor-TX | **TP1** (Prüfspitze flach/gerundet, PS-W2) | J6 | – |
+| Puffer → Host | – | J8 | RXD |
+| Sensor-RX | TP2 (Prüfspitze, wie oben) | – | TXD |
+
+Anschliessen: (1) Board offen, **keine Zelle**. (2) Scheibe einsetzen. (3) Prüfspitzen auf TP1 und TP2 setzen
+(dritte Hand). (4) USB stecken. (5) Netzteil vorher auf 2.0 V (PL2303: höchstens 2.1 V) / **10 mA** einstellen, dann
+einschalten (CC-Anzeige → sofort aus). (6) Taster wie Schritt 6. (7) Programmieren **nur mit 19200 Baud**
+(DS-B4; SPICE `simulation/spice/programmer/prog_uart_b2_report.txt`, bei 2.1 V Prüfspitzenleitung TP1–J6 ≤ 10 cm):
+```bash
+python scripts/flash_sensor.py info --port /dev/ttyACM0 --baud 19200
+python scripts/flash_sensor.py program --hex "$HEX" --port /dev/ttyACM0 --baud 19200
+```
+**Abbau, feste Reihenfolge (DS-B1):** (a) Netzteil **aus und abziehen**, (b) **beide Prüfspitzen abheben** (die
+TP1-Spitze hängt an der Scheibe – zuerst abheben, nicht über das Fach ziehen), (c) **Scheibe heraus**, (d) USB ziehen.
+Erst danach eine Zelle einsetzen.
+Nacharbeit B2 (statt Schritt 9 Lötnacharbeit): Sichtprüfung TP1/TP2 unter der Lupe (nur Abdruck, Kupferkappe der
+Via-in-Pad-Fläche unbeschädigt, PS-W2), Kontrollmessung ohne Speisung TP1 ↔ R9 Pad 1 ≈ 200 kΩ; Funktionsprüfung mit
+Zelle, Entnahme und Zellregeln wie Schritt 9. **PROTOTYP-PRÜFUNG** am ersten Muster (DS-B5): Pegel bei 2.0 und 2.1 V,
+20 × Flashen mit 19200 Baud, Spitzensitz ≥ 3 min.
 
 ## 6 Achtung: Bootloader-Falle beim Einsetzen der Zelle (W-10)
 

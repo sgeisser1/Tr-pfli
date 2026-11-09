@@ -94,6 +94,8 @@ Stimmt ein Punkt nicht, **nicht bezahlen** und Projektleitung informieren.
 | 6 | PCB-Preis (ohne PCBA/Versand) gegen Angebot 2026-11-08 | 5 Stk 65.21 USD; 20 Stk 76.30 USD = Engineering 25.00 + Via Covering 18.59 + Surface Finish 18.50 + Deburring 0.50 + Board 10.20 + Via Plating 3.51 (Screenshot, Confirm Production File = No). **Aufpreis für Confirm Production File = Yes notieren** (ANNAHME 0). Abweichung > 5 % → `cost_rev_b.py` / `cost_final_phase5.py` nachführen | [ ] | Preis: |
 | 7 | Mark on PCB | **„Remove Mark“** gewählt (nicht „2D barcode (Serial Number)“); Preis 0 | [ ] | |
 | 8 | Lagerbestand am Bestelltag (K-5), v. a. **BT1 C5213768** | ≥ 5 (Prototyp) bzw. ≥ 16 (Serie); Abfrage 2026-11-08 10:51: **629 Stk** (2026-11-07: 654), Kap. 7 | [ ] | Bestand heute: |
+| 8a | **PFLICHT (Red Team W-4): BT1-Vorrat in den privaten JLC-Teilebestand** – mit dem Prototyp **≥ 25 Stk C5213768** über „Parts Manager → Order Parts → Add to My Part Lib“ kaufen und bezahlen (In-stock-Extended-Teile ohne Mindestmenge; Teile werden nicht verschickt, nur für eigene PCBA-Aufträge; dasselbe Teil nicht gleichzeitig aus Global Sourcing/Consigned) – `docs/references/JLCPCB_PartsPreorder_Auszug_2026-11-09.txt` | 25 × 0.3615 USD = **9.04 USD** (JLC-Teilesuche 2026-11-09 01:28: Lager 594, Staffel ab 10 Stk; ≈ 7.51 CHF, im Kassenbedarf `phase5_kosten_final.md` Kap. 4a). Zahlungsfrist laut Hilfeseiten 1 h bzw. 168 h (widersprüchlich) → sofort bezahlen. Danach „My Parts Lib“: 25 Stk sichtbar | [ ] | Stk im Bestand: |
+| 8b | **PFLICHT (Prototyp): Dummy-Platinen in derselben Bestellung** (`hardware/dummy_cell/README.md` Kap. 4, `docs/manuals/BESTELLEN_JLC.md` Schritt 9a): „Add new item“ je Design (`JLCPCB_HowToPlaceOrder_Auszug_2026-11-08.txt` Schritt 6), gemeinsamer „Secure Checkout“. PLUS `fluidi_dummy_plus_gerber_jlc.zip` sha256 `02d5b9ec…cf6c`: 2 L, FR-4, **1.0 mm**, 5 Stk, HASL bleifrei, grün, ohne PCBA; MINUS `fluidi_dummy_minus_gerber_jlc.zip` sha256 `03a535a6…2eb3`: wie PLUS, **2.0 mm**, Via Covering Tented | Mehrpreis 4.80–16.07 USD (4.31–14.44 CHF, `cost_dummy.py`). **ANNAHME** gleiche Sendung; **Stopp**, wenn ein eigener Versandposten erscheint oder der Versand um > 5 USD steigt | [ ] | Preis PLUS/MINUS: |
 | 9 | BOM-Zuordnung in JLC | 26 Zeilen, alle LCSC-Nummern erkannt, keine Zeile „not matched“; Basic/Extended wie Kap. 7 | [ ] | |
 | 10 | **Confirm Parts Placement** | Abhakliste Kap. 5 vollständig | [ ] | |
 | 11 | Gesamtbetrag vor dem Bezahlen | Prototyp ≈ 163.23 USD, Serie ≈ 220.33 USD JLC-Rechnung inkl. DHL (`docs/reviews/phase5_kosten_final.md` Kap. 2); Abweichung > 10 % klären. **Stopp:** Posten „Pre-reflow Soldering“ vorhanden (0.016 USD/Lötstelle) → nicht bezahlen, Projektleitung: Serie dann ≈ 10.60 CHF/Stück > REQ-FAB-04 (W-3, `phase5_kosten_final.md` Kap. 0) | [ ] | Betrag: |
@@ -168,9 +170,8 @@ Serie 9.31 CHF, REQ-FAB-04 (< 10 CHF) bleibt erfüllt. **Freigabe durch den Auft
 ## 7 Lagerbestand (K-5) – Abfrage 2026-11-08 10:51 (JLC-Teilesuche, `order_check.py --live`)
 
 **Den Bestand am Bestelltag erneut prüfen** (Kap. 4 Nr. 8). BT1 C5213768 ist das einzige mechanisch festgelegte
-Extended-Teil, und sein Bestand sinkt (2026-11-07: 654, 2026-11-08: **629**). Für die Serie (16 Stk) prüfen, ob sich
-der Halter schon mit dem Prototyp-Los vorbestellen lässt („Parts pre-order“/privater Bestand, **ANNAHME** zur
-Funktion, im Formular ansehen).
+Extended-Teil, und sein Bestand sinkt (2026-11-07: 654, 2026-11-08: **629**). Für die Serie (16 Stk + Reserve) wird der Halter
+**mit dem Prototyp-Los in den privaten Teilebestand gekauft** (Kap. 4 Nr. 8a, Pflicht; Red Team W-4). Belegter Ablauf (`docs/references/JLCPCB_PartsPreorder_Auszug_2026-11-09.txt`): Parts Manager → „Order Parts“ → Teil und Menge → „Add to My Part Lib“ → Warenkorb → Checkout → bezahlen; Teile bleiben bei JLC („won't be shipped separately“), Lagerverlust 0.03 % der Mindestpackung pro Jahr. Bei der Serienbestellung nimmt JLC BT1 aus dem privaten Bestand (**ANNAHME** zur Auswahl im BOM-Schritt: am Bestelltag ansehen). Bestand 2026-11-09 01:28: **594 Stk** (Abfluss ≈ 30 Stk/Tag).
 
 | LCSC | Kat. | Lager | Teil | Ref |
 |---|---|---|---|---|

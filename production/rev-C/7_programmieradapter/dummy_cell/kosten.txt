@@ -1,0 +1,6 @@
+fluidi Dummy-Scheibe Rev 1 - Mehrkosten in der JLC-Prototypbestellung (je Design 5 Stk, ohne PCBA)
+Kurs 0.8189 CHF/USD + 1.5 % Karte, MWST 8.1 %, 2.0-mm-Faktor 1.30 (ANNAHME)
+Obergrenze (Rechnerpreis 2 L 5 Stk)    PLUS 7.00 USD + MINUS 9.07 USD = 16.07 USD -> 13.36 CHF + MWST 1.07 + DHL 0.02 = 14.44 CHF
+Untergrenze (Promo $2)                 PLUS 2.10 USD + MINUS 2.70 USD = 4.80 USD -> 3.99 CHF + MWST 0.32 + DHL 0.01 = 4.31 CHF
+Versand: 0 (gleiche Sendung, +~10 g; DHL pauschal bis ca. 0.5 kg, ANNAHME cost_model). Getrennte Bestellung: + Versand 7.63 USD (GSDL, Warenwert < 65 USD) und Post-Verzollung
+Optionale Teile Variante B2 (U1/R1/C1): bereits in der Einkaufsliste P3/P5/P6 (Programmieradapter), 0 CHF

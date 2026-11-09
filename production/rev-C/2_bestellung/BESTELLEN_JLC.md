@@ -169,7 +169,31 @@ Erwartete Warnung (**ANNAHME**): Der Umriss von BT1 schliesst die Knopfzelle ein
    **Gibt es einen Posten „Pre-reflow Soldering“? → Stopp, nicht bezahlen, Projektleitung fragen.** (145 Lötstellen ×
    0.016 USD = 2.32 USD je Board; Prototyp +11.60 USD; Serie dann ≈ 10.60 CHF/Sensor statt 8.38 → Kostenziel < 10 CHF
    verfehlt, `docs/reviews/phase5_kosten_final.md` Kap. 2.1.)
-3. „Secure Checkout“.
+3. **PFLICHT (nur Prototyp): die zwei Dummy-Platinen in dieselbe Bestellung** (Schritt 9a), erst danach „Secure Checkout“.
+
+## Schritt 9a – PFLICHT: Dummy-Platinen PLUS und MINUS in dieselbe Bestellung (Weg B, `hardware/dummy_cell`)
+
+Für das Programmieren vor dem Verguss (Weg B) braucht es die Dummy-Scheibe aus zwei unbestückten Platinen
+(`hardware/dummy_cell/README.md` Kap. 4). Sie kommen in **dieselbe Bestellung** wie der Sensor-Prototyp.
+
+Belegt (`docs/references/JLCPCB_HowToPlaceOrder_Auszug_2026-11-08.txt` Schritte 4–8): Im Warenkorb **„Add new item“**,
+Gerber hochladen, Optionen wählen, „Save to Cart“, für jedes weitere PCB wiederholen; danach alle Posten zusammen über
+„Secure Checkout“ bezahlen; die Versandkosten werden im Checkout bestimmt.
+
+1. sha256 prüfen (vor dem Upload): `fluidi_dummy_plus_gerber_jlc.zip` = `02d5b9ec4c880b3f4f84d55aa81295a4b59e9b5b554da938c63db902244bcf6c`,
+   `fluidi_dummy_minus_gerber_jlc.zip` = `03a535a6bb2168db98aee80e2b0d93e1e095395b60e614bb8cb16f2ce3872eb3`
+   (`hardware/dummy_cell/out/SHA256SUMS`, im Paket `1_jlc_upload/dummy/`).
+2. „Add new item“ → PLUS-ZIP hochladen. Optionen: **2 Lagen, FR-4, Dicke 1.0 mm**, 5 Stk, 1 oz, **HASL bleifrei**, grün,
+   ohne „PCB Assembly“, Mark: keine Markierung. Gerber-Viewer: Kontur 27.9 × 19.8 mm, Aufdruck „DUMMY“. „Save to Cart“.
+3. „Add new item“ → MINUS-ZIP. Wie PLUS, aber **Dicke 2.0 mm**, Via Covering **Tented**; Kontur 44.4 × 19.8 mm. „Save to Cart“.
+4. Warenkorb: drei Posten (Sensor-PCBA, PLUS, MINUS) auswählen, gemeinsam „Secure Checkout“.
+
+**ANNAHME** (nicht lokal belegt): JLC verschickt die unbestückten Platinen zusammen mit der PCBA in **einer** Sendung
+(gemeinsamer Checkout, ein Versandposten). **Stopp-Regel:** Zeigt der Checkout für die Dummy-Platinen einen **eigenen
+Versandposten** oder steigt der Versand gegenüber der Sensor-Bestellung allein um **mehr als 5 USD**, nicht bezahlen;
+Projektleitung entscheidet (getrennt: + 7.63 USD GSDL und Post-Verzollung, `hardware/dummy_cell/out/kosten.txt`).
+Erwarteter Mehrpreis 4.80–16.07 USD für beide Designs (= 4.31–14.44 CHF inkl. MWST, `hardware/dummy_cell/gen/cost_dummy.py`);
+mehr → Stopp. In ORDER_JLC_REV_C.md Kap. 4 Nr. 8b abhaken.
 
 ## Schritt 10 – Versand
 
@@ -181,6 +205,23 @@ Erwartete Warnung (**ANNAHME**): Der Umriss von BT1 schliesst die Knopfzelle ein
 4. **Gesamtbetrag** vergleichen (ORDER Kap. 4 Nr. 11): Prototyp ≈ **163 USD**, Serie ≈ **220 USD** inkl. DHL.
 5. Bei Ankunft verlangt DHL Express: MWST 8.1 % + 19 CHF Abwicklung + Vorlagegebühr max(3 CHF; 2 %) (ORDER Kap. 4 Nr. 12,
    Quelle DHL lokal). Zoll auf Leiterplatten: 0.
+
+## Schritt 10a – PFLICHT: BT1-Vorrat in den privaten Teilebestand (Red Team W-4)
+
+Der Batteriehalter BT1 (C5213768, Keystone 3034TR) ist mechanisch festgelegt und wird knapp (594 Stk am 2026-11-09, ≈ 30 Stk/Tag weniger).
+Deshalb **zusammen mit dem Prototyp mindestens 25 Stück** in den privaten JLC-Bestand kaufen. Ablauf laut JLC-Hilfe
+(`docs/references/JLCPCB_PartsPreorder_Auszug_2026-11-09.txt`):
+
+1. Angemeldet „Parts Manager“ öffnen → „Order Parts“.
+2. C5213768 suchen, Menge **25** eingeben → „Add to My Part Lib“. In-stock-Extended-Teile haben keine Mindestmenge.
+3. Warenkorb → Teile auswählen → „Secure Checkout“ → Rechnungsadresse → bezahlen. **Sofort bezahlen**: Die Hilfeseiten nennen
+   1 Stunde bzw. 168 Stunden Frist (widersprüchlich), danach wird storniert.
+4. Kontrolle: „My Parts Lib“ zeigt 25 Stk C5213768. Die Teile werden **nicht verschickt**; sie werden nur in eigenen PCBA-Aufträgen
+   verbaut. Dasselbe Teil nicht gleichzeitig aus „Global Sourcing/Consigned“ beziehen.
+
+Kosten: 25 × 0.3615 USD = 9.04 USD (≈ 7.51 CHF, JLC-Teilesuche 2026-11-09). In ORDER_JLC_REV_C.md Kap. 4 Nr. 8a abhaken.
+Wie JLC bei der Serie den privaten Bestand zuordnet, steht nicht in den lokalen Quellen (**ANNAHME**: im BOM-Schritt sichtbar) →
+bei der Serienbestellung in Schritt 7 prüfen, dass BT1 aus „My Parts Lib“ kommt.
 
 ## Schritt 11 – Coupons und Bezahlung
 

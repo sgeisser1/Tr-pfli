@@ -14,11 +14,11 @@
 
 | Szenario | PCBA | Versand | **Stück CHF** | Einmal CHF | Bestellung total CHF | Vollkosten/Sensor CHF |
 |---|---|---|---|---|---|---|
-| Prototyp 5 PCB / 5 bestueckt, 4 x 100 uF (D-013) | economic | DHL | **9.15** | 178.90 | 224.66 | 44.93 |
-| Serie 20 PCB / 16 bestueckt / 15 Sensoren, 4 x 100 uF | economic | DHL | **8.31** | 177.94 | 302.57 | 20.17 |
-| Serie 20 PCB / 16 bestueckt / 15 Sensoren, 2 x 100 uF | economic | DHL | **8.09** | 177.94 | 299.35 | 19.96 |
+| Prototyp 5 PCB / 5 bestueckt, 4 x 100 uF (D-013) | economic | DHL | **9.53** | 178.90 | 226.57 | 45.31 |
+| Serie 20 PCB / 16 bestueckt / 15 Sensoren, 4 x 100 uF | economic | DHL | **8.69** | 177.94 | 308.29 | 20.55 |
+| Serie 20 PCB / 16 bestueckt / 15 Sensoren, 2 x 100 uF | economic | DHL | **8.48** | 177.94 | 305.07 | 20.34 |
 
-REQ-FAB-04 (< 10 CHF Stückkosten bei 10–15 Stück): Serie **8.31 / 8.09 CHF** (4 / 2 × 100 µF) → **erfüllt**. PCB-Preis aus dem JLC-Angebot (5 Stk 65.21 USD, 20 Stk 76.30 USD): Aufpreise ENIG/POFV sind überwiegend fix (Befund DFM W-2 erledigt).
+REQ-FAB-04 (< 10 CHF Stückkosten bei 10–15 Stück): Serie **8.69 / 8.48 CHF** (4 / 2 × 100 µF) → **erfüllt**. PCB-Preis aus dem JLC-Angebot (5 Stk 65.21 USD, 20 Stk 76.30 USD): Aufpreise ENIG/POFV sind überwiegend fix (Befund DFM W-2 erledigt).
 
 ### 1.1 Stückkosten und Vollkosten (K-3)
 
@@ -26,9 +26,9 @@ Die Stückkosten nach D-005 enthalten alles, was pro Sensor anfällt (Bauteile, 
 
 | Szenario | Sensoren | Stückkosten CHF (D-005) | Einmalkosten CHF | Vollkosten CHF/Sensor | Anteil Einmalkosten an Vollkosten |
 |---|---|---|---|---|---|
-| Prototyp 5 PCB / 5 bestueckt, 4 x 100 uF (D-013) | 5 | 9.15 | 178.90 | **44.93** | 80 % |
-| Serie 20 PCB / 16 bestueckt / 15 Sensoren, 4 x 100 uF | 15 | 8.31 | 177.94 | **20.17** | 59 % |
-| Serie 20 PCB / 16 bestueckt / 15 Sensoren, 2 x 100 uF | 15 | 8.09 | 177.94 | **19.96** | 59 % |
+| Prototyp 5 PCB / 5 bestueckt, 4 x 100 uF (D-013) | 5 | 9.53 | 178.90 | **45.31** | 79 % |
+| Serie 20 PCB / 16 bestueckt / 15 Sensoren, 4 x 100 uF | 15 | 8.69 | 177.94 | **20.55** | 58 % |
+| Serie 20 PCB / 16 bestueckt / 15 Sensoren, 2 x 100 uF | 15 | 8.48 | 177.94 | **20.34** | 58 % |
 
 ### 1.2 Verzollung alt / neu (K-2)
 
@@ -36,9 +36,9 @@ Bis 2026-11-08 rechnete das Modell nur die DHL-Vorlagegebühr (max(3 CHF; 2 %)).
 
 | Szenario | Verzollung alt CHF | neu CHF (inkl. MWST darauf) | Einmal alt | Einmal neu | Vollkosten alt | Vollkosten neu |
 |---|---|---|---|---|---|---|
-| Prototyp 5 PCB / 5 bestueckt, 4 x 100 uF (D-013) | 3.00 | 23.54 | 158.36 | 178.90 | 40.82 | 44.93 |
-| Serie 20 PCB / 16 bestueckt / 15 Sensoren, 4 x 100 uF | 3.00 | 23.54 | 157.40 | 177.94 | 18.80 | 20.17 |
-| Serie 20 PCB / 16 bestueckt / 15 Sensoren, 2 x 100 uF | 3.00 | 23.54 | 157.40 | 177.94 | 18.59 | 19.96 |
+| Prototyp 5 PCB / 5 bestueckt, 4 x 100 uF (D-013) | 3.00 | 23.54 | 158.36 | 178.90 | 41.21 | 45.31 |
+| Serie 20 PCB / 16 bestueckt / 15 Sensoren, 4 x 100 uF | 3.00 | 23.54 | 157.40 | 177.94 | 19.18 | 20.55 |
+| Serie 20 PCB / 16 bestueckt / 15 Sensoren, 2 x 100 uF | 3.00 | 23.54 | 157.40 | 177.94 | 18.97 | 20.34 |
 
 ### 1.3 Alternative Standard-PCBA (W-2, nur falls Economic + ENIG + POFV nicht bestellbar)
 
@@ -46,8 +46,8 @@ Standard-PCBA verlangt mindestens 70 × 70 mm je Einzelplatine oder Paneel sowie
 
 | Szenario | PCBA | Versand | Stück CHF | Einmal CHF | Bestellung total CHF | Vollkosten/Sensor CHF | Δ Stück ggü. Economic | Δ Bestellung ggü. Economic |
 |---|---|---|---|---|---|---|---|---|
-| ALT W-2 Standard-PCBA Prototyp: 2 Paneele = 6 PCB / 6 bestueckt / 5 Sensoren | standard | DHL | **10.65** | 223.82 | 277.05 | 55.41 | +1.50 | +52.39 |
-| ALT W-2 Standard-PCBA Serie: 7 Paneele = 21 PCB / 18 bestueckt / 15 Sensoren | standard | DHL | **9.24** | 222.22 | 360.79 | 24.05 | +0.93 | +58.22 |
+| ALT W-2 Standard-PCBA Prototyp: 2 Paneele = 6 PCB / 6 bestueckt / 5 Sensoren | standard | DHL | **11.03** | 223.82 | 278.96 | 55.79 | +1.50 | +52.39 |
+| ALT W-2 Standard-PCBA Serie: 7 Paneele = 21 PCB / 18 bestueckt / 15 Sensoren | standard | DHL | **9.62** | 222.22 | 366.51 | 24.43 | +0.93 | +58.22 |
 
 REQ-FAB-04 bleibt auch mit Standard-PCBA erfüllt, solange der Paneelpreis nicht deutlich über dem Angebot pro Platine liegt; die Mehrkosten sind überwiegend einmalig (Setup, Schablone, Fixture, Feeder für Basic-Teile). Freigabe durch den Auftraggeber nötig.
 
@@ -76,8 +76,8 @@ BOM-Typen: 10 Extended, 1 Preferred, 15 Basic; 50 Bauteile, 145 Lötstellen je B
     + MWST-Anteil CH                                         0.45 CHF
     = JLC-Anteil pro Board                                   6.14 CHF
     x Boards / Sensoren                                  5/5
-    + lokal beschaffte Teile inkl. Ausschuss                 3.01 CHF
-    = STUECKKOSTEN pro Sensor (D-005)                        9.15 CHF
+    + lokal beschaffte Teile inkl. Ausschuss                 3.39 CHF
+    = STUECKKOSTEN pro Sensor (D-005)                        9.53 CHF
   Einmalkosten pro Bestellung (USD):
     PCB Fixanteil pro Bestellung (D-005)                    61.51
     Bauteile Mindestabnahme/Verlust-Ueberschuss              3.13
@@ -90,7 +90,7 @@ BOM-Typen: 10 Extended, 1 Preferred, 15 Basic; 50 Bauteile, 145 Lötstellen je B
     + MWST-Anteil CH (einmalig)                             10.10 CHF
     + Verzollungsgebuehr Kurier/Post                        22.00 CHF
     = EINMALKOSTEN                                         178.90 CHF
-  JLC-Rechnung total 163.23 USD = 133.67 CHF; MWST 12.37 CHF; Bestellung total 224.66 CHF; VOLLKOSTEN pro Sensor 44.93 CHF
+  JLC-Rechnung total 163.23 USD = 133.67 CHF; MWST 12.37 CHF; Bestellung total 226.57 CHF; VOLLKOSTEN pro Sensor 45.31 CHF
   Hinweis: GSDL nicht zulaessig (Warenwert 139.71 USD > 65.0 USD oder Gewicht > 1.5 kg) -> DHL Express gerechnet.
   Hinweis: EINMALKOSTEN enthalten lokal Vergussmasse ER2223 (1 Beutel 41.29 CHF minus Verbrauch in den Stueckkosten) = 39.56 CHF
 ```
@@ -107,8 +107,8 @@ BOM-Typen: 10 Extended, 1 Preferred, 15 Basic; 50 Bauteile, 145 Lötstellen je B
     + MWST-Anteil CH                                         0.37 CHF
     = JLC-Anteil pro Board                                   4.96 CHF
     x Boards / Sensoren                                  16/15
-    + lokal beschaffte Teile inkl. Ausschuss                 3.01 CHF
-    = STUECKKOSTEN pro Sensor (D-005)                        8.31 CHF
+    + lokal beschaffte Teile inkl. Ausschuss                 3.39 CHF
+    = STUECKKOSTEN pro Sensor (D-005)                        8.69 CHF
   Einmalkosten pro Bestellung (USD):
     PCB Fixanteil pro Bestellung (D-005)                    61.51
     PCB unbestueckte Reserveplatinen                         2.96
@@ -122,7 +122,7 @@ BOM-Typen: 10 Extended, 1 Preferred, 15 Basic; 50 Bauteile, 145 Lötstellen je B
     + MWST-Anteil CH (einmalig)                             10.28 CHF
     + Verzollungsgebuehr Kurier/Post                        22.00 CHF
     = EINMALKOSTEN                                         177.94 CHF
-  JLC-Rechnung total 220.33 USD = 180.43 CHF; MWST 16.15 CHF; Bestellung total 302.57 CHF; VOLLKOSTEN pro Sensor 20.17 CHF
+  JLC-Rechnung total 220.33 USD = 180.43 CHF; MWST 16.15 CHF; Bestellung total 308.29 CHF; VOLLKOSTEN pro Sensor 20.55 CHF
   Hinweis: GSDL nicht zulaessig (Warenwert 196.81 USD > 65.0 USD oder Gewicht > 1.5 kg) -> DHL Express gerechnet.
   Hinweis: EINMALKOSTEN enthalten lokal Vergussmasse ER2223 (1 Beutel 41.29 CHF minus Verbrauch in den Stueckkosten) = 36.09 CHF
 ```
@@ -139,8 +139,8 @@ BOM-Typen: 10 Extended, 1 Preferred, 15 Basic; 50 Bauteile, 145 Lötstellen je B
     + MWST-Anteil CH                                         0.35 CHF
     = JLC-Anteil pro Board                                   4.76 CHF
     x Boards / Sensoren                                  16/15
-    + lokal beschaffte Teile inkl. Ausschuss                 3.01 CHF
-    = STUECKKOSTEN pro Sensor (D-005)                        8.09 CHF
+    + lokal beschaffte Teile inkl. Ausschuss                 3.39 CHF
+    = STUECKKOSTEN pro Sensor (D-005)                        8.48 CHF
   Einmalkosten pro Bestellung (USD):
     PCB Fixanteil pro Bestellung (D-005)                    61.51
     PCB unbestueckte Reserveplatinen                         2.96
@@ -154,7 +154,7 @@ BOM-Typen: 10 Extended, 1 Preferred, 15 Basic; 50 Bauteile, 145 Lötstellen je B
     + MWST-Anteil CH (einmalig)                             10.28 CHF
     + Verzollungsgebuehr Kurier/Post                        22.00 CHF
     = EINMALKOSTEN                                         177.94 CHF
-  JLC-Rechnung total 216.74 USD = 177.49 CHF; MWST 15.92 CHF; Bestellung total 299.35 CHF; VOLLKOSTEN pro Sensor 19.96 CHF
+  JLC-Rechnung total 216.74 USD = 177.49 CHF; MWST 15.92 CHF; Bestellung total 305.07 CHF; VOLLKOSTEN pro Sensor 20.34 CHF
   Hinweis: GSDL nicht zulaessig (Warenwert 193.22 USD > 65.0 USD oder Gewicht > 1.5 kg) -> DHL Express gerechnet.
   Hinweis: EINMALKOSTEN enthalten lokal Vergussmasse ER2223 (1 Beutel 41.29 CHF minus Verbrauch in den Stueckkosten) = 36.09 CHF
 ```
@@ -171,8 +171,8 @@ BOM-Typen: 10 Extended, 1 Preferred, 15 Basic; 50 Bauteile, 145 Lötstellen je B
     + MWST-Anteil CH                                         0.47 CHF
     = JLC-Anteil pro Board                                   6.36 CHF
     x Boards / Sensoren                                  6/5
-    + lokal beschaffte Teile inkl. Ausschuss                 3.01 CHF
-    = STUECKKOSTEN pro Sensor (D-005)                       10.65 CHF
+    + lokal beschaffte Teile inkl. Ausschuss                 3.39 CHF
+    = STUECKKOSTEN pro Sensor (D-005)                       11.03 CHF
   Einmalkosten pro Bestellung (USD):
     PCB Fixanteil pro Bestellung (D-005)                    61.51
     Bauteile Mindestabnahme/Verlust-Ueberschuss              3.11
@@ -187,7 +187,7 @@ BOM-Typen: 10 Extended, 1 Preferred, 15 Basic; 50 Bauteile, 145 Lötstellen je B
     + MWST-Anteil CH (einmalig)                             13.42 CHF
     + Verzollungsgebuehr Kurier/Post                        22.00 CHF
     = EINMALKOSTEN                                         223.82 CHF
-  JLC-Rechnung total 221.61 USD = 181.47 CHF; MWST 16.24 CHF; Bestellung total 277.05 CHF; VOLLKOSTEN pro Sensor 55.41 CHF
+  JLC-Rechnung total 221.61 USD = 181.47 CHF; MWST 16.24 CHF; Bestellung total 278.96 CHF; VOLLKOSTEN pro Sensor 55.79 CHF
   Hinweis: Standard-PCBA: min. 70x70 mm -> Panel (z. B. 3-fach + Raender) noetig; Panelpreis im Rechner pruefen [ANNAHME: hier nicht modelliert].
   Hinweis: GSDL nicht zulaessig (Warenwert 198.09 USD > 65.0 USD oder Gewicht > 1.5 kg) -> DHL Express gerechnet.
   Hinweis: EINMALKOSTEN enthalten lokal Vergussmasse ER2223 (1 Beutel 41.29 CHF minus Verbrauch in den Stueckkosten) = 39.56 CHF
@@ -205,8 +205,8 @@ BOM-Typen: 10 Extended, 1 Preferred, 15 Basic; 50 Bauteile, 145 Lötstellen je B
     + MWST-Anteil CH                                         0.38 CHF
     = JLC-Anteil pro Board                                   5.19 CHF
     x Boards / Sensoren                                  18/15
-    + lokal beschaffte Teile inkl. Ausschuss                 3.01 CHF
-    = STUECKKOSTEN pro Sensor (D-005)                        9.24 CHF
+    + lokal beschaffte Teile inkl. Ausschuss                 3.39 CHF
+    = STUECKKOSTEN pro Sensor (D-005)                        9.62 CHF
   Einmalkosten pro Bestellung (USD):
     PCB Fixanteil pro Bestellung (D-005)                    61.51
     PCB unbestueckte Reserveplatinen                         2.22
@@ -222,7 +222,7 @@ BOM-Typen: 10 Extended, 1 Preferred, 15 Basic; 50 Bauteile, 145 Lötstellen je B
     + MWST-Anteil CH (einmalig)                             13.56 CHF
     + Verzollungsgebuehr Kurier/Post                        22.00 CHF
     = EINMALKOSTEN                                         222.22 CHF
-  JLC-Rechnung total 285.20 USD = 233.55 CHF; MWST 20.46 CHF; Bestellung total 360.79 CHF; VOLLKOSTEN pro Sensor 24.05 CHF
+  JLC-Rechnung total 285.20 USD = 233.55 CHF; MWST 20.46 CHF; Bestellung total 366.51 CHF; VOLLKOSTEN pro Sensor 24.43 CHF
   Hinweis: Standard-PCBA: min. 70x70 mm -> Panel (z. B. 3-fach + Raender) noetig; Panelpreis im Rechner pruefen [ANNAHME: hier nicht modelliert].
   Hinweis: GSDL nicht zulaessig (Warenwert 261.68 USD > 65.0 USD oder Gewicht > 1.5 kg) -> DHL Express gerechnet.
   Hinweis: EINMALKOSTEN enthalten lokal Vergussmasse ER2223 (1 Beutel 41.29 CHF minus Verbrauch in den Stueckkosten) = 36.09 CHF

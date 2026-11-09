@@ -3,8 +3,8 @@
 | | |
 |---|---|
 | Dokument | `docs/manuals/PAIRING_KALIBRIERUNG.md` |
-| Version | 0.1 (Phase 6) |
-| Datum | 2026-11-08 |
+| Version | 0.2 (Phase 6: Werkseinstellungs-Falle, Kalibrierung fortsetzen) |
+| Datum | 2026-11-09 |
 | Für wen | Alle, die Sensoren in Betrieb nehmen oder Pflanzen einrichten. Keine Fachkenntnisse nötig. |
 | Gilt für | App `app/` (Seiten Koppeln, Kalibrieren, Profil, Einstellungen), Gateway 0.5.0, Sensor-Firmware 0.1.0 |
 | Status | Nach dem Programmcode erstellt, **noch nicht am echten Sensor durchgespielt** (PROTOTYP-PRÜFUNG) |
@@ -32,8 +32,15 @@ Bei Problemen: `FEHLERSUCHE.md`.
    beenden“ brechen Sie ab.
 2. Sensor in die Hand nehmen (Zelle eingesetzt). **Taste oben am Sensor drücken und halten.**
    - Nach **3 Sekunden** blitzt die LED **einmal kurz gelb** → jetzt **loslassen**.
-   - Lassen Sie erst nach **8 Sekunden** los, passiert nichts (Schutz gegen versehentliches Drücken). Nochmals
-     versuchen.
+   - Lassen Sie zwischen **8 und 10 Sekunden** los, passiert nichts (Schutz gegen versehentliches Drücken).
+     Nochmals versuchen.
+   - **Achtung – ab 10 Sekunden Halten wird die Werkseinstellung vorbereitet:** Die LED **blinkt schnell rot**
+     und glimmt nach dem Loslassen **5 Sekunden schwach rot**. Ein **kurzer** Druck in diesen 5 Sekunden setzt den
+     Sensor auf Werkseinstellung zurück und **löscht Schlüssel, Einstellungen und noch nicht abgeholte Messwerte**.
+     Darum: Blinkt die LED schnell rot, **loslassen und mindestens 5 Sekunden nicht drücken**, bis das Glimmen
+     aufhört. Danach ganz normal neu beginnen (wieder halten bis zum gelben Blitz nach 3 s). (Ablauf wie
+     `firmware/sensor/core/fl_ui.c`: ab 10 s „vorbereitet“, nur ein kurzer Druck unter 1.5 s innert 5 s löst aus;
+     erneutes Halten 3–8 s hebt die Vorbereitung auf; über 30 s gilt die Taste als klemmend und es passiert nichts.)
    - Nach dem Loslassen blinkt der Sensor **1 × pro Sekunde gelb**: Er ist bereit zum Koppeln, **2 Minuten** lang.
 3. Nach wenigen Sekunden erscheint der Sensor in der App als Karte mit seiner Kennung (`fluidi-XXXX`) und der
    Signalstärke. **Kennung mit dem Aufkleber am Sensor vergleichen.** „war schon gekoppelt“ heisst: Dieser Sensor
@@ -86,8 +93,11 @@ zwei Messungen – einmal trocken, einmal frisch durchnässt – passt die Anzei
 ### 3.2 Vorbereitung
 
 - Planen Sie etwa **30 Minuten** ein, mit Wartezeit.
-- **Die App-Seite während der ganzen Kalibrierung offen lassen.** Wer die Seite vor dem Übernehmen verlässt, bricht
-  den Lauf ab und beginnt von vorne. Ein Neustart des Gateways bricht ihn ebenfalls ab.
+- Der Lauf wird im Gateway **6 Stunden** lang gespeichert. Geht das Handy in der Wartezeit aus oder wird die App
+  geschlossen, öffnen Sie einfach wieder **„Kalibrieren“** bei derselben Pflanze: Die App setzt den begonnenen Lauf
+  fort, ein **gemessener Trockenpunkt bleibt erhalten**. Auch ein Neustart des Gateways behält ihn; eine gerade
+  laufende Messung muss dann wiederholt werden (die App sagt es). Abbrechen nur ausdrücklich mit „Abbrechen“ oder
+  „Neu beginnen“. Nach 6 Stunden verfällt ein nicht übernommener Lauf.
 - Für den Trockenpunkt eignet sich die Pflanze am besten, wenn sie **ohnehin gegossen werden muss** (Erde mehrere
   Tage nicht gegossen). Alternativ ein Gefäss mit trockener Erde derselben Sorte.
 
@@ -99,8 +109,9 @@ zwei Messungen – einmal trocken, einmal frisch durchnässt – passt die Anzei
 3. Schritt **Trocken:** Sensor **bis zur Markierung** in das trockene Substrat stecken. Nicht drücken, nicht giessen.
    → **„Trocken messen“**. Der Sensor misst 5-mal, jeweils nach einem kurzen Funkkontakt. Das dauert **bis etwa
    1 Minute**. Werden einzelne Ausreisser verworfen, meldet die App das.
-4. Schritt **Nass:** Jetzt **durchdringend giessen, bis unten Wasser austritt.** **10 Minuten warten.** Sensor nicht
-   bewegen. → **„Nass messen“** (wieder bis etwa 1 Minute).
+4. Schritt **Nass:** Jetzt **durchdringend giessen, bis unten Wasser austritt** – auf die Erde, **nicht über den
+   Sensorkopf**; den Sensor nie untertauchen. **10 Minuten warten.** Sensor nicht bewegen. Das Handy darf in der
+   Wartezeit ausgehen (Kap. 3.2). → **„Nass messen“** (wieder bis etwa 1 Minute).
 5. Schritt **Übernehmen:** Die App zeigt beide Rohwerte.
    - **„Bereit zum Übernehmen“** → **„Übernehmen“**. Fertig: „Kalibrierung gespeichert – gilt auch rückwirkend“.
      Auf der Pflanzenseite steht nun „kalibriert (2 Punkte)“.
