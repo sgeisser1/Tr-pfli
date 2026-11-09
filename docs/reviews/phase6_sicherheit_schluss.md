@@ -287,3 +287,135 @@ Tests nach Umsetzung: Gateway 114 OK, App JS 17 OK, App Python 63 OK, `test_test
 | **W-7** | **umgesetzt** (Generator; wirksam beim nächsten Erzeugen) | Neu `0_SICHERHEIT.md` im Paket: Knopfzellen (144/145, Originalverpackung), Verguss und Kleber mit SDB, PSA vor dem ersten Beutel, Programmieren nur nach Anleitung (Weg B 2.0/2.1 V, 10 mA), Testfirmware und DEV-Hex nie an Endnutzer, Netzteil nicht im Giessbereich. Dazu der **D-030-Auszug, automatisch aus DECISIONS.md**. Das README verweist zuoberst darauf. `6_anleitungen/sdb/` enthält ER2223 A (EN, SV), B (HU, als „nicht ausreichend“ markiert), TDS ER2223, SDB und TDS UHU sowie die Handschuhdokumente. |
 | **K-1** | **umgesetzt** | EU-DoC RP-001257-CF-3 (11.08.2026) unter `docs/datasheets/RaspberryPi_12W5-MicroUSB-PSU_EU-DoC_RP-001257-CF-3.pdf`, Register GW-PSU, BOM_GATEWAY G2 mit Wareneingangsprüfung. Die Registerlücke G2 ist geschlossen. |
 | **K-7** | **umgesetzt** | V-Z7…V-Z10 tragen den Status „PFLICHT vor dem ersten Beutel“. V-Z8: vorhandene Brille nur als Korbbrille EN 166 **Kennzeichnung 3** + Visier (Kandidat 3M 2890SA gasdicht + BGS Visier, galaxus; Kennzeichnung am Artikel prüfen). V-Z9 Augenspülflasche 500 ml + Schürze, V-Z10 Halbmaske A2P2 bzw. Absaugung. EINKAUFSLISTE Kap. 5 ist ergänzt. |
+
+## Dummy-Scheibe (Runde 1)
+
+| | |
+|---|---|
+| Prüfgegenstand | `hardware/dummy_cell/` Stand `7f3fb9a` (README Kap. 1–8, `gen/gen_dummy.py`, `out/*_layout.pdf`, DRC-Berichte), `docs/manuals/PROGRAMMIEREN_SENSOR.md` Kap. 2 |
+| Massstab | Veto PS-K1 und PS-W2…W4 (`phase5_programmer_sicherheit.md`), Bedingungen B1–B6 (`hardware/programmer/README.md` Kap. 9.5), dieser Bericht Kap. 1 |
+| Ergebnis | **Kein Veto.** Scheibe freigegeben (Entwurf → Bestellung zulässig). **Variante B2 freigegeben mit Bedingungen DS-B1…DS-B5**, anwendbar erst nach Aufnahme in PROGRAMMIEREN Kap. 5. 0 kritisch, 2 wichtig, 5 klein |
+
+### Selbst geprüft
+
+| Was | Ergebnis |
+|---|---|
+| Sensor-Platine (pcbnew): BT1 Mitte (153.0/64.8), Minuspad 4 × 4, VBAT-Clip-Pads bei y ± 10.9 (Länge 5.08 → r 8.37…13.45 ab Mitte), TP1 (139.4/55.5), TP2 (139.4/58.5) | TP1/TP2 liegen **r ≈ 16.5 mm** ab Zellmitte, also ausserhalb der Scheibe Ø 19.8 → mit eingesetzter Scheibe für Prüfspitzen erreichbar (B2 geometrisch möglich) |
+| `Keystone_3034_Catalog_M65.pdf` S. 1, Zeile 3034 | Halterhöhe **4.1 mm** |
+| `gen_dummy.py` | PLUS: oben nur Kupferscheibe Ø 19.0 + Pad J3 (Netz VBAT_DUMMY), unten kein Kupfer; MINUS: unten nur Insel Ø 8.0 (DRU-Regel), Leitung − oben unter Lack; J7 „VIO“ ist ein **eigenes Netz**, nicht mit J3 verbunden; B2-Teile oben auf der Lasche ab x 24 |
+| DRC `out/drc_minus_wsl.rpt` | 0 Verstösse, 0 nicht verbundene Pads, 0 Footprint-Fehler |
+| `JLCPCB_NOTES.md` Z. 125/126 | 1.0/2.0 mm verfügbar, Toleranz ± 10 % (≥ 1.0 mm) – stimmt mit README |
+
+### Prüfpunkte
+
+| Punkt | Bewertung |
+|---|---|
+| **Verwechslung mit einer Zelle** | Gering. Lasche (bis 37.5 mm lang), fest angelötete Litzen, Aufdruck DUMMY/KEINE ZELLE/max 2.1 V / 10 mA. Die Scheibe speichert keine Energie; verschluckt (z. B. nach abgebrochener Lasche) besteht **keine** Verätzungsgefahr wie bei einer Lithiumzelle. Ausreichend |
+| **Isolation + ↔ −** | Pole auf getrennten Platinen, 1.0 mm FR-4 + Lack + Klebefuge; am Scheibenrand kein Kupfer (Plus 0.4 mm vom Rand, Insel nur Ø 8). Einzige knappe Stelle: J3 (+, PLUS-Lasche bis x 17.1, 2 mm hoch) und J4 (−, ab x 19.25) – ≈ 2.2 mm waagrecht, Litzenlitzen/Zinn können überbrücken → DS-K1. Folge eines Schlusses: Netzteil in Strombegrenzung 10 mA, keine Zelle im Kreis → harmlos |
+| **Verpolung** | Physisch möglich (Kippen um die Laschenachse, Lasche bleibt in +x). Dann liegt die Plusfläche Ø 19 auf dem Minuspad **und** reicht über die VBAT-Clip-Pads (r 8.37 < 9.5), die Insel (−) an der Haltefeder (VBAT): das Netzteil wird über den Clip kurzgeschlossen. README Kap. 2 („Q1 sperrt“) beschreibt das unvollständig → DS-K2. Mit 10 mA Begrenzung und ohne Zelle **harmlos**, erkennbar an der Strombegrenzung |
+| **Dicke/Toleranz** | Ungepaart 2.7–3.3 mm + Kleber; Paarung auf 2.95–3.10 und Endprüfung 3.0–3.2 mm (PS-W3) sind ausreichend. 3.3 mm wird durch die Endprüfung ausgesondert. Kapton **in** der Klebefuge kann die Epoxidhaftung schwächen → DS-K3 |
+| **Gleichzeitig eine Zelle?** | Nein. Ein Clip, Halterhöhe 4.1 mm; Scheibe ≥ 3.0 (selbst ein delaminiertes MINUS-Teil 2.0 mm) + Zelle 3.2 mm > 4.1 mm. Speisung ohne Scheibe ist mit fest angelöteten Litzen nicht mehr naheliegend (PS-K1 konstruktiv besser als die Selbstbau-Scheibe). Missbrauchsfall „Scheibe liegt neben dem Sensor, Netzteil an, Zelle eingesetzt“: Die Litzen speisen dann nur die Scheibe, keine Verbindung zum Sensor; über TP1/TP2 nur Quellen ≤ 2.1 V hinter 200 kΩ bzw. 10 MΩ → kein Ladepfad in eine Zelle ≥ 2.6 V (Ströme ≤ 10 µA, Maxell-Grenze 10 mA) |
+| **Abbaureihenfolge** | Für Weg B mit Draht an R9 unverändert eindeutig (Schritt 8). Für B2 fehlt der Text: Die TP1-Spitze hängt **an der Scheibe** (J6); wer nach Schritt 8 (b) zuerst die Scheibe zieht, schleift die TP1-Spitze über das Fach → DS-B1 |
+
+### B2 – neue Gefahren durch Speisung des Puffers aus dem Netzteil
+
+- **Keine neue Lade- oder Brandgefahr.** VCC des Puffers = Netzteil = VDD des Sensors (über Q1); alle Quellen enden mit dem
+  Abschalten des Netzteils. Kein Pfad in eine Zelle (siehe oben). Mehrstrom: AUP ICC ≤ 0.5 µA, RXD-LED des USB-UART
+  ≈ 0.5 mA aus derselben Schiene – im Budget < 10 mA (README Kap. 9.3 Schritt 2).
+- **Sicherheitsgewinn:** Beide 100-kΩ-Barrieren bleiben im TX-Pfad, keine Lötstelle am bestückten Sensor, PS-W4 entfällt.
+  B2 ist sicherheitlich **besser** als der Draht an R9.
+- **Fehlbedienung J7:** J7 ist ein eigenes Netz. Vergessen → nur Funktion. Falsch an 3.3/5 V (z. B. Jumper-Stift des
+  USB-UART) → U1 (abs. max 4.6 V, `TI_SN74AUP1G17_Datasheet_SCES579J.pdf` S. 4) bzw. Pegel am Sensor-RX über VDDS → DS-B2.
+- **Netzteil-Überschwingen (PS-L3):** Sensor (4.1 V abs. max) ist empfindlicher als U1; nichts Neues.
+
+### B2 gegen B1–B6
+
+| Bed. | B2 |
+|---|---|
+| B1 Puffer, nie RXD direkt an TP1 | **erfüllt** (U1 = gleicher Puffer wie Adapter U4) |
+| B2 Jumper J1 (PL2303) bzw. H3 (CH343) ab | gilt unverändert |
+| B3 Eingangsprüfung | gilt; Grenze RXD-Strom wie **Weg A ≤ 2.1 mA** (Puffer treibt RXD), nicht 0.69 mA; TXD-Kriterien ≥ VCCIO − 0.10 V / ≤ 0.10 V unverändert (TP2-Pfad wie bisher) |
+| B4 Netzteil 2.0 V, ≤ 2.1 V (PL2303), 10 mA, Reihenfolge USB zuerst / Netzteil zuletzt | gilt **voll**, weil VIO/VCCIO aus dem Netzteil kommt |
+| B5 R2 470 Ω | **nicht anwendbar** (betrifft den USB-gespeisten Adapter-Regler U3); ersetzt durch B4 |
+| B6 Port, 20 × Flashen | gilt, aber **nur 19200 Baud**; 57600 ist für B2 nicht freigegeben (Reserve nur am Adapter belegt). Bitfehler werden durch CRC je Bereich erkannt – keine Sicherheitsfrage |
+
+### Bedingungen B2 (wichtig, vor dem ersten Einsatz)
+
+**DS-B1 · wichtig – B2-Ablauf und Abbaureihenfolge in PROGRAMMIEREN Kap. 5 aufnehmen** (heute nur Kap. 2-Verweis; DC-5).
+Anschliessen: Scheibe einsetzen → Spitzen TP1/TP2 setzen → USB stecken → Netzteil (vorher 2.0 V/10 mA eingestellt)
+ein. Abbau: **(a) Netzteil aus und ab, (b) beide Prüfspitzen abheben, (c) Scheibe heraus, (d) USB ziehen**; erst dann
+Zelle. Schritt 9 für B2: kein Lötnacharbeit, aber Sichtprüfung TP1/TP2 (Abdruck, keine Beschädigung der VIP-Fläche,
+PS-W2) und Kontrollmessung TP1 ↔ R9 Pad 1 ≈ 200 kΩ. `--baud 19200` als Pflicht im Befehl.
+
+**DS-B2 · wichtig – VIO fest mit + verbinden.** Beim Zusammenbau eine kurze Brücke J3 (+, PLUS) ↔ J7 (VIO, MINUS) fest
+einlöten und als **einzigen** Abgriff für VCCIO/VIO des USB-UART J7 verwenden. Dann gibt es nur eine rote Litze zum
+Netzteil, VIO = VDD ist konstruktiv sichergestellt (Regel 3), und J7 kann nicht an eine fremde Spannung geraten. Danach
+Isolationsprüfung (DS-K1) wiederholen; der B2-Prüfschritt misst J7 ↔ J3 < 1 Ω.
+
+Weitere Bedingungen: **DS-B3** B3 mit der Weg-A-Grenze (≤ 2.1 mA) durchführen; **DS-B4** B4 und B6 wie oben (nur
+19200 Baud); **DS-B5 PROTOTYP-PRÜFUNG** am ersten Muster (DC-4): Pegel DIO6/RXD und Sensor-RX bei 2.0 und 2.1 V
+(SPICE A1p deckt nur VIO 1.96–2.04 V ab), 20 × Flashen bei 19200 Baud, Spitzensitz während ≥ 3 min.
+
+### Kleine Befunde
+
+- **DS-K1** Isolationsprüfung + ↔ − > 10 MΩ **nach** dem Anlöten der Litzen (und nach B2-Bestückung/Brücke) wiederholen;
+  heute nur vor Schritt 5. Lötstellen J3/J4 flach, keine abstehenden Litzenadern.
+- **DS-K2** README Kap. 2 „Verpolt eingesetzt“ korrigieren: Plusfläche überdeckt Minuspad und VBAT-Clip-Pads → Netzteil
+  geht in die Strombegrenzung. In PROGRAMMIEREN Kap. 5 Schritt 5/6: „Zeigt das Netzteil Strombegrenzung (CC) → sofort
+  aus, Scheibe/Polung prüfen.“
+- **DS-K3** Dickenausgleich mit Kapton nicht vollflächig in die Klebefuge, sondern als schmaler Ring am Rand bzw.
+  lieber ein anderes Paar wählen; nach dem Aushärten Prüfung „Platinen lassen sich von Hand nicht gegeneinander
+  verdrehen“. Beim Fasen (Kap. 4 Schritt 2) nicht bis an die Plus-Kupferfläche (0.4 mm Rand) schleifen.
+- **DS-K4** Grenzwerte vereinheitlichen: WB-1 nennt noch „10 mA (höchstens 20 mA)“ (PROGRAMMIEREN seit `f49f343` nur
+  10 mA). Der Aufdruck „max 2.1 V / 10 mA“ widerspricht TESTFIRMWARE Kap. 1 (Funk-/Energietests **3.0 V / 30 mA** über
+  die Dummy-Scheibe). Sicherheitlich unkritisch (ohne Zelle, Quelle < Zellspannung irrelevant), aber verwirrend:
+  Aufdruck bzw. README präzisieren („Programmieren: 2.0 V/10 mA; Energietests nach TESTFIRMWARE“) – oder für
+  Energietests eine eigene Scheibe ohne B2-Bestückung kennzeichnen.
+- **DS-K5** PROGRAMMIEREN Kap. 2 Zeile Dummy-Scheibe nach Freigabe nachführen („Prüfung sicherheit offen“ → „Sicherheit
+  Runde 1 ohne Veto, B2 unter DS-B1…B5“); Mechanik DC-1 (Freiraum der Lasche) bleibt offen und ist Voraussetzung für den
+  Einsatz, nicht für die Bestellung.
+
+### Ergebnis Dummy-Scheibe
+
+**Kein Veto.** PS-K1 ist mit der Platinen-Scheibe besser erfüllt als mit der Selbstbau-Scheibe (Litzen fest an der
+Scheibe, Clip belegt, Stapeln unmöglich). Bestellung der Platinen ist aus Sicht der Sicherheit freigegeben. Variante
+B2 ist sicherheitlich vorteilhaft und freigegeben, **anwendbar erst nach DS-B1 und DS-B2**; DS-B3…B5 vor bzw. am ersten
+Einsatz. Bitte je Befund *umgesetzt* / *abgelehnt (Grund)*.
+
+(Stand der Dummy-Scheibe-Prüfung auch für HEAD `49bfb3c` gültig: `hardware/dummy_cell/`, PROGRAMMIEREN und Adapter-README
+seit `7f3fb9a` unverändert, `git diff --stat` leer.)
+
+## Handschuhe V-Z7: MAPA Solo 977 (Nachtrag zu W-5)
+
+| | |
+|---|---|
+| Unterlagen (selbst gelesen, pdftotext) | `docs/references/MAPA_Solo977_TechnicalSheet_DE_2026-09.pdf` (S. 1–2), `docs/references/MAPA_Solo977_Bestaendigkeitstabelle_2024-04-11.pdf` (S. 1); SDB `Electrolube_ER2223-PartA_SDS_Rev0-2016-10-19_EN.pdf` Abschn. 3/8, `Electrolube_ER2223-PartB_SDS_2023-10-02_HU.pdf` Abschn. 3/8, `UHU_PlusEndfest300-33g_SDS_V62-2026-07-17_DE.pdf` (Binder und Härter, Abschn. 3/8) |
+| Ergebnis | **Freigegeben als Spritzschutz unter HS-1…HS-5.** Bedingung D-030 Nr. 1 („Beständigkeitsliste abgelegt“) gilt damit als erfüllt. Kein Veto |
+
+**Belegt:** Nitril, chloriert, Einweg, **0.13 mm**, EN ISO 374-1 **Typ B (J, K, T)**, EN ISO 374-5, Kategorie III,
+AQL 0.65 (Datenblatt S. 1–2). Beständigkeitstabelle: Isopropanol 99 % 48 min (Stufe 2), Ammoniak 25 % 16 min (Stufe 1),
+Ethanol 5 min, Essigsäure 2 min. Es gibt **keine Werte** für die Inhaltsstoffe:
+- ER2223 B: 4,4'-Methylenbis(cyclohexylamin), CAS 1761-71-3, 60–100 %, H314
+- ER2223 A: CAS 25068-38-6 60–100 %, 16096-31-4 10–30 %, Cyclohexanon < 1 %
+- UHU-Härter: CAS 10563-29-8 und 90640-67-8 (Amine)
+
+**Bewertung:**
+- Die SDB von ER2223 A/B nennen kein Handschuhmaterial („geeignete, undurchlässige Handschuhe“).
+- Das UHU-SDB nennt für einen vergleichbaren Amin-Härter **Nitrilkautschuk > 0.12 mm für Kurzzeit/Spritzer**
+  (10 min < BTT < 480 min). Für Langzeitkontakt verlangt es Butyl 0.7 mm oder EVAL.
+- Solo 977 mit 0.13 mm erfüllt die UHU-Vorgabe **direkt**.
+- Für ER2223 B ist Nitril als Spritzschutz eine **ANNAHME** in Analogie: aliphatische Amine, Ammoniak 16 min. Die
+  Stoffmenge je Ansatz ist klein (Gramm), und es gibt keinen Vollkontakt. Unter diesen Umständen ist das vertretbar.
+- Ungeeignet ist der Handschuh für Vollkontakt, für das Aufnehmen von verschüttetem Härter von Hand und für das
+  Reinigen mit Ketonen oder Essigsäure.
+
+| Nr | Auflage |
+|---|---|
+| HS-1 | **Zwei Paar übereinander** (K-3). Das äussere Paar sofort wechseln bei sichtbarem Kontakt, spätestens nach **15 min** Arbeit mit offener Masse oder offenem Härter. Danach Hände waschen |
+| HS-2 | Nur Spritzschutz: kein Eintauchen, kein Abwischen von Härter mit dem Handschuh. Verschüttetes nur mit Saugmaterial und Spatel aufnehmen (V-Z4) |
+| HS-3 | Reinigen nur mit Isopropanol (48 min). **Kein Aceton und kein anderes Keton-Lösungsmittel** mit diesen Handschuhen |
+| HS-4 | Bei Verschütten grösserer Mengen (z. B. platzender Beutel beim Abfüllen M-A) zuerst Handschuhe wechseln. Für das Abfüllen M-A wird ein Paar Butyl- oder Laminathandschuhe als Überhandschuh **empfohlen**, nicht Pflicht |
+| HS-5 | Bei MAPA (bzw. Electrolube) die Permeationsdaten für CAS 1761-71-3 anfragen (Textvorlage wie Konzept Anhang B). Liefert MAPA eine Durchbruchzeit < 10 min, wird HS-4 Pflicht. Die Anfrage ist **keine** Voraussetzung für den ersten Beutel |
+
+MONTAGE Kap. 3a und EINKAUFSLISTE V-Z7 entsprechend nachführen: HS-1 bis HS-3 in die Schutzmassnahmen, Status
+„freigegeben (Sicherheit, Spritzschutz)“. Bitte *umgesetzt* / *abgelehnt (Grund)*.
