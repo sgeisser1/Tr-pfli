@@ -385,6 +385,31 @@ Einsatz. Bitte je Befund *umgesetzt* / *abgelehnt (Grund)*.
 (Stand der Dummy-Scheibe-Prüfung auch für HEAD `49bfb3c` gültig: `hardware/dummy_cell/`, PROGRAMMIEREN und Adapter-README
 seit `7f3fb9a` unverändert, `git diff --stat` leer.)
 
+### Antwort Ersteller (Elektronik, Dummy)
+
+2026-11-09, Elektronik. Generator neu gelaufen (`bash hardware/dummy_cell/gen/run_all.sh`): DRC KiCad 10.0.8 WSL und
+Windows je Platine **0 Verstösse, 0 nicht verbundene Pads, 0 Footprint-Fehler**; neue Gerber-ZIPs
+`fluidi_dummy_minus_gerber_jlc.zip` SHA-256 `03a535a6bb2168db98aee80e2b0d93e1e095395b60e614bb8cb16f2ce3872eb3`,
+`fluidi_dummy_plus_gerber_jlc.zip` SHA-256 `02d5b9ec4c880b3f4f84d55aa81295a4b59e9b5b554da938c63db902244bcf6c`
+(`hardware/dummy_cell/out/SHA256SUMS`).
+
+| Befund | Antwort | Umsetzung |
+|---|---|---|
+| DS-B1 | *umgesetzt* | PROGRAMMIEREN v1.3 Kap. 5 neuer Abschnitt „Variante B2“: Anschlusstabelle, Anschliessen (1)–(7), `--baud 19200` in beiden Befehlen, Abbau **(a) Netzteil aus und ab, (b) beide Prüfspitzen abheben, (c) Scheibe heraus, (d) USB ziehen**, erst dann Zelle; Nacharbeit B2 (Sichtprüfung TP1/TP2, TP1 ↔ R9 Pad 1 ≈ 200 kΩ). Regeln 1–4 und PS-K1 unverändert, der Weg mit Draht an R9 bleibt daneben bestehen |
+| DS-B2 | *umgesetzt* (Layout + README) | Eine Leiterbahn J3 ↔ J7 ist nicht möglich (J3 auf PLUS, J7 auf MINUS). Neu: Brückenpad **J9 „BR+“** auf MINUS direkt neben J3 (x 14.85 / y −6.5), Netz VIO, Leitung zu U1-VCC und J7. Zusammenbau README Kap. 4 Schritt 5: Brücke J3–J9 fest einlöten (Pflicht, mit und ohne B2); Prüfung J7 ↔ J3 < 1 Ω. J7 ist als **einziger** VIO-Abgriff bezeichnet (README Pad-Tabelle, PROGRAMMIEREN Kap. 5 Schritt 2 und Anschlusstabelle VIO → J7) |
+| DS-B3 | *umgesetzt* | PROGRAMMIEREN Kap. 5 B2 und README Kap. 3: Eingangsprüfung mit Weg-A-Grenze RXD ≤ 2.1 mA; `hardware/programmer/README.md` Kap. 9.3 Schritt 3 und B3 um „Weg B Variante B2“ ergänzt |
+| DS-B4 | *umgesetzt* | Nur 19200 Baud (Befehle mit `--baud 19200`); B4 voll, B5 entfällt (README Kap. 3) |
+| DS-B5 | *umgesetzt* (Rechnung) / PROTOTYP-PRÜFUNG offen | SPICE erweitert: `simulation/spice/programmer/prog_uart_b2.py` (nutzt die Modelle aus `prog_uart.py`/`prog_uart_pl2303.py`, eigene .cir-Dateien), VDD = VIO 1.96/2.00/2.05/**2.10 V**, Bericht `prog_uart_b2_report.txt`: 43 von 44 Fällen ok. DC: Puffer-Eingang low ≤ 0.398 V (Reserve ≥ +72 mV bei 2.1 V), PL2303-RXD ≤ 0.098 V, Sensor-RX mit PL2303-TXD 0.1 V ≤ 0.262 V (≥ +158 mV). 19200 Baud: Prüfspitze ≤ 10 cm (20 pF) ≥ 0.223 Bit bei 2.1 V; **40 pF bei 2.1 V nur 0.089 Bit** → Auflage Prüfspitzenleitung TP1–J6 ≤ 10 cm (PROGRAMMIEREN B2 Schritt 7, README Kap. 3). A1z (Ruhepegel vor dem ersten Zugriff) wie beim Adapter im Hysteresebereich, unschädlich. Prüfung am Muster bei 2.0 und 2.1 V bleibt DC-4 |
+| DS-K1 | *umgesetzt* | README Kap. 4 Schritt 5: nach Litzen, Brücke und B2-Bestückung Isolation J3 ↔ J4 > 10 MΩ wiederholen; Lötstellen flach, keine abstehenden Adern |
+| DS-K2 | *umgesetzt* | README Kap. 2 „Verpolt eingesetzt“ korrigiert (Plusfläche über Minuspad und VBAT-Clip-Pads → Netzteil in Strombegrenzung, Q1 schützt hier nicht); PROGRAMMIEREN Kap. 5 Schritt 5 und B2 (5): „CC-Anzeige → sofort aus, Scheibe/Polung prüfen“ |
+| DS-K3 | *umgesetzt* | README Kap. 4: zuerst anderes Paar; Kapton nur als schmaler Ring am Rand, nicht vollflächig; Verdrehprobe nach dem Aushärten; Fasen nur an der FR-4-Kante, nicht bis an die Plus-Kupferfläche |
+| DS-K4 | *umgesetzt* | WB-1: „höchstens 20 mA“ entfernt, Programmieren 2.0 V (PL2303 ≤ 2.1 V) / 10 mA, Tests 3.0 V / 30 mA nach TESTFIRMWARE Kap. 1. Aufdruck MINUS unten neu „PROG 2.0-2.1V/10mA“ und „TEST 3.0V/30mA“ (passt, DRC ok), PLUS „+2.0V“ → „PLUS“ |
+| DS-K5 | *umgesetzt* | PROGRAMMIEREN Kap. 2 Zeile Dummy-Scheibe: „Sicherheit Runde 1 ohne Veto, B2 unter DS-B1…B5“, Mechanik DC-1 passt (README Kap. 6a) |
+
+Hinweis: Die Gerber-Hashes in `hardware/sensor/out/ORDER_JLC_REV_C.md`, `docs/manuals/BESTELLEN_JLC.md` und im
+Release-Paket (`production/`) zeigen noch auf den alten Stand und sind nachzuführen (nicht Teil dieses Auftrags,
+`production/` nicht geändert).
+
 ## Handschuhe V-Z7: MAPA Solo 977 (Nachtrag zu W-5)
 
 | | |
@@ -427,3 +452,97 @@ MONTAGE Kap. 3a und EINKAUFSLISTE V-Z7 entsprechend nachführen: HS-1 bis HS-3 i
 | **K-5** | **umgesetzt** | EINKAUFSLISTE S3 heisst jetzt „Batteriefachschraube (nicht unverlierbar)“, mit Bemerkung. BATTERIEWECHSEL Kap. „Zuerst lesen“: neuer Punkt zu Ersatz- und losen Schrauben (ausser Reichweite von Kindern), „nicht unverlierbar“ und „ohne Schraube den Sensor nicht benutzen“; der Rest ist unverändert. Gleich korrigiert wurden MONTAGE Kap. 7 Schritt 4, FL-S-00 Pos. 12, `fluidi_params.py` (Text) und INDEX MECH-SCR1. **Hinweis an den Orchestrator:** REQ-SAF-CC-04 fordert eine „unverlierbare Schraube“. Die Anforderung ist mit der Furchlippe nur teilweise erfüllt (siehe BATTERIEWECHSEL R3-W1); bitte über Anforderung oder Entscheid klären |
 | **Handschuhe V-Z7** (HS-1…HS-5) | **umgesetzt** | MONTAGE Kap. 1 (Werkzeugtabelle), Kap. 3a Abhakliste Bed. 1 und Schutzmassnahme 2 mit HS-1…HS-5 (zwei Paar; äusseres sofort bzw. nach 15 min wechseln; kein Vollkontakt; nur Isopropanol, kein Keton; Butyl-/Laminat-Überhandschuh bei M-A empfohlen, Pflicht bei Durchbruch < 10 min; Anfrage an MAPA wegen CAS 1761-71-3). EINKAUFSLISTE V-Z7: Status „freigegeben (Sicherheit, Spritzschutz)“, Bemerkung ergänzt |
 | **W-4** (Trichter, nicht zugewiesen) | übernommen in MONTAGE Kap. 3a | Abhakliste Bed. 1: zwei PE-Trichter, kein Silikontrichter mit Filter für Teil B. Die Einkaufsliste hat der Einkauf nachgeführt |
+
+## REQ-SAF-CC-04 Schraube
+
+| | |
+|---|---|
+| Stand | HEAD `d068690` |
+| Frage | Genügt die Batteriefachschraube M2 × 3 TX6 (D-032), die von der Furchlippe nur gehalten wird, dem Schutzziel von REQ-SAF-CC-04 („Werkzeug (unverlierbare Schraube) …, Massstab ANSI/UL 4200A“)? |
+| Ergebnis | **Kein Veto.** Das Schutzziel ist für die Muster und die Kleinserie **erreicht unter den Auflagen SR-1…SR-4**. Der Wortlaut „unverlierbar“ ist nicht wörtlich erfüllt → Formulierungsvorschlag unten (Entscheid Orchestrator/Auftraggeber) |
+
+### Was UL 4200A verlangt – Quellenlage
+
+- **Lokal liegt keine Quelle vor.** Weder der Normtext ANSI/UL 4200A noch ein Auszug ist unter `docs/references/`
+  bzw. `docs/datasheets/` abgelegt; `phase3_sleeve_sicherheit.md` zitiert einen Intertek-Auszug nur mit URL.
+- Ich habe diesen Auszug heute erneut abgerufen und mit `pdftotext` gelesen: Intertek, „UL 4200A SUN Rev 8-15-2023
+  and 8-30-2023 ED 3-19-2025“, S. 2–3 (URL wie in `phase3_sleeve_sicherheit.md`). Er liegt nur im Sitzungsordner,
+  **nicht im Repo**. Wörtlich:
+  - **5.5 a)** „A tool, such as a screwdriver or monetary coin, is required to open the battery compartment. For a
+    battery compartment secured by a screw or a twist-on access cover, a minimum torque of 0.5 Nm and a minimum angle
+    of 90 degrees of rotation shall be required to open the compartment or the fastener shall engage a minimum of two
+    full threads“.
+  - **5.6** „If screws or similar fasteners are used to secure the door or cover providing access to a battery
+    compartment, the fasteners shall be captive to the door, cover, or device.“
+  - Exception No. 1/2 zu 5.6 gelten nur für Zellen, die **nicht** vom Nutzer gewechselt werden. Beim fluidi-Sensor
+    wechselt der Nutzer die Zelle, die Ausnahmen gelten also **nicht**.
+- **Nicht belegt:** Was „captive“ genau heisst (Definition, Prüfverfahren, Zahl der Umdrehungen, Haltekraft). Der
+  Auszug definiert es nicht, der Normtext fehlt. Ich lege dafür keinen Wert fest.
+- **Vorschlag:** Den Intertek-Auszug (Dateiname z. B. `Intertek_UL4200A-SUN-Rev2023_Auszug_2025-03-19.pdf`) nach
+  `docs/references/` legen und registrieren. Den Normtext 4200A (Definition „captive“, Abschn. 7C/9) über einen
+  Lesezugang beschaffen, falls die Serie über den Eigengebrauch hinausgeht.
+- Rechtlich gilt UL 4200A für den Eigengebrauch nicht (`phase3_sleeve_sicherheit.md` „Einordnung“). Sie ist der
+  Massstab des Projekts.
+
+### Bewertung der heutigen Lösung (Geometrie selbst nachgerechnet)
+
+Werte aus `mechanical/gen/fluidi_params.py` (SCREW, Z) und `mechanical/sensor/check_sensor.txt` 5c:
+- Hülsenboden z 0…1.3, Furchlippe Ø 1.7 bei z 0…0.5, darüber Bohrung Ø 2.4.
+- Mutter im Kragen z 1.6…3.2; Schaft z 0…3.0 (vollgewindig); Steigung P 0.4.
+
+| Zustand | Rechnung | Ergebnis |
+|---|---|---|
+| angezogen | Eingriff in der Mutter 1.4 mm = **3.5 Gänge** | 5.5 a) „≥ 2 full threads“ **erfüllt** (Werkzeug TX6) |
+| aus der Mutter gelöst (Hülse abziehbar) | 3.5 Umdrehungen; Schaft dann z −1.4…1.6, steckt noch in der Lippe | Schraube bleibt **in der Hülse** (Hülse = „cover“) |
+| fällt heraus | Schaftende muss z 0 unterschreiten: weitere 1.6 mm = **≈ 4 Umdrehungen**, gesamt ≈ 7.5 | Reserve ≈ 4 Umdrehungen gegenüber dem nötigen Lösen |
+
+**Urteil:**
+- Im bestimmungsgemässen Wechsel bleibt die Schraube in der Hülse. Das entspricht dem Sinn von 5.6 („captive to the
+  cover“): kein loses Teil beim Wechsel, Fach wird wieder verschraubt.
+- Sie ist aber nur **verliersicher**, nicht konstruktiv unverlierbar. Wer bewusst weiterdreht, kann sie entfernen, und
+  die Lippe verschleisst über viele Wechsel.
+- Die Folgen eines Verlusts (FMEA F-21/F-28):
+  - Die Hülse sitzt nur noch über die O-Ring-Reibung, die Zelle wäre ohne Werkzeug erreichbar.
+  - Die Schraube selbst ist ein Kleinteil.
+- Für den Rahmen fluidi (Eigengebrauch, 10–15 Sensoren, Büro, Anleitung warnt, Ersatzschraube, „ohne Schraube nicht
+  benutzen“) ist das Restrisiko **vertretbar**, wenn es durch Prüfung belegt wird.
+
+**Bewertete Alternativen für Rev C (Kunststoffteile, Platine unverändert):**
+- **Lippe tiefer oder höher legen:** bringt nichts. Die Reserve hängt nur von der Schaftlänge über der Lippe ab;
+  eine höher liegende Lippe (z 0.8…1.3) senkt sie auf ≈ 2 Umdrehungen.
+- **Längere Schraube:** M2 × 4 wurde mit V-K verworfen (0.8 mm über der Mutter, neben der O-Ring-Nut).
+- **Sicherungsscheibe oder O-Ring auf dem Schaft:** Mit abgezogener Hülse ragt der Schaft nur ≈ 0.3 mm über den
+  Hülsenboden. Für eine Scheibe gibt es keinen Platz. Ein Mikro-O-Ring in der Kammer z 0.5…1.3 (Ø 2.4) wäre
+  denkbar, eine Quelle mit Datenblatt fehlt aber. Nicht für die Muster.
+- **Schraube mit Taillenschaft (Dünnschaft):** Das ist die sauberste Lösung. Eine M2-Kaufquelle in dieser Länge ist
+  im Projekt nicht belegt, ich nenne keine Teilenummer. → Prüfauftrag Einkauf/Mechanik für die Serie bzw. Rev D:
+  Taillenschaft, Gewindelänge ≥ 0.8 mm (2 Gänge) + Lippe, Gesamtlänge ≤ 3 mm.
+
+### Auflagen (für Muster und Kleinserie)
+
+| Nr | Auflage |
+|---|---|
+| SR-1 | **Prüfung M-D5/ST-K8 mit Zahlen:** (a) Die Schraube fällt nach dem Lösen aus der Mutter bei Hülse kopfüber und Schütteln nicht heraus. (b) Umdrehungen bis zum Herausfallen zählen: ≥ 6 gesamt bzw. ≥ 2 über das Lösen hinaus. (c) Dasselbe nach 50 Wechseln (Lippe). Fällt (c) durch, Hülse als Verschleissteil nach n Wechseln ersetzen |
+| SR-2 | **Abzugskraft der Hülse ohne Schraube** messen (Federwaage). Bleibt sie ≥ 72 N (Wert 6.3.4B laut Intertek-Auszug, Massstab), ist ein Verlust weniger kritisch. Sonst bleibt es bei der Anleitungsregel „ohne Schraube Sensor nicht benutzen“ |
+| SR-3 | BATTERIEWECHSEL behält „etwa 4 Umdrehungen … nicht weiter drehen“ und die Ersatzschraube. Ergänzen: „Ersatzschrauben wie Zellen ausser Reichweite von Kindern aufbewahren.“ (K-5) |
+| SR-4 | Einkaufsliste S3 nicht „unverlierbar“ nennen (K-5); Bezeichnung „Batteriefachschraube (verliersicher in der Hülse)“ |
+
+### Formulierungsvorschlag REQ-SAF-CC-04
+
+> **Verschluckschutz:** Batteriefach nur mit Werkzeug zu öffnen (Schraube, im Eingriff ≥ 2 volle Gewindegänge; Massstab
+> ANSI/UL 4200A 5.5 a) **oder** mit zwei gleichzeitigen, unabhängigen Handbewegungen (5.5 b). Die Schraube ist
+> **verliersicher an der Hülse**: Nach dem Lösen aus dem Gewinde bleibt sie in der Hülse, fällt bei Hülse kopfüber
+> nicht heraus und lässt sich erst nach ≥ 2 weiteren Umdrehungen entfernen. Dies gilt auch nach 50 Wechseln. Die
+> Anleitung warnt davor, weiterzudrehen, und nennt eine Ersatzschraube. *Abweichung zu UL 4200A 5.6 („captive“):
+> Definition nicht lokal belegt, konstruktive Unverlierbarkeit (Taillenschaft) für Serie/Rev D zu prüfen.* Bleibt nach
+> Falltest aus 1 m geschlossen (**ANNAHME** Fallhöhe); Warnsymbol am Batteriefach. *(S-K03, F-14, F-20, F-28, R2-L02,
+> R2-L03, R3-W1)* – **Muss**, Nachweis I, T (M-D5, ST-K1, ST-K8).
+
+**Begründung:**
+- Das Schutzziel ist erreicht: Die Zelle ist nur mit Werkzeug zugänglich (3.5 Gänge), beim bestimmungsgemässen Wechsel
+  entsteht kein loses Teil, und die Anleitung schliesst die Lücke im Fehlgebrauch.
+- „Unverlierbar“ im strengen Sinn ist mit Kaufteilen aus CH-Quelle (D-032) und dem verfügbaren Bauraum heute nicht
+  belegbar umsetzbar.
+- Die Abweichung wird offen benannt statt stillschweigend als erfüllt geführt.
+
+Bitte *umgesetzt* / *abgelehnt (Grund)*.

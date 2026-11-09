@@ -313,3 +313,14 @@ Format: Nr. · Datum · Entscheid · Alternativen · Begründung · Quelle · St
   Kaltweiss (deckend, Lichtweg 4.0 mm) bzw. PETG natur (HDT 64 °C < 65-°C-Prüfung).
 - **PROTOTYP-PRÜFUNG:** Haftung UHU auf ASA, Dichtheit Fensterfuge, LED-Sichtbarkeit durch 4 mm Natural.
 - **Status:** gültig.
+
+### D-034 · 2026-11-09 · Batteriefachschraube verliersicher statt unverlierbar (Orchestrator, nach Sicherheit ohne Veto)
+- **Entscheid:** REQ-SAF-CC-04 neu formuliert: Schraube M2×3 TX6 (D-032) ist verliersicher in der Hülse (Furchlippe;
+  angezogen 3.5 Gänge, Herausfallen erst nach ≈ 7.5 Umdrehungen), nicht konstruktiv unverlierbar. Auflagen SR-1 (M-D5/ST-K8:
+  kopfüber hält, ≥ 2 Umdrehungen Reserve, auch nach 50 Wechseln), SR-2 (Abzugskraft Hülse ohne Schraube, Massstab 72 N),
+  SR-3/SR-4 (Anleitung, Einkaufsliste – umgesetzt).
+- **Alternativen:** Sicherungsscheibe (kein Platz), Lippe versetzen (weniger Reserve), M2×4 (verworfen V-K), Taillenschaft
+  (Quelle offen → Serie/Rev D).
+- **Quelle:** `docs/reviews/phase6_sicherheit_schluss.md` Abschnitt „REQ-SAF-CC-04 Schraube“; UL 4200A-Auszug (Intertek)
+  noch lokal abzulegen.
+- **Status:** gültig für Muster und Kleinserie.
