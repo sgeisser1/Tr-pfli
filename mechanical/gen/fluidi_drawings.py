@@ -356,10 +356,11 @@ def d_fenster(S):
         l.dim((0, 0, 43.0), (0, D_['BOSS_Y1'], D_['ZC']), 'h', l.bottom(2), 'Lichtschaft Ende', k, frame=True)
         l.dim((0, 2.5, D_['ZC'] - D_['BOSS_D'] / 2), (0, 2.5, D_['ZC'] + D_['BOSS_D'] / 2), 'v', l.right(1), 'Lichtschaft', k, pre='Ø', frame=True)
     small(S, 'Fenster_transluzent', 'FL-S-04', 'FL-S-04_fenster_tropfen', 'Lichtfenster Tropfen (Sensor)',
-          'Diffusor + Lichtschaft vor D1, LED-Abstand 2.0 mm', 'ASA natur transluzent (PETG nur mit Nachweis REQ-MECH-12)', 10,
+          'Diffusor + Lichtschaft vor D1, LED-Abstand 2.0 mm', 'Polymaker ASA Natural PF01006 (PRINT_SETTINGS Kap. 1)', 10,
           'Tropfenfläche auf dem Bett (matt = Diffusor), Schaft nach oben, 0.12 mm',
           [('f', 'front', None, (70, 145), 'Vorderansicht'), ('l', 'left', (0, 0, 0), (165, 145), 'A–A')], dims,
-          notes=['6  Kleben in Kappe FL-S-02 (Spalt 0.1 je Seite), Klebstoff nicht auf die Sichtfläche (PRINT_SETTINGS Kap. 5).'])
+          notes=['6  Kleben in Kappe FL-S-02 mit UHU plus endfest 300 (Spalt 0.1 je Seite), Klebstoff nur auf Tropfenrand und Schaftmantel,',
+                 '   nicht auf Sichtfläche und Schaft-Stirnfläche (PRINT_SETTINGS Kap. 5, MONTAGE_SENSOR Kap. 3).'])
 
 
 def d_taste(S):
@@ -488,7 +489,7 @@ ASM = [  # (Pos, Schluessel FCStd oder STEP-Gruppe, Menge, Benennung, Sachnummer
     (1, 'Kappe_blau', '1', 'Kappe blau', 'FL-S-02', 'ASA hellblau', (45, 1.4), 'A'),
     (2, 'Huelse_grau', '1', 'Hülse grau', 'FL-S-01', 'ASA warmgrau', (135, 1.4), 'A'),
     (3, 'Kragen', '1', 'Kragen', 'FL-S-03', 'ASA', (45, 0.8), 'A'),
-    (4, 'Fenster_transluzent', '1', 'Lichtfenster Tropfen', 'FL-S-04', 'ASA natur transluzent, geklebt', (135, 0.6), 'A'),
+    (4, 'Fenster_transluzent', '1', 'Lichtfenster Tropfen', 'FL-S-04', 'Polymaker ASA Natural, geklebt', (135, 0.6), 'A'),
     (5, 'Taste_blau', '1', 'Taste', 'FL-S-05', 'ASA hellblau', (135, 0.6), 'B'),
     (6, 'Klemmring', '1', 'Klemmring', 'FL-S-06', 'ASA hellblau', (45, 0.5), 'B'),
     (7, 'Tastenteller', '1', 'Tastenteller', 'FL-S-07', 'ASA hellblau', (135, 0.4), 'B'),
@@ -503,7 +504,7 @@ ASM = [  # (Pos, Schluessel FCStd oder STEP-Gruppe, Menge, Benennung, Sachnummer
     (16, '_pcb', '1', 'Platine fluidi_sensor Rev C, bestückt', 'hardware/sensor (JLC)', 'FR4 4 L 1.6, inkl. XBT1 Keystone 3034', (45, 0.45), 'A'),
     (17, '_cell', '1', 'Knopfzelle CR2032', 'Panasonic CR2032', 'Panasonic_CR2032_Datasheet_2026-02.pdf', (135, 0.45), 'A'),
 ]
-AIDS = 'Hilfsmittel (nicht im Produkt): Distanzlehre FL-S-10 (2 Stk.), Silikonfett O-Ringe, Klebstoff Fenster (Typ ANNAHME), Kapton-Punkt'
+AIDS = 'Hilfsmittel (nicht im Produkt): Distanzlehre FL-S-10 (2 Stk.), Silikonfett O-Ringe, Fensterkleber UHU plus endfest 300, Kapton-Punkt'
 
 
 def load_pcb_step():
@@ -706,7 +707,7 @@ def d_fenster_gw(GN, GS):
     f = Part.read(os.path.join(REPO, 'mechanical', 'gateway_pi', 'print', 'fenster_tropfen_gw.step'))
     f = f.Solids[0]
     sh = Sheet('A4', 'FL-G-03', 'Gateway – Lichtfenster Tropfen', 'Diffusor vor der LED-Platine, auf der 45°-Facette eingeklebt',
-               'ASA natur transluzent', '10:1', 'Aussenfläche auf dem Bett (wie exportiert), 0.12 mm', STAND,
+               'Polymaker ASA Natural PF01006', '10:1', 'Aussenfläche auf dem Bett (wie exportiert), 0.12 mm', STAND,
                'mechanical/gateway_pi/print/fenster_tropfen_gw.step (Druckausrichtung)  <-  fluidi_gateway_pi.py', NOTE_COMMON, date=DATE)
     tp = View(sh, f, 'top', 10.0).place(80, 140).draw('Draufsicht (Druckausrichtung)', 7)
     fr = View(sh, f, 'front', 10.0).place(190, 140).draw('Vorderansicht', 7)

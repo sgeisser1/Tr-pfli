@@ -304,3 +304,12 @@ Format: Nr. · Datum · Entscheid · Alternativen · Begründung · Quelle · St
 - **Gateway-Klimakammer:** Bodenschiene + Deckelrippe für SEN0428 (D-029), RTC-Platzhalter entfernt (D-028).
 - **Quelle:** `mechanical/gateway_pi/check_gateway_pi.txt`, `mechanical/drawings/drawings_check.txt` (182 Masse, 0 Fehler).
 - **Status:** gültig, Prüfung in der Phase-6-Prüfrunde.
+
+### D-033 · 2026-11-09 · LED-Fenster: Kleber und Material (Orchestrator)
+- **Kleber:** UHU plus endfest 300 (opak zulässig: Klebefuge nicht im Lichtweg, CAD `fluidi_sensor.py` Fenster).
+  Härter ätzend (H314/H318, SDB V62 PDF S. 14) → Schutz nach MONTAGE Kap. 3a gilt auch beim Kleben.
+  ER2223 abgelehnt (gemischt schwarz, 800 mPa·s kriecht in die 0.1-mm-Fuge).
+- **Fenster:** Polymaker ASA Natural PF01006 (3djake.ch; TDS V6.0 S. 1: HDT 100 °C @ 1.8 MPa) statt eSun ASA+
+  Kaltweiss (deckend, Lichtweg 4.0 mm) bzw. PETG natur (HDT 64 °C < 65-°C-Prüfung).
+- **PROTOTYP-PRÜFUNG:** Haftung UHU auf ASA, Dichtheit Fensterfuge, LED-Sichtbarkeit durch 4 mm Natural.
+- **Status:** gültig.

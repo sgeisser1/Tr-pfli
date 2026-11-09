@@ -19,7 +19,7 @@ sondern die Projektleitung fragen.
 |---|---|---|
 | O-1 | **Vergussmasse** (Kragen, Schott): Epoxid 2K, mineralisch gefüllt, Tg ≥ 80 °C, niedriger CTE, *ein* Material für den ganzen Kragen (K-4, Wortlaut gilt bis zum Entscheid D-030) | **Vorschlag Electrolube ER2223** (Tg 140 °C laut TDS, Härtebedingung unbekannt; ungefüllt **ANNAHME**; `docs/concepts/vergussmasse_versiegelung.md`, INDEX.csv EP-K). **Abweichung von K-4** („gefüllt, niedriger CTE“): Sicherheit kein Veto, zulässig unter Auflagen A-1 … A-5 (`docs/reviews/phase6_vergussmasse_sicherheit.md`). **Freigabe D-030 offen.** Vor dem ersten Beutel (auch Vorversuche V-1 … V-3): SDB Teil B in DE/EN/FR/IT liegt vor (Kap. 3a). Bis zur Freigabe **kein Verguss an Mustern**. Ohne Datenblatt und SDB keine andere Masse verwenden. |
 | O-2 | **Kantenversiegelung der Sonde** (REQ-MECH-07) | **Vorschlag:** ER2223 nur auf Schnittkante und Spitze, Flächen frei (Kap. 5a; Feldsimulation `simulation/field/results/coat_epoxy.txt`). Freigabe wie O-1 |
-| O-3 | Klebstoff Lichtfenster | **ANNAHME** transparentes 2K-Epoxid oder UV-Kleber (PRINT_SETTINGS Kap. 5) |
+| O-3 | Klebstoff Lichtfenster | **Vorschlag Mechanik (2026-11-09): UHU plus endfest 300** (2K-Epoxid, Tuben 33 g, INDEX MAT-ADH1). Transparenz nicht nötig: Klebstoff nur im Spalt 0.1 mm an Tropfenrand und Schaftmantel, nicht im Lichtweg (PRINT_SETTINGS Kap. 5). Haftung auf ASA im TDS nicht belegt → **PROTOTYP-PRÜFUNG** Klebeprobe und Dichtheit nach 7 d 65 °C. **Härter ätzend (H314/H318)**, Schutzmassnahmen Kap. 3 Schritt 1. Freigabe Orchestrator offen |
 | O-4 | Klemmring (Pos. 6): **Presssitz** 0.05 je Seite in der Senkung Ø 6.4, Schürze verpresst die Membran um 0.1 mm (20 %) – Phase 5 R3-W2 (`check_sensor.txt` 2e) | Auszugskraft und Dichtheit am Muster: PROTOTYP-PRÜFUNG ST-W6 (a), M-W3; Klebung nur, wenn ein Kleber mit Datenblatt gewählt ist |
 | O-5 | Tastermechanik (P5-M2, Runde 2): 60°-Keil am Finger auf einer Nase der Zunge in Höhe SW1, Führungsrippe und D-Bohrung gegen Verdrehen. SW1 schaltet im CAD nominal bei 0.3 mm Tastenhub, worst bei 0.65 mm (Reserve +0.17); Tastenkraft nominal ≈ 8 N, worst ≈ 12 N (+ Membran, μ 0.3 ANNAHME) (`check_sensor.txt` 2a–2e) | **Überlast:** nach dem Schalten trägt SW1 die Tastenkraft; bei 20 N und μ ≥ 0.3 Zunge SF ≥ 1.15, bei kleinerer Reibung < 1 → PROTOTYP-PRÜFUNG M-T2; Taste nicht mit Kraft drücken |
 | O-6 | Anzugsmoment Schraube M2 × 3 in ASA/Mutter | nicht festgelegt; „handfest mit TX6“ (**ANNAHME**), am Muster prüfen (ST-K1) |
@@ -37,6 +37,7 @@ Teile: Pos. 1–17 laut Stückliste FL-S-00 (gedruckt nach `PRINT_SETTINGS.md`, 
 | Isopropanol (**leicht entzündlich**: keine offene Flamme, Lötkolben aus, lüften), fusselfreie Tücher | Flussmittelreste im Kragenbereich entfernen (K-5) |
 | 600er Schleifpapier | FDM-Naht auf den O-Ring-Gleitflächen der Hülse glätten (PRINT_SETTINGS Kap. 5) |
 | Silikonfett | O-Ringe (Pos. 11) |
+| Fensterkleber **UHU plus endfest 300** (Tuben Binder + Härter 33 g, O-3), SDB Binder und Härter ausgedruckt am Arbeitsplatz; Zahnstocher, PE-Folie (Gefrierbeutel), 120er Schleifpapier, Mischunterlage (PE-Deckel) | Lichtfenster (Pos. 4) in die Kappe kleben (Kap. 3 Schritt 1) |
 | Kapton-Punkt (Ø ≈ 3 mm) | Gewinde der Mutter vor Epoxid schützen (PCB_OUTLINE Kap. 7) |
 | Dosierspritzen + Kanülen, Mischbecher, Spatel, **Waage 0.01 g** | Verguss (Mengen siehe Kap. 4/5), Variante M-A (Kap. 3a) |
 | Vergussmasse **Electrolube ER2223, Resin Pack 250 g** (Vorschlag O-1), TDS und SDB A/B (**B in DE/EN/FR/IT**, Kap. 3a) ausgedruckt am Arbeitsplatz | Schott, Kragen, Sondenkanten (Kap. 3a) |
@@ -67,6 +68,25 @@ Geometrie.
 
 1. **Lichtfenster (Pos. 4)** von aussen in den Tropfenausschnitt kleben, Lichtschaft nach innen (Spalt 0.1 je Seite).
    Klebstoff nur auf den Rand, nicht auf die Sichtfläche und nicht in den Innenraum (O-3).
+   - **Schutz (UHU plus endfest 300):** Der **Härter ist ätzend** (SDB Härter V35, PDF S. 14: H314, H318, H317, Signalwort
+     „Gefahr“), der Binder reizend und sensibilisierend (SDB Binder V62, S. 1–2: H315, H317, H319, H411, EUH205). Darum gilt
+     dieselbe Grundausrüstung wie Kap. 3a: Nitrilhandschuhe **> 0.12 mm** (SDB Härter PDF S. 18; zwei Paar übereinander),
+     **dicht schliessende Schutzbrille**, Augenspülflasche bereit, gelüfteter Raum, keine Kinder/Haustiere im Raum, Tuben nach
+     Gebrauch sofort verschliessen und wie Kap. 3a unter Verschluss lagern. Hände mit Wasser und Seife, **nie mit Lösungsmittel**
+     reinigen (TDS S. 5). Erste Hilfe wie Kap. 3a (Augen ≥ 15 min spülen, Arzt; SDB Härter PDF S. 15: P305+P351+P338,
+     P301+P330+P331), Tox Info Suisse 145. Flüssige Reste und angebrochene Tuben nicht in Hausmüll oder Abfluss (SDB Binder
+     S. 9, Abschn. 13) → Sammelstelle Sonderabfälle; Mischreste auf der Unterlage aushärten lassen, dann wie Kap. 3a
+     (**ANNAHME**).
+   - Klebeflächen (Tropfenrand und Schaftmantel am Fenster, Wand des Tropfenausschnitts und der Bohrung Ø 3.2 in der Kappe) mit
+     120er Papier leicht anrauen, mit Isopropanol entfetten, ablüften. **Kein Aceton** (löst ASA an, **ANNAHME**).
+   - Gleich lange Stränge Binder und Härter (1 : 1 Volumen, TDS S. 5) auf der PE-Unterlage gut mischen (gleichmässige Farbe),
+     Raum ≥ 18 °C (TDS S. 2). Mit dem Zahnstocher eine **dünne** Schicht nur auf den Tropfenrand des Fensters und rundum auf den
+     Schaftmantel (nicht auf die Schaft-Stirnfläche = Lichteintritt) auftragen; Topfzeit ≈ 90 min (TDS S. 1).
+   - Kappe mit der Front nach unten auf PE-Folie legen (UHU haftet nicht auf PE, TDS S. 1), Fenster von aussen einsetzen → Sichtfläche
+     bündig und sauber. Ausgetretenen Kleber innen an der Schaft-Stirnfläche mit Zahnstocher entfernen; die Fuge muss rundum
+     geschlossen sein (Dichtlinie).
+   - Liegend aushärten: ≥ 24 h bei Raumtemperatur (Endfestigkeit, TDS S. 1), danach erst Kap. 3 Schritt 2 ff. Optional
+     45 min bei 70 °C (TDS S. 2) im Wärmeschrank – unbelastet unter der HDT der Kappe (Bambu ASA 92 °C bei 1.8 MPa).
 2. **Stössel (Pos. 8)** von unten in die D-Bohrung des Führungsrohrs stecken (D-Fläche nach vorne, passt nur so),
    Finger links zwischen Führungsrippe (vorne) und Zungennase (hinten).
 3. **Membran (Pos. 10)** flach auf den Grund der Senkung Ø 6.4 legen.
@@ -76,7 +96,9 @@ Geometrie.
 
 **Prüfung 3:** Taste federt zurück (Membran), Stössel gleitet ohne Klemmen und lässt sich **nicht verdrehen** (C-1).
 Membran rundum unter dem Klemmring geklemmt, Klemmring sitzt bündig und fest (R3-W2). Ohne Platine: beim Drücken bewegt
-sich die Zunge sichtbar nach hinten (Nase), in Ruhe ist sie nicht vorgespannt. Fenster bündig, keine Kleberspuren.
+sich die Zunge sichtbar nach hinten (Nase), in Ruhe ist sie nicht vorgespannt. Fenster bündig, keine Kleberspuren auf
+Sichtfläche und Schaft-Stirnfläche, Klebefuge aussen rundum geschlossen (Lupe); gegen eine Taschenlampe von innen
+leuchtet der Tropfen gleichmässig.
 
 ## 3a Vergussmasse: Schutzmassnahmen, Sitzungsplan, Mischen, Aushärten (gilt für Kap. 4, 5, 5a)
 

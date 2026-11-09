@@ -628,7 +628,7 @@ PRINT = {  # Teil: (Datei, Rotationen in Druckausrichtung, Material)
     'Huelse_grau': ('huelse_grau', [], 'ASA Warmgrau hell'),
     'Kappe_blau': ('kappe_blau', [((1, 0, 0), 180)], 'ASA Hellblau'),
     'Kragen': ('kragen', [], 'ASA (Rest, beliebig)'),
-    'Fenster_transluzent': ('fenster_tropfen', [((1, 0, 0), 90)], 'ASA/PETG natur transluzent'),
+    'Fenster_transluzent': ('fenster_tropfen', [((1, 0, 0), 90)], 'Polymaker ASA Natural (PF01006)'),
     'Taste_blau': ('taste_blau', [((1, 0, 0), 180)], 'ASA Hellblau'),
     'Tastenteller': ('tastenteller', [], 'ASA Hellblau'),
     'Klemmring': ('klemmring', [((1, 0, 0), 180)], 'ASA Hellblau'),

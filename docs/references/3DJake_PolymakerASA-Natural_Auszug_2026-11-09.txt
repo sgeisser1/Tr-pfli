@@ -1,0 +1,18 @@
+Quelle: 3djake.ch (niceshops GmbH), Produktseite Polymaker ASA Natural und Versandkosten Schweiz; TDS-Link der Produktseite
+Abgerufen: 2026-11-09 mit curl (User-Agent Browser), Textauszug (Tags entfernt), gekuerzt; sha256 des Roh-HTML
+Verwendung: docs/manuals/EINKAUFSLISTE.csv S11, docs/datasheets/INDEX.csv MAT-WIN2, mechanical/PRINT_SETTINGS.md Kap. 1
+======================================================================
+
+### URL: https://www.3djake.ch/de-CH/polymaker/polymaker-asa-natur
+sha256 Roh-HTML: 4b4be31998ac8ba641fc3893ab3a5cdf8cba64a15dd6bb94815d7e0bd0e34ce9
+Polymaker ASA Natural CHF 23.75 CHF 33.00 -28% ( CHF 23.75 / kg , inkl. 8,1% MwSt. - zzgl. Versand ) Farbe: Polymaker ASA White UV- & witterungsbeständiges ASA Filament für den Außeneinsatz in White CHF 23.75 CHF 33.00 (CHF 23.75 / kg) 4.9 (10) Polymaker ASA N
+ung: 1,75 mm / 1000 g 1,75 mm / 1000 g CHF 23.75 CHF 33.00 (CHF 23.75 / kg) 1,75 mm / 3000 g CHF 90.50 (CHF 30.17 / kg) Noch 1 Stück auf Lager Zustellung bis Dienstag, 17. November , wenn du bis Mittwoch um 23:59 Uhr bestellst. Von diesem Artikel ist nur noch 1 Stück in unserem Lager. Nachschub ist unterwegs! Falls mehr bestellt wird, könnte dies das Zustelldatum beeinflussen. Schweiz: Kostenloser Standardversand ab CHF 69.90 Weitere Infos zu Ver
+Produktinformationen & technische Daten: Art.-Nr.: PM-PF01006 Inhalt: 1.000 g EAN: 6938936709992 Hersteller-Nr.: PF01006 Marken (Hersteller): Polymaker Durchmesser: 1,75 mm Produktarten: ASA Filament Farbe: Natur Kompatibilität: Bambu Lab AMS* System: Spule Empf. Drucktemperatur: 240 - 260 °C Empf. Heizbetttemperatur: 75 - 95 °C Beschreibung Das Polymaker™ ASA ist der Nachfolger von PolyLite ASA . Das Material und seine Eigenschaften haben sich nicht geändert. Beachte, dass es passieren kann, dass du während der Namensumstellung die alte PolyLite ASA-Verpackung erhältst. Das Polymaker™ ASA ist ein leistungsstarkes technisches Filament auf ASA-Basis, das speziell als Weiterentwicklung von ABS konzipiert wurde. Es überzeugt durch eine hohe UV- und Witterungsbeständigkeit und eignet sich damit ideal für Bauteile, die dauerhaft im Außenbereich eingesetzt werden. Im Vergleich zu ABS bietet ASA eine deutlich bessere Beständigkeit gegenüber Sonneneinstrahlung, Feuchtigkeit und Temperaturschwankungen, ohne dabei auf stabile mechanische Eigenschaften zu verzichten. Die Verarbeitung des Polymaker™ ASA erfolgt ähnlich wie bei ABS: Mit einem geschlossenen Bauraum lassen sich Verzug und Temperaturunterschiede minimieren, wodurch saubere und zuverlässige Druckergebnisse erzielt werden. ► Eigenschaften des Polymaker™ ASA im Überblick: hohe UV- und Witterungsbeständigkeit, ideal für Außenanwen
+Downloads Technical Data Sheet_Polymaker ASA (515,68 KB) Videos zum Produkt PolyLite ASA Gesetzliche Gewährleistung & He
+TDS-Link (Roh-HTML): https://3d.nice-cdn.com/upload/file/TDS_Polymaker_ASA-V6.0_2025-12-02_EN.pdf
+  -> md5 d64676152f8d594624dcd0fbea014404, identisch mit Polymaker-Wiki-Link cdn.shopify.com/.../PolyLite_ASA_TDS_EN_V5.4.pdf (Inhalt V6.0)
+  -> lokal: docs/references/Polymaker_ASA_TDS_V6.0-2025-12-02.pdf
+
+### URL: https://www.3djake.ch/de-CH/hilfe/versandkosten
+sha256 Roh-HTML: 1ea895679f3b770fe8c66ff81d8c1c69627d701b15cab23ee12cf9ed01b9823a
+Versandkosten für Schweiz ab CHF 69.90 kostenlos* ab CHF 0.00 CHF 8.90 * Diese Lieferkosten fallen bei einem Standard-Versand an. Es können weitere Kosten, z. B. aufgrund des Gewichts, Größe oder Eigenschaften der Produkte, entstehen. Diese Informationen findest du direkt in der Produktbeschreibung. Hilfe & Support Meine Bestell

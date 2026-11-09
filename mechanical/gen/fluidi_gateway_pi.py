@@ -532,7 +532,7 @@ def checks(S):
 PRINT = {'Wanne_grau': ('wanne_grau', [], 'ASA Warmgrau hell'),
          'Wanne_grau_OTG': ('wanne_grau_otg', [], 'ASA Warmgrau hell (Variante mit OTG-Ausschnitt)'),
          'Deckel_blau': ('deckel_blau', [((1, 0, 0), 180)], 'ASA Hellblau'),
-         'Fenster_transluzent': ('fenster_tropfen_gw', [((1, 0, 0), 135)], 'ASA/PETG natur transluzent')}
+         'Fenster_transluzent': ('fenster_tropfen_gw', [((1, 0, 0), 135)], 'Polymaker ASA Natural (PF01006)')}
 
 COLORS = {'Wanne_grau': '#B9B5AC', 'Deckel_blau': '#59ADDD', 'Fenster_transluzent': '#7CFC9A',
           'Pi_PCB': '#1F6B3A', 'Pi_Bauteile_oben': '#8A8F94', 'Pi_Bauteile_unten': '#5E6A60', 'microSD_Karte': '#202020',

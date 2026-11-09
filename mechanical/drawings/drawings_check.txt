@@ -1,6 +1,6 @@
 fluidi Fertigungszeichnungen - Pruefprotokoll der Masse (erzeugt von mechanical/gen/fluidi_drawings.py, 2026-11-09)
-Generator-SHA256 (fluidi_params, fluidi_cadlib, fluidi_sensor, fluidi_gateway_pi, fluidi_drawings, fluidi_drawing_lib): b57d75e10d
-Stand: Rev C, V-K/M-4, P5-M1..M3 R2; Generator-SHA256 b57d75e10d (git-Basis fe383b1+)
+Generator-SHA256 (fluidi_params, fluidi_cadlib, fluidi_sensor, fluidi_gateway_pi, fluidi_drawings, fluidi_drawing_lib): b05118d32d
+Stand: Rev C, V-K/M-4, P5-M1..M3 R2; Generator-SHA256 b05118d32d (git-Basis 1dab168+)
 Jede Masszahl ist der Abstand zweier Modellpunkte; Spalte "max d" = groesster Abstand der Messpunkte zur
 Geometrie des Teils (Soll < 0.005 mm, sonst FEHLER).
 

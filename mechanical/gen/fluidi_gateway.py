@@ -213,7 +213,7 @@ def checks(S):
 
 PRINT = {'Wanne_grau': ('wanne_grau', [], 'ASA Warmgrau hell'),
          'Deckel_blau': ('deckel_blau', [((1, 0, 0), 180)], 'ASA Hellblau'),
-         'Fenster_transluzent': ('fenster_tropfen_gw', [((1, 0, 0), 135)], 'ASA/PETG natur transluzent')}
+         'Fenster_transluzent': ('fenster_tropfen_gw', [((1, 0, 0), 135)], 'Polymaker ASA Natural (PF01006)')}
 
 
 def main():

@@ -1,7 +1,8 @@
 # fluidi – Druckeinstellungen Sensor P3 und Gateway G1 v3 (Bambu Lab P1S)
 
 Stand 2026-11-07, Phase 4b Welle 1; Phase 6 (2026-11-09): Werkstoff-Alternative eSun ASA+ (Kap. 1/2), Gateway-Klimamodul
-SEN0428 (D-029), RTC gestrichen (D-028), Gewindeeinsatz Ø4.6 (Kap. 3–5), Batteriefachschraube TX6. Druckdateien werden von den Generatoren erzeugt und liegen bereits in
+SEN0428 (D-029), RTC gestrichen (D-028), Gewindeeinsatz Ø4.6 (Kap. 3–5), Batteriefachschraube TX6; Lichtfenster
+**Polymaker ASA Natural** und Fensterkleber **UHU plus endfest 300** (Kap. 1, 2, 5; Vorschlag Mechanik 2026-11-09). Druckdateien werden von den Generatoren erzeugt und liegen bereits in
 **Druckausrichtung** (auf z = 0, mittig):
 
 ```
@@ -17,9 +18,9 @@ freecadcmd mechanical/gen/fluidi_gateway.py          # mechanical/gateway/print/
 | Gehäuse (alle tragenden Teile) | **Bambu ASA** (UV- und feuchtebeständig, kein PLA) | `docs/references/BambuLab_ASA_TechnicalDataSheet_V2.0.pdf` S.1–2: HDT **92 °C** (ISO 75, 1.8 MPa) / 100 °C (0.45 MPa), Vicat 106 °C, E 2450 MPa (XY) / 2120 MPa (Z), Zugfestigkeit 52 / 35 MPa (XY / Z) → REQ-MECH-12 (HDT ≥ 80 °C) **erfüllt** |
 | Alternative (Phase 6, nur wenn Bambu ASA fehlt) | **eSun ASA+** (bastelgarage.ch Blau 424238 / Kaltweiss 424234 lagernd, Grau 424233 ausverkauft, 2026-11-09) – **bedingt gleichwertig**, siehe unten | `docs/references/eSUN_ASAplus_TDS_V1.0-2024-06.pdf` S. 1: HDT **95.5 °C (GB/T 1634, 0.45 MPa)**, kein 1.8-MPa-Wert; Zug 35.7 MPa, Biegemodul 2364 MPa, Izod 14.9 kJ/m² (spritzgegossene Proben); S. 2: Düse 250–280 °C, Bett 100–110 °C, Lüfter 10–50 %, **auf Bambu P1S 0.4 mm ermittelt** |
 | Farben | Hülse/Wanne Warmgrau hell #B9B5AC, Kappe/Taste/Deckel Hellblau (D-010/D-011) | Filamentton nach Musterdruck wählen (P3_FLUIDI.md Kap. 6). **Pigment ohne Russ/Metall** im Antennenbereich (Kappe, Deckel) – **ANNAHME**, beim Filamentkauf prüfen (Elektronikbericht 2.4 Pkt. 3) |
-| Lichtfenster | transluzentes, mattes Filament **natur**, ≥ 1 mm (Diffusor) | bevorzugt ASA natur/transluzent (**ANNAHME** Verfügbarkeit). PETG transluzent nur mit Nachweis (REQ-MECH-12): 7 d bei 65 °C ohne Verformung und Klebefuge dicht (PROTOTYP-PRÜFUNG) |
+| Lichtfenster | **Polymaker ASA Natural** (PF01006, 1.75 mm, 3djake.ch PM-PF01006), unpigmentiert, Aussenfläche matt (Diffusor). Lichtweg im Fenster massiv: Tropfen 1.6 + Lichtschaft Ø 3.0 × 2.4 = **4.0 mm** (Sensor), Platte 1.6 (Gateway) | `docs/references/Polymaker_ASA_TDS_V6.0-2025-12-02.pdf` S. 1: HDT **100 °C (ISO 75, 1.8 MPa)** / 103 °C (0.45 MPa), Vicat 105 °C, Tg 98 °C → REQ-MECH-12 **erfüllt**; Lichttransmission im TDS „N/A“ → Durchlässigkeit **ANNAHME** (unpigmentiert = milchig-transluzent), PROTOTYP-PRÜFUNG LED-Sichtbarkeit. **Nicht** PETG natur (HDT 64 °C laut Händlern, kein TDS) und **nicht** eSun ASA+ Kaltweiss (TiO₂-weiss deckend, 4 mm massiver Lichtweg; nur als Notlösung mit hohlem Lichtschaft, nicht konstruiert) |
 | Kragen, Stössel, Schottkeil, Lehren | ASA, Farbe beliebig (Reste) | im Gehäuse unsichtbar |
-| Trocknen | 80 °C, 8 h vor dem Druck, Lagerung < 20 % rF | TDS S.1 (eSun ASA+: TDS „N/A“ → gleich wie Bambu ASA, **ANNAHME**) |
+| Trocknen | 80 °C, 8 h vor dem Druck, Lagerung < 20 % rF; Polymaker ASA Natural **70 °C, 7 h** | TDS S.1 (eSun ASA+: TDS „N/A“ → gleich wie Bambu ASA, **ANNAHME**); Polymaker-TDS S. 1 |
 
 **Bewertung eSun ASA+ gegen Bambu ASA (Phase 6):**
 - **Wärme (REQ-MECH-12):** 95.5 °C bei 0.45 MPa ≥ 80 °C → erfüllt laut Datenblatt. Vergleich bei gleicher Last: Bambu 100 °C,
@@ -46,6 +47,12 @@ freecadcmd mechanical/gen/fluidi_gateway.py          # mechanical/gateway/print/
 Für **eSun ASA+** (Kap. 1, Alternative) gelten dieselben Werte ausser: Filamentprofil „Generic ASA“, Düse **270 °C**
 (erste Schicht 275 °C), Bett **100 °C**, Bauteillüfter 10 % (max. 30 %), Flussrate und Pressure Advance mit der
 Kalibrierung von Bambu Studio für die Rolle bestimmen (eSun-TDS S. 2: 250–280 / 100–110 °C / 10–50 %).
+
+Für das **Lichtfenster aus Polymaker ASA Natural** (Kap. 1): Filamentprofil „Generic ASA“, Düse **260 °C** (erste Schicht
+260 °C), Bett **90 °C**, Bauteillüfter **aus** (Polymaker-TDS S. 1: Düse 230–260 °C, Bett 75–95 °C, Lüfter OFF, geschlossener
+Bauraum, Prüfkörper bei 260/90 °C), Schicht 0.12 mm, 100 % Füllung (Fenster ist ohnehin massiv). Wegen der kurzen
+Schichtzeit **6–10 Fenster** mit ≥ 10 mm Abstand auf einer Platte drucken (Schichtzeit ≥ 10 s ohne Lüfter). Eigener Druckauftrag,
+keine Mischung mit farbigem Filament im selben Teil (Farbverschleppung trübt das Fenster).
 
 
 | Parameter | Wert | Bemerkung |
@@ -76,7 +83,7 @@ Kalibrierung von Bambu Studio für die Rolle bestimmen (eSun-TDS S. 2: 250–280
 | `huelse_grau` | Hülse | Warmgrau | stehend, Boden auf dem Bett | Logo-Relief 0.25 auf senkrechter Wand (19.4 mm); Warnsymbol innen vertieft 0.3; Kerbe oben offen; 4 Ablaufschlitze 3 × 1.2 hinten (Brücke 3 mm); Furchlippe Ø 1.7 in den ersten 3 Schichten; Höhe 44.7 | 7.5 |
 | `kappe_blau` | Kappe mit Zapfen, Schott, Biegezunge | Hellblau | **kopfüber** (Decke auf dem Bett) | Tastentasche im Bett; Schott = Brücke 5.5 mm; O-Ring-Nut-Flanke 1.35 mm Überhang (ohne Stütze druckbar, Probedruck); Zunge 0.6 mm (P5-M2, 1–2 Bahnen, Arachne) mit Nase; **Nasen-Oberseite 30° zur Waagrechten = kopfüber 60° Überhang auf 1.2 mm** (ohne Stütze, Probedruck; hängt sie durch, Fläche mit 600er nacharbeiten); Führungsrippe vor dem Finger; D-Bohrung Stössel; Boden unter dem Membransitz 0.8 (Sektor zur Platine 0.3, W-1); Ablaufstufe am Zapfen = 0.5 mm Überhang (kopfüber ohne Stütze); dünnste Zapfenwand 0.54 mm hinter den hinteren Nutecken; **Phase 5: 45°-Trichter verbindet Zapfen und Kappenwand (P5-M1, vorher 2 getrennte Körper), Mantel 0.8 um die Membran-Senkung (P5-M3)**; Massbild `mechanical/drawings/FL-S-02_kappe_blau.pdf` | 4.7 |
 | `kragen` | Kragen (Vergussform) | beliebig | stehend | Mutterntasche von vorne = Brücke 4.6 mm; Nutflanke 1.35 mm | 0.8 |
-| `fenster_tropfen` | Lichtfenster Sensor | natur transluzent | Tropfenfläche auf dem Bett, Schaft nach oben | Aussenfläche matt (Bettstruktur Engineering Plate = Diffusor) | 0.1 |
+| `fenster_tropfen` | Lichtfenster Sensor | Polymaker ASA Natural | Tropfenfläche auf dem Bett, Schaft nach oben | Aussenfläche matt (Bettstruktur Textured PEI oder Engineering Plate = Diffusor; Polymaker-TDS S. 1: PC/Textured PEI) | 0.1 |
 | `taste_blau` | Taste 9 × 6 | Hellblau | Oberseite auf dem Bett | Hals Ø 3.0 | 0.1 |
 | `klemmring` | Klemmring Membran, **Presssitz 0.05 je Seite** in der Senkung, verpresst die Membran 0.1 mm (R3-W2) | Hellblau | Platte auf dem Bett | Rand 0.4; Unterseite der Schürze = Dichtfläche zur Membran (oberste Lage, nicht nacharbeiten) | < 0.1 |
 | `tastenteller` | Teller (auf den Tastenhals gepresst) | Hellblau | flach | 0.4 mm dick = 3 Schichten | < 0.1 |
@@ -93,7 +100,7 @@ ASA pro Sensor ≈ **13 g** (Kopf V4, Rev B; Rev A ≈ 9 g) (≈ CHF 0.25, **ANN
 |---|---|---|---|---|---|
 | `wanne_grau` | Wanne | Warmgrau | Boden auf dem Bett | Bodenschlitze (Lüftung), USB-C-Ausschnitt = Brücke 12 mm, Innenfacette 45° | 10.4 |
 | `deckel_blau` | Deckel mit Facette, Steg, Domen, Lichtschacht | Hellblau | **kopfüber** | Facette = 45°-Überhang; Lichtschacht 45° | 6.8 |
-| `fenster_tropfen_gw` | Lichtfenster Gateway | natur transluzent | Aussenfläche auf dem Bett | | 0.1 |
+| `fenster_tropfen_gw` | Lichtfenster Gateway | Polymaker ASA Natural | Aussenfläche auf dem Bett | | 0.1 |
 
 ### Gateway G1 v4 für Raspberry Pi Zero 2 W (`mechanical/gateway_pi/print/`, D-014)
 
@@ -105,7 +112,7 @@ Aussen 84 × 42 × 20 mm, Profil, Facette, Fuge und Tropfen wie G1 v3; Profil un
 | `wanne_grau` | Wanne mit Pi-Abstandshaltern, Lichtschacht, Trennwand Klimakammer, Bodenschiene Klimamodul (Nut 1.9, 1.0 tief, mit Endanschlägen), Kabelkanal | Warmgrau | Boden auf dem Bett | Senkkopfbohrungen unten (Brücke über Ø 5.4); Micro-USB-Fenster 11.4 × 7.8 (Brücke 11.4); Lichtschacht hängt 45° an der Innenfacette (ohne Stütze, Probedruck); Kabelkanal Ø 3.0 waagrecht; Stirnschlitze 1.2 hoch (Brücken 20 mm); Schienenwände 0.8 (2 Bahnen) | 13.8 |
 | `wanne_grau_otg` | wie oben, zusätzlich Micro-USB-OTG-Fenster (XIAO-Empfänger extern, D-014) | Warmgrau | wie oben | Steg zwischen den Fenstern 1.2 mm | 13.7 |
 | `deckel_blau` | Deckel mit 4 Niederhalterrohren Ø 7.0 / Fuss Ø 5.6 (Einsatz M2.5 Ø 4.6, Bohrung 3.9), Steg, Gegenrippe Klimakammer, Nutrippe Klimamodul (D-028: kein RTC-Rahmen mehr) | Hellblau | **kopfüber** | Facette 45°; vordere Rohre stehen auf der Innenfacette; Rohre an HDMI/Micro-USB/microSD-Halter abgeflacht (0.3 Luft); Steg vorne bewusst weggelassen (sonst nicht senkrecht montierbar) | 10.2 |
-| `fenster_tropfen_gw` | Lichtfenster | natur transluzent | Aussenfläche auf dem Bett | | 0.1 |
+| `fenster_tropfen_gw` | Lichtfenster | Polymaker ASA Natural | Aussenfläche auf dem Bett | | 0.1 |
 
 Montage: 4 Litzen an die Lötaugen des Klimamoduls **DFRobot SEN0428** (D-029) löten (von der Rückseite, Litzen zeigen
 nach −x), Bündel von der Kammer aus durch den Kanal Ø 3.0 (y −2.5) in der Trennwand fädeln, an die Pi-Lötaugen löten
@@ -163,7 +170,18 @@ dreht danach frei (Phase 6: Kaufteil M2 × 3 Linsenkopf **Torx TX6**, Kopf 1.6 h
 ## 5 Nacharbeit und Montage-Hilfsstoffe
 
 - Hülse: Gleitflächen innen (z 2–8, 30–35) glätten, Ablaufschlitze frei halten, Kerbe innen entgraten (O-Ring läuft darüber).
-- Fenster: Aussenseite matt lassen; Kleben mit transparentem 2K-Epoxid oder UV-Kleber (**ANNAHME** Typ, Welle 2), Klebstoff nicht auf die Sichtfläche.
+- Fenster: Aussenseite matt lassen. Kleben mit **UHU plus endfest 300** (2K-Epoxid, `docs/references/UHU_PlusEndfest300_TDS_2012-07.pdf`;
+  Vorschlag Mechanik 2026-11-09, Ablauf und Schutzmassnahmen `docs/manuals/MONTAGE_SENSOR.md` Kap. 3 Schritt 1).
+  **Transparenz ist nicht nötig:** Der Klebstoff sitzt nur im Spalt 0.1 mm am Tropfenrand und am Mantel des Lichtschafts
+  (CAD `fluidi_sensor.py`: Ausschnitt = Tropfen r 2.5, Fenster r 2.4; Bohrung Ø 3.2, Schaft Ø 3.0). Der Lichtweg LED → Schaft-
+  Stirnfläche (y 4.0, 2.0 mm vor der LED) → Schaft → Tropfen-Sichtfläche (y 0) läuft durch das Fenstermaterial, nicht durch die
+  Klebefuge. Sichtbar bleibt aussen nur der 0.1-mm-Fugenring. Ein heller, deckender Kleber reflektiert am Schaftmantel eher
+  zurück als ein schwarzer (ER2223 schwarz, 800 mPa·s, kriecht in 0.1-mm-Spalten auf die Stirnflächen → für das Fenster
+  abgelehnt). UHU: Binder 40 000 / Härter 30 000 mPa·s, „minimales Laufbestreben“ (TDS S. 1/S. 2), −40 … +100 °C (S. 1).
+  **Pflicht:** Schaft-Stirnfläche (Lichteintritt) und Sichtfläche frei von Klebstoff. Klebeflächen anrauen (TDS S. 4: Körnung 100)
+  und mit **Isopropanol** entfetten – **nicht Aceton** (TDS-Empfehlung gilt für Metall; Aceton löst ASA an, **ANNAHME**
+  Werkstoffkenntnis). Das TDS nennt ASA weder geeignet noch ungeeignet (S. 1/S. 5: ungeeignet PE, PP, PTFE, **PS**, Weich-PVC;
+  ASA ist ein Styrol-Copolymer) → Haftung und Dichtheit **PROTOTYP-PRÜFUNG**.
 - O-Ringe mit Silikonfett (Mechanikbericht 2.1), Werkstoff ohne Russ.
 - Gateway: Gewindeeinsätze M2.5 (Ø 4.6 × 4) mit Lötkolben und Einschmelzspitze einsetzen, Temperatur = Drucktemperatur
   + 10–20 °C laut Händler → Bambu ASA **270–280 °C**, eSun ASA+ 280–290 °C. Deckel kopfüber, Einsatz senkrecht ansetzen,

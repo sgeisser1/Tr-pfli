@@ -26,6 +26,8 @@ VERSAND = {
     "pi-shop.ch": (7.90, None, "pi-shop.ch/versandkosten (2026-11-08): B-Post 7.90, A-Post 9.90 "
                    "(docs/references/pi-shop_Gateway-Teile_Auszug_2026-11-08.txt)"),
     "galaxus.ch": (9.90, None, "ANNAHME (Versandseite nicht abrufbar, Bot-Sperre)"),
+    "3djake.ch": (8.90, 69.90, "3djake.ch/de-CH/hilfe/versandkosten (2026-11-09): Standardversand Schweiz 8.90, ab CHF 69.90 "
+                  "gratis (docs/references/3DJake_PolymakerASA-Natural_Auszug_2026-11-09.txt)"),
     "offen (Normteile-/Dichtungs-Fachhandel)": (10.00, None, "ANNAHME (Haendler offen, eine Sammelbestellung S2/S5/S6/G8b/P8)"),
     "offen (Platzhalter)": (0.00, None, "Platzhalter"),
     "Digi-Key CH (laut phase5_gateway_led.md)": (0.00, None, "nicht einzeln bestellen (23 CHF Versand unter 70 CHF, "
