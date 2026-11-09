@@ -127,7 +127,8 @@ def main():
         lcsc_v = ek.VERSAND["LCSC (mit JLC-Bestellung buendeln, ANNAHME)"][0]
         prog = round(sum(r["_sum"] for r in pz) + lcsc_v, 2)
         prog_ann = round(sum(r["_sum"] for r in pz if r["_annahme"]) + lcsc_v, 2)
-        zub_src = "Einkaufsliste V-Z (`docs/manuals/EINKAUFSLISTE.csv`)"
+        zub_src = ("Einkaufsliste V-Z, nur Verbrauchsmaterial; Ausrüstung beim Auftraggeber vorhanden (2026-11-09), "
+                   "`docs/manuals/EINKAUFSLISTE.csv`")
     except (ImportError, OSError, KeyError):
         pass
     sysA = s4["total_chf"] + gw_plan + zub
@@ -259,38 +260,43 @@ def main():
     jlc_p_pre, jlc_s_pre = jlc_cash(pre["proto"]), jlc_cash(pre["serie4"])
     bt1_chf = BT1_VORRAT[0] * BT1_VORRAT[1] * fx() * (1 + cm.CH_VAT)
     dum_lo, dum_hi = dummy_chf()
-    ek_ware = ek_vers = ek_ann = None
+    sm = None
     try:
         import einkaufsliste as ek
-        ek_rows = ek.load()
-        hs = ek.haendler(ek_rows)
-        ek_ware = round(sum(h["ware"] for h in hs), 2)
-        ek_vers = round(sum(h["vers"] for h in hs), 2)
-        ek_ann = round(sum(r["_sum"] for r in ek_rows if r["_annahme"] and r["Status"] not in ek.NICHT_SUMMIEREN), 2)
-    except (ImportError, OSError, KeyError):
+        sm = ek.summen(ek.load())
+    except (ImportError, OSError, KeyError, AttributeError):
         pass
-    if ek_ware is not None:
-        kasse = jlc_p + jlc_s + bt1_chf + dum_hi + ek_ware + ek_vers
-        kasse_pre = jlc_p_pre + jlc_s_pre + bt1_chf + dum_hi + ek_ware + ek_vers
-        w("## 4a Kassenbedarf gesamt (alle Rechnungen; Red Team Phase 6 W-2)\n\n")
-        w("Kap. 4 ist eine Kostenzuordnung (Grenz- und Einmalkosten). Bar bezahlt werden dagegen ganze Packungen, Versand und "
-          "Testzellen. Prototyp-Los und Serie, Gateway, Verguss, Zubehör, Programmieradapter und Werkstatt stehen vollständig in "
-          "der Einkaufsliste. Die Verguss-Beutel sind nur dort gezählt, nicht in den JLC-Rechnungen.\n\n")
-        w("| Rechnung | ohne Pre-reflow CHF | mit Pre-reflow CHF |\n|---|---|---|\n")
-        w(f"| JLC Prototyp (Ware + MWST + Verzollung DHL) | {jlc_p:.2f} | {jlc_p_pre:.2f} |\n")
-        w(f"| JLC Serie (Ware + MWST + Verzollung DHL) | {jlc_s:.2f} | {jlc_s_pre:.2f} |\n")
-        w(f"| JLC BT1-Vorrat {BT1_VORRAT[0]} × C5213768 à {BT1_VORRAT[1]} USD (privater Bestand, inkl. MWST ANNAHME) | "
-          f"{bt1_chf:.2f} | {bt1_chf:.2f} |\n")
-        w(f"| JLC Dummy-Platinen PLUS 1.0 + MINUS 2.0 mm, je 5 Stk, gleiche Bestellung wie der Prototyp "
-          f"(`hardware/dummy_cell/gen/cost_dummy.py`, Obergrenze; Untergrenze {dum_lo:.2f}) | {dum_hi:.2f} | {dum_hi:.2f} |\n")
-        w(f"| Einkaufsliste Ware (`docs/manuals/EINKAUFSLISTE.md`) | {ek_ware:.2f} | {ek_ware:.2f} |\n")
-        w(f"| Einkaufsliste Versand | {ek_vers:.2f} | {ek_vers:.2f} |\n")
-        w(f"| **Kassenbedarf gesamt** | **{kasse:.2f}** | **{kasse_pre:.2f}** |\n\n")
-        w(f"- Davon Preis-ANNAHME in der Einkaufsliste: {ek_ann:.2f} CHF (Händler offen, gesperrte Shopseiten). Versand "
-          "teils ANNAHME.\n")
-        w("- Nicht enthalten: Pi Zero 2 W (vorhanden), Werkstattbestand (Netzteil, Lötstation, Drucker), Arbeitszeit, "
-          "Coupons. Die Serie zieht BT1 später aus dem Vorrat; die Serien-JLC-Rechnung sinkt dann um ≈ 16 × 0.36 USD "
-          "(nicht abgezogen, konservativ).\n\n")
+    if sm is not None:
+        mu, se = sm["muster"], sm["serie"]
+        k_mu = jlc_p + bt1_chf + dum_hi + mu["ware"] + mu["vers"]
+        k_mu_pre = jlc_p_pre + bt1_chf + dum_hi + mu["ware"] + mu["vers"]
+        k_se = jlc_s + se["ware"] + se["vers"]
+        k_se_pre = jlc_s_pre + se["ware"] + se["vers"]
+        kasse, kasse_pre = k_mu + k_se, k_mu_pre + k_se_pre
+        ek_ware, ek_vers, ek_ann = mu["ware"] + se["ware"], mu["vers"] + se["vers"], mu["ann"] + se["ann"]
+        w("## 4a Kassenbedarf (alle Rechnungen; Red Team Phase 6 W-2): nur Muster, Serie danach, gesamt\n\n")
+        w("Kap. 4 ist eine Kostenzuordnung (Grenz- und Einmalkosten). Bar bezahlt werden ganze Packungen, Versand und "
+          "Testzellen. **Stand 2026-11-09: Der Auftraggeber hat das Zubehör komplett** (Verguss-/Schutzzubehör V-Z1–V-Z4, "
+          "V-Z8–V-Z12, Werkstatt Weg B, TX6, Etikettiergerät) → nicht bestellt; Verbrauchsmaterial bleibt bestellt "
+          "(`docs/manuals/EINKAUFSLISTE.md` Kap. 1). Die Verguss-Beutel sind nur in der Einkaufsliste gezählt.\n\n")
+        w("| Rechnung | Muster (Prototyp-Los, ohne Serie) CHF | Serie danach CHF |\n|---|---|---|\n")
+        w(f"| JLC Sensor-PCBA (Ware + MWST + Verzollung DHL) | {jlc_p:.2f} | {jlc_s:.2f} |\n")
+        w(f"| JLC BT1-Vorrat {BT1_VORRAT[0]} × C5213768 à {BT1_VORRAT[1]} USD (privater Bestand, MWST ANNAHME) | {bt1_chf:.2f} | – |\n")
+        w(f"| JLC Dummy-Platinen PLUS/MINUS je 5 Stk (`cost_dummy.py`, Obergrenze; Untergrenze {dum_lo:.2f}) | {dum_hi:.2f} | – |\n")
+        w(f"| Einkaufsliste Ware (Muster: LCSC, 1 Verguss-Beutel, Filament, Zellen Muster + Tests + Serie, Gateway, "
+          f"Kleinteile, Verbrauchsmaterial; Serie: 2. Verguss-Beutel) | {mu['ware']:.2f} | {se['ware']:.2f} |\n")
+        w(f"| Einkaufsliste Versand | {mu['vers']:.2f} | {se['vers']:.2f} |\n")
+        w(f"| **Summe ohne Pre-reflow** | **{k_mu:.2f}** | **{k_se:.2f}** |\n")
+        w(f"| Summe mit Pre-reflow | {k_mu_pre:.2f} | {k_se_pre:.2f} |\n\n")
+        w(f"**Gesamt (Muster + Serie): {kasse:.2f} CHF**, mit Pre-reflow {kasse_pre:.2f} CHF.\n\n")
+        w(f"- Preis-ANNAHME in der Einkaufsliste: Muster {mu['ann']:.2f} CHF, Serie {se['ann']:.2f} CHF (Händler offen, "
+          "gesperrte Shopseiten); Versand teils ANNAHME.\n")
+        w("- Verguss 1 Beutel für das Muster, 1 Beutel für die Serie: angebrochen 3 Monate haltbar (MA-3), Serie erst nach dem "
+          "Mustertest, bei Rückfallmasse (Konzept Kap. 9a) wäre ein zweiter Beutel umsonst; Lieferzeit 8 Wochen.\n")
+        w("- Zellen (48er-Packung), Filament (ganze Spulen) und Kleinteil-Packungen werden mit dem Muster gekauft und reichen "
+          "für die Serie; die Seriensumme enthält sie deshalb nicht.\n")
+        w("- Nicht enthalten: Pi Zero 2 W (vorhanden), Zubehör/Werkstatt (vorhanden), Arbeitszeit, Coupons. Die Serie zieht "
+          "BT1 aus dem Vorrat; die Serien-JLC-Rechnung sinkt dann um ≈ 16 × 0.36 USD (nicht abgezogen, konservativ).\n\n")
     w("## 5 Annahmen und offene Punkte\n\n")
     w("- PCB 5 Stk (65.21 USD) stammt aus dem Angebot vom 2026-11-08 (CLIENT_INPUT), nicht aus dem Screenshot.\n")
     w("- Economic PCBA + ENIG + POFV + 4 Lagen: JLC-Doku sagt dazu nichts (`docs/references/JLCPCB_NOTES.md` Kap. 10) → "
@@ -319,7 +325,8 @@ def main():
     print(f"Gateway kauffertig {gw_buy:.2f} CHF (ANNAHME-Anteil {gw_annahme:.2f}), offen {gw_pend:.2f}, geplant {gw_plan:.2f}, "
           f"Neuwert {gw_new:.2f} CHF; Serie mit Pre-reflow {unit_pre:.2f} CHF")
     print(f"System A {sysA:.2f} CHF, B {sysB:.2f} CHF, B+Adapter " + (f"{sysB_prog:.2f}" if sysB_prog is not None else f"{sysB_lo:.2f}-{sysB_hi:.2f}") + f" CHF (Zubehoer Verguss {zub:.2f}, Adapter {prog})")
-    if ek_ware is not None:
+    if sm is not None:
+        print(f"Kasse Muster {k_mu:.2f} (Pre-reflow {k_mu_pre:.2f}), Serie {k_se:.2f} (Pre-reflow {k_se_pre:.2f}) CHF")
         print(f"Kassenbedarf {kasse:.2f} CHF (mit Pre-reflow {kasse_pre:.2f}); JLC P {jlc_p:.2f} S {jlc_s:.2f} BT1 {bt1_chf:.2f} "
               f"Dummy {dum_lo:.2f}-{dum_hi:.2f}; "
               f"Einkauf {ek_ware:.2f} + {ek_vers:.2f}, ANNAHME {ek_ann:.2f}")

@@ -11,7 +11,7 @@
 ## 0 Fazit
 
 - **Stückkosten nach D-005** (REQ-FAB-04, Grenzkosten pro Sensor ohne Einmalkosten): Serie **8.69 CHF** → < 10 CHF erfüllt, **unter Vorbehalt**: Berechnet JLC „Pre-reflow Soldering“ (0.016 USD/Lötstelle), steigen sie auf **10.91 CHF** → REQ-FAB-04 **verfehlt** (Kap. 2.1, Stopp-Kriterium im Warenkorb).
-- **Vollkosten** (ganze Bestellung inkl. Einmalkosten / Sensoren): Serie **20.55 CHF/Sensor**; mit Prototyp-Los und Gateway 57.47 CHF/Sensor (15 Sensoren). Das ist, was ein Sensor real kostet.
+- **Vollkosten** (ganze Bestellung inkl. Einmalkosten / Sensoren): Serie **20.55 CHF/Sensor**; mit Prototyp-Los und Gateway 44.75 CHF/Sensor (15 Sensoren). Das ist, was ein Sensor real kostet.
 - D-005 (Definition Stückkosten) hat Status „zur Kenntnis“; der Auftraggeber sollte ausdrücklich bestätigen, dass REQ-FAB-04 die Stückkosten nach D-005 meint und nicht die Vollkosten.
 - Gateway: kauffertig 49.65 CHF, offen/nicht lieferbar 27.90 CHF, geplant total 77.55 CHF.
 
@@ -53,7 +53,7 @@ REQ-FAB-04 (< 10 CHF Stückkosten bei 10–15 Stück, D-005): Serie **8.69 CHF**
 
 ### 2.0 Vergussmasse (Phase 6, D-030-Vorschlag, Variante M-A)
 
-Electrolube ER2223 Resin Pack 250 g, Simpex CH CHF 38.20 exkl. MWST = **41.29 CHF** inkl. MWST (Abruf 2026-11-08). Variante M-A (abfüllen, 8-g-Ansätze wägen, `docs/manuals/MONTAGE_SENSOR.md` Kap. 3a): **1 Beutel je Bestellung** (angebrochen max. 3 Monate, ANNAHME). Stückkosten = Verbrauch 2 g/Sensor = 0.33 CHF (+5 % Ausschuss); Einmalkosten = Beutelrest (Prototyp 39.56, Serie 36.09 CHF), Einordnung nach D-005 durch den Orchestrator. Zubehör/Schutzausrüstung einmalig je Projekt **249.60 CHF** (Einkaufsliste V-Z (`docs/manuals/EINKAUFSLISTE.csv`), davon 211.90 CHF ANNAHME; in der Systemsumme Kap. 4). Hinweis M-B (ganzer Beutel je Sitzung): Prototyp 3 + Serie 3 Beutel = 247.74 CHF statt 82.58 CHF.
+Electrolube ER2223 Resin Pack 250 g, Simpex CH CHF 38.20 exkl. MWST = **41.29 CHF** inkl. MWST (Abruf 2026-11-08). Variante M-A (abfüllen, 8-g-Ansätze wägen, `docs/manuals/MONTAGE_SENSOR.md` Kap. 3a): **1 Beutel je Bestellung** (angebrochen max. 3 Monate, ANNAHME). Stückkosten = Verbrauch 2 g/Sensor = 0.33 CHF (+5 % Ausschuss); Einmalkosten = Beutelrest (Prototyp 39.56, Serie 36.09 CHF), Einordnung nach D-005 durch den Orchestrator. Zubehör/Schutzausrüstung einmalig je Projekt **58.80 CHF** (Einkaufsliste V-Z, nur Verbrauchsmaterial; Ausrüstung beim Auftraggeber vorhanden (2026-11-09), `docs/manuals/EINKAUFSLISTE.csv`, davon 39.00 CHF ANNAHME; in der Systemsumme Kap. 4). Hinweis M-B (ganzer Beutel je Sitzung): Prototyp 3 + Serie 3 Beutel = 247.74 CHF statt 82.58 CHF.
 
 ### 2.1 Versteckte Kosten und Empfindlichkeiten
 
@@ -100,30 +100,34 @@ Stand Phase 6 (2026-11-09): **D-028** Gateway ohne RTC (G4 PiRTC DS3231 und G5 C
 
 | Weg | Inhalt | CHF |
 |---|---|---|
-| A: direkt Serie | Serie 20 PCB / 16 bestückt / 15 Sensoren + Gateway (geplant total) | **635.44** |
-| B: Prototyp + Serie (geplant) | Prototyp 5 + Serie 15 Sensoren + Gateway (geplant total) | **862.01** |
-| davon Verguss-Zubehör/Schutz (A und B je einmal) | Kap. 2.0, Einkaufsliste V-Z (`docs/manuals/EINKAUFSLISTE.csv`), davon 211.90 ANNAHME | 249.60 |
-| B + Programmierwerkzeug | wie B + Adapter Rev 1 inkl. PL2303-Board und LCSC-Versand (Einkaufsliste P1–P9, W1; 36.36 CHF, davon 26.00 ANNAHME) + Dummy-Platinen Weg B als Einmalkosten des Prototyp-Loses (4.31–14.44 CHF, Obergrenze gerechnet, `hardware/dummy_cell/gen/cost_dummy.py`) | 912.81 |
+| A: direkt Serie | Serie 20 PCB / 16 bestückt / 15 Sensoren + Gateway (geplant total) | **444.64** |
+| B: Prototyp + Serie (geplant) | Prototyp 5 + Serie 15 Sensoren + Gateway (geplant total) | **671.21** |
+| davon Verguss-Zubehör/Schutz (A und B je einmal) | Kap. 2.0, Einkaufsliste V-Z, nur Verbrauchsmaterial; Ausrüstung beim Auftraggeber vorhanden (2026-11-09), `docs/manuals/EINKAUFSLISTE.csv`, davon 39.00 ANNAHME | 58.80 |
+| B + Programmierwerkzeug | wie B + Adapter Rev 1 inkl. PL2303-Board und LCSC-Versand (Einkaufsliste P1–P9, W1; 36.36 CHF, davon 26.00 ANNAHME) + Dummy-Platinen Weg B als Einmalkosten des Prototyp-Loses (4.31–14.44 CHF, Obergrenze gerechnet, `hardware/dummy_cell/gen/cost_dummy.py`) | 722.01 |
 
-- Pro Sensor (Weg A, inkl. Gateway-Anteil): 42.36 CHF; Weg B: 57.47 CHF (die 5 Prototypen sind zusätzlich nutzbar, falls sie die Prüfungen bestehen → dann 20 Sensoren: 43.10 CHF).
+- Pro Sensor (Weg A, inkl. Gateway-Anteil): 29.64 CHF; Weg B: 44.75 CHF (die 5 Prototypen sind zusätzlich nutzbar, falls sie die Prüfungen bestehen → dann 20 Sensoren: 33.56 CHF).
 - Nicht enthalten: Arbeitszeit, Werkzeug (ausser Verguss-Zubehör Kap. 2.0), Dichtmittel über die Sensor-Pauschalen hinaus, Status-LED-Platine Gateway, Ersatzzellen.
 
-## 4a Kassenbedarf gesamt (alle Rechnungen; Red Team Phase 6 W-2)
+## 4a Kassenbedarf (alle Rechnungen; Red Team Phase 6 W-2): nur Muster, Serie danach, gesamt
 
-Kap. 4 ist eine Kostenzuordnung (Grenz- und Einmalkosten). Bar bezahlt werden dagegen ganze Packungen, Versand und Testzellen. Prototyp-Los und Serie, Gateway, Verguss, Zubehör, Programmieradapter und Werkstatt stehen vollständig in der Einkaufsliste. Die Verguss-Beutel sind nur dort gezählt, nicht in den JLC-Rechnungen.
+Kap. 4 ist eine Kostenzuordnung (Grenz- und Einmalkosten). Bar bezahlt werden ganze Packungen, Versand und Testzellen. **Stand 2026-11-09: Der Auftraggeber hat das Zubehör komplett** (Verguss-/Schutzzubehör V-Z1–V-Z4, V-Z8–V-Z12, Werkstatt Weg B, TX6, Etikettiergerät) → nicht bestellt; Verbrauchsmaterial bleibt bestellt (`docs/manuals/EINKAUFSLISTE.md` Kap. 1). Die Verguss-Beutel sind nur in der Einkaufsliste gezählt.
 
-| Rechnung | ohne Pre-reflow CHF | mit Pre-reflow CHF |
+| Rechnung | Muster (Prototyp-Los, ohne Serie) CHF | Serie danach CHF |
 |---|---|---|
-| JLC Prototyp (Ware + MWST + Verzollung DHL) | 168.03 | 178.30 |
-| JLC Serie (Ware + MWST + Verzollung DHL) | 218.58 | 251.44 |
-| JLC BT1-Vorrat 25 × C5213768 à 0.3615 USD (privater Bestand, inkl. MWST ANNAHME) | 8.12 | 8.12 |
-| JLC Dummy-Platinen PLUS 1.0 + MINUS 2.0 mm, je 5 Stk, gleiche Bestellung wie der Prototyp (`hardware/dummy_cell/gen/cost_dummy.py`, Obergrenze; Untergrenze 4.31) | 14.44 | 14.44 |
-| Einkaufsliste Ware (`docs/manuals/EINKAUFSLISTE.md`) | 587.81 | 587.81 |
-| Einkaufsliste Versand | 81.70 | 81.70 |
-| **Kassenbedarf gesamt** | **1078.69** | **1121.82** |
+| JLC Sensor-PCBA (Ware + MWST + Verzollung DHL) | 168.03 | 218.58 |
+| JLC BT1-Vorrat 25 × C5213768 à 0.3615 USD (privater Bestand, MWST ANNAHME) | 8.12 | – |
+| JLC Dummy-Platinen PLUS/MINUS je 5 Stk (`cost_dummy.py`, Obergrenze; Untergrenze 4.31) | 14.44 | – |
+| Einkaufsliste Ware (Muster: LCSC, 1 Verguss-Beutel, Filament, Zellen Muster + Tests + Serie, Gateway, Kleinteile, Verbrauchsmaterial; Serie: 2. Verguss-Beutel) | 349.22 | 41.29 |
+| Einkaufsliste Versand | 81.70 | 15.00 |
+| **Summe ohne Pre-reflow** | **621.52** | **274.87** |
+| Summe mit Pre-reflow | 631.79 | 307.73 |
 
-- Davon Preis-ANNAHME in der Einkaufsliste: 292.64 CHF (Händler offen, gesperrte Shopseiten). Versand teils ANNAHME.
-- Nicht enthalten: Pi Zero 2 W (vorhanden), Werkstattbestand (Netzteil, Lötstation, Drucker), Arbeitszeit, Coupons. Die Serie zieht BT1 später aus dem Vorrat; die Serien-JLC-Rechnung sinkt dann um ≈ 16 × 0.36 USD (nicht abgezogen, konservativ).
+**Gesamt (Muster + Serie): 896.39 CHF**, mit Pre-reflow 939.52 CHF.
+
+- Preis-ANNAHME in der Einkaufsliste: Muster 113.24 CHF, Serie 0.00 CHF (Händler offen, gesperrte Shopseiten); Versand teils ANNAHME.
+- Verguss 1 Beutel für das Muster, 1 Beutel für die Serie: angebrochen 3 Monate haltbar (MA-3), Serie erst nach dem Mustertest, bei Rückfallmasse (Konzept Kap. 9a) wäre ein zweiter Beutel umsonst; Lieferzeit 8 Wochen.
+- Zellen (48er-Packung), Filament (ganze Spulen) und Kleinteil-Packungen werden mit dem Muster gekauft und reichen für die Serie; die Seriensumme enthält sie deshalb nicht.
+- Nicht enthalten: Pi Zero 2 W (vorhanden), Zubehör/Werkstatt (vorhanden), Arbeitszeit, Coupons. Die Serie zieht BT1 aus dem Vorrat; die Serien-JLC-Rechnung sinkt dann um ≈ 16 × 0.36 USD (nicht abgezogen, konservativ).
 
 ## 5 Annahmen und offene Punkte
 

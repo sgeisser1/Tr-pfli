@@ -41,7 +41,8 @@ VERSAND = {
 }
 BEREICHE = ["Sensor", "Sensor+Werkstatt", "Sensor+Gateway", "Gateway", "Werkstatt", "Verguss", "Programmieradapter",
             "Werkstatt Weg B"]
-NICHT_SUMMIEREN = {"vorhanden", "separat", "Platzhalter", "entfaellt, falls vorhanden (Werkstatt)"}
+VORHANDEN_AG = "vorhanden (Auftraggeber 2026-11-09)"
+NICHT_SUMMIEREN = {"vorhanden", "separat", "Platzhalter", "entfaellt, falls vorhanden (Werkstatt)", VORHANDEN_AG}
 REQ = ["ID", "Bereich", "Teil", "Spezifikation_Soll", "Bedarf_Stk", "Haendler", "Packung_Stk", "Preis_CHF_Packung",
        "Packungen", "Preisbasis", "Lager", "Abruf", "Status"]
 
@@ -93,10 +94,26 @@ def check(rows):
     return err, warn
 
 
-def haendler(rows):
+def summen(rows):
+    """Ware/Versand/ANNAHME fuer Muster-Los und Serie (fuer cost_final_phase5.py)."""
+    out = {}
+    for k, ser in (("muster", False), ("serie", True)):
+        hs = haendler(rows, serie=ser)
+        out[k] = dict(ware=round(sum(h["ware"] for h in hs), 2), vers=round(sum(h["vers"] for h in hs), 2),
+                      ann=round(sum(r["_sum"] for h in hs for r in h["rows"] if r["_annahme"]), 2))
+    return out
+
+
+def is_serie(r):
+    """Zeilen, die erst nach dem Mustertest fuer die Serie bestellt werden (Status beginnt mit 'Serie')."""
+    return r["Status"].startswith("Serie")
+
+
+def haendler(rows, serie=False):
+    """Haendlergruppen der Bestellung: serie=False -> Muster-Los (jetzt), serie=True -> Serie danach."""
     g = {}
     for r in rows:
-        if r["Status"] in NICHT_SUMMIEREN:
+        if r["Status"] in NICHT_SUMMIEREN or is_serie(r) != serie:
             continue
         g.setdefault(r["Haendler"], []).append(r)
     res = []
@@ -248,9 +265,21 @@ def main():
     w("## 1 Fazit\n\n")
     tot = sum(h["ware"] for h in hs)
     tot_v = sum(h["vers"] for h in hs)
-    ann = sum(r["_sum"] for r in rows if r["_annahme"] and r["Status"] not in NICHT_SUMMIEREN)
-    w(f"- Warenwert geplant **{tot:.2f} CHF** + Versand **{tot_v:.2f} CHF** = **{tot + tot_v:.2f} CHF** "
-      f"(davon {ann:.2f} CHF Preis-ANNAHME; ohne JLC, ohne Werkstattbestand; Summen je Bereich Kap. 8).\n")
+    ann = sum(r["_sum"] for h in hs for r in h["rows"] if r["_annahme"])
+    sm = summen(rows)
+    w(f"- **Muster-Los (jetzt bestellen):** Ware **{tot:.2f} CHF** + Versand **{tot_v:.2f} CHF** = **{tot + tot_v:.2f} CHF** "
+      f"(davon {ann:.2f} CHF Preis-ANNAHME; ohne JLC). **Serie danach:** {sm['serie']['ware']:.2f} + Versand "
+      f"{sm['serie']['vers']:.2f} = {sm['serie']['ware'] + sm['serie']['vers']:.2f} CHF (2. Verguss-Beutel). "
+      "Mit JLC: `docs/reviews/phase5_kosten_final.md` Kap. 4a.\n")
+    w("- **Vorhanden beim Auftraggeber (2026-11-09):** Verguss-/Schutzzubehör V-Z1–V-Z4, V-Z8–V-Z12, Werkstatt Weg B "
+      "WB-1…WB-24, TX6 (W3), Etikettiergerät (S12) – Zeilen bleiben als Checkliste, nicht bestellt. Verbrauchsmaterial "
+      "(Handschuhe, Becher, Rührstäbe, Einwegtrichter/Pipetten, Spritzen, Pinsel) bleibt bestellt: Es wird je Ansatz "
+      "verbraucht, die Menge hängt vom Projekt ab.\n")
+    w("- Verguss: **1 Beutel jetzt** (Muster + Vorversuche ≈ 48 g), **1 Beutel erst für die Serie**: angebrochen nur 3 Monate "
+      "haltbar (MA-3), die Serie folgt erst nach dem Mustertest, und bei Rückfall auf eine andere Masse (Konzept Kap. 9a) "
+      "wäre ein zweiter ER2223-Beutel umsonst.\n")
+    w("- Filament: nur die Art ist vorgegeben (ASA 1.75 mm, HDT ≥ 80 °C, ohne Carbon/Metall/Glitzer; Fenster ASA natur), "
+      "die Farbe wählt der Auftraggeber; Produkte nur Beispiele.\n")
     w(f"- **Händler mit Bestellung: {sum(1 for h in hs if h['ware'] > 0)}** "
       f"({', '.join(h['h'] for h in hs if h['ware'] > 0)}). Kern sind **zwei** CH-Händler: bastelgarage.ch und pi-shop.ch; "
       "dazu Simpex (Verguss, 8 Wochen Lieferzeit) und LCSC (mit JLC bündeln).\n")
@@ -279,12 +308,18 @@ def main():
     for r in rows:
         if r["Bemerkung"].strip():
             w(f"- **{r['ID']}** ({r['Bedarf_Herleitung']}): {r['Bemerkung']}\n")
-    w("\n## 7 Händlergruppierung und Versand\n\n")
+    w("\n## 7 Händlergruppierung und Versand (Muster-Los; Serie am Tabellenende)\n\n")
     w("| Händler | Positionen | Ware CHF | Versand CHF | Total CHF | davon jetzt lieferbar | Versandregel |\n|---|---|---|---|---|---|---|\n")
     for h in hs:
         w(f"| {h['h']} | {', '.join(r['ID'] for r in h['rows'])} | {h['ware']:.2f} | {h['vers']:.2f} | "
           f"{h['ware'] + h['vers']:.2f} | {h['ware_jetzt']:.2f} (+{h['vers_jetzt']:.2f} Versand) | {h['q']} |\n")
-    w(f"| **Summe** | | **{tot:.2f}** | **{tot_v:.2f}** | **{tot + tot_v:.2f}** | | |\n\n")
+    w(f"| **Summe Muster-Los** | | **{tot:.2f}** | **{tot_v:.2f}** | **{tot + tot_v:.2f}** | | |\n")
+    for h in haendler(rows, serie=True):
+        w(f"| Serie danach: {h['h']} | {', '.join(r['ID'] for r in h['rows'])} | {h['ware']:.2f} | {h['vers']:.2f} | "
+          f"{h['ware'] + h['vers']:.2f} | – | {h['q']} |\n")
+    sm2 = summen(rows)
+    gt = tot + tot_v + sm2["serie"]["ware"] + sm2["serie"]["vers"]
+    w(f"| **Gesamt (Muster + Serie)** | | | | **{gt:.2f}** | | |\n\n")
     bg = next((h for h in hs if h["h"] == "bastelgarage.ch"), None)
     if bg:
         w(f"- bastelgarage.ch: geplant {bg['ware']:.2f} CHF → {'versandkostenfrei' if bg['vers'] == 0 else 'Versand 6.90'}; "
@@ -322,7 +357,9 @@ def main():
     open(OUT, "w", encoding="utf-8").write(md.getvalue())
     for h in hs:
         print(f"{h['h']:45s} Ware {h['ware']:7.2f}  Versand {h['vers']:5.2f}  jetzt {h['ware_jetzt']:7.2f}")
-    print(f"Total Ware {tot:.2f} + Versand {tot_v:.2f} = {tot + tot_v:.2f} CHF (ANNAHME-Anteil {ann:.2f}); "
+    smp = summen(rows)
+    print(f"Serie danach: Ware {smp['serie']['ware']:.2f} + Versand {smp['serie']['vers']:.2f} CHF")
+    print(f"Muster-Los: Ware {tot:.2f} + Versand {tot_v:.2f} = {tot + tot_v:.2f} CHF (ANNAHME-Anteil {ann:.2f}); "
           f"{len(warn)} Hinweise -> {os.path.relpath(OUT, ROOT)}")
 
 
