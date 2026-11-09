@@ -1,0 +1,11 @@
+(footprint "MINUS_ISLAND"
+	(version 20241229)
+	(generator "fluidi_gen_dummy")
+	(layer "F.Cu")
+	(descr "Mittelinsel - (Minuspad BT1 4 x 4 mm), Oe 8.0 mm unten offen, Oe 7.0 oben abgedeckt")
+	(attr smd exclude_from_pos_files exclude_from_bom)
+	(property "Reference" "J2" (at 0 0 0) (layer "F.Fab") (hide yes) (effects (font (size 1 1) (thickness 0.15))))
+	(property "Value" "MINUS_ISLAND" (at 0 0 0) (layer "F.Fab") (hide yes) (effects (font (size 1 1) (thickness 0.15))))
+	(pad "1" smd circle (at 0 0) (size 8.0 8.0) (layers "B.Cu" "B.Mask") (solder_mask_margin 0))
+	(pad "1" smd circle (at 0 0) (size 7.0 7.0) (layers "F.Cu"))
+)

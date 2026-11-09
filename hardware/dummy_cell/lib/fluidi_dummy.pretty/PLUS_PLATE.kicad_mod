@@ -1,0 +1,10 @@
+(footprint "PLUS_PLATE"
+	(version 20241229)
+	(generator "fluidi_gen_dummy")
+	(layer "F.Cu")
+	(descr "Kontaktscheibe + (Clip BT1), Oe 19.0 mm, Loetstopp offen")
+	(attr smd exclude_from_pos_files exclude_from_bom)
+	(property "Reference" "J1" (at 0 0 0) (layer "F.Fab") (hide yes) (effects (font (size 1 1) (thickness 0.15))))
+	(property "Value" "PLUS_PLATE" (at 0 0 0) (layer "F.Fab") (hide yes) (effects (font (size 1 1) (thickness 0.15))))
+	(pad "1" smd circle (at 0 0) (size 19.0 19.0) (layers "F.Cu" "F.Mask") (solder_mask_margin 0))
+)

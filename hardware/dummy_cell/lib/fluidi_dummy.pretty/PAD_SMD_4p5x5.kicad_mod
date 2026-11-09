@@ -1,0 +1,10 @@
+(footprint "PAD_SMD_4p5x5"
+	(version 20241229)
+	(generator "fluidi_gen_dummy")
+	(layer "F.Cu")
+	(descr "Loetpad fuer Litze, nur Oberseite (keine Unterseiten-Kupferflaeche auf PLUS)")
+	(attr smd exclude_from_pos_files exclude_from_bom)
+	(property "Reference" "J" (at 0 0 0) (layer "F.Fab") (hide yes) (effects (font (size 1 1) (thickness 0.15))))
+	(property "Value" "PAD_SMD_4p5x5" (at 0 0 0) (layer "F.Fab") (hide yes) (effects (font (size 1 1) (thickness 0.15))))
+	(pad "1" smd rect (at 0 0) (size 4.5 5) (layers "F.Cu" "F.Mask"))
+)

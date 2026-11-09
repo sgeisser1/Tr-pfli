@@ -1,0 +1,10 @@
+(footprint "PAD_PTH_D2p2_D1p0"
+	(version 20241229)
+	(generator "fluidi_gen_dummy")
+	(layer "F.Cu")
+	(descr "Loetauge Oe 2.2 mm, Bohrung 1.0 mm fuer Litze")
+	(attr through_hole exclude_from_pos_files exclude_from_bom)
+	(property "Reference" "J" (at 0 0 0) (layer "F.Fab") (hide yes) (effects (font (size 1 1) (thickness 0.15))))
+	(property "Value" "PAD_PTH_D2p2_D1p0" (at 0 0 0) (layer "F.Fab") (hide yes) (effects (font (size 1 1) (thickness 0.15))))
+	(pad "1" thru_hole circle (at 0 0) (size 2.2 2.2) (drill 1.0) (layers "*.Cu" "*.Mask"))
+)

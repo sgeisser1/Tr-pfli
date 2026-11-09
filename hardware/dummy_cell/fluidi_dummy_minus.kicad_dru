@@ -1,0 +1,40 @@
+(version 1)
+# fluidi Dummy-Scheibe - erzeugt von hardware/dummy_cell/gen/gen_dummy.py (nicht von Hand aendern)
+# ---------------- JLC 2 Lagen (docs/references/JLCPCB_NOTES.md Kap. 3, abgerufen 2026-11-06), mit Reserve
+(rule "JLC Abstand Kupfer >= 0.10 (Entwurf 0.15)"
+  (constraint clearance (min 0.15mm)))
+(rule "JLC Leiterbahnbreite >= 0.10"
+  (condition "A.Type == 'Track'")
+  (constraint track_width (min 0.1mm)))
+(rule "JLC Via Durchmesser >= 0.45 (ohne Aufpreis), Bohrung >= 0.20"
+  (condition "A.Type == 'Via'")
+  (constraint via_diameter (min 0.45mm))
+  (constraint hole_size (min 0.2mm)))
+(rule "JLC Restring Via >= 0.15 (2 L absolut 0.18 PTH, empfohlen 0.25)"
+  (condition "A.Type == 'Via'")
+  (constraint annular_width (min 0.15mm)))
+(rule "JLC Restring PTH-Pad >= 0.25 (empfohlen)"
+  (condition "A.Type == 'Pad' && A.Pad_Type == 'Through-hole'")
+  (constraint annular_width (min 0.25mm)))
+(rule "JLC NPTH >= 0.50"
+  (condition "A.Type == 'Pad' && A.Pad_Type == 'NPTH, mechanical'")
+  (constraint hole_size (min 0.5mm)))
+(rule "JLC Bohrabstand >= 0.25"
+  (constraint hole_to_hole (min 0.25mm)))
+(rule "JLC Bohrung - Kupfer >= 0.20"
+  (constraint hole_clearance (min 0.2mm)))
+(rule "JLC Kupfer - Kontur >= 0.30 (gefraest >= 0.2)"
+  (constraint edge_clearance (min 0.3mm)))
+(rule "JLC SMD-Pad - Pad >= 0.15"
+  (condition "A.Type == 'Pad' && B.Type == 'Pad'")
+  (constraint clearance (min 0.15mm)))
+(rule "JLC Silkscreen Text >= 1.0 / 0.15"
+  (layer "?.Silkscreen")
+  (condition "A.Type == 'Text' || A.Type == 'Field'")
+  (constraint text_height (min 1.0mm))
+  (constraint text_thickness (min 0.15mm)))
+# ---------------- Projektregeln Dummy-Scheibe (README Kap. 3)
+(rule "MINUS: Scheiben-Unterseite nur Mittelinsel und Vias (keine Leitungen/Flaechen)"
+  (layer B.Cu)
+  (condition "A.intersectsArea('SCHEIBE_UNTEN') && (A.Type == 'Track' || A.Type == 'Zone')")
+  (constraint disallow track zone))

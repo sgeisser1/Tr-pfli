@@ -1,0 +1,10 @@
+(footprint "HOLE_NPTH_1p0"
+	(version 20241229)
+	(generator "fluidi_gen_dummy")
+	(layer "F.Cu")
+	(descr "Passloch Oe 1.0 mm (Klebelehre PLUS/MINUS)")
+	(attr exclude_from_pos_files exclude_from_bom)
+	(property "Reference" "H" (at 0 0 0) (layer "F.Fab") (hide yes) (effects (font (size 1 1) (thickness 0.15))))
+	(property "Value" "HOLE_NPTH_1p0" (at 0 0 0) (layer "F.Fab") (hide yes) (effects (font (size 1 1) (thickness 0.15))))
+	(pad "" np_thru_hole circle (at 0 0) (size 1.0 1.0) (drill 1.0) (layers "*.Cu" "*.Mask"))
+)

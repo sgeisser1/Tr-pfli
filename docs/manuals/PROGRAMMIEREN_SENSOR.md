@@ -38,8 +38,8 @@ fehlt: am **offenen Board vor dem Verguss**, mit Labornetzteil und gelöteten Dr
 | Waveshare CH343 USB UART Board, Jumper H3 abgezogen | ✓ | ✓ | `WCH_CH343_Datasheet_V1E.pdf`; Belegung `docs/references/Waveshare_CH343-USB-UART-Board_Schematic_2026-11-08.pdf` |
 | **oder** Waveshare PL2303 USB UART Board (type A) V2, Jumper J1 abgezogen, Eingangsprüfung bestanden | ✓ | ✓ | `Prolific_PL2303GS_Datasheet_Rev1.0.4.pdf`; Belegung `docs/references/Waveshare_PL2303-USB-UART-Board-TypeA-V2_Schematic_2026-11-08.pdf`; Bedingungen `hardware/programmer/README.md` Kap. 9.5 |
 | Programmieradapter Rev 1 (Dummy-Zelle + Federstiftkopf + Puffer) | ✓ | – | `hardware/programmer/README.md` |
-| Labornetzteil mit Strombegrenzung, Kupferlackdraht 0.1–0.2 mm, Lötstation mit feiner Spitze, Lupe/Mikroskop, Isopropanol | – | ✓ | |
-| Dummy-Scheibe (nur die Dummy-Zelle des Adapters, ohne Federstiftkopf; Dicke 3.0–3.2 mm, PS-W3) | – | **Pflicht** | Kap. 5 Schritt 2 (Veto PS-K1) |
+| Labornetzteil mit Strombegrenzung, Kupferlackdraht 0.1–0.2 mm, Lötstation mit feiner Spitze, Lupe/Mikroskop, Isopropanol | – | ✓ | vollständige Werkstattliste WB-1…WB-24: `hardware/dummy_cell/README.md` Kap. 7 |
+| Dummy-Scheibe (nur die Dummy-Zelle des Adapters, ohne Federstiftkopf; Dicke 3.0–3.2 mm, PS-W3) | – | **Pflicht** | Kap. 5 Schritt 2 (Veto PS-K1); als JLC-Platinenpaar (1.0 + 2.0 mm, Entwurf 2026-11-09, Prüfung sicherheit/mechanik offen): `hardware/dummy_cell/README.md` |
 | Werks-Hex `firmware/sensor/build/fluidi-sensor-factory-<ver>-key<fp>.hex` | ✓ | ✓ | erzeugt mit `make` in `firmware/sensor` (`firmware/sensor/README.md`) |
 
 ## 3 Software vorbereiten

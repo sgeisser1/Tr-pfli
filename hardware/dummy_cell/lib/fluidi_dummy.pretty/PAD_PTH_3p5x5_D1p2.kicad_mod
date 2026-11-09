@@ -1,0 +1,10 @@
+(footprint "PAD_PTH_3p5x5_D1p2"
+	(version 20241229)
+	(generator "fluidi_gen_dummy")
+	(layer "F.Cu")
+	(descr "Loetpad mit Bohrung 1.2 mm fuer Litze (Netzteil -)")
+	(attr through_hole exclude_from_pos_files exclude_from_bom)
+	(property "Reference" "J" (at 0 0 0) (layer "F.Fab") (hide yes) (effects (font (size 1 1) (thickness 0.15))))
+	(property "Value" "PAD_PTH_3p5x5_D1p2" (at 0 0 0) (layer "F.Fab") (hide yes) (effects (font (size 1 1) (thickness 0.15))))
+	(pad "1" thru_hole rect (at 0 0) (size 3.5 5) (drill 1.2) (layers "*.Cu" "*.Mask"))
+)
