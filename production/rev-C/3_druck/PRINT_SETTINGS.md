@@ -1,6 +1,7 @@
 # fluidi – Druckeinstellungen Sensor P3 und Gateway G1 v3 (Bambu Lab P1S)
 
-Stand 2026-11-07, Phase 4b Welle 1. Druckdateien werden von den Generatoren erzeugt und liegen bereits in
+Stand 2026-11-07, Phase 4b Welle 1; Phase 6 (2026-11-09): Werkstoff-Alternative eSun ASA+ (Kap. 1/2), Gateway-Klimamodul
+SEN0428 (D-029), RTC gestrichen (D-028), Gewindeeinsatz Ø4.6 (Kap. 3–5), Batteriefachschraube TX6. Druckdateien werden von den Generatoren erzeugt und liegen bereits in
 **Druckausrichtung** (auf z = 0, mittig):
 
 ```
@@ -14,12 +15,38 @@ freecadcmd mechanical/gen/fluidi_gateway.py          # mechanical/gateway/print/
 | | Wahl | Beleg |
 |---|---|---|
 | Gehäuse (alle tragenden Teile) | **Bambu ASA** (UV- und feuchtebeständig, kein PLA) | `docs/references/BambuLab_ASA_TechnicalDataSheet_V2.0.pdf` S.1–2: HDT **92 °C** (ISO 75, 1.8 MPa) / 100 °C (0.45 MPa), Vicat 106 °C, E 2450 MPa (XY) / 2120 MPa (Z), Zugfestigkeit 52 / 35 MPa (XY / Z) → REQ-MECH-12 (HDT ≥ 80 °C) **erfüllt** |
+| Alternative (Phase 6, nur wenn Bambu ASA fehlt) | **eSun ASA+** (bastelgarage.ch Blau 424238 / Kaltweiss 424234 lagernd, Grau 424233 ausverkauft, 2026-11-09) – **bedingt gleichwertig**, siehe unten | `docs/references/eSUN_ASAplus_TDS_V1.0-2024-06.pdf` S. 1: HDT **95.5 °C (GB/T 1634, 0.45 MPa)**, kein 1.8-MPa-Wert; Zug 35.7 MPa, Biegemodul 2364 MPa, Izod 14.9 kJ/m² (spritzgegossene Proben); S. 2: Düse 250–280 °C, Bett 100–110 °C, Lüfter 10–50 %, **auf Bambu P1S 0.4 mm ermittelt** |
 | Farben | Hülse/Wanne Warmgrau hell #B9B5AC, Kappe/Taste/Deckel Hellblau (D-010/D-011) | Filamentton nach Musterdruck wählen (P3_FLUIDI.md Kap. 6). **Pigment ohne Russ/Metall** im Antennenbereich (Kappe, Deckel) – **ANNAHME**, beim Filamentkauf prüfen (Elektronikbericht 2.4 Pkt. 3) |
 | Lichtfenster | transluzentes, mattes Filament **natur**, ≥ 1 mm (Diffusor) | bevorzugt ASA natur/transluzent (**ANNAHME** Verfügbarkeit). PETG transluzent nur mit Nachweis (REQ-MECH-12): 7 d bei 65 °C ohne Verformung und Klebefuge dicht (PROTOTYP-PRÜFUNG) |
 | Kragen, Stössel, Schottkeil, Lehren | ASA, Farbe beliebig (Reste) | im Gehäuse unsichtbar |
-| Trocknen | 80 °C, 8 h vor dem Druck, Lagerung < 20 % rF | TDS S.1 |
+| Trocknen | 80 °C, 8 h vor dem Druck, Lagerung < 20 % rF | TDS S.1 (eSun ASA+: TDS „N/A“ → gleich wie Bambu ASA, **ANNAHME**) |
+
+**Bewertung eSun ASA+ gegen Bambu ASA (Phase 6):**
+- **Wärme (REQ-MECH-12):** 95.5 °C bei 0.45 MPa ≥ 80 °C → erfüllt laut Datenblatt. Vergleich bei gleicher Last: Bambu 100 °C,
+  eSun 95.5 °C (−4.5 K). Für 1.8 MPa gibt eSun keinen Wert an. Die Gehäuseteile sind bei 65 °C kaum belastet (Wandspannungen
+  < 3 MPa, `simulation/fem/REPORT.md`), nur unter dem Schraubenkopf ≈ 11 MPa Pressung lokal. **Widerspruch:** Die
+  Händlerseite, die das TDS verlinkt (grobotronics.com), nennt 78 °C bei 0.45 MPa. Darum gilt eSun ASA+ erst nach der
+  **PROTOTYP-PRÜFUNG** 7 d bei 65 °C (Hülse mit Schraube angezogen, Kappe mit O-Ringen montiert, Wanne/Deckel):
+  keine Verformung > 0.1 mm an Dichtflächen und Schraubensitz, O-Ring-Gleitsitz unverändert.
+- **Festigkeit:** Zug 35.7 MPa (spritzgegossen) gegen Bambu 52 MPa (gedruckt XY, angelassen). Gedruckt ist eSun
+  vermutlich schwächer (Z-Wert nicht angegeben). Kleinster Sicherheitsfaktor der Gehäuseteile (Kippen Hülsenboden, 2.9 MPa
+  Schub, `simulation/fem/REPORT.md`) sinkt mit 0.5 × 35.7 = 18 MPa von ≈ 9 auf ≈ 6 → ausreichend (Soll ≥ 2).
+  Biegezunge Kappe: Biegemodul 2364 MPa vs. Bambu E 2450 MPa (XY) → Schaltkraft ≈ −4 %, innerhalb der Toleranz.
+- **UV/Feuchte:** Beide Datenblätter nur qualitativ („better resistance to ultraviolet light“ bzw. „exceptional UV“),
+  keine Prüfnorm → gleichwertig nach Datenlage, keine Zahl. Wasseraufnahme gibt eSun nicht an.
+- **Druckbarkeit P1S:** vom Hersteller auf P1S ermittelt. Bett 100–110 °C laut TDS; der P1S erreicht laut Bambu max.
+  100 °C (**ANNAHME**, Herstellerangabe nicht lokal) → 100 °C. Höhere Düsentemperatur 270 °C (Probedruck 275 °C).
+- **Pigment:** Blau/Kaltweiss ohne Angabe zu Russ/Metall → wie bisher **ANNAHME**, RSSI-Messung (Antennenbereich Kappe/Deckel).
+- **Mischung:** Ein Teil = ein Material. Gleiche Teile einer Serie nicht aus verschiedenen Filamenten (Passungen, Schwindung).
+  Vor dem ersten eSun-Teil Passproben (Kap. 4) mit eSun neu drucken.
+- **Farbe:** Grau ist auch bei eSun ausverkauft. Kaltweiss statt Warmgrau weicht von D-010 ab → Entscheid Auftraggeber.
 
 ## 2 Profil (Bambu Studio, Basis: Systemprofil „Bambu ASA“ + „0.16mm Optimal @BBL P1S“)
+
+Für **eSun ASA+** (Kap. 1, Alternative) gelten dieselben Werte ausser: Filamentprofil „Generic ASA“, Düse **270 °C**
+(erste Schicht 275 °C), Bett **100 °C**, Bauteillüfter 10 % (max. 30 %), Flussrate und Pressure Advance mit der
+Kalibrierung von Bambu Studio für die Rolle bestimmen (eSun-TDS S. 2: 250–280 / 100–110 °C / 10–50 %).
+
 
 | Parameter | Wert | Bemerkung |
 |---|---|---|
@@ -75,17 +102,20 @@ Aussen 84 × 42 × 20 mm, Profil, Facette, Fuge und Tropfen wie G1 v3; Profil un
 
 | Datei | Teil | Farbe | Ausrichtung | Kritische Stellen | g |
 |---|---|---|---|---|---|
-| `wanne_grau` | Wanne mit Pi-Abstandshaltern, Lichtschacht, Trennwand Klimakammer, Nutpfosten, Kabelkanal | Warmgrau | Boden auf dem Bett | Senkkopfbohrungen unten (Brücke über Ø 5.4); Micro-USB-Fenster 11.4 × 7.8 (Brücke 11.4); Lichtschacht hängt 45° an der Innenfacette (ohne Stütze, Probedruck); Kabelkanal Ø 3.0 waagrecht; Stirnschlitze 1.2 hoch (Brücken 20 mm) | 14.0 |
-| `wanne_grau_otg` | wie oben, zusätzlich Micro-USB-OTG-Fenster (XIAO-Empfänger extern, D-014) | Warmgrau | wie oben | Steg zwischen den Fenstern 1.2 mm | 13.8 |
-| `deckel_blau` | Deckel mit 4 Niederhalterrohren (Einsatz M2.5), Steg, Gegenrippe Klimakammer, RTC-Rahmen | Hellblau | **kopfüber** | Facette 45°; vordere Rohre stehen auf der Innenfacette; Steg vorne bewusst weggelassen (sonst nicht senkrecht montierbar) | 9.7 |
+| `wanne_grau` | Wanne mit Pi-Abstandshaltern, Lichtschacht, Trennwand Klimakammer, Bodenschiene Klimamodul (Nut 1.9, 1.0 tief, mit Endanschlägen), Kabelkanal | Warmgrau | Boden auf dem Bett | Senkkopfbohrungen unten (Brücke über Ø 5.4); Micro-USB-Fenster 11.4 × 7.8 (Brücke 11.4); Lichtschacht hängt 45° an der Innenfacette (ohne Stütze, Probedruck); Kabelkanal Ø 3.0 waagrecht; Stirnschlitze 1.2 hoch (Brücken 20 mm); Schienenwände 0.8 (2 Bahnen) | 13.8 |
+| `wanne_grau_otg` | wie oben, zusätzlich Micro-USB-OTG-Fenster (XIAO-Empfänger extern, D-014) | Warmgrau | wie oben | Steg zwischen den Fenstern 1.2 mm | 13.7 |
+| `deckel_blau` | Deckel mit 4 Niederhalterrohren Ø 7.0 / Fuss Ø 5.6 (Einsatz M2.5 Ø 4.6, Bohrung 3.9), Steg, Gegenrippe Klimakammer, Nutrippe Klimamodul (D-028: kein RTC-Rahmen mehr) | Hellblau | **kopfüber** | Facette 45°; vordere Rohre stehen auf der Innenfacette; Rohre an HDMI/Micro-USB/microSD-Halter abgeflacht (0.3 Luft); Steg vorne bewusst weggelassen (sonst nicht senkrecht montierbar) | 10.2 |
 | `fenster_tropfen_gw` | Lichtfenster | natur transluzent | Aussenfläche auf dem Bett | | 0.1 |
 
-Montage: Pi auf die 4 Abstandshalter legen (Buchsen in die inneren Freistiche der Rückwand), Klimasensor-Leitungen
-(3V3 Pin 1, SDA Pin 3, SCL Pin 5, GND Pin 6 oder 9) **direkt in die Lötaugen** löten (Pi ohne Stiftleiste), Bündel
-durch den Kanal Ø 3.0 in der Trennwand führen, Modul in die Nuten stecken, Kanal mit Silikon vergiessen (Zugentlastung
-und Luftsperre). LED-Platine auf den Lichtschacht kleben. Deckel senkrecht aufsetzen, umdrehen, 4 × M2.5 × 8 (ISO 7380,
-**ANNAHME**) von unten durch Abstandshalter und Pi-Bohrung in die Einsätze (Ø 3.5 × 4, Bohrung 3.2, Lötkolben 220 °C,
-**ANNAHME**) – die 4 Schrauben halten Pi und Deckel zugleich. Nylonschrauben als Option, falls die RSSI-Messung mit
+Montage: 4 Litzen an die Lötaugen des Klimamoduls **DFRobot SEN0428** (D-029) löten (von der Rückseite, Litzen zeigen
+nach −x), Bündel von der Kammer aus durch den Kanal Ø 3.0 (y −2.5) in der Trennwand fädeln, an die Pi-Lötaugen löten
+(3V3 Pin 1, SDA Pin 3, SCL Pin 5, GND Pin 6 oder 9; Pi ohne Stiftleiste). Pi auf die 4 Abstandshalter legen (Buchsen in die
+inneren Freistiche der Rückwand). Modul senkrecht in die Bodenschiene stecken: **Sensorseite zur Stirnwand (+x),
+Lötaugen-Kante zum Kabelkanal (vorn, y −6.5), Bohrungs-Kante hinten**; die Deckelrippe fasst beim Schliessen die
+Oberkante (0.8 mm). Kanal mit Silikon vergiessen (Zugentlastung und Luftsperre). LED-Platine auf den Lichtschacht kleben.
+Deckel senkrecht aufsetzen, umdrehen, 4 × M2.5 × 8 (ISO 7380, **ANNAHME**) von unten durch Abstandshalter und Pi-Bohrung
+in die Einsätze (Kaufteil bastelgarage 425681: Ø 4.6 × 4, Bohrung 3.9, Einschmelzen Kap. 5) – die 4 Schrauben halten Pi
+und Deckel zugleich. Nylonschrauben als Option, falls die RSSI-Messung mit
 Stahlschrauben schlechter ist (PROTOTYP-PRÜFUNG). microSD bleibt innen (Zugang nach Lösen der 4 Schrauben).
 
 **Vor dem ersten Druck am vorhandenen Pi messen** und in `PI`/`PARTS` des Generators eintragen: Platinendicke
@@ -119,19 +149,25 @@ Fertigungszeichnungen aller Druckteile (Phase 5): `mechanical/drawings/FL-*.pdf`
 | Taste in Tasche | 0.40 (Sichtspalt, Design) | D-010 |
 | Stössel in Rohr | 0.10 | |
 | Gateway Deckelsteg in Wanne | 0.15 | |
-| Gewindeeinsatz M2.5 (Gateway) | Bohrung Ø 3.2 (**ANNAHME** Einsatz Ø 3.5 × 4) | |
+| Gewindeeinsatz M2.5 (Gateway) | Bohrung Ø **3.9**, Tiefe 5.2 ab Rohrende, Einsatz 0.5 versenkt (Einsatz Ø 4.6 × 4) | Händler bastelgarage 425681: Bohrung 3.9, Tiefe ≥ 4.5 (`docs/references/bastelgarage_Gewindeeinsatz-Schraube_Auszug_2026-11-09.txt`); Wand um die Bohrung 1.15–1.55, im Fuss 0.85 (`check_gateway_pi.txt` 3) |
 | G1 v4: Pi-Platine zu Wänden / microSD-Karte zur Trennwand | 0.4 (Buchsenseite) bzw. ≥ 1.0 / 1.5 | `check_gateway_pi.txt` |
 | G1 v4: Micro-USB-Umspritzung im Fenster | 0.4 je Seite | |
-| G1 v4: Klimamodul-Platine in Nut | 0.15 je Seite (Nut 1.9 für 1.6) | Modul Welle 2 |
+| G1 v4: Klimamodul SEN0428 in Bodenschiene / Deckelnut | 0.15 je Seite (Nut 1.9 für Platine 1.6 **ANNAHME**), Eingriff 1.0 / 0.8, 0.3 Luft über der Oberkante und an den Endanschlägen | `check_gateway_pi.txt` 14; Platinendicke am Muster messen (Nut = Dicke + 0.3) |
 | G1 v4: Deckel-Gegenrippe zur Trennwand | 0.3 (= Fuge) | |
 
 **Vor der ersten Serie:** `passprobe_huelse_unten` + `kragen` + O-Ring und `passprobe_huelse_oben` + `kappe_blau` drucken
 und prüfen: Hülse gleitet mit Silikonfett ohne Klemmen, O-Ring sichtbar verpresst, Schraube M2 × 3 (V-K, D-023) furcht durch die Lippe und
-dreht danach frei. Bei Bedarf XY-Lochkompensation anpassen, nicht die Geometrie.
+dreht danach frei (Phase 6: Kaufteil M2 × 3 Linsenkopf **Torx TX6**, Kopf 1.6 hoch, bastelgarage 422191; Kopf-Ø messen,
+≤ 4.2 zulässig, `check_sensor.txt` 5c). Bei Bedarf XY-Lochkompensation anpassen, nicht die Geometrie.
 
 ## 5 Nacharbeit und Montage-Hilfsstoffe
 
 - Hülse: Gleitflächen innen (z 2–8, 30–35) glätten, Ablaufschlitze frei halten, Kerbe innen entgraten (O-Ring läuft darüber).
 - Fenster: Aussenseite matt lassen; Kleben mit transparentem 2K-Epoxid oder UV-Kleber (**ANNAHME** Typ, Welle 2), Klebstoff nicht auf die Sichtfläche.
 - O-Ringe mit Silikonfett (Mechanikbericht 2.1), Werkstoff ohne Russ.
-- Gateway: Gewindeeinsätze M2.5 mit Lötkolben 220 °C einsetzen (**ANNAHME**), FPC innen an die linke Stirnwand kleben.
+- Gateway: Gewindeeinsätze M2.5 (Ø 4.6 × 4) mit Lötkolben und Einschmelzspitze einsetzen, Temperatur = Drucktemperatur
+  + 10–20 °C laut Händler → Bambu ASA **270–280 °C**, eSun ASA+ 280–290 °C. Deckel kopfüber, Einsatz senkrecht ansetzen,
+  ohne Druck einsinken lassen bis **0.5 mm unter** die Rohrstirn (Lehre: Schraube M2.5 eindrehen, plan aufsetzen), danach
+  ohne Bewegung abkühlen lassen. Im Fuss (unterste 1.5 mm, Wand 0.85) nicht verkanten. **PROTOTYP-PRÜFUNG:** ein Rohr
+  probeweise bestücken, Fuss nicht aufgeplatzt, Schraube M2.5 mit Handanzug ohne Mitdrehen des Einsatzes.
+- Gateway G1 v3 (XIAO): FPC innen an die linke Stirnwand kleben.
