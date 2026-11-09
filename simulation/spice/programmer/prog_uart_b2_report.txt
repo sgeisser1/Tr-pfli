@@ -1,0 +1,60 @@
+fluidi - prog_uart_b2.py (ngspice -b): Weg B Variante B2, VDD = VIO aus einem Netzteil, 1.96-2.10 V
+
+(1) DC-Pegel [V]
+| Fall | Bedingung | Pegel | V | Grenze | ok | Reserve [mV] |
+|---|---|---|---|---|---|---|
+| A1 Puffer-Eingang TP1 | VDD = VIO = 1.96 V, Leck +0.5 uA | low | 0.331 | <= 0.47 (VT- min Huelle) / 0.57 interp. | ja | +139 |
+| A1 Puffer-Eingang TP1 | VDD = VIO = 1.96 V, Leck -0.5 uA | high | 1.862 | >= 1.77 (VT+ max Huelle) / 1.52 interp. | ja | +92 |
+| A1z Ruhe, DIO6 hochohmig (Info) | VDD = VIO = 1.96 V, Leck -0.5 uA | high (Ruhe) | 0.531 | >= 1.04 (VT- max, haelt high) | Info | -509 |
+| A1o Puffer -> CH343-RXD | VIO 1.96 V, Pull-up max, Board-LED min | low | 0.040 | <= 0.50 (CH343 VIL) | ja | +460 |
+| A1p Puffer -> PL2303-RXD | VIO 1.96 V, Pull-up 0, Board-LED min | low | 0.062 | <= 0.40 (PL2303 VIL) | ja | +338 |
+| A1p Puffer -> PL2303-RXD | VIO 1.96 V, Pull-up 100 uA, Board-LED min | low | 0.078 | <= 0.40 (PL2303 VIL) | ja | +322 |
+| B Sensor-RX (TXD 0 V) | VDD 1.96 V, LED blau min | low | 0.136 | <= 0.392 (0.2 VDDS) | ja | +256 |
+| Bp Sensor-RX (PL2303 TXD 0.1 V) | VDD 1.96 V, LED blau min | low | 0.178 | <= 0.392 (0.2 VDDS) | ja | +214 |
+| A1 Puffer-Eingang TP1 | VDD = VIO = 2.0 V, Leck +0.5 uA | low | 0.350 | <= 0.47 (VT- min Huelle) / 0.59 interp. | ja | +120 |
+| A1 Puffer-Eingang TP1 | VDD = VIO = 2.0 V, Leck -0.5 uA | high | 1.902 | >= 1.77 (VT+ max Huelle) / 1.55 interp. | ja | +132 |
+| A1z Ruhe, DIO6 hochohmig (Info) | VDD = VIO = 2.0 V, Leck -0.5 uA | high (Ruhe) | 0.571 | >= 1.04 (VT- max, haelt high) | Info | -469 |
+| A1o Puffer -> CH343-RXD | VIO 2.0 V, Pull-up max, Board-LED min | low | 0.043 | <= 0.50 (CH343 VIL) | ja | +457 |
+| A1p Puffer -> PL2303-RXD | VIO 2.0 V, Pull-up 0, Board-LED min | low | 0.068 | <= 0.40 (PL2303 VIL) | ja | +332 |
+| A1p Puffer -> PL2303-RXD | VIO 2.0 V, Pull-up 100 uA, Board-LED min | low | 0.083 | <= 0.40 (PL2303 VIL) | ja | +317 |
+| B Sensor-RX (TXD 0 V) | VDD 2.0 V, LED blau min | low | 0.162 | <= 0.400 (0.2 VDDS) | ja | +238 |
+| Bp Sensor-RX (PL2303 TXD 0.1 V) | VDD 2.0 V, LED blau min | low | 0.199 | <= 0.400 (0.2 VDDS) | ja | +201 |
+| A1 Puffer-Eingang TP1 | VDD = VIO = 2.05 V, Leck +0.5 uA | low | 0.374 | <= 0.47 (VT- min Huelle) / 0.61 interp. | ja | +96 |
+| A1 Puffer-Eingang TP1 | VDD = VIO = 2.05 V, Leck -0.5 uA | high | 1.952 | >= 1.77 (VT+ max Huelle) / 1.59 interp. | ja | +182 |
+| A1z Ruhe, DIO6 hochohmig (Info) | VDD = VIO = 2.05 V, Leck -0.5 uA | high (Ruhe) | 0.621 | >= 1.04 (VT- max, haelt high) | Info | -419 |
+| A1o Puffer -> CH343-RXD | VIO 2.05 V, Pull-up max, Board-LED min | low | 0.048 | <= 0.50 (CH343 VIL) | ja | +452 |
+| A1p Puffer -> PL2303-RXD | VIO 2.05 V, Pull-up 0, Board-LED min | low | 0.075 | <= 0.40 (PL2303 VIL) | ja | +325 |
+| A1p Puffer -> PL2303-RXD | VIO 2.05 V, Pull-up 100 uA, Board-LED min | low | 0.091 | <= 0.40 (PL2303 VIL) | ja | +309 |
+| B Sensor-RX (TXD 0 V) | VDD 2.05 V, LED blau min | low | 0.198 | <= 0.410 (0.2 VDDS) | ja | +212 |
+| Bp Sensor-RX (PL2303 TXD 0.1 V) | VDD 2.05 V, LED blau min | low | 0.229 | <= 0.410 (0.2 VDDS) | ja | +181 |
+| A1 Puffer-Eingang TP1 | VDD = VIO = 2.1 V, Leck +0.5 uA | low | 0.398 | <= 0.47 (VT- min Huelle) / 0.62 interp. | ja | +72 |
+| A1 Puffer-Eingang TP1 | VDD = VIO = 2.1 V, Leck -0.5 uA | high | 2.002 | >= 1.77 (VT+ max Huelle) / 1.62 interp. | ja | +232 |
+| A1z Ruhe, DIO6 hochohmig (Info) | VDD = VIO = 2.1 V, Leck -0.5 uA | high (Ruhe) | 0.671 | >= 1.04 (VT- max, haelt high) | Info | -369 |
+| A1o Puffer -> CH343-RXD | VIO 2.1 V, Pull-up max, Board-LED min | low | 0.052 | <= 0.50 (CH343 VIL) | ja | +448 |
+| A1p Puffer -> PL2303-RXD | VIO 2.1 V, Pull-up 0, Board-LED min | low | 0.082 | <= 0.40 (PL2303 VIL) | ja | +318 |
+| A1p Puffer -> PL2303-RXD | VIO 2.1 V, Pull-up 100 uA, Board-LED min | low | 0.098 | <= 0.40 (PL2303 VIL) | ja | +302 |
+| B Sensor-RX (TXD 0 V) | VDD 2.1 V, LED blau min | low | 0.235 | <= 0.420 (0.2 VDDS) | ja | +185 |
+| Bp Sensor-RX (PL2303 TXD 0.1 V) | VDD 2.1 V, LED blau min | low | 0.262 | <= 0.420 (0.2 VDDS) | ja | +158 |
+
+(2) Transient 19200 Baud, Bytes 55 55 00 FF 01 80 CC 33, Taktfehler +-1.5 %, Kriterium Reserve >= 0.2 Bit
+| Richtung | Kapazitaeten | Schwellen | Bytes ok | Reserve [Bit] | ok |
+|---|---|---|---|---|---|
+| Sensor->Puffer (TP1), VDD = VIO = 2.0 V | Spitze 10 cm (1/2/20 pF) | interp. VT+max/VT-min | ja | 0.303 | ja |
+| Sensor->Puffer (TP1), VDD = VIO = 2.0 V | Spitze 10 cm (1/2/20 pF) | interp. VT+min/VT-max | ja | 0.335 | ja |
+| Sensor->Puffer (TP1), VDD = VIO = 2.0 V | Spitze 10 cm (1/2/20 pF) | Huelle VT+1.77/VT-0.47 | ja | 0.288 | ja |
+| Sensor->Puffer (TP1), VDD = VIO = 2.0 V | Spitze lang (1/2/40 pF) | interp. VT+max/VT-min | ja | 0.240 | ja |
+| Sensor->Puffer (TP1), VDD = VIO = 2.0 V | Spitze lang (1/2/40 pF) | interp. VT+min/VT-max | ja | 0.300 | ja |
+| Sensor->Puffer (TP1), VDD = VIO = 2.0 V | Spitze lang (1/2/40 pF) | Huelle VT+1.77/VT-0.47 | ja | 0.213 | ja |
+| Host->Sensor (DIO20), VDD 2.0 V | schlecht, LED 30 pF | 0->1 max / 1->0 min | ja | 0.354 | ja |
+| Host->Sensor (DIO20), VDD 2.0 V | schlecht, LED 30 pF | 0->1 min / 1->0 max | ja | 0.357 | ja |
+| Sensor->Puffer (TP1), VDD = VIO = 2.1 V | Spitze 10 cm (1/2/20 pF) | interp. VT+max/VT-min | ja | 0.294 | ja |
+| Sensor->Puffer (TP1), VDD = VIO = 2.1 V | Spitze 10 cm (1/2/20 pF) | interp. VT+min/VT-max | ja | 0.330 | ja |
+| Sensor->Puffer (TP1), VDD = VIO = 2.1 V | Spitze 10 cm (1/2/20 pF) | Huelle VT+1.77/VT-0.47 | ja | 0.223 | ja |
+| Sensor->Puffer (TP1), VDD = VIO = 2.1 V | Spitze lang (1/2/40 pF) | interp. VT+max/VT-min | ja | 0.222 | ja |
+| Sensor->Puffer (TP1), VDD = VIO = 2.1 V | Spitze lang (1/2/40 pF) | interp. VT+min/VT-max | ja | 0.291 | ja |
+| Sensor->Puffer (TP1), VDD = VIO = 2.1 V | Spitze lang (1/2/40 pF) | Huelle VT+1.77/VT-0.47 | ja | 0.089 | NEIN |
+| Host->Sensor (DIO20), VDD 2.1 V | schlecht, LED 30 pF | 0->1 max / 1->0 min | ja | 0.357 | ja |
+| Host->Sensor (DIO20), VDD 2.1 V | schlecht, LED 30 pF | 0->1 min / 1->0 max | ja | 0.357 | ja |
+
+Ergebnis: 43 von 44 Faellen ok (ohne 4 Info-Faelle A1z, wie Adapter: Ruhepegel im Hysteresebereich, unschaedlich)
+NICHT ok: Sensor->Puffer (TP1), VDD = VIO = 2.1 V / Spitze lang (1/2/40 pF) / Huelle VT+1.77/VT-0.47

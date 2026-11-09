@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Stand | 2026-11-09, Rev 1, **Entwurf Elektronik**. Freigabe Orchestrator/Auftraggeber offen; Prüfung durch `sicherheit` (PS-K1, PS-W2/W3/W4) und `mechanik` (Freiraum der Lasche, Kap. 6) offen |
+| Stand | 2026-11-09, Rev 1 (nach Sicherheit Runde 1: Brücke J9, Aufdruck PROG/TEST, DS-B1…B5/DS-K1…K5 umgesetzt). **Sicherheit Runde 1 ohne Veto** (`docs/reviews/phase6_sicherheit_schluss.md`, Abschnitt „Dummy-Scheibe (Runde 1)“), B2 freigegeben unter DS-B1…B5; Mechanik DC-1 passt (Kap. 6a). Freigabe Orchestrator/Auftraggeber offen |
 | Anlass | Red-Team Phase 6 W-1 (`docs/reviews/phase6_redteam_paket.md`): Weg B verlangte eine **selbstgebaute** Scheibe (FR-4 schleifen), nichts davon war bestellbar |
 | Grundlage | `docs/manuals/PROGRAMMIEREN_SENSOR.md` v1.2 Regel 1, Kap. 2, Kap. 5; Veto PS-K1 und Auflagen PS-W2…W4 (`docs/reviews/phase5_programmer_sicherheit.md`); `hardware/programmer/README.md` Kap. 4 (Dummy-Zelle) |
 | Platinen | `fluidi_dummy_plus.kicad_pcb` (oben, +, **1.0 mm**), `fluidi_dummy_minus.kicad_pcb` (unten, −, **2.0 mm**) |
@@ -43,11 +43,17 @@ Lötpads (Litze von oben anlöten):
 | J3 „+“ 4.5 × 5 mm SMD | PLUS (Lasche, x 12.6–17.1) | + (Kupferscheibe oben) | Netzteil + (rote Litze). Kein Loch: PLUS hat unten **kein** Kupfer |
 | J4 „−“ 3.5 × 5 mm, Bohrung 1.2 | MINUS (x 19.25–22.75, frei hinter PLUS) | − (Mittelinsel) | Netzteil − (schwarze Litze) |
 | J5 „GND“ Ø 2.2, Bohrung 1.0 | MINUS | − | GND des USB-UART-Boards |
-| J6 „TP1“, J7 „VIO“, J8 „RXD“ | MINUS | Variante B2 | Kap. 3 |
+| J9 „BR+“ Ø 2.2, Bohrung 1.0 | MINUS (x 14.85, y −6.5, neben J3) | VIO | **Pflicht-Brücke** zu J3 (+): kurzer verzinnter Draht, beim Zusammenbau fest eingelötet (DS-B2) |
+| J7 „VIO“ Ø 2.2, Bohrung 1.0 | MINUS | VIO (= + über J9–J3) | **einziger** Abgriff für VIO/VCCIO des USB-UART (Regel 3), mit und ohne B2 |
+| J6 „TP1“, J8 „RXD“ | MINUS | Variante B2 | Kap. 3 |
 
-**Verpolt eingesetzt** (Insel oben): Die Plusfläche liegt dann auf dem Minuspad, die Insel trifft die Haltefeder höchstens
-zufällig. Der Verpolschutz Q1 (AO3401A) des Sensors sperrt (hardware/programmer/README.md Kap. 2.3, CONCEPTS 2.7). Die
-Lasche zeigt dann zur falschen Seite bzw. die Beschriftung „+“ ist unten; das ist sichtbar.
+**Verpolt eingesetzt** (Scheibe um die Laschenachse gekippt, Insel oben; physisch möglich, die Lasche bleibt in +x):
+Die Plusfläche Ø 19 liegt dann auf dem Minuspad **und** reicht über die VBAT-Clip-Pads (diese beginnen bei r 8.37 mm ab
+Zellmitte, Plusfläche bis r 9.5), die Insel (−) kann die Haltefeder (VBAT) berühren. Folge: **Das Netzteil wird über
+Clip/Pads kurzgeschlossen und geht in die Strombegrenzung (10 mA)**; ohne Zelle im Kreis harmlos (Sicherheit DS-K2). Q1
+schützt in diesem Fall nicht, weil der Kurzschluss vor Q1 liegt. Erkennen: Netzteil zeigt Strombegrenzung (CC) → sofort
+aus, Scheibe richtig herum einsetzen („PLUS“/„+“ oben, Aufdruck „DUMMY“ der MINUS-Unterseite unten).
+Gegenstück auf der Sensorplatine geprüft durch `sicherheit` (pcbnew, BT1-Pads y ± 10.9, Länge 5.08).
 
 ## 3 Variante B2 (optional): Weg B ohne Draht an R9
 
@@ -67,16 +73,30 @@ bereits in der Einkaufsliste P3/P5/P6):
 | C1 | 100 nF 0805 (Samsung CL21B104KBCNNNC) | VIO – GND | Adapter README Kap. 2.1 |
 
 Anschluss B2: J6 „TP1“ → Prüfspitze (flacher/gerundeter Kopf, PS-W2) auf **TP1**; J8 „RXD“ → RXD des USB-UART;
-J7 „VIO“ → Netzteil + (gleiche 2.0 V wie J3 und wie VIO/VCCIO des USB-UART, Regel 3); J5 → GND des USB-UART. TP2
-wie bisher mit Prüfspitze. Pegel und Zeitverhalten entsprechen SPICE A1 des Adapters (VDD = VIO 1.96–2.04 V);
-**Baudrate 19200** (`--baud 19200`): Mit Puffer am Kabelende (40 pF) bleibt die Reserve bei 19200 noch 0.213 Bit, bei
-57600 nicht (`simulation/spice/programmer/prog_uart_report.txt`, Fall „Puffer am Kabelende“). Prüfspitzenleitung
-TP1–J6 so kurz wie möglich (**ANNAHME** ≤ 10 cm).
+J7 „VIO“ → VIO/VCCIO des USB-UART (J7 ist über die Pflicht-Brücke J9–J3 fest mit + verbunden, DS-B2; nie an eine andere
+Spannung); J5 → GND des USB-UART. TP2 wie bisher mit Prüfspitze. Ablauf und Abbaureihenfolge: PROGRAMMIEREN Kap. 5
+„Variante B2“ (DS-B1).
+
+**SPICE B2** (`simulation/spice/programmer/prog_uart_b2.py`, Bericht `prog_uart_b2_report.txt`, ngspice 42 -b; erweitert
+die Adapter-Rechnung A1 von VDD/VIO 1.96–2.04 V auf **VDD = VIO aus einem Netzteil 1.96 / 2.00 / 2.05 / 2.10 V**, DS-B5):
+- DC: Puffer-Eingang low 0.331–0.398 V (Grenze VT− min 0.47 V, Reserve **+139 … +72 mV**, kleinste bei 2.1 V), high
+  ≥ 1.86 V (+92 mV); Puffer → CH343-RXD ≤ 0.052 V, → PL2303-RXD ≤ 0.098 V (VIL 0.40 V); Sensor-RX bei TXD 0 V 0.136–0.235 V,
+  bei PL2303-TXD-Low 0.1 V (Grenze Eingangsprüfung B3) 0.178–0.262 V (VIL 0.2 VDDS, Reserve ≥ +158 mV). Ruhepegel A1z
+  (DIO6 noch hochohmig) im Hysteresebereich wie beim Adapter – unschädlich (Adapter README Kap. 3, „Wahl von R1“).
+- Transient **19200 Baud**: Prüfspitze ≤ 10 cm (20 pF, **ANNAHME**) Reserve ≥ 0.288 Bit bei 2.0 V und ≥ 0.223 Bit bei
+  2.1 V; lange Leitung (40 pF) bei 2.0 V 0.213 Bit, **bei 2.1 V 0.089 Bit (nicht ok)**. Host → Sensor ≥ 0.354 Bit.
+- Folge: **nur 19200 Baud** (DS-B4); bei 2.1 V (PL2303-Obergrenze) Prüfspitzenleitung TP1–J6 **≤ 10 cm**.
+
+Bedingungen B2 (Sicherheit DS-B3…B5): Eingangsprüfung des USB-UART nach `hardware/programmer/README.md` Kap. 9.3 mit der
+**Weg-A-Grenze RXD-Kurzschlussstrom ≤ 2.1 mA** (der Puffer treibt RXD, nicht DIO6); TXD-Kriterien unverändert. B4
+(2.0 V, PL2303 ≤ 2.1 V, 10 mA, USB zuerst / Netzteil zuletzt) gilt voll, B5 (R2 470 Ω) entfällt. **PROTOTYP-PRÜFUNG**
+am ersten Muster (DC-4): Pegel RXD (U1-Ausgang) und Sensor-RX (DIO20) bei **2.0 und 2.1 V**, 20 × Flashen mit
+`--baud 19200`, Sitz beider Prüfspitzen ≥ 3 min.
 
 Vorteile: keine Lötstelle am bestückten Sensor, kein vergessener Draht (PS-W4 entfällt), beide 100-kΩ-Barrieren
 bleiben im TX-Pfad. Nachteil: zwei Prüfspitzen (TP1, TP2, Abstand 3.0 mm) müssen ≈ 2–3 min ruhig sitzen (dritte Hand
-oder zwei Federstifte P8 in einem Halter, **ANNAHME**). **B2 ist ein Vorschlag**: Aufnahme in PROGRAMMIEREN Kap. 5 erst
-nach Prüfung durch `sicherheit` und einem Versuch am ersten Muster (**PROTOTYP-PRÜFUNG**).
+oder zwei Federstifte P8 in einem Halter, **ANNAHME**). B2 ist durch `sicherheit` freigegeben (Runde 1, DS-B1…B5) und
+in PROGRAMMIEREN Kap. 5 aufgenommen; die PROTOTYP-PRÜFUNG oben bleibt Bedingung für den Routineeinsatz.
 
 ## 4 Herstellung und Prüfung (je Scheibe)
 
@@ -98,18 +118,23 @@ JLC-Bestelloptionen (beide Designs, `docs/references/JLCPCB_NOTES.md` Kap. 3/5):
 Zusammenbau (einmal, ≈ 30 min + Aushärtezeit):
 1. Je 5 PLUS und 5 MINUS mit dem Messschieber an 3 Stellen der Scheibe messen; Paare so wählen, dass PLUS + MINUS
    **2.95–3.10 mm** ergibt (Kleber ≈ 0.05–0.10 mm, **ANNAHME**). JLC-Toleranz ± 10 % (`JLCPCB_NOTES.md` Kap. 3) →
-   schlechtester Fall 2.7–3.3 mm; zu dünn: 1 Lage Kaptonband (≈ 0.06 mm) **in** die Klebefuge, nie auf Kontaktflächen;
-   zu dick: anderes Paar.
-2. Entgraten: Scheibenrand mit Schleifpapier 400 leicht fasen (wie eine Zelle), Staub mit Isopropanol entfernen.
+   schlechtester Fall 2.7–3.3 mm. Zu dünn oder zu dick: **lieber ein anderes Paar wählen**. Nur wenn keines passt:
+   Kaptonband (≈ 0.06 mm) als **schmaler Ring am Rand** in die Klebefuge, **nicht vollflächig** (Epoxid braucht die
+   Fläche zum Haften, DS-K3), nie auf Kontaktflächen.
+2. Entgraten: Scheibenrand mit Schleifpapier 400 leicht fasen (wie eine Zelle), **nur die FR-4-Kante, nicht bis an die
+   Plus-Kupferfläche** (0.4 mm Rand, DS-K3); Staub mit Isopropanol entfernen.
 3. Kleben: **isolierender** Zweikomponenten-Epoxidkleber dünn auf die MINUS-Oberseite im Scheibenbereich, nicht auf
    J4/J5–J8. Zwei Stifte Ø 1.0 mm (z. B. Bohrerschaft) durch die Passlöcher H1/H2 beider Platinen, Ränder bündig,
    zwischen zwei glatten Flächen leicht pressen; Stifte vor dem Aushärten ziehen; Kleberreste am Rand entfernen.
 4. Prüfen: Gesamtdicke an 3 Stellen **3.0–3.2 mm**, Wert mit Stift ins Feld „d = ___ mm“ (MINUS unten) schreiben
-   (PS-W3). Isolation + ↔ − **> 10 MΩ** (Multimeter, Programmer README Kap. 4). Durchgang J3 ↔ Kupferscheibe und
-   J4 ↔ Mittelinsel (< 1 Ω).
-5. Litzen: rot an J3 (+), schwarz an J4 (−), 0.14–0.25 mm², 20–30 cm, Lötstellen flach; Litzen mit einem Tropfen
-   Kleber oder Kaptonband auf der Lasche zugentlasten; freie Enden mit Krokodilklemme/4-mm-Stecker an das Netzteil.
-   Optional B2: U1, R1, C1 von Hand bestücken (Kap. 3).
+   (PS-W3). **Verdrehprobe:** PLUS und MINUS lassen sich von Hand nicht gegeneinander verdrehen (DS-K3). Isolation
+   + ↔ − **> 10 MΩ** (Multimeter, Programmer README Kap. 4). Durchgang J3 ↔ Kupferscheibe und J4 ↔ Mittelinsel (< 1 Ω).
+5. Litzen und Brücke: rot an J3 (+), schwarz an J4 (−), 0.14–0.25 mm², 20–30 cm; **Brücke J3 ↔ J9** (kurzer verzinnter
+   Draht, fest, DS-B2). Lötstellen flach, **keine abstehenden Litzenadern** (J3 und J4 liegen ≈ 2 mm auseinander);
+   Litzen mit einem Tropfen Kleber oder Kaptonband auf der Lasche zugentlasten; freie Enden mit Krokodilklemme/4-mm-
+   Stecker an das Netzteil. Optional B2: U1, R1, C1 von Hand bestücken (Kap. 3).
+   **Danach Prüfung wiederholen (DS-K1):** Isolation + (J3) ↔ − (J4) **> 10 MΩ**, J7 ↔ J3 **< 1 Ω**; mit B2 zusätzlich
+   J8 ↔ J4 und J6 ↔ J4 nicht niederohmig (> 1 MΩ).
 6. Probesitz am Sensor (ohne Speisung): Scheibe sitzt ohne Kraftaufwand, Clip nicht sichtbar gespreizt; Durchgang
    J3 ↔ Clip (VBAT) und J4 ↔ Minuspad (GND) < 1 Ω (**PROTOTYP-PRÜFUNG**: Kontakt der Insel am Minuspad mit der
    Haltekraft des Clips).
@@ -132,7 +157,7 @@ Zusammenbau (einmal, ≈ 30 min + Aushärtezeit):
 | Punkt | Umsetzung |
 |---|---|
 | PS-K1: Netzteil nur über die Scheibe, nie mit Zelle | Die Scheibe belegt den einzigen Clip (Höhe 3.0–3.2 mm = Zellhöhe); die Litzen sind **fest** an die Scheibe gelötet → Speisung ohne Scheibe ist mit diesem Werkzeug nicht vorgesehen. Regeln 1–4 und Schritt 8 (Netzteil aus und ab → Scheibe heraus → Draht/Spitzen weg → erst dann Zelle) bleiben **unverändert** |
-| Verwechslung mit einer Zelle | **Lasche** (eine Zelle hat keine), angelötete Litzen, Aufdruck „DUMMY“ (oben und unten), „KEINE ZELLE“, „max 2.1 V / 10 mA“, „+2.0V“ am Pluspad; Dicke von Hand eingetragen. Die Scheibe ist kein Energiespeicher; eingesetzt in ein fremdes Gerät liefert sie nichts |
+| Verwechslung mit einer Zelle | **Lasche** (eine Zelle hat keine), angelötete Litzen, Aufdruck „DUMMY“ (oben und unten), „KEINE ZELLE“, „PROG 2.0-2.1V/10mA“ und „TEST 3.0V/30mA“ (MINUS unten, DS-K4: Programmieren nach PROGRAMMIEREN Regel 2, Funk-/Energietests nach TESTFIRMWARE Kap. 1), „+“/„PLUS“ am Pluspad; Dicke von Hand eingetragen. Die Scheibe ist kein Energiespeicher; eingesetzt in ein fremdes Gerät liefert sie nichts |
 | PS-W3 Dicke | 1.0 + 2.0 mm + Kleber, Paarung nach Messung, Prüfmass 3.0–3.2 mm (Kap. 4) |
 | PS-W2 Via-in-Pad im Fach | Keine Lötstelle auf Minuspad/VBAT-Pad/TP1/TP2. Die Insel ist eben (HASL), Vias ausserhalb der Padfläche; keine Lötstelle an der Unterseite der Scheibe |
 | R2-W01 kein Plusrand unten | PLUS hat unten kein Kupfer (DRC-Regel), MINUS unten nur die Insel (DRC-Regel) |
@@ -180,7 +205,7 @@ Die Einkaufsliste ändert der Einkauf; diese Liste ist die Vorgabe dafür.
 
 | Nr | Werkzeug / Material | Mindestanforderung | Wofür (Quelle) |
 |---|---|---|---|
-| WB-1 | **Labornetzteil** | 0–3 V einstellbar, Anzeige/Auflösung ≤ 10 mV, **Strombegrenzung einstellbar auf 10 mA** (Anzeige in mA), Ausgang schaltbar | Speisung 2.0 V (PL2303: ≤ 2.1 V), 10 mA (höchstens 20 mA), erst einstellen dann anschliessen (PROGRAMMIEREN Regel 2, Schritt 5, PS-L3) |
+| WB-1 | **Labornetzteil** | 0–3.3 V einstellbar, Anzeige/Auflösung ≤ 10 mV, **Strombegrenzung einstellbar auf 10 mA** (Anzeige in mA, CC-Anzeige), Ausgang schaltbar | **Programmieren 2.0 V (PL2303: ≤ 2.1 V) / 10 mA** (PROGRAMMIEREN Regel 2, Schritt 5, PS-L3); Funk-/Energietests 3.0 V / 30 mA über die Scheibe (TESTFIRMWARE Kap. 1); erst einstellen, dann anschliessen |
 | WB-2 | **Multimeter** | DC 2 V mit 1 mV Auflösung; Widerstand bis ≥ 20 MΩ; Durchgangsprüfer | VIO/VDD 2.0 V messen (Schritt 5), Polarität vor dem Anschliessen, Isolation Scheibe > 10 MΩ, Kontrolle TP1 ↔ R9 Pad 1 ≈ 200 kΩ (Schritt 9), Zellspannung ≥ 3.0 V |
 | WB-3 | **Messschieber** | Auflösung 0.01 mm | Scheibendicke 3.0–3.2 mm (PS-W3) |
 | WB-4 | **Lötstation** | temperaturgeregelt, feine Spitze (≤ 0.4 mm, konisch oder Meissel) | Draht an R9 Pad 1 (0402, 0.54 × 0.64 mm), Litzen an der Scheibe, B2-Bestückung |
@@ -210,7 +235,7 @@ Die Einkaufsliste ändert der Einkauf; diese Liste ist die Vorgabe dafür.
 | Nr | Punkt | Wer |
 |---|---|---|
 | DC-1 | Freiraum der Lasche beim Weg-B-Schritt (Kap. 6) – **erledigt** 2026-11-09, passt (Kap. 6a) | mechanik |
-| DC-2 | Prüfung Kap. 6 (PS-K1 bleibt erfüllt, Kennzeichnung ausreichend), Freigabe Variante B2 | sicherheit |
+| DC-2 | Prüfung Kap. 6, Freigabe B2 – **erledigt** 2026-11-09: ohne Veto, B2 unter DS-B1…B5 (Antworten in `phase6_sicherheit_schluss.md`) | sicherheit |
 | DC-3 | JLC-Preis 1.0/2.0 mm, 2 Lagen, Kleinformat am Bestelltag im Rechner ablesen (ersetzt die Spanne Kap. 5) | Auftraggeber/Einkauf |
-| DC-4 | **PROTOTYP-PRÜFUNG**: Sitz im Clip, Kontakt Insel–Minuspad, Dicke nach Kleben, B2 mit 19200 Baud am ersten Muster | Elektronik |
-| DC-5 | Verweis in `PROGRAMMIEREN_SENSOR.md` Kap. 2 gesetzt (2026-11-09: Scheibe und Werkstattliste); Kap. 5 Schritt 2 und ggf. B2 erst nach DC-2 | Elektronik |
+| DC-4 | **PROTOTYP-PRÜFUNG**: Sitz im Clip, Lasche ohne Kontakt zu den Clip-Armen, Kontakt Insel–Minuspad, Dicke nach Kleben; B2: Pegel RXD/DIO20 bei 2.0 und 2.1 V, 20 × Flashen mit 19200 Baud, Prüfspitzensitz ≥ 3 min (DS-B5) | Elektronik |
+| DC-5 | PROGRAMMIEREN Kap. 2 nachgeführt, Kap. 5 „Variante B2“ aufgenommen – **erledigt** 2026-11-09 (DS-B1, DS-K5) | Elektronik |

@@ -214,7 +214,7 @@ def build_plus(path):
     F = pcbnew.F_SilkS
     b.text("+", 11.0, 0.0, 1.6, F, thick=0.25)
     b.text("DUMMY", 14.85, 3.25, 1.0, F)
-    b.text("+2.0V", 14.85, -3.25, 1.0, F)
+    b.text("PLUS", 14.85, -3.25, 1.0, F)
     fab_note(b, ["fluidi Dummy-Scheibe PLUS Rev %s (oben, +)" % REV,
                  "JLC: FR-4 2 Lagen 1.0 mm, 1 oz, HASL bleifrei, gruen, 5 Stk, ohne Bestueckung",
                  "Kupferscheibe offen (Kontakt Clip), keine Vias, Unterseite ohne Kupfer"])
@@ -239,7 +239,10 @@ def build_minus(path):
     # Variante B2 (optional, Handloeten): Schmitt-Puffer wie Programmieradapter U4/R1/C5
     j5 = b.fp(LIB, "PAD_PTH_D2p2_D1p0", "J5", 24.2, 5.5, nets={"1": g}, val="GND UART")
     j6 = b.fp(LIB, "PAD_PTH_D2p2_D1p0", "J6", 24.2, -5.5, nets={"1": "TX_PROBE"}, val="TP1-Pruefspitze")
-    j7 = b.fp(LIB, "PAD_PTH_D2p2_D1p0", "J7", 31.5, -5.5, nets={"1": "VIO"}, val="VIO (Netzteil +)")
+    j7 = b.fp(LIB, "PAD_PTH_D2p2_D1p0", "J7", 31.5, -5.5, nets={"1": "VIO"}, val="VIO USB-UART (einziger Abgriff)")
+    # DS-B2: Bruecke J3 (+, PLUS) -> J9 beim Zusammenbau fest einloeten; VIO = VDD konstruktiv, J7 nur Abgriff
+    b.fp(LIB, "PAD_PTH_D2p2_D1p0", "J9", 14.85, -6.5, nets={"1": "VIO"}, val="Bruecke zu J3 (+)")
+    b.track([(14.85, -6.5), (14.85, -7.7), (28.85, -7.7), (28.85, -5.5)], 0.3, "VIO")
     j8 = b.fp(LIB, "PAD_PTH_D2p2_D1p0", "J8", 32.0, 4.5, nets={"1": "RXD_HOST"}, val="RXD USB-UART")
     u = b.fp(KLIB + "/Package_TO_SOT_SMD.pretty", "SOT-23-5_HandSoldering", "U1", 27.5, 0,
              nets={"2": "TX_PROBE", "3": g, "4": "RXD_HOST", "5": "VIO"}, val="SN74AUP1G17DBVR")
@@ -292,14 +295,15 @@ def build_minus(path):
     b.text("VIO", 31.5, -7.6, 1.0, F)
     b.text("RXD", 32.0, 6.6, 1.0, F)
     b.text("DUMMY", 14.6, 6.5, 1.0, F)
-    b.text("Rev " + REV, 14.6, -6.5, 1.0, F)
+    b.text("BR+", 17.7, -6.5, 1.0, F)
     b.text("U1 AUP1G17", 27.2, 2.6, 1.0, F)
     b.text("R1", 26.6, -4.2, 1.0, F)
     b.text("C1", 33.3, -2.2, 1.0, F)
     b.text("DUMMY", 15.5, 0.0, 1.5, B, rot=90, thick=0.25)
     b.text("KEINE ZELLE", 18.0, 0.0, 1.0, B, rot=90)
-    b.text("max 2.1 V / 10 mA", 26.6, 8.0, 1.0, B)
-    b.text("fluidi Dummy Rev " + REV, 26.6, -8.0, 1.0, B)
+    b.text("PROG 2.0-2.1V/10mA", 26.2, 8.0, 1.0, B)
+    b.text("TEST 3.0V/30mA", 26.6, -8.0, 1.0, B)
+    b.text("Rev " + REV, 13.5, 6.8, 1.0, B)
     b.text("d=_____mm", 28.0, 2.6, 1.0, B)
     fab_note(b, ["fluidi Dummy-Scheibe MINUS Rev %s (unten, -)" % REV,
                  "JLC: FR-4 2 Lagen 2.0 mm, 1 oz, HASL bleifrei, gruen, 5 Stk, ohne Bestueckung",

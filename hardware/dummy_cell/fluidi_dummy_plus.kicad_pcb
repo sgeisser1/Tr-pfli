@@ -89,16 +89,16 @@
 			(outputdirectory "")
 		)
 	)
-	(footprint "HOLE_NPTH_1p0"
+	(footprint "PAD_SMD_4p5x5"
 		(layer "F.Cu")
-		(uuid "0ca0b1eb-960c-42e4-abb4-f09abe0f1938")
-		(at 111.6 97.1)
-		(descr "Passloch Oe 1.0 mm (Klebelehre PLUS/MINUS)")
-		(property "Reference" "H2"
+		(uuid "4bf5957a-d62b-4c72-8d48-b5625836eb7d")
+		(at 114.85 100)
+		(descr "Loetpad fuer Litze, nur Oberseite (keine Unterseiten-Kupferflaeche auf PLUS)")
+		(property "Reference" "J3"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "a2b7fcc1-af18-4d28-92d1-1deea467378c")
+			(uuid "0f90d5ff-ca8d-4f64-8dff-0bf2c4cdee76")
 			(effects
 				(font
 					(size 1 1)
@@ -106,11 +106,11 @@
 				)
 			)
 		)
-		(property "Value" "Passloch"
+		(property "Value" "Netzteil +"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "77727853-41aa-4045-9dfd-812b5fd5e2f6")
+			(uuid "6d5cac83-99e1-48f7-a637-a0f35884d080")
 			(effects
 				(font
 					(size 1 1)
@@ -122,7 +122,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "7915b238-169b-4f47-8f6c-c822124304d9")
+			(uuid "13a99604-de28-4c28-9ecb-06c88764d06e")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -133,7 +133,69 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "e2f75fe5-62c8-4ed8-a7c7-d5ae17479e5d")
+			(uuid "2ce97e07-0f89-4a47-a152-5ed8db905e22")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(attr smd exclude_from_pos_files exclude_from_bom)
+		(duplicate_pad_numbers_are_jumpers no)
+		(pad "1" smd rect
+			(at 0 0)
+			(size 4.5 5)
+			(layers "F.Cu" "F.Mask")
+			(net "VBAT_DUMMY")
+			(uuid "e22b5696-fecd-448f-9521-ae442f3833a4")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "HOLE_NPTH_1p0"
+		(layer "F.Cu")
+		(uuid "9be0e033-8e2c-4022-8f6e-b370e0ad24f6")
+		(at 111.6 97.1)
+		(descr "Passloch Oe 1.0 mm (Klebelehre PLUS/MINUS)")
+		(property "Reference" "H2"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "9dda9153-3cb7-4265-9684-e0bd3ad5edb0")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "Passloch"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "5ee2db94-7403-4967-9194-b27e58e22d9e")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "e40c151a-6100-4860-b18c-e24ccae3f56b")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "f11b2bbf-6da5-4ca4-a666-27716866a213")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -147,20 +209,20 @@
 			(size 1 1)
 			(drill 1)
 			(layers "*.Cu" "*.Mask")
-			(uuid "e0a82a4d-6478-423d-82d9-74ad9debe0e6")
+			(uuid "7791cdaa-4bfd-451d-a1e0-a1ca0d44134f")
 		)
 		(embedded_fonts no)
 	)
 	(footprint "PLUS_PLATE"
 		(layer "F.Cu")
-		(uuid "28c02647-4258-4437-9b00-6814f1855c1f")
+		(uuid "9e0ee881-80c2-4114-9f4c-e1ca67da0928")
 		(at 100 100)
 		(descr "Kontaktscheibe + (Clip BT1), Oe 19.0 mm, Loetstopp offen")
 		(property "Reference" "J1"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "6be09e95-faa6-4fe7-9e24-3533147385ea")
+			(uuid "40a170b1-dcf4-48db-ad6d-8ca7d65e9da6")
 			(effects
 				(font
 					(size 1 1)
@@ -172,7 +234,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "a4642b55-4b5e-4f5e-9b15-395edfbd6282")
+			(uuid "ac1e2ba1-d402-4a34-b202-ce8510853d62")
 			(effects
 				(font
 					(size 1 1)
@@ -184,7 +246,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "b6e825be-4b41-4b73-912f-60e2ebcb6fd7")
+			(uuid "f9a478ba-8a94-4c5b-8c4d-5c6e0f7b4dfa")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -195,7 +257,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "2e4778f7-0e24-44fe-bc61-0498ee0f1d4f")
+			(uuid "e70fbf63-6296-457e-a67c-ba14bb48151a")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -210,82 +272,20 @@
 			(layers "F.Cu" "F.Mask")
 			(net "VBAT_DUMMY")
 			(solder_mask_margin 0)
-			(uuid "b6ff0ccf-44e8-41b9-ad2c-a90db4a1c290")
-		)
-		(embedded_fonts no)
-	)
-	(footprint "PAD_SMD_4p5x5"
-		(layer "F.Cu")
-		(uuid "3a090ddd-03b8-4b0a-818f-21692551bf19")
-		(at 114.85 100)
-		(descr "Loetpad fuer Litze, nur Oberseite (keine Unterseiten-Kupferflaeche auf PLUS)")
-		(property "Reference" "J3"
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "706de661-c9a9-410f-b994-46d87f0d1790")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
-		(property "Value" "Netzteil +"
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "de761a16-6284-42b0-aafc-e0ef9d5fe659")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "a41a75ea-63fe-4be4-b8e5-7fdd96f21607")
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "e33791af-b602-425d-abf1-b509fc7fb6d5")
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(attr smd exclude_from_pos_files exclude_from_bom)
-		(duplicate_pad_numbers_are_jumpers no)
-		(pad "1" smd rect
-			(at 0 0)
-			(size 4.5 5)
-			(layers "F.Cu" "F.Mask")
-			(net "VBAT_DUMMY")
-			(uuid "ee595ab2-5497-48b2-8464-9f49ddb9a8fb")
+			(uuid "e508e038-f793-40ec-bc9f-54817f87b660")
 		)
 		(embedded_fonts no)
 	)
 	(footprint "HOLE_NPTH_1p0"
 		(layer "F.Cu")
-		(uuid "774c07ec-f850-4c91-a2be-2fc4b71270a1")
+		(uuid "c4b765f9-e1a2-4970-89f8-8391233d5630")
 		(at 111.6 102.9)
 		(descr "Passloch Oe 1.0 mm (Klebelehre PLUS/MINUS)")
 		(property "Reference" "H1"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "8847ad92-4c1c-40e2-8921-dc10be195667")
+			(uuid "cda48c36-4345-46a5-b61c-d07ede362a4b")
 			(effects
 				(font
 					(size 1 1)
@@ -297,7 +297,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "9e892b77-1cc0-4203-9d66-29c777fc4c50")
+			(uuid "784325a8-21c0-41cf-8cb5-f16adbd8ebaf")
 			(effects
 				(font
 					(size 1 1)
@@ -309,7 +309,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "59d30680-91c0-4d1a-90ae-4ececa1cc11b")
+			(uuid "d0752836-c102-48b7-86e1-0a317a1df50e")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -320,7 +320,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "13a5803a-c434-4f29-9476-16c5ea03a92f")
+			(uuid "667098c1-7ab0-4ea4-a3a6-4c64f3681fa7")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -334,7 +334,7 @@
 			(size 1 1)
 			(drill 1)
 			(layers "*.Cu" "*.Mask")
-			(uuid "bd04b04b-d14d-45d6-943f-06ee2c378cb0")
+			(uuid "e71612ed-5b6e-4c48-83df-3ce909598661")
 		)
 		(embedded_fonts no)
 	)
@@ -346,7 +346,7 @@
 			(type default)
 		)
 		(layer "Edge.Cuts")
-		(uuid "ac222a09-ddcd-4e33-879d-8fed311703f7")
+		(uuid "2fbfd112-6e84-4544-a7de-7bae43359056")
 	)
 	(gr_arc
 		(start 109.055937 104)
@@ -357,7 +357,7 @@
 			(type default)
 		)
 		(layer "Edge.Cuts")
-		(uuid "9e0e5538-998f-4165-aecf-447ae9972e21")
+		(uuid "8344cb43-ae4a-4ab0-ac15-45ec02fd9e74")
 	)
 	(gr_line
 		(start 118 96)
@@ -367,7 +367,7 @@
 			(type default)
 		)
 		(layer "Edge.Cuts")
-		(uuid "ae099c03-60f2-4ea8-ba3b-250ec07cccc8")
+		(uuid "c4460a42-5028-4df3-937a-7699147b8f6c")
 	)
 	(gr_line
 		(start 118 104)
@@ -377,12 +377,12 @@
 			(type default)
 		)
 		(layer "Edge.Cuts")
-		(uuid "31288934-5a69-41b6-b3a2-a3195ecb32e0")
+		(uuid "319b7500-ec15-4996-ac8c-19eb75c4650c")
 	)
-	(gr_text "+2.0V"
+	(gr_text "PLUS"
 		(at 114.85 96.75 0)
 		(layer "F.SilkS")
-		(uuid "28ee94c1-dae6-4cf1-9e04-9a0a4e6e4e65")
+		(uuid "92f1318b-cbf9-4458-a719-83e84bcc7f4a")
 		(effects
 			(font
 				(size 1 0.9)
@@ -393,7 +393,7 @@
 	(gr_text "DUMMY"
 		(at 114.85 103.25 0)
 		(layer "F.SilkS")
-		(uuid "f1bbce51-5f62-4b8e-9dc3-6e05ec507110")
+		(uuid "44121f61-62db-4079-a5a9-7295efbff2d7")
 		(effects
 			(font
 				(size 1 0.9)
@@ -404,7 +404,7 @@
 	(gr_text "+"
 		(at 111 100 0)
 		(layer "F.SilkS")
-		(uuid "29157c46-867d-4fcb-bd1b-7501cdefb398")
+		(uuid "67deab10-0795-4361-8182-6707fbf6ac56")
 		(effects
 			(font
 				(size 1.6 1.44)
@@ -415,7 +415,7 @@
 	(gr_text "fluidi Dummy-Scheibe PLUS Rev 1 (oben, +)"
 		(at 90 81.2 0)
 		(layer "F.Fab")
-		(uuid "6e1a57c8-adb8-4527-81d2-03e3f2c6c326")
+		(uuid "5437fd80-c98d-4829-ab67-e47776d4f552")
 		(effects
 			(font
 				(size 1 0.9)
@@ -426,7 +426,7 @@
 	(gr_text "JLC: FR-4 2 Lagen 1.0 mm, 1 oz, HASL bleifrei, gruen, 5 Stk, ohne Bestueckung"
 		(at 90 82.8 0)
 		(layer "F.Fab")
-		(uuid "561969cc-f3d2-466f-af37-4db369030390")
+		(uuid "6b89cb3f-7978-44b5-953c-e822019b7fa3")
 		(effects
 			(font
 				(size 1 0.9)
@@ -437,7 +437,7 @@
 	(gr_text "Kupferscheibe offen (Kontakt Clip), keine Vias, Unterseite ohne Kupfer"
 		(at 90 84.4 0)
 		(layer "F.Fab")
-		(uuid "a05cba2b-21d9-41ea-bbb3-553f03d12987")
+		(uuid "8e4c278b-bf59-4a35-9e7b-3f687398526c")
 		(effects
 			(font
 				(size 1 0.9)
@@ -451,7 +451,7 @@
 		(width 3)
 		(layer "F.Cu")
 		(net "VBAT_DUMMY")
-		(uuid "6268c262-43be-46c0-8ebc-0eadbfb8dda1")
+		(uuid "f90f4bbe-ebef-4d52-94fc-96da6895bc2b")
 	)
 	(embedded_fonts no)
 )

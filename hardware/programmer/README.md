@@ -302,7 +302,7 @@ Werkzeug: Labornetzteil 2.0 V / 10 mA, Multimeter. Kein Sensor angeschlossen.
    **VCCIO (P2.1) offen ≤ 0.10 V** (das Board treibt VCCIO nicht zurück; Voraussetzung für Weg B).
 2. Erst jetzt das Netzteil (2.0 V, 10 mA, ausgeschaltet) an P2.1/P2.2 und einschalten: Strom ≤ 1 mA (VDD_IO-Ruhestrom
    ist im Datenblatt nicht angegeben; Budget Weg B: Sensor ≤ 7 mA + Board-LEDs ≤ 1 mA + VDD_IO ≤ 1 mA < 10 mA).
-3. Strommesser (mA-Bereich) von P2.4 RXD nach GND: **≤ 0.69 mA** (Grenze Weg B bei 2.0 V). 0.69–2.1 mA: nur Weg A.
+3. Strommesser (mA-Bereich) von P2.4 RXD nach GND: **≤ 0.69 mA** (Grenze Weg B bei 2.0 V). 0.69–2.1 mA: nur Weg A **oder Weg B Variante B2** (Puffer auf der Dummy-Scheibe, `hardware/dummy_cell/README.md` Kap. 3, Sicherheit DS-B3).
    Über 2.1 mA: Board ungeeignet.
 4. Port öffnen (`picocom -b 57600 /dev/ttyUSB0`), P2.3 TXD gegen GND: **≥ 1.90 V**.
 5. Break halten: `python3 -c "import serial,time; s=serial.Serial('/dev/ttyUSB0',57600); s.break_condition=True; time.sleep(30)"`,
@@ -339,7 +339,7 @@ Werkzeug: Labornetzteil 2.0 V / 10 mA, Multimeter. Kein Sensor angeschlossen.
 |---|---|
 | B1 | Weg A nur mit Puffer U4 am Federstift; PL2303-RXD nie direkt an TP1 (A0p) |
 | B2 | Jumper J1 des Boards entfernt; Anschluss J1 nach Tab. 2.1 |
-| B3 | Eingangsprüfung Kap. 9.3 bestanden (VCCIO offen ≤ 0.10 V, RXD-Kurzschlussstrom ≤ 0.69 mA bzw. ≤ 2.1 mA nur Weg A, TXD high ≥ 1.90 V, TXD low ≤ 0.10 V) |
+| B3 | Eingangsprüfung Kap. 9.3 bestanden (VCCIO offen ≤ 0.10 V, RXD-Kurzschlussstrom ≤ 0.69 mA bzw. ≤ 2.1 mA nur Weg A / Weg B Variante B2, TXD high ≥ 1.90 V, TXD low ≤ 0.10 V) |
 | B4 | Weg B: Netzteil 2.0 V, **höchstens 2.1 V**, 10 mA; Reihenfolge USB/Netzteil nach Kap. 9.4 |
 | B5 | Weg A nur mit bestücktem R2 (470 Ω VIO → GND); Kontrolle beim Aufbau: VIO ↔ GND ohne Speisung ≤ 470 Ω (R2 parallel zu U3/U4). Ohne R2: Dummy-Zelle vor dem Ziehen der USB entfernen und Kap. 9.4 gilt nicht |
 | B6 | Port `/dev/ttyUSB0` (Treiber `pl2303`); 20 × Flashen bei 57600 und 19200 (PA-7) |

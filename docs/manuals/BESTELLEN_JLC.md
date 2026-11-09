@@ -180,8 +180,8 @@ Belegt (`docs/references/JLCPCB_HowToPlaceOrder_Auszug_2026-11-08.txt` Schritte 
 Gerber hochladen, Optionen wählen, „Save to Cart“, für jedes weitere PCB wiederholen; danach alle Posten zusammen über
 „Secure Checkout“ bezahlen; die Versandkosten werden im Checkout bestimmt.
 
-1. sha256 prüfen (vor dem Upload): `fluidi_dummy_plus_gerber_jlc.zip` = `5361f11926ba21a9f4ef1a34fbc018e60a4ed07329dcf4ad2250acc96fbc5831`,
-   `fluidi_dummy_minus_gerber_jlc.zip` = `a66f0b576484715333e002a8c9cca1ba90349176a9de6d133407c0c64007a6fa`
+1. sha256 prüfen (vor dem Upload): `fluidi_dummy_plus_gerber_jlc.zip` = `02d5b9ec4c880b3f4f84d55aa81295a4b59e9b5b554da938c63db902244bcf6c`,
+   `fluidi_dummy_minus_gerber_jlc.zip` = `03a535a6bb2168db98aee80e2b0d93e1e095395b60e614bb8cb16f2ce3872eb3`
    (`hardware/dummy_cell/out/SHA256SUMS`, im Paket `1_jlc_upload/dummy/`).
 2. „Add new item“ → PLUS-ZIP hochladen. Optionen: **2 Lagen, FR-4, Dicke 1.0 mm**, 5 Stk, 1 oz, **HASL bleifrei**, grün,
    ohne „PCB Assembly“, Mark: keine Markierung. Gerber-Viewer: Kontur 27.9 × 19.8 mm, Aufdruck „DUMMY“. „Save to Cart“.
