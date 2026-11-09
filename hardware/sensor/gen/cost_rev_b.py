@@ -75,14 +75,50 @@ ZUBEHOER_VERGUSS = [("Feinwaage 0.01 g / 200 g (falls nicht vorhanden)", 25.0),
                     ("Halbmaske mit Filter A (EN 14387)", 40.0),
                     ("Thermometer fuer Trockner/Waermeschrank", 10.0)]
 ZUBEHOER_VERGUSS_CHF = sum(v for _, v in ZUBEHOER_VERGUSS)
-LOKAL = [cm.BomLine("Zelle Panasonic CR2032", 1, 0, 1.38, "none", False, 0, 1, 0, "LOKAL"),
-         cm.BomLine("Gehaeuse ASA 11 g + 4 g AMS (ANNAHME)", 1, 0, 0.525, "none", False, 0, 1, 0, "LOKAL"),
-         cm.BomLine(f"ASA-Mehrmenge Kopf V4 {ASA_EXTRA_G:.1f} g (ANNAHME 0.035 CHF/g)", 1, 0, 0.035 * ASA_EXTRA_G,
-                    "none", False, 0, 1, 0, "LOKAL"),
-         cm.BomLine("Dichtungen (ANNAHME)", 1, 0, 0.3, "none", False, 0, 1, 0, "LOKAL"),
-         cm.BomLine(f"Verguss ER2223 Verbrauch {VERGUSS_G_PRO_SENSOR:.0f} g (M-A, Gruppe 8, ANNAHME)", 1, 0,
-                    VERGUSS_CHF_PRO_SENSOR, "none", False, 0, 1, 0, "LOKAL"),
-         cm.BomLine("Schraube/Mutter (ANNAHME)", 1, 0, 0.2, "none", False, 0, 1, 0, "LOKAL")]
+# K-l6 (Red Team Phase 6): Lokale Teile je Sensor aus docs/manuals/EINKAUFSLISTE.csv (Preis je Stueck bzw. je g aus dem
+# Packungspreis x Verbrauch je Sensor). Verbrauchsfaktoren (ANNAHME, wo markiert):
+#   S1 Zelle 1 Stk, S2 O-Ring 2 Stk, S3 Schraube 1 Stk, S4 Mutter 1 Stk, S5 Silikonplatte 1/20 Platte (ANNAHME 20 Membranen
+#   je Platte), S6 Silikonfett 1/50 Tube (ANNAHME), S7 Kleber 0.05 g von 33 g (EINKAUFSLISTE S7), ASA 11 g + 4 g AMS +
+#   Mehrmenge Kopf V4 zum Preis je g von S10 (1 kg-Spule; S9 grau gleicher Preis). Rueckfall ohne Einkaufsliste: alte Pauschalen.
+LOKAL_VERBRAUCH = {"S1": 1.0, "S2": 2.0, "S3": 1.0, "S4": 1.0, "S5": 1.0 / 20, "S6": 1.0 / 50, "S7": 0.05 / 33.0}
+LOKAL_NAMEN = {"S1": "Zelle Panasonic CR2032", "S2": "O-Ringe AS568-019 (2)", "S3": "Schraube M2x3 TX6", "S4": "Mutter M2",
+               "S5": "Tastenmembran (1/20 Platte, ANNAHME)", "S6": "Silikonfett (1/50 Tube, ANNAHME)",
+               "S7": "Kleber Fenster 0.05 g"}
+
+
+def _lokal_aus_einkaufsliste():
+    sys.path.insert(0, os.path.join(HERE, "..", "..", "..", "scripts"))
+    import einkaufsliste as ek
+    rows = {r["ID"]: r for r in ek.load()}
+    out = []
+    for k, f in LOKAL_VERBRAUCH.items():
+        r = rows[k]
+        stk = r["_preis"] / r["_pack"]          # Preis je Stueck der Packung (S7: Packung = 1 Kleberset -> f in Packungen)
+        price = (r["_preis"] * f) if k == "S7" else (stk * f if k not in ("S5", "S6") else r["_preis"] * f)
+        tag = " (ANNAHME-Preis)" if r["_annahme"] else ""
+        out.append(cm.BomLine(f"{LOKAL_NAMEN[k]} [{k}{tag}]", 1, 0, round(price, 4), "none", False, 0, 1, 0, "LOKAL"))
+    asa = rows["S10"]["_preis"] / 1000.0      # CHF/g
+    out.append(cm.BomLine(f"Gehaeuse ASA 11 g + 4 g AMS [S10 {asa * 1000:.2f} CHF/kg]", 1, 0, round(15.0 * asa, 4),
+                          "none", False, 0, 1, 0, "LOKAL"))
+    out.append(cm.BomLine(f"ASA-Mehrmenge Kopf V4 {ASA_EXTRA_G:.1f} g [S10]", 1, 0, round(ASA_EXTRA_G * asa, 4),
+                          "none", False, 0, 1, 0, "LOKAL"))
+    return out
+
+
+_VERGUSS_LINE = cm.BomLine(f"Verguss ER2223 Verbrauch {VERGUSS_G_PRO_SENSOR:.0f} g (M-A, Gruppe 8, ANNAHME)", 1, 0,
+                           VERGUSS_CHF_PRO_SENSOR, "none", False, 0, 1, 0, "LOKAL")
+try:
+    LOKAL = _lokal_aus_einkaufsliste() + [_VERGUSS_LINE]
+    LOKAL_QUELLE = "docs/manuals/EINKAUFSLISTE.csv (K-l6)"
+except (ImportError, OSError, KeyError):
+    LOKAL = [cm.BomLine("Zelle Panasonic CR2032", 1, 0, 1.38, "none", False, 0, 1, 0, "LOKAL"),
+             cm.BomLine("Gehaeuse ASA 11 g + 4 g AMS (ANNAHME)", 1, 0, 0.525, "none", False, 0, 1, 0, "LOKAL"),
+             cm.BomLine(f"ASA-Mehrmenge Kopf V4 {ASA_EXTRA_G:.1f} g (ANNAHME 0.035 CHF/g)", 1, 0, 0.035 * ASA_EXTRA_G,
+                        "none", False, 0, 1, 0, "LOKAL"),
+             cm.BomLine("Dichtungen (ANNAHME)", 1, 0, 0.3, "none", False, 0, 1, 0, "LOKAL"),
+             _VERGUSS_LINE,
+             cm.BomLine("Schraube/Mutter (ANNAHME)", 1, 0, 0.2, "none", False, 0, 1, 0, "LOKAL")]
+    LOKAL_QUELLE = "Pauschalen (Einkaufsliste nicht lesbar)"
 
 
 def paste_pads(fp_name):

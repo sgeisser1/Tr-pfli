@@ -182,6 +182,23 @@ Erwartete Warnung (**ANNAHME**): Der Umriss von BT1 schliesst die Knopfzelle ein
 5. Bei Ankunft verlangt DHL Express: MWST 8.1 % + 19 CHF Abwicklung + Vorlagegebühr max(3 CHF; 2 %) (ORDER Kap. 4 Nr. 12,
    Quelle DHL lokal). Zoll auf Leiterplatten: 0.
 
+## Schritt 10a – PFLICHT: BT1-Vorrat in den privaten Teilebestand (Red Team W-4)
+
+Der Batteriehalter BT1 (C5213768, Keystone 3034TR) ist mechanisch festgelegt und wird knapp (594 Stk am 2026-11-09, ≈ 30 Stk/Tag weniger).
+Deshalb **zusammen mit dem Prototyp mindestens 25 Stück** in den privaten JLC-Bestand kaufen. Ablauf laut JLC-Hilfe
+(`docs/references/JLCPCB_PartsPreorder_Auszug_2026-11-09.txt`):
+
+1. Angemeldet „Parts Manager“ öffnen → „Order Parts“.
+2. C5213768 suchen, Menge **25** eingeben → „Add to My Part Lib“. In-stock-Extended-Teile haben keine Mindestmenge.
+3. Warenkorb → Teile auswählen → „Secure Checkout“ → Rechnungsadresse → bezahlen. **Sofort bezahlen**: Die Hilfeseiten nennen
+   1 Stunde bzw. 168 Stunden Frist (widersprüchlich), danach wird storniert.
+4. Kontrolle: „My Parts Lib“ zeigt 25 Stk C5213768. Die Teile werden **nicht verschickt**; sie werden nur in eigenen PCBA-Aufträgen
+   verbaut. Dasselbe Teil nicht gleichzeitig aus „Global Sourcing/Consigned“ beziehen.
+
+Kosten: 25 × 0.3615 USD = 9.04 USD (≈ 7.51 CHF, JLC-Teilesuche 2026-11-09). In ORDER_JLC_REV_C.md Kap. 4 Nr. 8a abhaken.
+Wie JLC bei der Serie den privaten Bestand zuordnet, steht nicht in den lokalen Quellen (**ANNAHME**: im BOM-Schritt sichtbar) →
+bei der Serienbestellung in Schritt 7 prüfen, dass BT1 aus „My Parts Lib“ kommt.
+
 ## Schritt 11 – Coupons und Bezahlung
 
 1. Coupons: Der Screenshot zeigte 2 × „Save $20.00“. Im Checkout das Feld „Coupon“ öffnen und, falls ein Coupon für

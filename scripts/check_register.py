@@ -13,8 +13,8 @@ Prueft:
      'Programmieradapter' mit gleicher LCSC und vorhandener Datei.
   4. Einkaufsliste (docs/manuals/EINKAUFSLISTE.csv, falls vorhanden): Spalte 'Register' -> Ref vorhanden.
   5. Format INDEX.csv: 12 Spalten (unquotiertes ';' in der Bemerkung), lokale Pfade vorhanden.
-Ausgabe: Konsole + docs/reviews/phase6_register_abgleich.txt (Protokoll, erzeugt)
-Aufruf : .venv/bin/python scripts/check_register.py [--strict]   (--strict: Exitcode 1 bei Luecken)
+Ausgabe: Konsole; mit --write zusaetzlich docs/reviews/phase6_register_abgleich.txt (Protokoll, erzeugt)
+Aufruf : .venv/bin/python scripts/check_register.py [--strict] [--write]   (--strict: Exitcode 1 bei Luecken)
 """
 import csv
 import datetime
@@ -43,7 +43,7 @@ GW_MAP = {
     "G7": ["MAT-ASA"],
     "G8a": ["GW-MECH-INS1 (Gateway G8a)"],
     "G8b": None,    # Normteile (Handelsware), Masse ANNAHME im CAD
-    "G9": ["GW-LED1 (Gateway, Vorschlag)", "GW-R1 (Gateway, Vorschlag)"],
+    "G9": ["GW-LED1 (Gateway, Vorschlag)", "GW-R2 (Gateway G9, LCSC)"],
     "G10": None,    # Werkstattbestand
     "G11": None,    # vorhanden, optional
 }
@@ -224,8 +224,10 @@ def main():
     o(f"ERGEBNIS: {gaps} Luecke(n)")
     txt = "\n".join(out) + "\n"
     print(txt)
-    os.makedirs(os.path.dirname(LOG), exist_ok=True)
-    open(LOG, "w", encoding="utf-8").write(txt)
+    if "--write" in sys.argv:   # K-l8 (Red Team Phase 6): Protokoll nur auf Wunsch schreiben, Arbeitsbaum sauber halten
+        os.makedirs(os.path.dirname(LOG), exist_ok=True)
+        open(LOG, "w", encoding="utf-8").write(txt)
+        print("->", os.path.relpath(LOG, ROOT))
     if "--strict" in sys.argv and gaps:
         sys.exit(1)
 

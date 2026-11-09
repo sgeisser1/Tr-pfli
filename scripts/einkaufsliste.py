@@ -28,7 +28,7 @@ VERSAND = {
     "galaxus.ch": (9.90, None, "ANNAHME (Versandseite nicht abrufbar, Bot-Sperre)"),
     "3djake.ch": (8.90, 69.90, "3djake.ch/de-CH/hilfe/versandkosten (2026-11-09): Standardversand Schweiz 8.90, ab CHF 69.90 "
                   "gratis (docs/references/3DJake_PolymakerASA-Natural_Auszug_2026-11-09.txt)"),
-    "offen (Normteile-/Dichtungs-Fachhandel)": (10.00, None, "ANNAHME (Haendler offen, eine Sammelbestellung S2/S5/S6/G8b/P8)"),
+    "offen (Normteile-/Dichtungs-Fachhandel)": (10.00, None, "ANNAHME (Haendler offen, eine Sammelbestellung S2/S5/G8b/P8)"),
     "offen (Platzhalter)": (0.00, None, "Platzhalter"),
     "Digi-Key CH (laut phase5_gateway_led.md)": (0.00, None, "nicht einzeln bestellen (23 CHF Versand unter 70 CHF, "
                                                  "docs/reviews/phase5_gateway_led.md): mit LCSC-Bestellung Programmieradapter buendeln"),
@@ -37,7 +37,7 @@ VERSAND = {
     "LCSC (mit JLC-Bestellung buendeln, ANNAHME)": (20.00, None, "ANNAHME (README Kap. 6: 10-25 CHF), Kombination mit der "
                                                     "JLC-Sendung im Warenkorb pruefen"),
     "Simpex Electronic AG": (15.00, None, "ANNAHME (Versandbetrag laut Konzept Kap. 7 nicht angegeben)"),
-    "offen (Labor-/Arbeitsschutz-Fachhandel)": (10.00, None, "ANNAHME (Haendler offen, eine Sammelbestellung V-Z2...V-Z11)"),
+    "offen (Labor-/Arbeitsschutz-Fachhandel)": (10.00, None, "ANNAHME (Haendler offen, eine Sammelbestellung V-Z2/V-Z3/V-Z4/V-Z5d/V-Z6b/V-Z11)"),
 }
 BEREICHE = ["Sensor", "Sensor+Werkstatt", "Sensor+Gateway", "Gateway", "Werkstatt", "Verguss", "Programmieradapter"]
 NICHT_SUMMIEREN = {"vorhanden", "separat", "Platzhalter"}
@@ -177,12 +177,18 @@ TEXT_VERG = """## 5 Verguss (D-030) und Programmieradapter (D-031)
 **Verguss:** Electrolube ER2223 Resin Pack 250 g, **2 Beutel** (je Bauserie einer, Haltbarkeit nach dem Abfüllen 3 Monate,
 MA-3) bei Simpex, CHF 41.29 inkl. MWST, **Lieferzeit 8 Wochen** → sofort nach Freigabe bestellen; vorher SDB Teil B in
 Landessprache anfordern (D-030 Bed. 1). Zubehör nach `docs/concepts/vergussmasse_versiegelung.md` Kap. 7.1 (V-Z1…V-Z11):
-mit Schweizer Shopbeleg bei bastelgarage.ch (ohnehin in der Liste) Feinwaage, Mischbecher, Rührstäbe, Trichter, Pinsel,
-Nitrilhandschuhe; der Rest (Prüfgewichte, kindergesicherte Flaschen, Sekundärbehälter, Spritzen/Kanülen, Schutzbrille/Visier,
-Schürze/Augenspülflasche, Halbmaske A, Thermometer bis 80 °C) hat **keine abrufbare CH-Quelle** (Laborhandel/Baumarkt-Seiten
-gesperrt oder JS) und bleibt **ANNAHME** aus Kap. 7.1. **Entfällt, falls vorhanden:** Feinwaage (V-Z1), Schutzbrille/Visier
-(V-Z8), Wärmeschrank (V-Z12). Abweichungen zur Freigabe durch die Sicherheit: Silikon- statt PE-Trichter (V-Z5c),
-Handschuhe ohne Angabe von Dicke/EN 374 (V-Z7), Waage ohne Justiergewicht (Prüfgewichte V-Z2 nötig).
+mit Schweizer Shopbeleg bei bastelgarage.ch (ohnehin in der Liste) Feinwaage, Mischbecher, Rührstäbe, Pinsel. Nach Red Team W-3
+liegen Handschuhe (MAPA Solo 977, 0.13 mm, EN ISO 374-1, TDS und Beständigkeitstabelle lokal), Korbbrille + Visier,
+Augenspülflasche/Schürze und Halbmaske A bei **galaxus.ch** (ohnehin für die Zellen in der Liste; Listings per Suchmaschine,
+Seiten gesperrt → Preise teils **ANNAHME**). Ohne gefundene Quelle bleiben Prüfgewichte, kindergesicherte Flaschen,
+Sekundärbehälter, 2 PE-Einwegtrichter, Spritzen/Kanülen und Thermometer bis 80 °C (Laborhändler, **ANNAHME** Kap. 7.1).
+
+**Pflicht vor dem Öffnen des ersten Beutels (D-030 Bed. 1, Sicherheit K-7):** V-Z7 Handschuhe mit Beständigkeitsliste,
+V-Z8 Korbbrille nach **EN 166 mit Kennzeichnung 3** (Flüssigkeiten) **und** Visier – eine vorhandene Brille zählt nur mit
+dieser Kennzeichnung –, V-Z9 Augenspülflasche und Schürze, V-Z10 Halbmaske mit Filter A (EN 14387) bzw. Absaugung
+(SDB B Abschn. 7.1/8.2). Der Silikontrichter mit Feinfilter ist gestrichen (Sicherheit W-4), stattdessen 2 PE-Einwegtrichter
+(A/B getrennt, V-Z5d). **Entfällt, falls vorhanden:** Feinwaage (V-Z1), Wärmeschrank (V-Z12), TX6-Schraubenzieher (W3).
+Waage ohne Justiergewicht → Prüfgewichte V-Z2 nötig.
 
 **Programmieradapter:** Teile nach `hardware/programmer/README.md` Kap. 2.1/6 (inkl. R2 470 Ω C17710, D-031/PA-6) bei LCSC,
 Preise der JLC/LCSC-Teilesuche umgerechnet mit dem Kurs aus `scripts/cost_model.py`; LCSC-Mindestmengen und Versand
@@ -248,9 +254,11 @@ def main():
       f"({', '.join(h['h'] for h in hs if h['ware'] > 0)}). Kern sind **zwei** CH-Händler: bastelgarage.ch und pi-shop.ch; "
       "dazu Simpex (Verguss, 8 Wochen Lieferzeit) und LCSC (mit JLC bündeln).\n")
     w("- Ein Händler weniger möglich: Zellen bei bastelgarage.ch (Varta statt Panasonic, Entscheid Auftraggeber, S1).\n")
-    w("- Offen: Quelle O-Ringe AS568-019 Silikon, ISO 7380 M2.5×8, Silikonplatte, Silikonfett, Federstifte "
-      "(ein Normteile-/Dichtungshändler) und Labor-/Schutzzubehör Verguss (ein Laborhändler); Filament grau und microSD "
-      "nicht an Lager.\n\n")
+    w("- Bestellreihenfolge (Red Team W-3d): **zuerst Verguss** (V-M1, 8 Wochen; Distrelec/RS von Hand vergleichen), dann JLC "
+      "(mit BT1-Vorrat 25 Stk, ORDER Kap. 4 Nr. 8a) und LCSC, dann der Rest.\n")
+    w("- Offen: Quelle O-Ringe AS568-019 Silikon, ISO 7380 M2.5×8, Silikonplatte, Federstifte (Normteile-/Dichtungshändler) "
+      "und Prüfgewichte, Flaschen, Sekundärbehälter, PE-Trichter, Spritzen, Thermometer (Laborhändler); Filament grau und "
+      "microSD nicht an Lager; Werkstatt-Voraussetzungen Weg B folgen (hardware/dummy_cell).\n\n")
     w(TEXT_SHT)
     w(TEXT_UART)
     w(TEXT_SD)
@@ -282,10 +290,10 @@ def main():
           f"{'frei' if bg['vers_jetzt'] == 0 else 'unter 80 CHF, Versand 6.90'}.\n")
     w("- pi-shop.ch: G2 + W1 + G3 in **einer** Sendung, sobald G3 an Lager ist; getrennt bestellt kostet die zweite Sendung "
       "nochmals 7.90 CHF.\n")
-    w("- Normteile/Dichtungen (S2, S5, S6, G8b, P8): **ein** Fachhändler für alles; noch keiner mit abrufbarem Angebot "
+    w("- Normteile/Dichtungen (S2, S5, G8b, P8): **ein** Fachhändler für alles; noch keiner mit abrufbarem Angebot "
       "(Versand ANNAHME 10 CHF).\n")
-    w("- G9 (Gateway-LED, D-027): nicht bei Digi-Key einzeln bestellen (23 CHF Versand), sondern in die LCSC-Bestellung des "
-      "Programmieradapters legen (Teilewahl Elektronik).\n")
+    w("- G9 (Gateway-LED, D-027): WP710A10GD C6001420 + 470 Ω C119317 bei LCSC zusammen mit den Adapterteilen (kein "
+      "Digi-Key-Versand).\n")
     w("- JLC (PCBA Sensor) und Verguss (S8) sind separat (ORDER_JLC_REV_C.md bzw. Material-Agent).\n\n")
     w("## 8 Summen je Bereich (Ware, ohne Versand)\n\n| Bereich | Positionen | Ware CHF | davon ANNAHME CHF |\n|---|---|---|---|\n")
     for b in BEREICHE:
