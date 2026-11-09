@@ -242,6 +242,10 @@ class MockApiTest(unittest.TestCase):
         st, lst = c.json("GET", f"/api/v1/sensors/{sid}/diag")
         self.check("/sensors/{sensor_id}/diag", "get", 200, lst)
         self.assertEqual(lst[0]["info_hex"], r["info_hex"])
+        st, hd, _ = c.req("POST", f"/api/v1/sensors/{sid}/diag")             # K-4: Mindestabstand
+        self.assertEqual(st, 429)
+        self.assertTrue(int(hd["Retry-After"]) > 0)
+        M.Handler.S.diag_requested.clear()
         # Testfirmware: Name fl-tf<n>-XXXX + Build 9<n>01 -> Kennung, Anhänge in INFO/DIAG
         s = M.Handler.S.sensors[sid]
         old = dict(s)
@@ -366,6 +370,43 @@ class MockApiTest(unittest.TestCase):
         items = {i["sensor_id"]: i["state"] for i in fw["rollout"]["items"]}
         self.assertEqual(items["fluidi-1A2B"], "done")
         self.assertEqual(items["fluidi-3E5F"], "failed")  # Batterie zu tief (REQ-FW-02)
+
+    def test_testfw_image(self):
+        """Sicherheit W-2 (Mock wie Gateway): Testfirmware nur mit Schalter, markiert, einzeln und bestätigt."""
+        c = Client(self.base)
+        c.login()
+        S = M.Handler.S
+        st, e = c.json("POST", "/api/v1/firmware/sensor-images?filename=fluidi-sensor-tf2-0.1.1%2B9201.bin", raw=b"\x00" * 512)
+        self.assertEqual((st, e["error"]["code"]), (403, "forbidden"))
+        S.allow_testfw = True
+        try:
+            st, img = c.json("POST", "/api/v1/firmware/sensor-images?filename=fluidi-sensor-tf2-0.1.1%2B9201.bin", raw=b"\x00" * 512)
+            self.assertEqual(st, 201)
+            self.check("/firmware/sensor-images", "post", 201, img)
+            self.assertEqual(img["testfw"], 2)
+            v = img["version"]
+            st, e = c.json("POST", "/api/v1/firmware/rollout", {"version": v, "sensor_ids": ["fluidi-1A2B"]})
+            self.assertEqual((st, e["error"]["code"]), (409, "confirmation_required"))
+            st, e = c.json("POST", "/api/v1/firmware/rollout", {"version": v, "sensor_ids": ["fluidi-1A2B", "fluidi-2C4D"], "confirm_testfw": "fluidi-1A2B"})
+            self.assertEqual(st, 400)
+        finally:
+            S.allow_testfw = False
+            c.json("DELETE", f"/api/v1/firmware/sensor-images/{img['version']}")
+
+    def test_calibration_run_resume(self):
+        """Red Team W-6: offener Lauf ist abrufbar (Fortsetzen), abgelaufene Läufe nicht."""
+        c = Client(self.base)
+        c.login()
+        st, run = c.json("POST", "/api/v1/sensors/fluidi-2C4D/calibration-runs", {"substrate": "erde", "samples": 5})
+        st, lst = c.json("GET", "/api/v1/sensors/fluidi-2C4D/calibration-runs")
+        self.assertEqual(st, 200)
+        self.check("/sensors/{sensor_id}/calibration-runs", "get", 200, lst)
+        self.assertEqual([r["id"] for r in lst], [run["id"]])
+        self.assertEqual(c.json("GET", "/api/v1/sensors/fluidi-2C4D/calibration-runs", csrf=False)[0], 200)
+        self.assertEqual(Client(self.base).json("GET", "/api/v1/sensors/fluidi-2C4D/calibration-runs")[0], 401)
+        M.Handler.S.runs[run["id"]]["expires"] = "2026-01-01T00:00:00Z"
+        self.assertEqual(c.json("GET", "/api/v1/sensors/fluidi-2C4D/calibration-runs")[1], [])
+        self.assertEqual(c.json("GET", f"/api/v1/calibration-runs/{run['id']}")[1]["state"], "cancelled")
 
     def test_unknown_and_method(self):
         c = Client(self.base)

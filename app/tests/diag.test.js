@@ -1,7 +1,7 @@
 // Unit-Tests Diagnose-/Firmware-Anzeige (app/js/diag.js), node --test.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { testfwOf, fwLabel, diagRows, diagFileName, evalCommand } from '../js/diag.js';
+import { testfwOf, fwLabel, diagRows, diagFileName, evalCommand, imageTestfw, tfLabel } from '../js/diag.js';
 
 test('testfwOf: Gateway-Feld, Gerätename fl-tf<n>-, Build 9<n>xx (TESTFIRMWARE Kap. 3)', () => {
   assert.equal(testfwOf({ testfw: 2 }), 2);
@@ -50,4 +50,14 @@ test('Dateiname und Auswertebefehl', () => {
   assert.equal(diagFileName(SERIE), 'fluidi-diag-fluidi-AB12-20261109T143000Z.json');
   assert.equal(evalCommand({ ...SERIE, testfw: 1 }), '.venv/bin/python scripts/testfw_eval.py diag --file fluidi-diag-fluidi-AB12-20261109T143000Z.json --expect tf1');
   assert.ok(!evalCommand(SERIE).includes('--expect'));
+});
+
+test('imageTestfw/tfLabel: Abbilder mit Build 9000–9999 sind Testfirmware (Sicherheit W-2)', () => {
+  assert.equal(imageTestfw({ testfw: 3, build: 9301 }), 3);
+  assert.equal(imageTestfw({ build: 9201 }), 2);          // älteres Gateway ohne Feld testfw
+  assert.equal(imageTestfw({ build: 9001 }), 9);          // Testbuild unbekannter Variante
+  assert.equal(imageTestfw({ build: 12 }), 0);
+  assert.equal(imageTestfw({}), 0);
+  assert.equal(tfLabel(2), 'TESTFIRMWARE TF-2');
+  assert.equal(tfLabel(9), 'TESTFIRMWARE');
 });

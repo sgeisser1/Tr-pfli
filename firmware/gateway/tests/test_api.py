@@ -168,6 +168,10 @@ class GatewayApi(unittest.TestCase):
         self.assertEqual(st, 200)
         self.check("/sensors/{sensor_id}/diag", "get", 200, lst)
         self.assertEqual(lst[0]["info_hex"], r["info_hex"])
+        st, hd, body = self.c.req("POST", f"/api/v1/sensors/{sid}/diag")   # K-4: Mindestabstand 60 s je Sensor
+        self.assertEqual(st, 429)
+        self.assertEqual(json.loads(body)["error"]["code"], "locked")
+        self.assertTrue(0 < int(hd["Retry-After"]) <= 60)
         st, s = self.c.json("GET", f"/api/v1/sensors/{sid}")
         self.check("/sensors/{sensor_id}", "get", 200, s)
         self.assertEqual(s["fw_build"], 100)
@@ -201,6 +205,70 @@ class GatewayApi(unittest.TestCase):
         self.check("/firmware/sensor-images", "post", 201, img)
         st, _ = self.c.json("DELETE", "/api/v1/firmware/sensor-images/9.9.9")
         self.assertEqual(st, 204)
+
+    def test_testfw_image_needs_switch_and_confirmation(self):
+        """Sicherheit W-2: Testfirmware (Build 9<n>xx) nur mit allow_testfw, markiert, an genau einen Sensor, bestätigt."""
+        M = self.gw.model
+        self.c.json("POST", "/api/v1/auth/elevate", {"password": PASSWORD})
+        tf = mcuboot.build(b"\x01" * 3000, (0, 9, 1), build_num=9201, key=self.key)
+        self.assertFalse(M.cfg.allow_testfw)                       # Vorgabe aus
+        st, e = self.c.json("POST", "/api/v1/firmware/sensor-images", raw=tf)
+        self.assertEqual((st, e["error"]["code"]), (403, "forbidden"))
+        serial = mcuboot.build(b"\x02" * 3000, (0, 9, 2), build_num=7, key=self.key)
+        st, e = self.c.json("POST", "/api/v1/firmware/sensor-images?filename=fluidi-sensor-tf3-0.9.2%2B7.bin", raw=serial)
+        self.assertEqual(st, 403)                                  # Dateiname -tf3- genügt als Merkmal
+        M.cfg.allow_testfw = True
+        try:
+            st, img = self.c.json("POST", "/api/v1/firmware/sensor-images", raw=tf)
+            self.assertEqual(st, 201, img)
+            self.check("/firmware/sensor-images", "post", 201, img)
+            self.assertEqual((img["testfw"], img["build"]), (2, 9201))
+            st, fw = self.c.json("GET", "/api/v1/firmware")
+            self.check("/firmware", "get", 200, fw)
+            self.assertEqual([i["testfw"] for i in fw["sensor_images"] if i["version"] == "0.9.1"], [2])
+            sids = [s["id"] for s in self.c.json("GET", "/api/v1/sensors")[1]]
+            st, e = self.c.json("POST", "/api/v1/firmware/rollout", {"version": "0.9.1", "sensor_ids": sids[:2], "confirm_testfw": sids[0]})
+            self.assertEqual((st, e["error"]["code"]), (400, "validation"))     # nur einzeln
+            st, e = self.c.json("POST", "/api/v1/firmware/rollout", {"version": "0.9.1", "sensor_ids": sids[:1]})
+            self.assertEqual((st, e["error"]["code"]), (409, "confirmation_required"))
+            st, e = self.c.json("POST", "/api/v1/firmware/rollout", {"version": "0.9.1", "sensor_ids": sids[:1], "confirm_testfw": sids[1]})
+            self.assertEqual(st, 409)                                           # Bestätigung für anderen Sensor
+            M.cfg.allow_testfw = False
+            st, e = self.c.json("POST", "/api/v1/firmware/rollout", {"version": "0.9.1", "sensor_ids": sids[:1], "confirm_testfw": sids[0]})
+            self.assertEqual(st, 403)                                           # Schalter gilt auch beim Verteilen
+            M.cfg.allow_testfw = True
+            st, ro = self.c.json("POST", "/api/v1/firmware/rollout", {"version": "0.9.1", "sensor_ids": sids[:1], "confirm_testfw": sids[0]})
+            self.assertEqual(st, 202, ro)
+            self.assertTrue(any(e["code"] == "fw_rollout_testfw" for e in self.gw.store.events(50)))
+            self.c.json("DELETE", "/api/v1/firmware/rollout")
+            # Sensor hat 1.0.3 > 0.9.1: das Gateway verweigert die Rückstufung ohnehin
+        finally:
+            M.cfg.allow_testfw = False
+            self.c.json("DELETE", "/api/v1/firmware/rollout")
+            self.c.json("DELETE", "/api/v1/firmware/sensor-images/0.9.1")
+
+    def test_calibration_run_resumable(self):
+        """Red Team W-6: offener Lauf abrufbar, Trockenpunkt über Gateway-Neustart erhalten, Ablauf nach 6 h."""
+        from fluidi_gw import model as MD
+        M = self.gw.model
+        sid = self.c.json("GET", "/api/v1/sensors")[1][1]["id"]
+        st, run = self.c.json("POST", f"/api/v1/sensors/{sid}/calibration-runs", {"substrate": "erde", "samples": 3})
+        self.assertEqual(st, 201)
+        st, lst = self.c.json("GET", f"/api/v1/sensors/{sid}/calibration-runs")
+        self.check("/sensors/{sensor_id}/calibration-runs", "get", 200, lst)
+        self.assertEqual([r["id"] for r in lst], [run["id"]])
+        r = M.runs[run["id"]]
+        r.update(dry={"raw": 4000, "temp_c": 21.0, "n": 3, "stddev": 1.0, "t": run["expires"]}, state="measuring_wet")
+        M.save_runs()
+        M2 = MD.Model(self.gw.store, M.cfg, M.time)                # Neustart: gleiche Datenbank
+        r2 = M2.runs[run["id"]]
+        self.assertEqual((r2["state"], r2["dry"]["raw"]), ("await_wet", 4000))
+        self.assertIn("Neustart", r2["message"])
+        r["_exp"] = time.time() - 1                                 # 6 h vorbei
+        M.expire_runs(time.time())
+        self.assertEqual(r["state"], "cancelled")
+        self.assertEqual(self.c.json("GET", f"/api/v1/sensors/{sid}/calibration-runs")[1], [])
+        self.assertNotIn(run["id"], MD.Model(self.gw.store, M.cfg, M.time).runs)
 
     def test_journal_fertilized_and_csv(self):
         st, e = self.c.json("POST", "/api/v1/plants/1/journal", {"type": "fertilizing", "note": "halbe Dosis"})

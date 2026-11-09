@@ -11,8 +11,10 @@ Direkter Aufruf `fluidi-helper led off` (systemd ExecStopPost des Gateway-Dienst
 from __future__ import annotations
 
 import json
+import os
 import re
 import shutil
+import stat
 import subprocess
 import sys
 import time
@@ -24,6 +26,7 @@ NTP_DROPIN = Path("/etc/systemd/timesyncd.conf.d/fluidi.conf")
 LED_DIR = Path("/sys/class/leds/fluidi")      # dtoverlay=gpio-led,gpio=17,label=fluidi (install_gateway.sh)
 # Kernel-Trigger "timer": delay_on/delay_off in ms (docs.kernel.org/leds/leds-class). Muss zu statusled.PATTERNS passen.
 LED_PATTERNS = {"ok": (100, 4900), "pair": (100, 100), "off": None}
+REQ_MAX = 4096          # Anfragen sind wenige hundert Byte (Sicherheit K-3)
 
 
 def sh(*cmd, check=True, timeout=60):
@@ -117,18 +120,49 @@ def main(argv=None):
             return
         print(f"unbekannter Aufruf: {argv}", file=sys.stderr)
         sys.exit(2)
-    for f in sorted(REQ.glob("*.json")):
-        try:
-            req = json.loads(f.read_text())
-            act = ACTIONS.get(req.get("action"))
-            f.unlink()
-            if not act:
-                print(f"unbekannte Aktion verworfen: {req.get('action')}", file=sys.stderr)
-                continue
-            act(req)
-        except Exception as e:  # noqa: BLE001
-            print(f"{f.name}: {e}", file=sys.stderr)
-            f.unlink(missing_ok=True)
+    try:
+        dfd = os.open(REQ, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)   # Ordner selbst kein Symlink (K-3)
+    except OSError as e:
+        print(f"Anfrageordner {REQ}: {e}", file=sys.stderr)
+        return
+    try:
+        for name in sorted(n for n in os.listdir(dfd) if n.endswith(".json")):
+            try:
+                req = read_request(dfd, name)
+                os.unlink(name, dir_fd=dfd)
+                act = ACTIONS.get(req.get("action")) if isinstance(req, dict) else None
+                if not act:
+                    print(f"unbekannte Aktion verworfen: {req.get('action') if isinstance(req, dict) else '?'}", file=sys.stderr)
+                    continue
+                act(req)
+            except Exception as e:  # noqa: BLE001
+                print(f"{name}: {e}", file=sys.stderr)
+                try:
+                    os.unlink(name, dir_fd=dfd)       # entfernt einen Symlink selbst, nie sein Ziel
+                except OSError:
+                    pass
+    finally:
+        os.close(dfd)
+
+
+def read_request(dfd: int, name: str) -> dict:
+    """Anfrage lesen, ohne Symlinks zu folgen und ohne an FIFOs/Geräten zu hängen (Sicherheit K-3):
+    O_NOFOLLOW | O_NONBLOCK, fstat = reguläre Datei mit einem Link, Grösse <= REQ_MAX."""
+    fd = os.open(name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK | getattr(os, "O_CLOEXEC", 0), dir_fd=dfd)
+    try:
+        st = os.fstat(fd)
+        if not stat.S_ISREG(st.st_mode):
+            raise ValueError("keine reguläre Datei – verworfen")
+        if st.st_nlink != 1:
+            raise ValueError("Datei mit mehreren Links – verworfen")
+        if st.st_size > REQ_MAX:
+            raise ValueError(f"Anfrage zu gross ({st.st_size} > {REQ_MAX} Byte) – verworfen")
+        data = os.read(fd, REQ_MAX + 1)
+        if len(data) > REQ_MAX:
+            raise ValueError("Anfrage zu gross – verworfen")
+        return json.loads(data.decode("utf-8"))
+    finally:
+        os.close(fd)
 
 
 if __name__ == "__main__":

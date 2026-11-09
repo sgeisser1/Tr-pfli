@@ -18,12 +18,14 @@ from zoneinfo import ZoneInfo
 from . import backup as BK
 from . import mcuboot
 from . import protocol as P
+from . import sensordiag as SD
 from . import sysinfo, timesvc
 from .model import ApiError, iso, now
 from .shared import AN, C
 
 ROUTES: list = []
 VERSION = "0.5.0"
+DIAG_MIN_INTERVAL_S = 60     # Sicherheit K-4: Mindestabstand Diagnoseabrufe je Sensor
 
 
 def route(method, tpl, *, auth="write", elevated=False):
@@ -369,7 +371,12 @@ def sensor_diag_start(h, sensor_id, **_):
     if busy:
         h.send_json(202, M.job_public(busy[0]))
         return
+    wait_s = DIAG_MIN_INTERVAL_S - (now() - M.diag_requested.get(sensor_id, -1e12))
+    if wait_s > 0:  # Sicherheit K-4: höchstens ein Abruf je Sensor und Minute (je Abruf eine BLE-Verbindung)
+        raise ApiError(429, "locked", f"Diagnose für {sensor_id} erst in {math.ceil(wait_s)} s wieder möglich",
+                       retry_after=math.ceil(wait_s))
     _need_radio(M)
+    M.diag_requested[sensor_id] = now()
     j = M.new_job("diag", sensor_id, s.get("plant_id"))
     M.job_update(j, state="waiting_for_sensor", message="Warte auf Sensor (nächstes Funksignal)")
     M.central.submit(s["addr"], {"kind": "diag", "job": j,
@@ -426,18 +433,27 @@ def cal_delete(h, sensor_id, substrate, **_):
 def run_create(h, sensor_id, body, **_):
     M = h.M
     _sensor(M, sensor_id)
-    for r in M.runs.values():
-        if r["sensor_id"] == sensor_id and r["state"] not in ("committed", "cancelled", "failed"):
-            r["state"] = "cancelled"
-    rid = "c" + secrets.token_hex(4)
     samples = body.get("samples", 5)
     if not isinstance(samples, int) or not 3 <= samples <= 20:
         raise ApiError(400, "validation", "samples 3–20", "samples")
+    for r in M.runs.values():
+        if r["sensor_id"] == sensor_id and r["state"] not in M.RUN_DONE:
+            r["state"] = "cancelled"
+    rid = "c" + secrets.token_hex(4)
+    t = now()
     run = {"id": rid, "sensor_id": sensor_id, "substrate": body.get("substrate", "erde"), "samples": samples,
            "state": "await_dry", "dry": None, "wet": None, "span_ok": None, "message": None,
-           "expires": iso(now() + 6 * 3600)}
+           "expires": iso(t + M.RUN_TTL_S), "_exp": t + M.RUN_TTL_S}
     M.runs[rid] = run
-    h.send_json(201, run)
+    M.save_runs()
+    h.send_json(201, _run_public(run))
+
+
+@route("GET", "/sensors/{sensor_id}/calibration-runs", auth="session")
+def runs_open(h, sensor_id, **_):
+    """Offener Lauf des Sensors (0 oder 1), damit die PWA nach Seitenverlust fortsetzen kann (Red Team W-6)."""
+    _sensor(h.M, sensor_id)
+    h.send_json(200, [_run_public(r) for r in h.M.open_runs(sensor_id)])
 
 
 def _run(M, run_id):
@@ -459,6 +475,7 @@ def run_get(h, run_id, **_):
 @route("DELETE", "/calibration-runs/{run_id}")
 def run_delete(h, run_id, **_):
     _run(h.M, run_id)["state"] = "cancelled"
+    h.M.save_runs()
     h.send_json(204, None)
 
 
@@ -474,8 +491,10 @@ def run_capture(h, run_id, body, **_):
     s = _sensor(M, run["sensor_id"])
     _need_radio(M)
     run["state"] = "measuring_" + point
+    run["message"] = None
     j = M.new_job("calibration_capture", s["id"], s.get("plant_id"))
     run["_job"] = j["id"]
+    M.save_runs()
 
     def done(res):
         recs = [r for r in res.get("records") or [] if r.valid]
@@ -498,6 +517,7 @@ def run_capture(h, run_id, body, **_):
                     run["message"] = None if run["span_ok"] else "Trocken- und Nasswert zu ähnlich – Substrat wirklich nass?"
                 else:
                     run["state"] = "await_wet" if point == "dry" else "await_dry"
+            M.save_runs()       # Trockenpunkt sofort gesichert (W-6)
             M.emit("calibration", _run_public(run))
             return {"run": _run_public(run), "outliers": st["outliers"]}
     M.job_update(j, state="waiting_for_sensor", message="Warte auf Sensor")
@@ -520,6 +540,7 @@ def run_commit(h, run_id, **_):
     M.cal.setdefault(s["addr"], {})[run["substrate"]] = cal
     M.store.save_calibration(s["addr"], run["substrate"], cal)
     run["state"] = "committed"
+    M.save_runs()
     M.log("info", "calibrated", f"Kalibrierung {run['substrate']} gespeichert", s["id"])
     s["pending_config"] = True
     M.save_sensor(s)
@@ -726,7 +747,7 @@ def fw_get(h, **_):
 
 
 @route("POST", "/firmware/sensor-images", elevated=True)
-def fw_upload(h, body, **_):
+def fw_upload(h, body, q, **_):
     M = h.M
     data = body if isinstance(body, (bytes, bytearray)) else b""
     if not data:
@@ -743,6 +764,11 @@ def fw_upload(h, body, **_):
     if img.security_counter < sec_max:
         raise ApiError(409, "downgrade", f"Sicherheitszähler {img.security_counter} < bereits verteilt {sec_max} (Anti-Rollback)")
     ver = "%d.%d.%d" % img.version
+    tf = SD.testfw_of_image(img.build, q.get("filename"))
+    if tf and not getattr(M.cfg, "allow_testfw", False):
+        M.log("warn", "fw_rejected", f"Testfirmware {ver}+{img.build} abgelehnt (allow_testfw = false)")
+        raise ApiError(403, "forbidden", f"TESTFIRMWARE ({ver}+{img.build}) – am Gateway nicht erlaubt "
+                                         "(gateway.toml allow_testfw = true nur für die Musterprüfung)")
     if any(i["version"] == ver for i in M.sensor_images):
         raise ApiError(409, "conflict", f"Version {ver} ist bereits abgelegt")
     if len(M.sensor_images) >= 2:
@@ -752,10 +778,12 @@ def fw_upload(h, body, **_):
     path.write_bytes(bytes(data))
     doc = {"version": ver, "build": img.build, "security_counter": img.security_counter, "size": img.size,
            "sha256": img.file_sha256.hex(), "signature_ok": True,
-           "hw_compat": "A-32 rev A" if img.hw_rev in (None, 0x0A) else f"0x{img.hw_rev:02X}", "uploaded": iso(now())}
+           "hw_compat": "A-32 rev A" if img.hw_rev in (None, 0x0A) else f"0x{img.hw_rev:02X}", "uploaded": iso(now()),
+           "testfw": tf}
     M.sensor_images.append(doc)
     M.store.save_image(doc)
-    M.log("info", "fw_upload", f"Sensor-Firmware {ver} abgelegt (Signatur gültig)")
+    M.log("warn" if tf else "info", "fw_upload", f"Sensor-Firmware {ver} abgelegt (Signatur gültig)"
+          + (f" – TESTFIRMWARE TF-{tf}, nur für Musterprüfung" if tf else ""))
     h.send_json(201, doc)
 
 
@@ -790,6 +818,16 @@ def fw_rollout(h, body, **_):
         items.append({"sensor_id": sid, "state": "pending", "progress": 0.0, "message": "wartet auf den Sensor"})
     if not items:
         raise ApiError(400, "validation", "Keine Sensoren gewählt", "sensor_ids")
+    tf = img.get("testfw") or SD.testfw_of_image(img.get("build"))   # auch Abbilder von vor W-2
+    if tf:  # Sicherheit W-2: nur mit Schalter, an genau einen Sensor, mit ausdrücklicher Bestätigung (= dessen Kennung)
+        if not getattr(M.cfg, "allow_testfw", False):
+            raise ApiError(403, "forbidden", "TESTFIRMWARE – am Gateway nicht erlaubt (allow_testfw = false)")
+        if len(items) != 1:
+            raise ApiError(400, "validation", "Testfirmware nur an einen einzeln gewählten Sensor verteilen", "sensor_ids")
+        if body.get("confirm_testfw") != items[0]["sensor_id"]:
+            raise ApiError(409, "confirmation_required", f"TESTFIRMWARE TF-{tf} an {items[0]['sensor_id']} verteilen? "
+                                                         "Ausdrücklich bestätigen (confirm_testfw = Sensor-Kennung)", "confirm_testfw")
+        M.log("warn", "fw_rollout_testfw", f"TESTFIRMWARE {ver} (TF-{tf}) an {items[0]['sensor_id']} bestätigt", items[0]["sensor_id"])
     M.rollout = {"version": ver, "started": iso(now()), "finished": None, "items": items}
     M.store.meta_set("sec_cnt_max", max(M.store.meta_get("sec_cnt_max", 0), img.get("security_counter", 0)))
     M.log("info", "fw_rollout", f"Verteilung {ver} an {len(items)} Sensor(en) gestartet")

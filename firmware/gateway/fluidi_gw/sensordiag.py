@@ -68,6 +68,23 @@ def testfw_from_build(build) -> int:
     return n if n in TESTFW_VARIANTS else 0
 
 
+_FILE_TF = re.compile(r"-tf([1-9])-")
+
+
+def testfw_from_filename(name) -> int:
+    """Dateiname fluidi-sensor-tf<n>-<ver>… (TESTFIRMWARE.md Kap. 2) -> n, sonst 0."""
+    m = _FILE_TF.search(name or "")
+    return int(m.group(1)) if m else 0
+
+
+def testfw_of_image(build, filename=None) -> int:
+    """Sensor-Abbild (Sicherheit W-2): Build 9000–9999 im signierten MCUboot-Kopf ist für Testfirmware reserviert
+    (Serien-Builds < 9000, Makefile). n aus 9<n>xx; unbekannte Variante -> 9. Zusätzlich Dateiname -tf<n>-."""
+    if isinstance(build, int) and 9000 <= build <= 9999:
+        return testfw_from_build(build) or 9
+    return testfw_from_filename(filename)
+
+
 def testfw_from_name(name) -> int:
     """Gerätename im Advertising fl-tf<n>-XXXX (Serie: fluidi-XXXX) -> n, sonst 0."""
     m = _NAME_TF.match(name or "")

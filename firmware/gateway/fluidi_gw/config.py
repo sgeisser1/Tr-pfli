@@ -38,6 +38,7 @@ class Config:
     sim_speed: float = 0.002                 # Zeitraffer der simulierten Sensoren
     sim_history_days: int = 30
     sim_autopair: bool = True
+    allow_testfw: bool = False               # Sicherheit W-2: Testfirmware-Abbilder annehmen/verteilen (nur Musterprüfung)
     sim_testfw: int = 0                      # 1..4: letzter gekoppelter Sim-Sensor läuft mit Testfirmware TF-n
     climate: str = "auto"                    # auto | sht4x | sim | off
     i2c_bus: int = 1

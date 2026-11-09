@@ -14,5 +14,6 @@ climate = "auto"          # auto | sht4x | off
 i2c_bus = 1
 climate_addr = 0x44
 fw_pubkey = "/etc/fluidi/keys/sensor-fw.pem"        # öffentlicher Schlüssel Sensor-Firmware (vom Entwickler)
+allow_testfw = false      # true nur für die Musterprüfung (TESTFIRMWARE.md): Testfirmware hochladen/verteilen erlauben
 gw_update_pubkey = "/etc/fluidi/keys/gateway-update.pem"
 status_led = "auto"       # auto | on | off – grüne LED an GPIO17 (D-027), Overlay gpio-led in config.txt

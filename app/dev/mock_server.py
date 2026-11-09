@@ -187,6 +187,8 @@ class State:
         self.cal: dict[str, dict] = {}
         self.records: dict[str, list] = {}
         self.diags: dict[str, list] = {}      # Sensor-ID -> SensorDiag, neueste zuerst
+        self.diag_requested: dict[str, float] = {}   # K-4: Mindestabstand je Sensor
+        self.allow_testfw = False             # wie gateway.toml allow_testfw (W-2), Mock: --allow-testfw
         self.assign: list[dict] = []
         self.next_plant = 1
         self.water_truth: dict[int, list] = {}
@@ -1218,6 +1220,9 @@ def sensor_identify(h: Handler, sensor_id, **_):
     h.send_json(202, j)
 
 
+DIAG_MIN_INTERVAL_S = 60
+
+
 @route("POST", "/sensors/{sensor_id}/diag")
 def sensor_diag_start(h: Handler, sensor_id, **_):
     S = h.S
@@ -1227,6 +1232,11 @@ def sensor_diag_start(h: Handler, sensor_id, **_):
     if busy:
         h.send_json(202, busy[0])
         return
+    wait_s = DIAG_MIN_INTERVAL_S - (now() - S.diag_requested.get(sensor_id, -1e12))
+    if wait_s > 0:  # K-4
+        raise ApiError(429, "locked", f"Diagnose für {sensor_id} erst in {math.ceil(wait_s)} s wieder möglich",
+                       retry_after=math.ceil(wait_s))
+    S.diag_requested[sensor_id] = now()
     j = S.new_job("diag", sensor_id)
     S.run_measure(j, None, sensor_id, on_done=lambda: S.make_diag(sensor_id, j["id"]), done_message="Diagnose gelesen")
     h.send_json(202, j)
@@ -1288,7 +1298,27 @@ def _run(S, run_id):
     r = S.runs.get(run_id)
     if not r:
         raise ApiError(404, "not_found", "Kalibrierlauf nicht gefunden")
+    _expire(r)
     return r
+
+
+def _expire(r):
+    if r["state"] not in ("committed", "cancelled", "failed") and datetime.fromisoformat(r["expires"].replace("Z", "+00:00")).timestamp() <= now():
+        r.update(state="cancelled", message="Kalibrierlauf abgelaufen (6 h) – bitte neu beginnen")
+
+
+@route("GET", "/sensors/{sensor_id}/calibration-runs", auth="session")
+def runs_open(h: Handler, sensor_id, **_):
+    """Offener Lauf (0 oder 1) zum Fortsetzen nach Seitenverlust (Red Team W-6)."""
+    S = h.S
+    _sensor(S, sensor_id)
+    out = []
+    for r in S.runs.values():
+        if r["sensor_id"] == sensor_id:
+            _expire(r)
+            if r["state"] not in ("committed", "cancelled", "failed"):
+                out.append(r)
+    h.send_json(200, out)
 
 
 @route("GET", "/calibration-runs/{run_id}", auth="session")
@@ -1569,7 +1599,7 @@ def fw_get(h: Handler, **_):
 
 
 @route("POST", "/firmware/sensor-images", elevated=True)
-def fw_upload(h: Handler, body, **_):
+def fw_upload(h: Handler, body, q, **_):
     S = h.S
     data = body if isinstance(body, (bytes, bytearray)) else b""
     if not data:
@@ -1578,10 +1608,13 @@ def fw_upload(h: Handler, body, **_):
         raise ApiError(413, "too_large", "Abbild grösser als 512 kB")
     if data.startswith(b"BAD"):  # Testhaken des Mocks: simulierte ungültige Signatur
         raise ApiError(422, "signature_invalid", "Signatur ungültig – Datei wird nicht verteilt")
+    tf = SD.testfw_of_image(None, q.get("filename"))   # Mock: kein Abbildkopf, nur Dateiname (W-2)
+    if tf and not S.allow_testfw:
+        raise ApiError(403, "forbidden", "TESTFIRMWARE – am Gateway nicht erlaubt (gateway.toml allow_testfw = true nur für die Musterprüfung)")
     n = len(S.sensor_images)
     img = {"version": f"1.0.{3 + n}", "security_counter": 3 + n, "size": len(data),
            "sha256": hashlib.sha256(data).hexdigest(), "signature_ok": True, "hw_compat": "A-32 rev A",
-           "uploaded": C.iso(now())}
+           "uploaded": C.iso(now()), "build": 9001 + 100 * tf if tf else 12 + n, "testfw": tf}
     S.sensor_images.append(img)
     S.log("info", "fw_upload", f"Sensor-Firmware {img['version']} abgelegt (Mock: Signatur simuliert)")
     h.send_json(201, img)
@@ -1609,6 +1642,14 @@ def fw_rollout(h: Handler, body, **_):
     for sid in body.get("sensor_ids", []):
         _sensor(S, sid)
         items.append({"sensor_id": sid, "state": "pending", "progress": 0.0, "message": None})
+    img = next(i for i in S.sensor_images if i["version"] == ver)
+    if img.get("testfw"):  # W-2: wie Gateway
+        if not S.allow_testfw:
+            raise ApiError(403, "forbidden", "TESTFIRMWARE – am Gateway nicht erlaubt (allow_testfw = false)")
+        if len(items) != 1:
+            raise ApiError(400, "validation", "Testfirmware nur an einen einzeln gewählten Sensor verteilen", "sensor_ids")
+        if body.get("confirm_testfw") != items[0]["sensor_id"]:
+            raise ApiError(409, "confirmation_required", f"TESTFIRMWARE TF-{img['testfw']} an {items[0]['sensor_id']} verteilen? Ausdrücklich bestätigen", "confirm_testfw")
     S.rollout = {"version": ver, "started": C.iso(now()), "finished": None, "items": items}
 
     def tick():
@@ -2232,8 +2273,9 @@ def stream(h: Handler, **_):
 
 
 def make_server(host="127.0.0.1", port=8080, seed=42, fresh=False, password="fluidi-demo-2026", quiet=False,
-                demo=False, testfw=0):
+                demo=False, testfw=0, allow_testfw=False):
     Handler.S = State(seed, fresh, password)
+    Handler.S.allow_testfw = allow_testfw
     if testfw:  # letzter Sensor mit Testfirmware TF-n (TESTFIRMWARE.md Kap. 3: Name fl-tf<n>-XXXX, Build 9<n>01)
         s = Handler.S.sensors[sorted(Handler.S.sensors)[-1]]
         s.update(adv_name=f"fl-tf{testfw}-{s['id'][-4:]}", fw_build=9001 + 100 * testfw, fw_version="0.1.1")
@@ -2255,6 +2297,7 @@ def main():
     ap.add_argument("--quiet", action="store_true")
     ap.add_argument("--testfw", type=int, choices=[0, 1, 2, 3, 4], default=0,
                     help="letzter Sensor läuft mit Testfirmware TF-n (Anzeige/Diagnose prüfen)")
+    ap.add_argument("--allow-testfw", action="store_true", help="wie gateway.toml allow_testfw = true (W-2)")
     ap.add_argument("--allow-framing", action="store_true",
                     help="CSP frame-ancestors * (nur für Screenshots im Geräterahmen)")
     ap.add_argument("--demo-session", action="store_true",
@@ -2264,7 +2307,7 @@ def main():
         ap.error("--demo-session nur mit --host 127.0.0.1")
     global CSP_FRAME_ANY
     CSP_FRAME_ANY = a.allow_framing
-    srv = make_server(a.host, a.port, a.seed, a.fresh, a.password, a.quiet, a.demo_session, a.testfw)
+    srv = make_server(a.host, a.port, a.seed, a.fresh, a.password, a.quiet, a.demo_session, a.testfw, a.allow_testfw)
     S = Handler.S
     print(f"fluidi Mock-Gateway: http://{'localhost' if a.host in ('127.0.0.1', '0.0.0.0') else a.host}:{a.port}/")
     if S.setup_code:

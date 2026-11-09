@@ -116,6 +116,7 @@ class Model:
         self.cache: dict = {}
         self.alert_since: dict = {}
         self.adv_stats: dict = {}
+        self.diag_requested: dict = {}   # Sensor-ID -> Zeitpunkt des letzten Diagnoseauftrags (K-4)
         self.volatile_dirty = set()
         self.last_flush = now()
         self._load()
@@ -151,6 +152,44 @@ class Model:
         self.sensor_images = st.images()
         self.sessions = st.sessions()
         self.max_seq = {addr: st.max_seq(addr) for addr in self.by_addr}
+        self._load_runs()
+
+    # ================================================================== Kalibrierläufe (Red Team W-6)
+    RUN_DONE = ("committed", "cancelled", "failed")
+    RUN_TTL_S = 6 * 3600
+
+    def _load_runs(self):
+        """Offene Läufe überleben Seitenverlust UND Gateway-Neustart bis `expires` (6 h); der Trockenpunkt bleibt."""
+        t = now()
+        for rid, r in (self.store.meta_get("cal_runs") or {}).items():
+            if r.get("state") in self.RUN_DONE or r.get("_exp", 0) <= t:
+                continue
+            if r["state"].startswith("measuring"):   # Messauftrag ging mit dem Neustart verloren
+                r["state"] = "await_dry" if r.get("dry") is None else "await_wet"
+                r["message"] = "Messung durch Neustart des Gateways unterbrochen – bitte wiederholen"
+            r.pop("_job", None)
+            self.runs[rid] = r
+
+    def save_runs(self):
+        """Nur offene Läufe sichern (wenige, kleine Schreibvorgänge je Kalibrierschritt)."""
+        keep = {rid: {k: v for k, v in r.items() if k != "_job"} for rid, r in self.runs.items()
+                if r["state"] not in self.RUN_DONE}
+        self.store.meta_set("cal_runs", keep)
+
+    def open_runs(self, sid):
+        t = now()
+        return [r for r in self.runs.values() if r["sensor_id"] == sid and r["state"] not in self.RUN_DONE
+                and r.get("_exp", 0) > t]
+
+    def expire_runs(self, t):
+        changed = False
+        for r in self.runs.values():
+            if r["state"] not in self.RUN_DONE and r.get("_exp", 0) <= t:
+                r.update(state="cancelled", message="Kalibrierlauf abgelaufen (6 h) – bitte neu beginnen")
+                changed = True
+                self.emit("calibration", {k: v for k, v in r.items() if not k.startswith("_")})
+        if changed:
+            self.save_runs()
 
     def new_setup_code(self):
         self.setup_code = f"{secrets.randbelow(1000):03d}-{secrets.randbelow(1000):03d}"
@@ -560,6 +599,8 @@ class Model:
                         for r in self.runs.values():
                             if r.get("_job") == j["id"] and r["state"].startswith("measuring"):
                                 r["state"] = "await_dry" if r["dry"] is None else "await_wet"
+                                self.save_runs()
+            self.expire_runs(t)
             if self.pairing["active"] and self.pairing["until"] < t:
                 self.pairing.update(active=False, until=None, candidates={})
                 self.emit("pairing", self.pairing_out())

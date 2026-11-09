@@ -134,7 +134,7 @@ Legende Zugriff: **L** = lesen (öffentlich, wenn `public_read`), **S** = Sitzun
 | POST / GET | `/sensors/{sid}/diag` | W / S | Diagnose (GET_INFO + GET_DIAG) abrufen → Job / gespeicherte Diagnosen | FW-07, Testplan Anhang A |
 | GET | `/sensors/{sid}/calibration` | L | Kalibrierung je Substrat | MES-09 |
 | PUT/DELETE | `/sensors/{sid}/calibration/{substrate}` | W | Fachmodus / zurück auf Startkalibrierung | |
-| POST | `/sensors/{sid}/calibration-runs` | W | geführte Kalibrierung starten | APP-07 |
+| GET / POST | `/sensors/{sid}/calibration-runs` | S / W | offener Lauf (Fortsetzen) / geführte Kalibrierung starten | APP-07 |
 | GET/DELETE | `/calibration-runs/{id}` | S / W | Stand / abbrechen | |
 | POST | `/calibration-runs/{id}/capture` | W | Punkt `dry`/`wet` messen → Job | |
 | POST | `/calibration-runs/{id}/commit` | W | übernehmen | |
@@ -177,6 +177,11 @@ misst“) → `done`, sobald der Datensatz `seq` gespeichert ist. Kalibrierpunkt
 robusten Mittelwert mit Ausreisserverwurf, Kap. 7.3) → `await_wet` → `capture{wet}` → `ready` (oder `failed`,
 wenn die Spanne < 2 %) → `commit` speichert `source=guided`. Ein neuer Lauf bricht offene Läufe desselben Sensors
 ab; Läufe verfallen nach 6 h. Punkte können wiederholt werden.
+Fortsetzen (Red Team W-6): Offene Läufe bleiben im Gateway bis `expires` (6 h), gesichert in SQLite (`meta.cal_runs`,
+ein kleiner Schreibvorgang je Schritt), auch über einen Gateway-Neustart (eine dabei laufende Messung wird auf
+`await_*` zurückgesetzt, `message` sagt es). `GET /sensors/{sid}/calibration-runs` (S) liefert den offenen Lauf; die
+PWA setzt ihn beim Öffnen von „Kalibrieren“ fort und löscht ihn beim Verlassen der Seite **nicht** mehr (nur
+„Abbrechen“/„Neu beginnen“). Abgelaufene Läufe werden `cancelled`.
 
 ### 5.3 Koppeln (UC-02, REQ-RF-05)
 1. PWA `POST /pairing/start` (Gateway sucht ≤ 300 s), Nutzer drückt die Sensortaste ≥ 3 s (LED gelb).
@@ -199,6 +204,11 @@ Das Gateway speichert den Schlüssel erst nach beiden Bestätigungen und gültig
    `failed` (z. B. Batterie unter Schwelle, Sensor lehnt ab), `waiting_for_sensor` (später erneut).
    Der Sensor prüft die Signatur selbst nochmals (Bootloader). Fortschritt per SSE `rollout`.
 3. Gleichzeitig höchstens **ein** Sensor in Übertragung (Funkzeit, Koexistenz).
+4. **Testfirmware (Sicherheit W-2):** Abbild mit Build 9000–9999 im signierten MCUboot-Kopf (für Testfirmware
+   reserviert, TESTFIRMWARE.md Kap. 3) oder Dateiname `-tf<n>-` (Query `filename` beim Upload) → nur mit
+   `allow_testfw = true` in `gateway.toml` (Werk `false`, sonst `403 forbidden`), im Abbild-Dokument `testfw: n`
+   (9 = unbekannte Variante), PWA rot „TESTFIRMWARE“. Rollout nur an **genau einen** Sensor (`400 validation`) und nur
+   mit `confirm_testfw` = dessen Kennung (`409 confirmation_required`); das Ereignisprotokoll hält die Bestätigung fest.
 
 ### 5.5 WLAN-Wechsel (UC-13, REQ-GW-10)
 `PUT /settings/network` (E) → Gateway verbindet neu; ohne Erfolg innert 120 s Rückfall auf die alten Daten.
@@ -237,7 +247,8 @@ Dünger-/Salzhinweis aus der Zeitreihe (D-018). `PlantCreate/PlantPatch` akzepti
 - `POST /sensors/{sid}/diag` (W: Sitzung + CSRF + Origin-Prüfung) → `202 Job{kind: diag}`. Beim nächsten Kontakt fragt das
   Gateway `GET_INFO` (0x10 → 0x90, PROTOCOL 5.5) und `GET_DIAG` (0x18 → 0x98, 5.7) ab, nach der Nachlieferung und vor
   OTA/MEASURE. Kein elevate: nur lesend, der Sensor ändert nichts (Kosten: eine Verbindung). Läuft schon ein Abruf, kommt
-  derselbe Job zurück. Lehnt der Sensor eine Anfrage ab (ERR_RSP), wird die andere trotzdem gespeichert; beide abgelehnt → `failed`.
+  derselbe Job zurück. **Mindestabstand 60 s je Sensor** (Sicherheit K-4: je Abruf eine BLE-Verbindung); früher →
+  `429 locked` mit `Retry-After`. Lehnt der Sensor eine Anfrage ab (ERR_RSP), wird die andere trotzdem gespeichert; beide abgelehnt → `failed`.
 - `done` → `result` = `SensorDiag`: Rohdaten `info_hex`/`diag_hex` (Nutzlast der Antworten), dekodiert `info`/`diag`
   (Feldnamen wie `scripts/testfw_eval.py --json`, TF-4-Anhang unter `diag.tf`), `testfw`, `decode_errors`. Rohdaten werden
   immer gespeichert, auch wenn die Dekodierung scheitert.
@@ -317,11 +328,11 @@ Batterie: `mv` unter Last vom Sensor, `pct` und `days_left` schätzt das Gateway
 | 403 | `csrf`, `forbidden`, `elevation_required` | Token fehlt, fremder Origin, Passwort erneut nötig |
 | 404 | `not_found` | unbekannte Ressource oder Kandidat nicht mehr im Kopplungsmodus |
 | 405 | `bad_request` | Methode nicht erlaubt |
-| 409 | `conflict`, `busy`, `setup_done`, `setup_required`, `downgrade` | Zustand passt nicht |
+| 409 | `conflict`, `busy`, `setup_done`, `setup_required`, `downgrade`, `confirmation_required` | Zustand passt nicht / ausdrückliche Bestätigung fehlt (Testfirmware) |
 | 413 | `too_large` | Upload zu gross |
 | 415 | `bad_request` | falscher Content-Type |
 | 422 | `signature_invalid`, `calibration_span` | Datei/Kalibrierung abgelehnt |
-| 429 | `locked` | Sperre, `Retry-After` |
+| 429 | `locked` | Sperre bzw. Mindestabstand (Diagnose), `Retry-After` |
 | 503 | `busy` | zu viele Streams/Verbindungen |
 
 ## 9 CSV-Format `fluidi-csv v1` (REQ-APP-08, REQ-SYS-09)

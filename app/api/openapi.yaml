@@ -339,7 +339,8 @@ paths:
       description: |
         Job `diag` wie „Jetzt messen“: `waiting_for_sensor` → `running` → `done` mit `result` = SensorDiag
         (Rohdaten hex + dekodiert, gespeichert). Nur lesend auf dem Sensor; Sitzung + CSRF (+ Origin), kein elevate.
-        Läuft für den Sensor schon ein Abruf, kommt derselbe Job zurück. Dekodierung `firmware/gateway/fluidi_gw/sensordiag.py`
+        Läuft für den Sensor schon ein Abruf, kommt derselbe Job zurück. Mindestabstand 60 s je Sensor (Sicherheit K-4),
+        sonst `429 locked` mit `Retry-After`. Dekodierung `firmware/gateway/fluidi_gw/sensordiag.py`
         (dieselbe wie `scripts/testfw_eval.py`).
       responses:
         '202':
@@ -349,6 +350,7 @@ paths:
               schema: {$ref: '#/components/schemas/Job'}
         '404': {$ref: '#/components/responses/Error'}
         '409': {$ref: '#/components/responses/Error'}
+        '429': {$ref: '#/components/responses/Error'}
     get:
       tags: [sensors]
       summary: Gespeicherte Diagnosen (neueste zuerst; nur mit Sitzung, nie öffentlich)
@@ -410,6 +412,21 @@ paths:
               schema: {$ref: '#/components/schemas/Calibration'}
   /sensors/{sensor_id}/calibration-runs:
     parameters: [{$ref: '#/components/parameters/SensorIdParam'}]
+    get:
+      tags: [calibration]
+      summary: Offener Kalibrierlauf des Sensors (0 oder 1) – Fortsetzen nach Seitenverlust (Red Team W-6)
+      description: |
+        Offene Läufe bleiben im Gateway bis `expires` (6 h nach dem Start), auch über einen Neustart des Gateways
+        (eine dabei unterbrochene Messung muss wiederholt werden, `message`). Abgelaufene Läufe werden `cancelled`.
+      responses:
+        '200':
+          description: offene Läufe (höchstens einer)
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: '#/components/schemas/CalibrationRun'}
+        '404': {$ref: '#/components/responses/Error'}
     post:
       tags: [calibration]
       summary: Geführte Zwei-Punkt-Kalibrierung starten (REQ-APP-07)
@@ -634,7 +651,12 @@ paths:
     post:
       tags: [firmware]
       summary: Signiertes Sensor-Abbild hochladen (Gateway prüft Signatur und Version)
+      description: |
+        Testfirmware (Build 9000–9999 im signierten Kopf, bzw. Dateiname `-tf<n>-`, TESTFIRMWARE.md Kap. 3) wird nur
+        mit `allow_testfw = true` in gateway.toml angenommen (sonst 403) und als `testfw: n` markiert (Sicherheit W-2).
       x-fluidi-elevated: true
+      parameters:
+        - {name: filename, in: query, required: false, schema: {type: string, maxLength: 200}, description: 'Original-Dateiname (zusätzliches TF-Merkmal)'}
       requestBody:
         required: true
         content:
@@ -646,6 +668,7 @@ paths:
           content:
             application/json:
               schema: {$ref: '#/components/schemas/SensorImage'}
+        '403': {$ref: '#/components/responses/Error'}
         '409': {$ref: '#/components/responses/Error'}
         '413': {$ref: '#/components/responses/Error'}
         '422': {$ref: '#/components/responses/Error'}
@@ -676,6 +699,9 @@ paths:
                   type: array
                   minItems: 1
                   items: {$ref: '#/components/schemas/SensorId'}
+                confirm_testfw:
+                  $ref: '#/components/schemas/SensorId'
+                  description: "Pflicht bei Testfirmware (W-2): genau ein Sensor, hier dessen Kennung als ausdrückliche Bestätigung; sonst 409 confirmation_required"
       responses:
         '202':
           description: Verteilung gestartet
@@ -683,6 +709,8 @@ paths:
             application/json:
               schema: {$ref: '#/components/schemas/Rollout'}
         '404': {$ref: '#/components/responses/Error'}
+        '400': {$ref: '#/components/responses/Error'}
+        '403': {$ref: '#/components/responses/Error'}
         '409': {$ref: '#/components/responses/Error'}
     delete:
       tags: [firmware]
@@ -1968,6 +1996,8 @@ components:
         signature_ok: {type: boolean}
         hw_compat: {type: string}
         uploaded: {$ref: '#/components/schemas/Timestamp'}
+        build: {type: ['integer', 'null'], description: Build-Nummer aus dem MCUboot-Kopf}
+        testfw: {type: integer, description: '0 = Serie; n = TESTFIRMWARE TF-n (9 = Testbuild unbekannter Variante). Verteilen nur mit Bestätigung'}
     RolloutItem:
       type: object
       required: [sensor_id, state]

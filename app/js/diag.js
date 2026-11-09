@@ -14,6 +14,18 @@ export function testfwOf(s) {
   return 0;
 }
 
+/** Sensor-Abbild (Sicherheit W-2): Gateway liefert `testfw`; sonst Build 9000–9999 (für Testfirmware reserviert). */
+export function imageTestfw(img) {
+  if (!img) return 0;
+  if (Number.isInteger(img.testfw) && img.testfw > 0) return img.testfw;
+  const b = img.build;
+  if (Number.isInteger(b) && b >= 9000 && b <= 9999) { const n = Math.floor(b / 100) % 10; return n >= 1 && n <= 4 ? n : 9; }
+  return 0;
+}
+
+/** Text der roten Marke; 9 = Testbuild unbekannter Variante. */
+export const tfLabel = (n) => (n === 9 ? 'TESTFIRMWARE' : `TESTFIRMWARE TF-${n}`);
+
 /** "1.0.3 · Build 12" (Build fehlt bei Sensoren, die seit dem Gateway-Update noch keinen Kontakt hatten). */
 export function fwLabel(s) {
   const v = (s && s.fw_version) || '?';

@@ -3,8 +3,8 @@
 | | |
 |---|---|
 | Dokument | `docs/manuals/FEHLERSUCHE.md` |
-| Version | 0.1 (Phase 6) |
-| Datum | 2026-11-08 |
+| Version | 0.2 (Phase 6: Sicherheit W-3/K-6, Red Team W-5) |
+| Datum | 2026-11-09 |
 | Für wen | Alle, die fluidi benutzen. Abschnitte mit „technisch“ brauchen Zugang zum Gateway (SSH) |
 | Gilt für | Sensor-Firmware 0.1.0 (`firmware/sensor/core/fl_ui.c`, `fl_app.c`), Gateway 0.5.0 (`firmware/gateway/`), App `app/` |
 | Status | LED-Muster aus dem Programmcode übernommen; **am echten Gerät noch nicht geprüft** (PROTOTYP-PRÜFUNG) |
@@ -108,11 +108,15 @@ Die App meldet „**Keine neuen Werte**“, wenn länger als 3 Messintervalle (m
 ist.
 
 1. Gateway-LED prüfen (Kap. 2).
-2. Batterie: *Einstellungen → Sensoren & Firmware* zeigt Prozent, Spannung und geschätzte Tage. Tastendruck am
+2. **Sensor kurz drücken.** Nach mehreren Abstürzen kurz hintereinander schaltet sich der Sensor zum Schutz der
+   Zelle ab (LED dunkel, keine Werte). **Ein kurzer Tastendruck weckt ihn:** Er startet neu (1 × grün) und arbeitet
+   normal weiter; die App zeigt danach „Absturz“ (Kap. 5). Erst wenn auf den Tastendruck **nichts** oder nur
+   **1 × kurz rot** kommt, die Zelle wechseln – so wird keine gute Zelle unnötig weggeworfen.
+3. Batterie: *Einstellungen → Sensoren & Firmware* zeigt Prozent, Spannung und geschätzte Tage. Tastendruck am
    Sensor: kommt gar nichts oder 1 × kurz rot → Zelle wechseln.
-3. Funk: Signal unter −80 dBm gilt als schwach. Gateway oder Sensor umstellen (nicht hinter Metall, nicht in einen
+4. Funk: Signal unter −80 dBm gilt als schwach. Gateway oder Sensor umstellen (nicht hinter Metall, nicht in einen
    Metalltopf).
-4. Werte gehen nicht verloren: Der Sensor speichert sie und liefert sie nach (bis etwa 60 Tage bei 6 Messungen pro
+5. Werte gehen nicht verloren: Der Sensor speichert sie und liefert sie nach (bis etwa 60 Tage bei 6 Messungen pro
    Tag). Unter *Sensoren & Firmware* steht „… Werte im Puffer“.
 
 ### 3.5 Unplausible Feuchtewerte
@@ -145,12 +149,16 @@ drücken und den Sensor nicht über die Taste in die Erde drücken.
 ### 3.8 Wasser im Sensorkopf
 
 Sofort nach `BATTERIEWECHSEL.md` „Wasser im Kopf“ vorgehen (Zelle heraus, trocknen, melden).
+Vorbeugen: beim Giessen den Kopf nicht übergiessen, den Sensor nie untertauchen, nicht unter fliessendem Wasser oder
+in der Spülmaschine reinigen; nur die Sonde mit einem feuchten Tuch abwischen.
 
 ## 4 Probleme mit der App und dem Gateway
 
 ### 4.1 Gateway-LED tagsüber aus oder dauernd im Herzschlag
 
-1. Netzteil und Steckdose prüfen.
+1. Netzteil und Steckdose prüfen. **Ist Wasser auf Netzteil oder Steckdose gelangt: nicht anfassen**, zuerst den
+   Stromkreis an der Sicherung abschalten, dann ausstecken und das Netzteil ersetzen. Gateway und Netzteil danach
+   ausserhalb des Giessbereichs aufstellen (`INBETRIEBNAHME.md` Kap. 2). Nur das Original-Netzteil verwenden.
 2. In der App *Einstellungen → Messung & Sensor-LED*: Ist „Status-LED“ eingeschaltet? Stimmt das Zeitfenster?
 3. App öffnen: *Einstellungen → System: Zeit, WLAN, Protokoll* → Karte **Gateway**, Zeile „Funk“, und das
    **Ereignisprotokoll** ansehen (z. B. „Funk nicht verfügbar“).
@@ -166,6 +174,9 @@ Sofort nach `BATTERIEWECHSEL.md` „Wasser im Kopf“ vorgehen (Zelle heraus, tr
 - Gateway-LED blitzt alle 5 s? Sonst Kap. 4.1.
 - Android löst `fluidi.local` erst ab Version 12 auf. Am PC im gleichen Netz prüfen: `ping fluidi.local`.
   Antwortet das Gateway dort auch nicht, ist es nicht im WLAN (WLAN-Passwort geändert? → technisch, `GATEWAY_SETUP.md`).
+- Neues oder anderes WLAN (z. B. Gäste- oder Firmennetz): Dort sind Geräte oft voneinander abgeschottet
+  (Client-Isolation) oder `.local`-Namen gesperrt. Prüfung und Ausweichwege: `GATEWAY_SETUP.md` Kap. 1.1. Bei
+  Client-Isolation hilft nur die IT. **Nicht** über die IP-Adresse arbeiten und die Zertifikatswarnung wegklicken.
 - Ist das Gateway nicht erreichbar, zeigt die App den zuletzt geladenen Stand mit einem Hinweisbalken.
 
 ### 4.3 Zertifikatswarnung im Browser
@@ -221,7 +232,7 @@ Unter *Einstellungen → Sensoren & Firmware* (und in den Hinweisen) zeigt die A
 | Messung wegen Unterspannung ausgelassen / Unterspannungsabschaltung | Zelle wechseln |
 | Flash-Fehler / Einstellungen beschädigt | Sensor neu koppeln; wiederholt: Kap. 6 |
 | Pufferüberlauf: unquittierte Messwerte überschrieben | Sensor war zu lange ohne Gateway (über etwa 60 Tage) – Funk prüfen |
-| Watchdog-Neustart / Brownout-Neustart / Absturz | einmalig: beobachten; häufig: Zelle wechseln, sonst Kap. 6 |
+| Watchdog-Neustart / Brownout-Neustart / Absturz | einmalig: beobachten. War der Sensor danach dunkel (Schutzabschaltung nach Abstürzen in Folge): kurzer Tastendruck weckt ihn (Kap. 3.4). Häufig: Zelle wechseln, sonst Kap. 6 |
 | Taste klemmt | Kap. 3.7 |
 | 32-kHz-Quarz gestört | Kap. 6 |
 | Verbindungssperre aktiv (zu viele Fehlversuche) | 30 Minuten warten (Kap. 3.3). Tritt sie ohne eigenes Koppeln auf, versucht eventuell ein fremdes Gerät, sich zu verbinden → Kap. 6 |

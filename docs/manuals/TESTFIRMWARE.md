@@ -103,7 +103,10 @@ Zurückflashen auslesen.** Zurück: Werks-Hex der Serie ebenso flashen (Version 
 (`fluidi_gw/central.py` `ota`: `tuple(vparts) <= cur` → Abbruch; die Build-Nummer zählt dort nicht), der Sensor lehnt
 Version+Build ≤ laufend ab (`fl_ota.c` `fl_ver_newer`) und MCUboot verbietet Downgrades (SEC_CNT, ST-S7). Das Gateway
 prüft die Signatur mit `fw_pubkey` (`fluidi_gw/config.py`): für die Muster muss dort der **öffentliche DEV-Schlüssel**
-eingetragen sein (ANNAHME, wie für die DEV-signierte Werksfirmware). Darum alle Images **vorab** mit steigender
+eingetragen sein (ANNAHME, wie für die DEV-signierte Werksfirmware), und in `gateway.toml` muss
+`allow_testfw = true` stehen (Werk `false`, Sicherheit W-2): erst dann nimmt das Gateway Abbilder mit Build 9xxx an,
+markiert sie rot „TESTFIRMWARE“ und verteilt sie nur an einen einzeln gewählten Sensor nach Bestätigung
+(GATEWAY_API 5.4). Darum alle Images **vorab** mit steigender
 Patch-Nummer bauen, z. B. für S4:
 
 | Schritt | Image | Befehl |

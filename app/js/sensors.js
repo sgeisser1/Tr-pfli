@@ -5,12 +5,12 @@ import { h, toast, fmt, fill, sheet } from './dom.js';
 import { icon, batteryIcon, signalIcon } from './art.js';
 import { card, toggle } from './comp.js';
 import { watchJob } from './api.js';
-import { testfwOf, fwLabel, diagRows, diagFileName, evalCommand } from './diag.js';
+import { testfwOf, fwLabel, diagRows, diagFileName, evalCommand, imageTestfw, tfLabel } from './diag.js';
 
 /** Kennzeichnung Testfirmware (nie mit Serie verwechseln): Pill + Gerätename. null bei Serie. */
 export function testfwBadge(s) {
   const n = testfwOf(s);
-  return n ? h('span.pill.p-ext', { title: `Gerätename ${s.adv_name || '?'} – nur für Prüfungen, nicht für den Betrieb` }, `TESTFIRMWARE TF-${n}`) : null;
+  return n ? h('span.pill.p-ext', { title: `Gerätename ${s.adv_name || '?'} – nur für Prüfungen, nicht für den Betrieb` }, tfLabel(n)) : null;
 }
 
 function diagView(d) {
@@ -90,18 +90,49 @@ export default async function sensors(el, ctx) {
   upload.addEventListener('click', async () => {
     if (!file.files.length) { upMsg.textContent = 'Bitte eine signierte Datei fluidi-sensor-x.y.z.bin wählen.'; return; }
     try {
-      const img = await ctx.api.post('/firmware/sensor-images', await file.files[0].arrayBuffer());
-      toast(`Version ${img.version} geprüft und abgelegt`, 'ok');
+      const f = file.files[0];
+      const img = await ctx.api.post('/firmware/sensor-images', await f.arrayBuffer(), { query: { filename: f.name } });
+      const tf = imageTestfw(img);
+      toast(tf ? `${tfLabel(tf)} ${img.version} abgelegt – nur für die Musterprüfung` : `Version ${img.version} geprüft und abgelegt`, tf ? 'err' : 'ok');
       ctx.refresh();
     } catch (e) { upMsg.textContent = e.message; }
   });
-  const imgs = fw.sensor_images.map((i) => h('li.img', null, h('strong', null, i.version), h('span.small.muted', null, ` · ${fmt.n0(i.size / 1024)} kB · Zähler ${i.security_counter} · ${i.signature_ok ? 'Signatur gültig' : 'ungültig'}`),
-    h('button.btn.primary.sm', { type: 'button', onclick: () => rollout(i.version) }, 'Verteilen'),
+  const imgs = fw.sensor_images.map((i) => h('li.img', null, h('strong', null, i.version),
+    imageTestfw(i) ? h('span.pill.p-ext', { title: 'Testfirmware: nur für die Musterprüfung, nie an Nutzersensoren' }, tfLabel(imageTestfw(i))) : null,
+    h('span.small.muted', null, ` · ${Number.isInteger(i.build) ? `Build ${i.build} · ` : ''}${fmt.n0(i.size / 1024)} kB · Zähler ${i.security_counter} · ${i.signature_ok ? 'Signatur gültig' : 'ungültig'}`),
+    h('button.btn.primary.sm', { type: 'button', onclick: () => (imageTestfw(i) ? rolloutTestfw(i) : rollout(i.version)) }, 'Verteilen'),
     h('button.btn.ghost.sm', { type: 'button', 'aria-label': 'Entfernen', onclick: async () => { try { await ctx.api.del(`/firmware/sensor-images/${i.version}`); ctx.refresh(); } catch (e) { toast(e.message, 'err'); } } }, icon('trash'))));
   async function rollout(version) {
     const ids = list.filter((s) => s.fw_version !== version.split('+')[0]).map((s) => s.id);
     if (!ids.length) { toast('Alle Sensoren haben diese Version'); return; }
     try { await ctx.api.post('/firmware/rollout', { version, sensor_ids: ids }); toast('Verteilung gestartet – ein Sensor nach dem anderen', 'ok'); ctx.refresh(); } catch (e) { toast(e.message, 'err'); }
+  }
+  // Sicherheit W-2: Testfirmware nur an EINEN gewählten Sensor und nur nach ausdrücklicher Bestätigung
+  async function rolloutTestfw(img) {
+    const n = imageTestfw(img);
+    await sheet((close) => {
+      const sel = h('select.input', { 'aria-label': 'Sensor' }, h('option', { value: '' }, 'Sensor wählen …'),
+        list.map((s) => h('option', { value: s.id }, `${s.id} · ${pname(s.plant_id)}`)));
+      const chk = h('input', { type: 'checkbox' });
+      const msg = h('p.status');
+      const go = h('button.btn.primary', { type: 'button', disabled: true }, `${tfLabel(n)} verteilen`);
+      const upd = () => { go.disabled = !(sel.value && chk.checked); };
+      sel.addEventListener('change', upd);
+      chk.addEventListener('change', upd);
+      go.addEventListener('click', async () => {
+        go.disabled = true;
+        try {
+          await ctx.api.post('/firmware/rollout', { version: img.version, sensor_ids: [sel.value], confirm_testfw: sel.value });
+          toast(`${tfLabel(n)} wird an ${sel.value} verteilt`, 'err');
+          close(true);
+          ctx.refresh();
+        } catch (e) { msg.textContent = e.message; upd(); }
+      });
+      return h('div.stack', null, h('h2', null, `${tfLabel(n)} ${img.version}`),
+        h('p.err', null, 'Testfirmware ist nur für die Musterprüfung (TESTFIRMWARE.md). Sie ändert das Verhalten des Sensors (z. B. Absturztests, Dauerspeisung) – nie an Sensoren im Betrieb verteilen.'),
+        sel, h('label.inl.small', null, chk, ' Ich verteile die Testfirmware bewusst an diesen einen Sensor.'),
+        msg, h('div.actions', null, go, h('button.btn.ghost', { type: 'button', onclick: () => close() }, 'Abbrechen')));
+    });
   }
   const roBox = h('div');
   const drawRo = (ro) => {
