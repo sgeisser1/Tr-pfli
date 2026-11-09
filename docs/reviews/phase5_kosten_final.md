@@ -103,7 +103,7 @@ Stand Phase 6 (2026-11-09): **D-028** Gateway ohne RTC (G4 PiRTC DS3231 und G5 C
 | A: direkt Serie | Serie 20 PCB / 16 bestückt / 15 Sensoren + Gateway (geplant total) | **635.44** |
 | B: Prototyp + Serie (geplant) | Prototyp 5 + Serie 15 Sensoren + Gateway (geplant total) | **862.01** |
 | davon Verguss-Zubehör/Schutz (A und B je einmal) | Kap. 2.0, Einkaufsliste V-Z (`docs/manuals/EINKAUFSLISTE.csv`), davon 211.90 ANNAHME | 249.60 |
-| B + Programmieradapter | wie B + Adapter Rev 1 inkl. PL2303-Board und LCSC-Versand (Einkaufsliste P1–P9, W1; 36.36 CHF, davon 26.00 ANNAHME) | 898.37 |
+| B + Programmierwerkzeug | wie B + Adapter Rev 1 inkl. PL2303-Board und LCSC-Versand (Einkaufsliste P1–P9, W1; 36.36 CHF, davon 26.00 ANNAHME) + Dummy-Platinen Weg B als Einmalkosten des Prototyp-Loses (4.31–14.44 CHF, Obergrenze gerechnet, `hardware/dummy_cell/gen/cost_dummy.py`) | 912.81 |
 
 - Pro Sensor (Weg A, inkl. Gateway-Anteil): 42.36 CHF; Weg B: 57.47 CHF (die 5 Prototypen sind zusätzlich nutzbar, falls sie die Prüfungen bestehen → dann 20 Sensoren: 43.10 CHF).
 - Nicht enthalten: Arbeitszeit, Werkzeug (ausser Verguss-Zubehör Kap. 2.0), Dichtmittel über die Sensor-Pauschalen hinaus, Status-LED-Platine Gateway, Ersatzzellen.
@@ -117,9 +117,10 @@ Kap. 4 ist eine Kostenzuordnung (Grenz- und Einmalkosten). Bar bezahlt werden da
 | JLC Prototyp (Ware + MWST + Verzollung DHL) | 168.03 | 178.30 |
 | JLC Serie (Ware + MWST + Verzollung DHL) | 218.58 | 251.44 |
 | JLC BT1-Vorrat 25 × C5213768 à 0.3615 USD (privater Bestand, inkl. MWST ANNAHME) | 8.12 | 8.12 |
+| JLC Dummy-Platinen PLUS 1.0 + MINUS 2.0 mm, je 5 Stk, gleiche Bestellung wie der Prototyp (`hardware/dummy_cell/gen/cost_dummy.py`, Obergrenze; Untergrenze 4.31) | 14.44 | 14.44 |
 | Einkaufsliste Ware (`docs/manuals/EINKAUFSLISTE.md`) | 587.81 | 587.81 |
 | Einkaufsliste Versand | 81.70 | 81.70 |
-| **Kassenbedarf gesamt** | **1064.25** | **1107.38** |
+| **Kassenbedarf gesamt** | **1078.69** | **1121.82** |
 
 - Davon Preis-ANNAHME in der Einkaufsliste: 292.64 CHF (Händler offen, gesperrte Shopseiten). Versand teils ANNAHME.
 - Nicht enthalten: Pi Zero 2 W (vorhanden), Werkstattbestand (Netzteil, Lötstation, Drucker), Arbeitszeit, Coupons. Die Serie zieht BT1 später aus dem Vorrat; die Serien-JLC-Rechnung sinkt dann um ≈ 16 × 0.36 USD (nicht abgezogen, konservativ).

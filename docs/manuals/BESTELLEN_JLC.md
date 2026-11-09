@@ -169,7 +169,31 @@ Erwartete Warnung (**ANNAHME**): Der Umriss von BT1 schliesst die Knopfzelle ein
    **Gibt es einen Posten „Pre-reflow Soldering“? → Stopp, nicht bezahlen, Projektleitung fragen.** (145 Lötstellen ×
    0.016 USD = 2.32 USD je Board; Prototyp +11.60 USD; Serie dann ≈ 10.60 CHF/Sensor statt 8.38 → Kostenziel < 10 CHF
    verfehlt, `docs/reviews/phase5_kosten_final.md` Kap. 2.1.)
-3. „Secure Checkout“.
+3. **PFLICHT (nur Prototyp): die zwei Dummy-Platinen in dieselbe Bestellung** (Schritt 9a), erst danach „Secure Checkout“.
+
+## Schritt 9a – PFLICHT: Dummy-Platinen PLUS und MINUS in dieselbe Bestellung (Weg B, `hardware/dummy_cell`)
+
+Für das Programmieren vor dem Verguss (Weg B) braucht es die Dummy-Scheibe aus zwei unbestückten Platinen
+(`hardware/dummy_cell/README.md` Kap. 4). Sie kommen in **dieselbe Bestellung** wie der Sensor-Prototyp.
+
+Belegt (`docs/references/JLCPCB_HowToPlaceOrder_Auszug_2026-11-08.txt` Schritte 4–8): Im Warenkorb **„Add new item“**,
+Gerber hochladen, Optionen wählen, „Save to Cart“, für jedes weitere PCB wiederholen; danach alle Posten zusammen über
+„Secure Checkout“ bezahlen; die Versandkosten werden im Checkout bestimmt.
+
+1. sha256 prüfen (vor dem Upload): `fluidi_dummy_plus_gerber_jlc.zip` = `5361f11926ba21a9f4ef1a34fbc018e60a4ed07329dcf4ad2250acc96fbc5831`,
+   `fluidi_dummy_minus_gerber_jlc.zip` = `a66f0b576484715333e002a8c9cca1ba90349176a9de6d133407c0c64007a6fa`
+   (`hardware/dummy_cell/out/SHA256SUMS`, im Paket `1_jlc_upload/dummy/`).
+2. „Add new item“ → PLUS-ZIP hochladen. Optionen: **2 Lagen, FR-4, Dicke 1.0 mm**, 5 Stk, 1 oz, **HASL bleifrei**, grün,
+   ohne „PCB Assembly“, Mark: keine Markierung. Gerber-Viewer: Kontur 27.9 × 19.8 mm, Aufdruck „DUMMY“. „Save to Cart“.
+3. „Add new item“ → MINUS-ZIP. Wie PLUS, aber **Dicke 2.0 mm**, Via Covering **Tented**; Kontur 44.4 × 19.8 mm. „Save to Cart“.
+4. Warenkorb: drei Posten (Sensor-PCBA, PLUS, MINUS) auswählen, gemeinsam „Secure Checkout“.
+
+**ANNAHME** (nicht lokal belegt): JLC verschickt die unbestückten Platinen zusammen mit der PCBA in **einer** Sendung
+(gemeinsamer Checkout, ein Versandposten). **Stopp-Regel:** Zeigt der Checkout für die Dummy-Platinen einen **eigenen
+Versandposten** oder steigt der Versand gegenüber der Sensor-Bestellung allein um **mehr als 5 USD**, nicht bezahlen;
+Projektleitung entscheidet (getrennt: + 7.63 USD GSDL und Post-Verzollung, `hardware/dummy_cell/out/kosten.txt`).
+Erwarteter Mehrpreis 4.80–16.07 USD für beide Designs (= 4.31–14.44 CHF inkl. MWST, `hardware/dummy_cell/gen/cost_dummy.py`);
+mehr → Stopp. In ORDER_JLC_REV_C.md Kap. 4 Nr. 8b abhaken.
 
 ## Schritt 10 – Versand
 

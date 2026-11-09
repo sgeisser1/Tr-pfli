@@ -39,8 +39,9 @@ VERSAND = {
     "Simpex Electronic AG": (15.00, None, "ANNAHME (Versandbetrag laut Konzept Kap. 7 nicht angegeben)"),
     "offen (Labor-/Arbeitsschutz-Fachhandel)": (10.00, None, "ANNAHME (Haendler offen, eine Sammelbestellung V-Z2/V-Z3/V-Z4/V-Z5d/V-Z6b/V-Z11)"),
 }
-BEREICHE = ["Sensor", "Sensor+Werkstatt", "Sensor+Gateway", "Gateway", "Werkstatt", "Verguss", "Programmieradapter"]
-NICHT_SUMMIEREN = {"vorhanden", "separat", "Platzhalter"}
+BEREICHE = ["Sensor", "Sensor+Werkstatt", "Sensor+Gateway", "Gateway", "Werkstatt", "Verguss", "Programmieradapter",
+            "Werkstatt Weg B"]
+NICHT_SUMMIEREN = {"vorhanden", "separat", "Platzhalter", "entfaellt, falls vorhanden (Werkstatt)"}
 REQ = ["ID", "Bereich", "Teil", "Spezifikation_Soll", "Bedarf_Stk", "Haendler", "Packung_Stk", "Preis_CHF_Packung",
        "Packungen", "Preisbasis", "Lager", "Abruf", "Status"]
 
@@ -258,7 +259,8 @@ def main():
       "(mit BT1-Vorrat 25 Stk, ORDER Kap. 4 Nr. 8a) und LCSC, dann der Rest.\n")
     w("- Offen: Quelle O-Ringe AS568-019 Silikon, ISO 7380 M2.5×8, Silikonplatte, Federstifte (Normteile-/Dichtungshändler) "
       "und Prüfgewichte, Flaschen, Sekundärbehälter, PE-Trichter, Spritzen, Thermometer (Laborhändler); Filament grau und "
-      "microSD nicht an Lager; Werkstatt-Voraussetzungen Weg B folgen (hardware/dummy_cell).\n\n")
+      "microSD nicht an Lager. Werkstatt Weg B (WB-1…WB-24) in Kap. 8a, entfällt, falls vorhanden; Dummy-Platinen über JLC "
+      "(ORDER Kap. 4 Nr. 8b).\n\n")
     w(TEXT_SHT)
     w(TEXT_UART)
     w(TEXT_SD)
@@ -304,6 +306,15 @@ def main():
       f"**{sum(r['_sum'] for r in rows if r['ID'].startswith('V-Z') and r['Status'] not in NICHT_SUMMIEREN):.2f} CHF** "
       "(geht als Einmalkosten in `scripts/cost_final_phase5.py`); Programmieradapter (P…, W1, LCSC-Versand ANNAHME) siehe "
       "Kap. 7.\n\n")
+    wb = [r for r in rows if r["Bereich"] == "Werkstatt Weg B"]
+    if wb:
+        w("## 8a Werkstatt-Voraussetzungen Weg B (entfällt, falls vorhanden)\n\n")
+        w("Vorgabe `hardware/dummy_cell/README.md` Kap. 7 (WB-1…WB-24), je Weg-B-Platz. **Nicht in der Bestellsumme**: in der "
+          "Regel Werkstattbestand. Fehlt etwas, gilt der Neukauf-Richtwert (**ANNAHME**, kein Angebot geprüft).\n\n")
+        w("| ID | Werkzeug/Material | Mindestanforderung | Richtwert CHF |\n|---|---|---|---|\n")
+        for r in wb:
+            w(f"| {r['ID']} | {r['Teil']} | {r['Spezifikation_Soll']} | {r['_preis']:.2f} |\n")
+        w(f"| | **Summe, falls nichts vorhanden (ANNAHME)** | | **{sum(r['_preis'] for r in wb):.2f}** |\n\n")
     w("## 9 Prüfhinweise (`scripts/einkaufsliste.py --check`)\n\n")
     for x in warn:
         w(f"- {x}\n")

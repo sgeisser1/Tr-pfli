@@ -80,6 +80,13 @@ ITEMS = [
     ("6_anleitungen/sdb", "docs/references/MAPA_Solo977_Bestaendigkeitstabelle_2024-04-11.pdf", "Beständigkeitstabelle Handschuh"),
     ("7_programmieradapter", "hardware/programmer/README.md", "Programmieradapter Rev 1 (Schaltung, Bezug, PL2303 Kap. 9)"),
     ("7_programmieradapter", "hardware/programmer/out/fluidi_programmer_schematic.pdf", "Schaltplan Programmieradapter"),
+    # Dummy-Scheibe Weg B (hardware/dummy_cell, Pflicht in der Prototypbestellung, ORDER Kap. 4 Nr. 8b)
+    ("1_jlc_upload/dummy", "hardware/dummy_cell/out/fluidi_dummy_plus_gerber_jlc.zip", "Dummy-Scheibe PLUS 1.0 mm (Upload JLC, PCB ohne PCBA)"),
+    ("1_jlc_upload/dummy", "hardware/dummy_cell/out/fluidi_dummy_minus_gerber_jlc.zip", "Dummy-Scheibe MINUS 2.0 mm (Upload JLC, PCB ohne PCBA)"),
+    ("7_programmieradapter/dummy_cell", "hardware/dummy_cell/README.md", "Dummy-Scheibe: Aufbau, Bestelloptionen, Zusammenbau, Werkstatt Weg B"),
+    ("7_programmieradapter/dummy_cell", "hardware/dummy_cell/out/fluidi_dummy_plus_layout.pdf", "Dummy-Scheibe PLUS Layout"),
+    ("7_programmieradapter/dummy_cell", "hardware/dummy_cell/out/fluidi_dummy_minus_layout.pdf", "Dummy-Scheibe MINUS Layout"),
+    ("7_programmieradapter/dummy_cell", "hardware/dummy_cell/out/kosten.txt", "Dummy-Scheibe Kosten (cost_dummy.py)"),
     ("9_renderings", "renders/final/*.png", "Produktrenderings"),
     ("9_renderings/pcb", "renders/pcb/*.png", "Leiterplatten-Renderings"),
 ]
@@ -299,6 +306,14 @@ def main():
         if not m or sha(os.path.join(ROOT, f)) != m.group(1):
             print(f"FEHLER: {f} entspricht nicht dem Hash in {ORDER} -> kein Release")
             return 1
+    # Dummy-Platinen: Upload-ZIPs muessen den Hashes in hardware/dummy_cell/out/SHA256SUMS entsprechen
+    dsums = os.path.join(ROOT, "hardware", "dummy_cell", "out", "SHA256SUMS")
+    for line in open(dsums, encoding="utf-8").read().split("\n"):
+        if line.strip():
+            h_, n_ = line.split()[0], line.split()[-1]
+            if n_.endswith("_gerber_jlc.zip") and sha(os.path.join(os.path.dirname(dsums), n_)) != h_:
+                print(f"FEHLER: {n_} entspricht nicht {os.path.relpath(dsums, ROOT)} -> kein Release")
+                return 1
     if os.path.isdir(DST):
         shutil.rmtree(DST)
     rows = []

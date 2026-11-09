@@ -43,6 +43,18 @@ PROG_ADAPTER_CHF = (25.0, 55.0)
 BT1_VORRAT = (25, 0.3615)      # hardware/programmer/README.md Kap. 6 (ANNAHME-Spanne)
 
 
+def dummy_chf():
+    """Mehrkosten Dummy-Platinen (Weg B) in der JLC-Prototypbestellung: (Untergrenze, Obergrenze) CHF inkl. MWST/DHL-Anteil,
+    gerechnet mit hardware/dummy_cell/gen/cost_dummy.py (Konstanten und increment_chf dort)."""
+    sys.path.insert(0, os.path.join(ROOT, "hardware", "dummy_cell", "gen"))
+    import cost_dummy as cd
+    out = []
+    for f in (cd.P_PROMO, cd.P_2L_5):
+        usd = (f + cd.DEBURR * cd.QTY) + (f * cd.F_2MM + cd.DEBURR * cd.QTY)
+        out.append(sum(cd.increment_chf(usd)))
+    return out[0], out[1]
+
+
 def fx():
     return cm.USD_TO_CHF * (1 + cm.FX_CARD_MARKUP)
 
@@ -122,7 +134,8 @@ def main():
     sysB = pr["total_chf"] + s4["total_chf"] + gw_plan + zub
     unit_pre = pre["serie4"]["unit_chf"]
     sysB_lo, sysB_hi = sysB + PROG_ADAPTER_CHF[0], sysB + PROG_ADAPTER_CHF[1]
-    sysB_prog = sysB + prog if prog is not None else None
+    dum_lo, dum_hi = dummy_chf()
+    sysB_prog = sysB + prog + dum_hi if prog is not None else None
 
     md = io.StringIO()
     w = md.write
@@ -228,8 +241,9 @@ def main():
     w(f"| B: Prototyp + Serie (geplant) | Prototyp 5 + Serie 15 Sensoren + Gateway (geplant total) | **{sysB:.2f}** |\n")
     w(f"| davon Verguss-Zubehör/Schutz (A und B je einmal) | Kap. 2.0, {zub_src}, davon {zub_ann:.2f} ANNAHME | {zub:.2f} |\n")
     if sysB_prog is not None:
-        w(f"| B + Programmieradapter | wie B + Adapter Rev 1 inkl. PL2303-Board und LCSC-Versand (Einkaufsliste P1–P9, W1; "
-          f"{prog:.2f} CHF, davon {prog_ann:.2f} ANNAHME) | {sysB_prog:.2f} |\n\n")
+        w(f"| B + Programmierwerkzeug | wie B + Adapter Rev 1 inkl. PL2303-Board und LCSC-Versand (Einkaufsliste P1–P9, W1; "
+          f"{prog:.2f} CHF, davon {prog_ann:.2f} ANNAHME) + Dummy-Platinen Weg B als Einmalkosten des Prototyp-Loses "
+          f"({dum_lo:.2f}–{dum_hi:.2f} CHF, Obergrenze gerechnet, `hardware/dummy_cell/gen/cost_dummy.py`) | {sysB_prog:.2f} |\n\n")
     else:
         w(f"| B + Programmieradapter | wie B + Adapter Rev 1 ({PROG_ADAPTER_CHF[0]:.0f}–{PROG_ADAPTER_CHF[1]:.0f} CHF, ANNAHME) | "
           f"{sysB_lo:.2f} – {sysB_hi:.2f} |\n\n")
@@ -244,6 +258,7 @@ def main():
     jlc_p, jlc_s = jlc_cash(pr), jlc_cash(s4)
     jlc_p_pre, jlc_s_pre = jlc_cash(pre["proto"]), jlc_cash(pre["serie4"])
     bt1_chf = BT1_VORRAT[0] * BT1_VORRAT[1] * fx() * (1 + cm.CH_VAT)
+    dum_lo, dum_hi = dummy_chf()
     ek_ware = ek_vers = ek_ann = None
     try:
         import einkaufsliste as ek
@@ -255,8 +270,8 @@ def main():
     except (ImportError, OSError, KeyError):
         pass
     if ek_ware is not None:
-        kasse = jlc_p + jlc_s + bt1_chf + ek_ware + ek_vers
-        kasse_pre = jlc_p_pre + jlc_s_pre + bt1_chf + ek_ware + ek_vers
+        kasse = jlc_p + jlc_s + bt1_chf + dum_hi + ek_ware + ek_vers
+        kasse_pre = jlc_p_pre + jlc_s_pre + bt1_chf + dum_hi + ek_ware + ek_vers
         w("## 4a Kassenbedarf gesamt (alle Rechnungen; Red Team Phase 6 W-2)\n\n")
         w("Kap. 4 ist eine Kostenzuordnung (Grenz- und Einmalkosten). Bar bezahlt werden dagegen ganze Packungen, Versand und "
           "Testzellen. Prototyp-Los und Serie, Gateway, Verguss, Zubehör, Programmieradapter und Werkstatt stehen vollständig in "
@@ -266,6 +281,8 @@ def main():
         w(f"| JLC Serie (Ware + MWST + Verzollung DHL) | {jlc_s:.2f} | {jlc_s_pre:.2f} |\n")
         w(f"| JLC BT1-Vorrat {BT1_VORRAT[0]} × C5213768 à {BT1_VORRAT[1]} USD (privater Bestand, inkl. MWST ANNAHME) | "
           f"{bt1_chf:.2f} | {bt1_chf:.2f} |\n")
+        w(f"| JLC Dummy-Platinen PLUS 1.0 + MINUS 2.0 mm, je 5 Stk, gleiche Bestellung wie der Prototyp "
+          f"(`hardware/dummy_cell/gen/cost_dummy.py`, Obergrenze; Untergrenze {dum_lo:.2f}) | {dum_hi:.2f} | {dum_hi:.2f} |\n")
         w(f"| Einkaufsliste Ware (`docs/manuals/EINKAUFSLISTE.md`) | {ek_ware:.2f} | {ek_ware:.2f} |\n")
         w(f"| Einkaufsliste Versand | {ek_vers:.2f} | {ek_vers:.2f} |\n")
         w(f"| **Kassenbedarf gesamt** | **{kasse:.2f}** | **{kasse_pre:.2f}** |\n\n")
@@ -303,7 +320,8 @@ def main():
           f"Neuwert {gw_new:.2f} CHF; Serie mit Pre-reflow {unit_pre:.2f} CHF")
     print(f"System A {sysA:.2f} CHF, B {sysB:.2f} CHF, B+Adapter " + (f"{sysB_prog:.2f}" if sysB_prog is not None else f"{sysB_lo:.2f}-{sysB_hi:.2f}") + f" CHF (Zubehoer Verguss {zub:.2f}, Adapter {prog})")
     if ek_ware is not None:
-        print(f"Kassenbedarf {kasse:.2f} CHF (mit Pre-reflow {kasse_pre:.2f}); JLC P {jlc_p:.2f} S {jlc_s:.2f} BT1 {bt1_chf:.2f}; "
+        print(f"Kassenbedarf {kasse:.2f} CHF (mit Pre-reflow {kasse_pre:.2f}); JLC P {jlc_p:.2f} S {jlc_s:.2f} BT1 {bt1_chf:.2f} "
+              f"Dummy {dum_lo:.2f}-{dum_hi:.2f}; "
               f"Einkauf {ek_ware:.2f} + {ek_vers:.2f}, ANNAHME {ek_ann:.2f}")
     print("->", os.path.relpath(OUT, ROOT))
 

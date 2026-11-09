@@ -14,7 +14,7 @@
 - **Händler mit Bestellung: 8** (galaxus.ch, bastelgarage.ch, offen (Labor-/Arbeitsschutz-Fachhandel), Simpex Electronic AG, pi-shop.ch, offen (Normteile-/Dichtungs-Fachhandel), 3djake.ch, LCSC (mit JLC-Bestellung buendeln, ANNAHME)). Kern sind **zwei** CH-Händler: bastelgarage.ch und pi-shop.ch; dazu Simpex (Verguss, 8 Wochen Lieferzeit) und LCSC (mit JLC bündeln).
 - Ein Händler weniger möglich: Zellen bei bastelgarage.ch (Varta statt Panasonic, Entscheid Auftraggeber, S1).
 - Bestellreihenfolge (Red Team W-3d): **zuerst Verguss** (V-M1, 8 Wochen; Distrelec/RS von Hand vergleichen), dann JLC (mit BT1-Vorrat 25 Stk, ORDER Kap. 4 Nr. 8a) und LCSC, dann der Rest.
-- Offen: Quelle O-Ringe AS568-019 Silikon, ISO 7380 M2.5×8, Silikonplatte, Federstifte (Normteile-/Dichtungshändler) und Prüfgewichte, Flaschen, Sekundärbehälter, PE-Trichter, Spritzen, Thermometer (Laborhändler); Filament grau und microSD nicht an Lager; Werkstatt-Voraussetzungen Weg B folgen (hardware/dummy_cell).
+- Offen: Quelle O-Ringe AS568-019 Silikon, ISO 7380 M2.5×8, Silikonplatte, Federstifte (Normteile-/Dichtungshändler) und Prüfgewichte, Flaschen, Sekundärbehälter, PE-Trichter, Spritzen, Thermometer (Laborhändler); Filament grau und microSD nicht an Lager. Werkstatt Weg B (WB-1…WB-24) in Kap. 8a, entfällt, falls vorhanden; Dummy-Platinen über JLC (ORDER Kap. 4 Nr. 8b).
 
 ## 2 Klimasensor-Breakout Gateway (D-029, G6)
 
@@ -165,6 +165,30 @@ Preise der JLC/LCSC-Teilesuche umgerechnet mit dem Kurs aus `scripts/cost_model.
 | P7 | R 470 Ohm 1 % 0805 (R2, D-031/PA-6) | UNI-ROYAL 0805W8F4700T5E | 2 | [LCSC (mit JLC-Bestellung buendeln, ANNAHME)](https://www.lcsc.com/search?q=C17710) | C17710 | USD 0.0048 je Stk | 1 × 2 | 0.01 | 0.01 | Basic, 1871834 (2026-11-09) | 2026-11-08 | kauffertig |
 | P8 | Federkontaktstifte TP1/TP2 (J3) | Ø <= 1.5 mm, Hub >= 1 mm (README Kap. 4) | 3 | offen (Normteile-/Dichtungs-Fachhandel) | - | - | 1 × 3 | 6.00 | 6.00 (A) | - | 2026-11-09 | Quelle offen |
 | P9 | FR4/Lochraster, SOT-23-Adapter, Litze, Steckbruecken, ASA-Buegel | README Kap. 6 Pos. 9/10 | 1 | Werkstattbestand | - | - | 1 × 1 | 0.00 | – | vorhanden | 2026-11-09 | vorhanden |
+| WB-1 | Labornetzteil | 0-3 V, Aufloesung <= 10 mV, Strombegrenzung einstellbar 10 mA, Ausgang schaltbar | 1 | Werkstattbestand | - | - | 1 × 1 | 60.00 | – | - | 2026-11-09 | entfaellt, falls vorhanden (Werkstatt) |
+| WB-2 | Multimeter | DC 2 V mit 1 mV, Widerstand >= 20 MOhm, Durchgang | 1 | Werkstattbestand | - | - | 1 × 1 | 40.00 | – | - | 2026-11-09 | entfaellt, falls vorhanden (Werkstatt) |
+| WB-3 | Messschieber | Aufloesung 0.01 mm | 1 | Werkstattbestand | - | - | 1 × 1 | 20.00 | – | - | 2026-11-09 | entfaellt, falls vorhanden (Werkstatt) |
+| WB-4 | Loetstation | temperaturgeregelt, Spitze <= 0.4 mm | 1 | Werkstattbestand | - | - | 1 × 1 | 60.00 | – | - | 2026-11-09 | entfaellt, falls vorhanden (Werkstatt) |
+| WB-5 | Loetzinn + Flussmittel | 0.3-0.5 mm mit Seele, No-clean-Flussmittelstift | 1 | Werkstattbestand | - | - | 1 × 1 | 15.00 | – | - | 2026-11-09 | entfaellt, falls vorhanden (Werkstatt) |
+| WB-6 | Entloetlitze | 1-1.5 mm | 1 | Werkstattbestand | - | - | 1 × 1 | 5.00 | – | - | 2026-11-09 | entfaellt, falls vorhanden (Werkstatt) |
+| WB-7 | Kupferlackdraht | 0.1-0.2 mm selbstverzinnend | 1 | Werkstattbestand | - | - | 1 × 1 | 8.00 | – | - | 2026-11-09 | entfaellt, falls vorhanden (Werkstatt) |
+| WB-8 | Kaptonband | ca. 0.06 mm | 1 | Werkstattbestand | - | - | 1 × 1 | 8.00 | – | - | 2026-11-09 | entfaellt, falls vorhanden (Werkstatt) |
+| WB-9 | Lupe oder Stereomikroskop | >= 10x | 1 | Werkstattbestand | - | - | 1 × 1 | 25.00 | – | - | 2026-11-09 | entfaellt, falls vorhanden (Werkstatt) |
+| WB-10 | Kamera/Smartphone | Makro durch die Lupe | 1 | Werkstattbestand | - | - | 1 × 1 | 0.00 | – | - | 2026-11-09 | entfaellt, falls vorhanden (Werkstatt) |
+| WB-11 | Feine Pinzette | antimagnetisch | 1 | Werkstattbestand | - | - | 1 × 1 | 8.00 | – | - | 2026-11-09 | entfaellt, falls vorhanden (Werkstatt) |
+| WB-12 | Kunststoffpinzette/-spatel | kein Metall | 1 | Werkstattbestand | - | - | 1 × 1 | 5.00 | – | - | 2026-11-09 | entfaellt, falls vorhanden (Werkstatt) |
+| WB-13 | Isopropanol >= 99 %, Pinsel/Wattestaebchen | - | 1 | Werkstattbestand | - | - | 1 × 1 | 10.00 | – | - | 2026-11-09 | entfaellt, falls vorhanden (Werkstatt) |
+| WB-14 | Pruefspitze/Federstift flacher Kopf + Kabel | Kopf Ø <= 1.5 mm, keine Krone | 1 | Werkstattbestand | - | - | 1 × 1 | 10.00 | – | - | 2026-11-09 | entfaellt, falls vorhanden (Werkstatt) |
+| WB-15 | Platinenhalter (dritte Hand) | nicht leitende Backen | 1 | Werkstattbestand | - | - | 1 × 1 | 15.00 | – | - | 2026-11-09 | entfaellt, falls vorhanden (Werkstatt) |
+| WB-16 | USB-UART-Board | PL2303 type A V2 = W1 (oder CH343) | 1 | Werkstattbestand | - | - | 1 × 1 | 0.00 | – | - | 2026-11-09 | entfaellt, falls vorhanden (Werkstatt) |
+| WB-17 | Steckbruecken | Dupont 10-20 cm | 1 | Werkstattbestand | - | - | 1 × 1 | 5.00 | – | - | 2026-11-09 | entfaellt, falls vorhanden (Werkstatt) |
+| WB-18 | PC mit WSL2 oder Raspberry Pi | flash_sensor.py, pyserial, intelhex | 1 | Werkstattbestand | - | - | 1 × 1 | 0.00 | – | - | 2026-11-09 | entfaellt, falls vorhanden (Werkstatt) |
+| WB-19 | Dummy-Scheibe PLUS 1.0 + MINUS 2.0 mm | hardware/dummy_cell (JLC, je 5 Stk, ORDER Kap. 4 Nr. 8b) | 1 | Werkstattbestand | - | - | 1 × 1 | 0.00 | – | - | 2026-11-09 | entfaellt, falls vorhanden (Werkstatt) |
+| WB-20 | Litze rot/schwarz + Krokodilklemmen/4-mm-Stecker | 0.14-0.25 mm2, 20-30 cm | 1 | Werkstattbestand | - | - | 1 × 1 | 5.00 | – | - | 2026-11-09 | entfaellt, falls vorhanden (Werkstatt) |
+| WB-21 | Isolierender 2K-Epoxidkleber, 2 Stifte Ø 1.0 mm, Schleifpapier 400 | duennfluessig | 1 | Werkstattbestand | - | - | 1 × 1 | 5.00 | – | - | 2026-11-09 | entfaellt, falls vorhanden (Werkstatt) |
+| WB-22 | Neue Zellen CR2032 | Leerlauf >= 3.0 V | 1 | Werkstattbestand | - | - | 1 × 1 | 0.00 | – | - | 2026-11-09 | entfaellt, falls vorhanden (Werkstatt) |
+| WB-23 | Behaelter fuer Altzellen, Klebeband | - | 1 | Werkstattbestand | - | - | 1 × 1 | 0.00 | – | - | 2026-11-09 | entfaellt, falls vorhanden (Werkstatt) |
+| WB-24 | ESD-Unterlage (empfohlen) | sauberer trockener Arbeitsplatz | 1 | Werkstattbestand | - | - | 1 × 1 | 20.00 | – | - | 2026-11-09 | entfaellt, falls vorhanden (Werkstatt) |
 
 (A) = Preis ANNAHME bzw. Quelle offen. Bedarf-Herleitung, Register-Ref und Bemerkungen: Spalten in der CSV.
 
@@ -215,6 +239,30 @@ Bemerkungen:
 - **P7** (1 + Reserve): -
 - **P8** (2 + Reserve): Typ mit Mechanik festlegen (P-J3)
 - **P9** (Werkstatt): ENTFAELLT, FALLS VORHANDEN
+- **WB-1** (1 je Weg-B-Platz (hardware/dummy_cell/README.md Kap. 7)): Wofuer: Speisung 2.0 V/10 mA (PROGRAMMIEREN Regel 2). ENTFAELLT, FALLS VORHANDEN; nicht in der Bestellsumme, Neukauf-Richtwert separat (EINKAUFSLISTE Kap. 8)
+- **WB-2** (1 je Weg-B-Platz (hardware/dummy_cell/README.md Kap. 7)): Wofuer: VIO/VDD, Isolation Scheibe > 10 MOhm, R9-Kontrolle. ENTFAELLT, FALLS VORHANDEN; nicht in der Bestellsumme, Neukauf-Richtwert separat (EINKAUFSLISTE Kap. 8)
+- **WB-3** (1 je Weg-B-Platz (hardware/dummy_cell/README.md Kap. 7)): Wofuer: Scheibendicke 3.0-3.2 mm (PS-W3). ENTFAELLT, FALLS VORHANDEN; nicht in der Bestellsumme, Neukauf-Richtwert separat (EINKAUFSLISTE Kap. 8)
+- **WB-4** (1 je Weg-B-Platz (hardware/dummy_cell/README.md Kap. 7)): Wofuer: Draht an R9 (0402), Litzen Scheibe. ENTFAELLT, FALLS VORHANDEN; nicht in der Bestellsumme, Neukauf-Richtwert separat (EINKAUFSLISTE Kap. 8)
+- **WB-5** (1 je Weg-B-Platz (hardware/dummy_cell/README.md Kap. 7)): Wofuer: 0402-Pad. ENTFAELLT, FALLS VORHANDEN; nicht in der Bestellsumme, Neukauf-Richtwert separat (EINKAUFSLISTE Kap. 8)
+- **WB-6** (1 je Weg-B-Platz (hardware/dummy_cell/README.md Kap. 7)): Wofuer: Zinnbruecken entfernen. ENTFAELLT, FALLS VORHANDEN; nicht in der Bestellsumme, Neukauf-Richtwert separat (EINKAUFSLISTE Kap. 8)
+- **WB-7** (1 je Weg-B-Platz (hardware/dummy_cell/README.md Kap. 7)): Wofuer: Draht R9 -> RXD (entfaellt mit B2). ENTFAELLT, FALLS VORHANDEN; nicht in der Bestellsumme, Neukauf-Richtwert separat (EINKAUFSLISTE Kap. 8)
+- **WB-8** (1 je Weg-B-Platz (hardware/dummy_cell/README.md Kap. 7)): Wofuer: Zugentlastung, Dickenausgleich Scheibe. ENTFAELLT, FALLS VORHANDEN; nicht in der Bestellsumme, Neukauf-Richtwert separat (EINKAUFSLISTE Kap. 8)
+- **WB-9** (1 je Weg-B-Platz (hardware/dummy_cell/README.md Kap. 7)): Wofuer: Sichtpruefung R9/R6/TP2, VIP-Pads. ENTFAELLT, FALLS VORHANDEN; nicht in der Bestellsumme, Neukauf-Richtwert separat (EINKAUFSLISTE Kap. 8)
+- **WB-10** (1 je Weg-B-Platz (hardware/dummy_cell/README.md Kap. 7)): Wofuer: Foto je Muster. ENTFAELLT, FALLS VORHANDEN; nicht in der Bestellsumme, Neukauf-Richtwert separat (EINKAUFSLISTE Kap. 8). Bezug Werkstattbestand
+- **WB-11** (1 je Weg-B-Platz (hardware/dummy_cell/README.md Kap. 7)): Wofuer: Draht fuehren, B2-Teile. ENTFAELLT, FALLS VORHANDEN; nicht in der Bestellsumme, Neukauf-Richtwert separat (EINKAUFSLISTE Kap. 8)
+- **WB-12** (1 je Weg-B-Platz (hardware/dummy_cell/README.md Kap. 7)): Wofuer: Zelle und Scheibe entnehmen. ENTFAELLT, FALLS VORHANDEN; nicht in der Bestellsumme, Neukauf-Richtwert separat (EINKAUFSLISTE Kap. 8)
+- **WB-13** (1 je Weg-B-Platz (hardware/dummy_cell/README.md Kap. 7)): Wofuer: Flussmittel entfernen. ENTFAELLT, FALLS VORHANDEN; nicht in der Bestellsumme, Neukauf-Richtwert separat (EINKAUFSLISTE Kap. 8)
+- **WB-14** (1 je Weg-B-Platz (hardware/dummy_cell/README.md Kap. 7)): Wofuer: TP2 (PS-W2), bei B2 auch TP1. ENTFAELLT, FALLS VORHANDEN; nicht in der Bestellsumme, Neukauf-Richtwert separat (EINKAUFSLISTE Kap. 8)
+- **WB-15** (1 je Weg-B-Platz (hardware/dummy_cell/README.md Kap. 7)): Wofuer: Sensor/Pruefspitze halten. ENTFAELLT, FALLS VORHANDEN; nicht in der Bestellsumme, Neukauf-Richtwert separat (EINKAUFSLISTE Kap. 8)
+- **WB-16** (1 je Weg-B-Platz (hardware/dummy_cell/README.md Kap. 7)): Wofuer: PROGRAMMIEREN Kap. 2. ENTFAELLT, FALLS VORHANDEN; nicht in der Bestellsumme, Neukauf-Richtwert separat (EINKAUFSLISTE Kap. 8). Bezug = W1 (pi-shop 11757)
+- **WB-17** (1 je Weg-B-Platz (hardware/dummy_cell/README.md Kap. 7)): Wofuer: USB-UART <-> Scheibe/Netzteil. ENTFAELLT, FALLS VORHANDEN; nicht in der Bestellsumme, Neukauf-Richtwert separat (EINKAUFSLISTE Kap. 8)
+- **WB-18** (1 je Weg-B-Platz (hardware/dummy_cell/README.md Kap. 7)): Wofuer: PROGRAMMIEREN Kap. 3. ENTFAELLT, FALLS VORHANDEN; nicht in der Bestellsumme, Neukauf-Richtwert separat (EINKAUFSLISTE Kap. 8). Bezug Werkstattbestand
+- **WB-19** (1 je Weg-B-Platz (hardware/dummy_cell/README.md Kap. 7)): Wofuer: Speisung Weg B (Veto PS-K1). ENTFAELLT, FALLS VORHANDEN; nicht in der Bestellsumme, Neukauf-Richtwert separat (EINKAUFSLISTE Kap. 8). Bezug = JLC-Bestellung (Dummy-Platinen)
+- **WB-20** (1 je Weg-B-Platz (hardware/dummy_cell/README.md Kap. 7)): Wofuer: Scheibe -> Netzteil. ENTFAELLT, FALLS VORHANDEN; nicht in der Bestellsumme, Neukauf-Richtwert separat (EINKAUFSLISTE Kap. 8)
+- **WB-21** (1 je Weg-B-Platz (hardware/dummy_cell/README.md Kap. 7)): Wofuer: Scheibe kleben/fasen (Kleber ggf. S7 UHU, isolierend laut TDS nicht belegt). ENTFAELLT, FALLS VORHANDEN; nicht in der Bestellsumme, Neukauf-Richtwert separat (EINKAUFSLISTE Kap. 8)
+- **WB-22** (1 je Weg-B-Platz (hardware/dummy_cell/README.md Kap. 7)): Wofuer: Funktionspruefung = S1 (Testzellen). ENTFAELLT, FALLS VORHANDEN; nicht in der Bestellsumme, Neukauf-Richtwert separat (EINKAUFSLISTE Kap. 8). Bezug = S1
+- **WB-23** (1 je Weg-B-Platz (hardware/dummy_cell/README.md Kap. 7)): Wofuer: Zellen < 2.6 V abkleben, entsorgen. ENTFAELLT, FALLS VORHANDEN; nicht in der Bestellsumme, Neukauf-Richtwert separat (EINKAUFSLISTE Kap. 8). Bezug Werkstattbestand
+- **WB-24** (1 je Weg-B-Platz (hardware/dummy_cell/README.md Kap. 7)): Wofuer: Kurzschlussgefahr am offenen Board. ENTFAELLT, FALLS VORHANDEN; nicht in der Bestellsumme, Neukauf-Richtwert separat (EINKAUFSLISTE Kap. 8)
 
 ## 7 Händlergruppierung und Versand
 
@@ -250,13 +298,43 @@ Bemerkungen:
 
 Verguss-Zubehör (V-Z…) ohne Beutel: **249.60 CHF** (geht als Einmalkosten in `scripts/cost_final_phase5.py`); Programmieradapter (P…, W1, LCSC-Versand ANNAHME) siehe Kap. 7.
 
+## 8a Werkstatt-Voraussetzungen Weg B (entfällt, falls vorhanden)
+
+Vorgabe `hardware/dummy_cell/README.md` Kap. 7 (WB-1…WB-24), je Weg-B-Platz. **Nicht in der Bestellsumme**: in der Regel Werkstattbestand. Fehlt etwas, gilt der Neukauf-Richtwert (**ANNAHME**, kein Angebot geprüft).
+
+| ID | Werkzeug/Material | Mindestanforderung | Richtwert CHF |
+|---|---|---|---|
+| WB-1 | Labornetzteil | 0-3 V, Aufloesung <= 10 mV, Strombegrenzung einstellbar 10 mA, Ausgang schaltbar | 60.00 |
+| WB-2 | Multimeter | DC 2 V mit 1 mV, Widerstand >= 20 MOhm, Durchgang | 40.00 |
+| WB-3 | Messschieber | Aufloesung 0.01 mm | 20.00 |
+| WB-4 | Loetstation | temperaturgeregelt, Spitze <= 0.4 mm | 60.00 |
+| WB-5 | Loetzinn + Flussmittel | 0.3-0.5 mm mit Seele, No-clean-Flussmittelstift | 15.00 |
+| WB-6 | Entloetlitze | 1-1.5 mm | 5.00 |
+| WB-7 | Kupferlackdraht | 0.1-0.2 mm selbstverzinnend | 8.00 |
+| WB-8 | Kaptonband | ca. 0.06 mm | 8.00 |
+| WB-9 | Lupe oder Stereomikroskop | >= 10x | 25.00 |
+| WB-10 | Kamera/Smartphone | Makro durch die Lupe | 0.00 |
+| WB-11 | Feine Pinzette | antimagnetisch | 8.00 |
+| WB-12 | Kunststoffpinzette/-spatel | kein Metall | 5.00 |
+| WB-13 | Isopropanol >= 99 %, Pinsel/Wattestaebchen | - | 10.00 |
+| WB-14 | Pruefspitze/Federstift flacher Kopf + Kabel | Kopf Ø <= 1.5 mm, keine Krone | 10.00 |
+| WB-15 | Platinenhalter (dritte Hand) | nicht leitende Backen | 15.00 |
+| WB-16 | USB-UART-Board | PL2303 type A V2 = W1 (oder CH343) | 0.00 |
+| WB-17 | Steckbruecken | Dupont 10-20 cm | 5.00 |
+| WB-18 | PC mit WSL2 oder Raspberry Pi | flash_sensor.py, pyserial, intelhex | 0.00 |
+| WB-19 | Dummy-Scheibe PLUS 1.0 + MINUS 2.0 mm | hardware/dummy_cell (JLC, je 5 Stk, ORDER Kap. 4 Nr. 8b) | 0.00 |
+| WB-20 | Litze rot/schwarz + Krokodilklemmen/4-mm-Stecker | 0.14-0.25 mm2, 20-30 cm | 5.00 |
+| WB-21 | Isolierender 2K-Epoxidkleber, 2 Stifte Ø 1.0 mm, Schleifpapier 400 | duennfluessig | 5.00 |
+| WB-22 | Neue Zellen CR2032 | Leerlauf >= 3.0 V | 0.00 |
+| WB-23 | Behaelter fuer Altzellen, Klebeband | - | 0.00 |
+| WB-24 | ESD-Unterlage (empfohlen) | sauberer trockener Arbeitsplatz | 20.00 |
+| | **Summe, falls nichts vorhanden (ANNAHME)** | | **324.00** |
+
 ## 9 Prüfhinweise (`scripts/einkaufsliste.py --check`)
 
 - S1: Preis ANNAHME/Quelle offen (39.84 CHF)
-- S2: Register-Ref 'REF-ORING1' nicht in INDEX.csv
 - S2: Preis ANNAHME/Quelle offen (7.50 CHF)
 - S5: Preis ANNAHME/Quelle offen (10.00 CHF)
-- S6: Register-Ref 'REF-ORING1' nicht in INDEX.csv
 - S6: Preis ANNAHME/Quelle offen (9.90 CHF)
 - S9: bastelgarage.ch Ausverkauft (Abruf 2026-11-09)
 - G3: pi-shop.ch nicht an Lager (Abruf 2026-11-09)
