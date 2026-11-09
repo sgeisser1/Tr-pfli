@@ -1,15 +1,23 @@
-# fluidi – Druckeinstellungen Sensor P3 und Gateway G1 v3 (Bambu Lab P1S)
+# fluidi – Druckeinstellungen Sensor P3 und Gateway G1 v4 für Raspberry Pi Zero 2 W (Bambu Lab P1S)
 
 Stand 2026-11-07, Phase 4b Welle 1; Phase 6 (2026-11-09): Werkstoff-Alternative eSun ASA+ (Kap. 1/2), Gateway-Klimamodul
 SEN0428 (D-029), RTC gestrichen (D-028), Gewindeeinsatz Ø4.6 (Kap. 3–5), Batteriefachschraube TX6; Lichtfenster
-**Polymaker ASA Natural** und Fensterkleber **UHU plus endfest 300** (Kap. 1, 2, 5; Vorschlag Mechanik 2026-11-09). Druckdateien werden von den Generatoren erzeugt und liegen bereits in
-**Druckausrichtung** (auf z = 0, mittig):
+**Polymaker ASA Natural** und Fensterkleber **UHU plus endfest 300** (Kap. 1, 2, 5; D-033). Phase-6-Prüfung (R W-7, K-l2, K-l7):
+Gateway-Status-LED 3 mm im Wannen-Rohr statt LED-Platine, O-Ringe EPDM mit dünnem Fettfilm, Bambu-Studio-Einrichtung Kap. 2a.
+Druckdateien werden von den Generatoren erzeugt und liegen bereits in **Druckausrichtung** (auf z = 0, mittig):
 
 ```
 .venv/bin/python mechanical/gen/fluidi_params.py      # Schnittstelle + Masse
 freecadcmd mechanical/gen/fluidi_sensor.py           # mechanical/sensor/print/*.{3mf,stl,step}
-freecadcmd mechanical/gen/fluidi_gateway.py          # mechanical/gateway/print/*.{3mf,stl,step}
+freecadcmd mechanical/gen/fluidi_gateway_pi.py       # mechanical/gateway_pi/print/*.{3mf,stl,step}  (Gateway G1 v4, D-014)
+freecadcmd mechanical/gen/fluidi_drawings.py         # mechanical/drawings/FL-*.pdf
 ```
+
+**Gateway:** gültig ist nur **G1 v4 für den Raspberry Pi Zero 2 W** (`mechanical/gateway_pi/`, D-014). Der Ordner
+`mechanical/gateway/` (G1 v3 für ESP32/XIAO, `fluidi_gateway.py`) ist durch D-014 ersetzt und wird **nicht gedruckt**.
+
+Die **3MF-Dateien enthalten nur die Geometrie** (FreeCAD-Netzexport, ein Objekt je Datei, bereits in Druckausrichtung) –
+kein Drucker-, Filament- oder Prozessprofil. Einstellen in Bambu Studio nach **Kap. 2a**.
 
 ## 1 Werkstoff
 
@@ -74,6 +82,41 @@ keine Mischung mit farbigem Filament im selben Teil (Farbverschleppung trübt da
 | Stützen | **keine** (alle Teile stützenfrei, Kap. 3) | |
 | Rand (Brim) | Hülse 3 mm Mausohren an den Ecken, Wanne/Deckel 3 mm | Verzug ASA |
 
+## 2a Druckdateien in Bambu Studio einrichten (3MF enthalten keine Profile)
+
+Begründung: Bambu-Studio-Projektdateien (3MF mit Platten, Profilen und Objekt-Einstellungen) erzeugt nur Bambu Studio
+selbst; das Format ist herstellerspezifisch und versionsabhängig, Bambu Studio ist in der Projektumgebung nicht
+installiert (keine Installation ohne Freigabe). Ein vom Skript geschriebenes Projekt liesse sich hier nicht prüfen →
+**abgelehnt**, stattdessen diese Anleitung. Menünamen nach Bambu Studio 1.9/2.x (**ANNAHME**, je nach Version leicht anders).
+
+1. **Drucker:** „Bambu Lab P1S 0.4 nozzle“. **Prozess:** „0.16mm Optimal @BBL P1S“ bzw. „0.12mm Fine @BBL P1S“ (Kap. 2,
+   Zeile Schichthöhe). **Filament:** „Bambu ASA“; eSun ASA+ und Polymaker ASA Natural als „Generic ASA“ mit den Werten aus
+   Kap. 2 (eigenes Benutzerprofil speichern, z. B. „fluidi eSun ASA+ 270/100“, „fluidi Polymaker ASA Natural 260/90 Lüfter 0“).
+2. **Import:** *Datei → Importieren → 3MF/STL* der Dateien aus `mechanical/sensor/print/` bzw. `mechanical/gateway_pi/print/`.
+   Frage „als ein Objekt mit mehreren Teilen laden?“ → **Nein**. **Nicht** automatisch ausrichten und nicht drehen: die
+   Teile liegen schon in der Ausrichtung aus Kap. 3 (z. B. Kappe und Deckel kopfüber).
+3. **Prozess-Werte global** (Prozessprofil kopieren und als „fluidi ASA“ speichern): Wände **4**, Deck/Boden **6/5**,
+   Füllung **100 %** (Gateway-Dome 40 % Gyroid), Naht **hinten**, Elefantenfuss **0.15**, XY-Lochkompensation **0.0**
+   (nach Passprobe Kap. 4), Stützen **aus**, Aussenwand ≤ 120 mm/s, Bauteillüfter laut Filamentprofil (Kap. 2).
+4. **Je Objekt** (Rechtsklick auf das Objekt → *Einstellungen hinzufügen*): Rand (Brim) 3 mm bzw. Mausohren bei Hülse,
+   Wanne, Deckel; Kappe zusätzlich „Lücken füllen“ ein, Linienbreite Wand 0.42 (Kap. 3, R3-W3).
+5. **Platten** (eine Schichthöhe und ein Filament je Platte; **ANNAHME**: Bambu Studio verlangt bei mehreren Objekten auf
+   einer Platte dieselbe Schichthöhe):
+
+| Platte | Teile | Filament | Schicht |
+|---|---|---|---|
+| S-1 | `passprobe_huelse_unten`, `passprobe_huelse_oben` (einmal, vor allem anderen), danach `huelse_grau` | ASA Warmgrau | 0.16 |
+| S-2 | `kappe_blau` (kopfüber) | ASA Hellblau | 0.16 |
+| S-3 | `kragen`, `schottkeil`, 2 × `distanzlehre_24p2` | ASA beliebig (Rest) | 0.16 |
+| S-4 | `taste_blau`, `klemmring`, `tastenteller`, `stoessel` | ASA Hellblau | 0.12 |
+| S-5 | 6–10 × `fenster_tropfen` (+ `fenster_tropfen_gw`), Abstand ≥ 10 mm | Polymaker ASA Natural | 0.12 |
+| G-1 | `wanne_grau` (oder `wanne_grau_otg`) | ASA Warmgrau | 0.16 |
+| G-2 | `deckel_blau` (kopfüber) | ASA Hellblau | 0.16 |
+
+6. **Prüfen vor dem Druck:** Vorschau „Überhang“ – rote Flächen nur dort, wo Kap. 3 sie als Brücke/45° nennt; geschätzte
+   Masse mit der Spalte g in Kap. 3 vergleichen (± 15 %). Projekt als `.3mf` **lokal** speichern (nicht ins Repository:
+   versions- und druckerabhängig); Druckzeit in Kap. 3 nachtragen.
+
 ## 3 Teile und Druckausrichtung
 
 ### Sensor (`mechanical/sensor/print/`, Masse in mm)
@@ -94,13 +137,10 @@ keine Mischung mit farbigem Filament im selben Teil (Farbverschleppung trübt da
 
 ASA pro Sensor ≈ **13 g** (Kopf V4, Rev B; Rev A ≈ 9 g) (≈ CHF 0.25, **ANNAHME** CHF 25/kg), kein AMS-Farbwechsel (jedes Teil einfarbig). Druckzeit-Schätzung nach Slicen eintragen.
 
-### Gateway (`mechanical/gateway/print/`)
+### Gateway G1 v3 (`mechanical/gateway/print/`) – ersetzt, nicht drucken
 
-| Datei | Teil | Farbe | Ausrichtung | Kritische Stellen | g |
-|---|---|---|---|---|---|
-| `wanne_grau` | Wanne | Warmgrau | Boden auf dem Bett | Bodenschlitze (Lüftung), USB-C-Ausschnitt = Brücke 12 mm, Innenfacette 45° | 10.4 |
-| `deckel_blau` | Deckel mit Facette, Steg, Domen, Lichtschacht | Hellblau | **kopfüber** | Facette = 45°-Überhang; Lichtschacht 45° | 6.8 |
-| `fenster_tropfen_gw` | Lichtfenster Gateway | Polymaker ASA Natural | Aussenfläche auf dem Bett | | 0.1 |
+G1 v3 für ESP32/XIAO ist durch D-014 (Raspberry Pi Zero 2 W) ersetzt. Die Dateien bleiben nur als Entwicklungsstand im
+Repository; gedruckt wird G1 v4 (nächster Abschnitt).
 
 ### Gateway G1 v4 für Raspberry Pi Zero 2 W (`mechanical/gateway_pi/print/`, D-014)
 
@@ -109,8 +149,8 @@ Aussen 84 × 42 × 20 mm, Profil, Facette, Fuge und Tropfen wie G1 v3; Profil un
 
 | Datei | Teil | Farbe | Ausrichtung | Kritische Stellen | g |
 |---|---|---|---|---|---|
-| `wanne_grau` | Wanne mit Pi-Abstandshaltern, Lichtschacht, Trennwand Klimakammer, Bodenschiene Klimamodul (Nut 1.9, 1.0 tief, mit Endanschlägen), Kabelkanal | Warmgrau | Boden auf dem Bett | Senkkopfbohrungen unten (Brücke über Ø 5.4); Micro-USB-Fenster 11.4 × 7.8 (Brücke 11.4); Lichtschacht hängt 45° an der Innenfacette (ohne Stütze, Probedruck); Kabelkanal Ø 3.0 waagrecht; Stirnschlitze 1.2 hoch (Brücken 20 mm); Schienenwände 0.8 (2 Bahnen) | 13.8 |
-| `wanne_grau_otg` | wie oben, zusätzlich Micro-USB-OTG-Fenster (XIAO-Empfänger extern, D-014) | Warmgrau | wie oben | Steg zwischen den Fenstern 1.2 mm | 13.7 |
+| `wanne_grau` | Wanne mit Pi-Abstandshaltern, **LED-Rohr** für die 3-mm-Status-LED (Bohrung Ø 3.1, Kragen an der Innenfacette), 2 Kabelhalter vorne, Trennwand Klimakammer, Bodenschiene Klimamodul (Nut 1.9, 1.0 tief, mit Endanschlägen), Kabelkanal | Warmgrau | Boden auf dem Bett | Senkkopfbohrungen unten (Brücke über Ø 5.4); Micro-USB-Fenster 11.4 × 7.8 (Brücke 11.4); LED-Rohr Ø 4.7 hängt 45° an der Innenfacette (ohne Stütze; Bohrung Ø 3.1 unter 45° – nach dem Druck mit Bohrer Ø 3.1 von Hand nachreiben, Probedruck); Kabelhalter-Lippe 0.8 Überhang; Kabelkanal Ø 3.0 waagrecht; Stirnschlitze 1.2 hoch (Brücken 20 mm); Schienenwände 0.8 (2 Bahnen) | 13.9 |
+| `wanne_grau_otg` | wie oben, zusätzlich Micro-USB-OTG-Fenster (XIAO-Empfänger extern, D-014) | Warmgrau | wie oben | Steg zwischen den Fenstern 1.2 mm | 13.8 |
 | `deckel_blau` | Deckel mit 4 Niederhalterrohren Ø 7.0 / Fuss Ø 5.6 (Einsatz M2.5 Ø 4.6, Bohrung 3.9), Steg, Gegenrippe Klimakammer, Nutrippe Klimamodul (D-028: kein RTC-Rahmen mehr) | Hellblau | **kopfüber** | Facette 45°; vordere Rohre stehen auf der Innenfacette; Rohre an HDMI/Micro-USB/microSD-Halter abgeflacht (0.3 Luft); Steg vorne bewusst weggelassen (sonst nicht senkrecht montierbar) | 10.2 |
 | `fenster_tropfen_gw` | Lichtfenster | Polymaker ASA Natural | Aussenfläche auf dem Bett | | 0.1 |
 
@@ -119,7 +159,16 @@ nach −x), Bündel von der Kammer aus durch den Kanal Ø 3.0 (y −2.5) in der 
 (3V3 Pin 1, SDA Pin 3, SCL Pin 5, GND Pin 6 oder 9; Pi ohne Stiftleiste). Pi auf die 4 Abstandshalter legen (Buchsen in die
 inneren Freistiche der Rückwand). Modul senkrecht in die Bodenschiene stecken: **Sensorseite zur Stirnwand (+x),
 Lötaugen-Kante zum Kabelkanal (vorn, y −6.5), Bohrungs-Kante hinten**; die Deckelrippe fasst beim Schliessen die
-Oberkante (0.8 mm). Kanal mit Silikon vergiessen (Zugentlastung und Luftsperre). LED-Platine auf den Lichtschacht kleben.
+Oberkante (0.8 mm). Kanal mit Silikon vergiessen (Zugentlastung und Luftsperre).
+**Status-LED (R W-7, D-027, BOM G9; Schaltung GATEWAY_SETUP Kap. 5.2):** grüne 3-mm-LED Kingbright WP710A10GD
+(`docs/datasheets/Kingbright_WP710A10GD_Datasheet_V10B.pdf` S. 1: Flansch Ø 3.2 × 1.0, Spitze–Flanschrückseite 4.6 ± 0.3).
+Beine 1 mm hinter dem Flansch abwinkeln und auf ≈ 5 mm kürzen, 470 Ω ans **Anodenbein** (langes Bein), Litzen AWG 28
+(≈ 70 mm) an Widerstand bzw. Kathode, Lötstellen mit Schrumpfschlauch. LED **vor dem Pi** von innen in das Rohr hinter dem
+Tropfen stecken, bis der Flansch an der Rohrstirn anliegt (Spitze dann 0.1 mm hinter dem Fenster); Flansch mit einem
+Tropfen UHU plus endfest 300 an der Stirn fixieren (Schutz wie MONTAGE_SENSOR Kap. 3 Schritt 1; nicht auf die Linse).
+Litzen nach unten-vorn zum Boden und zwischen Frontwand und den **2 Kabelhaltern** (Kanal 3.0 breit, unter der Lippe
+einfädeln) nach links bis vor die Lötaugen führen, dann über die Platinenkante an **J8 Pin 11 (GPIO17, über 470 Ω)** und
+**Pin 14 (GND)** löten. Erst dann den Pi einlegen (`check_gateway_pi.txt` 15: Pi-Kante zur LED 0.42 mm).
 Deckel senkrecht aufsetzen, umdrehen, 4 × M2.5 × 8 (ISO 7380, **ANNAHME**) von unten durch Abstandshalter und Pi-Bohrung
 in die Einsätze (Kaufteil bastelgarage 425681: Ø 4.6 × 4, Bohrung 3.9, Einschmelzen Kap. 5) – die 4 Schrauben halten Pi
 und Deckel zugleich. Nylonschrauben als Option, falls die RSSI-Messung mit
@@ -161,6 +210,7 @@ Fertigungszeichnungen aller Druckteile (Phase 5): `mechanical/drawings/FL-*.pdf`
 | G1 v4: Micro-USB-Umspritzung im Fenster | 0.4 je Seite | |
 | G1 v4: Klimamodul SEN0428 in Bodenschiene / Deckelnut | 0.15 je Seite (Nut 1.9 für Platine 1.6 **ANNAHME**), Eingriff 1.0 / 0.8, 0.3 Luft über der Oberkante und an den Endanschlägen | `check_gateway_pi.txt` 14; Platinendicke am Muster messen (Nut = Dicke + 0.3) |
 | G1 v4: Deckel-Gegenrippe zur Trennwand | 0.3 (= Fuge) | |
+| G1 v4: Status-LED 3 mm im Wannen-Rohr | Bohrung Ø 3.1 für Körper 2.9 (0.10 je Seite), Flansch an der Rohrstirn (Klebesitz); LED-Rohr zum Niederhalterrohr 0.61, Pi-Kante zur LED 0.42 | `check_gateway_pi.txt` 15; WP710A10GD Datenblatt S. 1 |
 
 **Vor der ersten Serie:** `passprobe_huelse_unten` + `kragen` + O-Ring und `passprobe_huelse_oben` + `kappe_blau` drucken
 und prüfen: Hülse gleitet mit Silikonfett ohne Klemmen, O-Ring sichtbar verpresst, Schraube M2 × 3 (V-K, D-023) furcht durch die Lippe und
@@ -182,10 +232,14 @@ dreht danach frei (Phase 6: Kaufteil M2 × 3 Linsenkopf **Torx TX6**, Kopf 1.6 h
   und mit **Isopropanol** entfetten – **nicht Aceton** (TDS-Empfehlung gilt für Metall; Aceton löst ASA an, **ANNAHME**
   Werkstoffkenntnis). Das TDS nennt ASA weder geeignet noch ungeeignet (S. 1/S. 5: ungeeignet PE, PP, PTFE, **PS**, Weich-PVC;
   ASA ist ein Styrol-Copolymer) → Haftung und Dichtheit **PROTOTYP-PRÜFUNG**.
-- O-Ringe mit Silikonfett (Mechanikbericht 2.1), Werkstoff ohne Russ.
+- O-Ringe: Werkstoff **EPDM** (nicht Silikon), nur ein **dünner Film** Silikonfett (Parker ORD 5700,
+  `docs/references/Parker_ORD5700_ORingHandbook_2007.pdf` PDF-S. 206: Silicone Greases EPDM 1 / VMQ 3; S. 50 Tab. 3-1:
+  Montagefett sparsam; S. 16: EPDM nicht mit Mineralfett), farbig/ohne Russ bevorzugt (Antenne, **ANNAHME**); Ablauf
+  MONTAGE_SENSOR Kap. 7 Schritt 2.
 - Gateway: Gewindeeinsätze M2.5 (Ø 4.6 × 4) mit Lötkolben und Einschmelzspitze einsetzen, Temperatur = Drucktemperatur
   + 10–20 °C laut Händler → Bambu ASA **270–280 °C**, eSun ASA+ 280–290 °C. Deckel kopfüber, Einsatz senkrecht ansetzen,
   ohne Druck einsinken lassen bis **0.5 mm unter** die Rohrstirn (Lehre: Schraube M2.5 eindrehen, plan aufsetzen), danach
   ohne Bewegung abkühlen lassen. Im Fuss (unterste 1.5 mm, Wand 0.85) nicht verkanten. **PROTOTYP-PRÜFUNG:** ein Rohr
   probeweise bestücken, Fuss nicht aufgeplatzt, Schraube M2.5 mit Handanzug ohne Mitdrehen des Einsatzes.
-- Gateway G1 v3 (XIAO): FPC innen an die linke Stirnwand kleben.
+- Gateway G1 v4: Status-LED im Wannen-Rohr mit einem Tropfen UHU plus endfest 300 am Flansch fixieren (Kap. 3, Montage).
+  Vor dem Kleben das Rohr gegen Licht prüfen (Bohrung durchgehend frei).

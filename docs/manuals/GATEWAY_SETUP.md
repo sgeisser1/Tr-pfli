@@ -182,8 +182,9 @@ und speichert sie erst nach dem Zeitabgleich mit korrigierter Zeit; ein Neustart
 Schaltung nach `docs/reviews/phase5_gateway_led.md` Kap. 3 (Variante B): **J8 Pin 11 (GPIO17) → Widerstand 470 Ω →
 Anode** der grünen 3-mm-LED (langes Bein), **Kathode** (kurzes Bein, Abflachung) → **J8 Pin 14 (GND)**. Widerstand
 direkt am Anodenbein, beide Lötstellen mit Schrumpfschlauch. **Vor dem Einschalten** den Widerstand zwischen Pin 11
-und Pin 14 messen (ohne Widerstand wäre GPIO17 bei leuchtender LED fast kurzgeschlossen). LED in den Lichtschacht des
-Deckels (Mechanik).
+und Pin 14 messen (ohne Widerstand wäre GPIO17 bei leuchtender LED fast kurzgeschlossen). LED von innen in das LED-Rohr der
+Wanne stecken (Flansch liegt an der Rohrstirn, Klebesitz), Litzen durch die zwei Kabelhalter am Boden führen
+(`mechanical/PRINT_SETTINGS.md` Kap. 5).
 
 | LED | Bedeutung | Quelle |
 |---|---|---|

@@ -140,6 +140,39 @@ Zusammenbau (einmal, ≈ 30 min + Aushärtezeit):
 | PS-W4 Draht an R9 | bleibt für Weg B unverändert gültig; mit Variante B2 entfällt der Draht (Kap. 3) |
 | **Mechanik (offen)** | Die Lasche ragt in +x über die Platinenkante (x +13.0) hinaus: MINUS bis x 37.5 (= Zellmitte + 34.5), Höhe 0…3.2 mm über der F-Seite, Breite 8 mm bis x 14, danach 18 mm. Zu prüfen mit `mechanik`: Ist dieser Raum beim Weg-B-Schritt (Platine offen, ohne Hülse und Verguss, ggf. in Kappe/Gabel bzw. mit Schottkeil) frei? Zellmitte X 3.0 / Y 34.8 (PCB_OUTLINE XBT1) |
 
+## 6a Freiraum (Mechanik) – DC-1
+
+Geprüft 2026-11-09 (Mechanik) im CAD Rev C (`mechanical/sensor/fluidi_sensor.FCStd`, `fluidi_sensor_mit_pcb.step`) mit
+den aus den KiCad-Dateien exportierten Scheiben (`kicad-cli pcb export step --subst-models`, KiCad 10.0.8 WSL; Skript im
+Scratchpad, nicht im Repo). Lage: Scheibenmitte = Zellmitte X 3.0 / Y 34.8 (CAD x 3.0, z 18.7), MINUS-Unterseite auf der
+F-Seite (CAD y 6.6), PLUS darüber nach 0.05 mm Klebefuge; Lasche in +x bis **X 37.5**.
+
+| Gegenstück (Montagezustand) | Abstand Scheibe inkl. Bauteile | Abstand Hüllraum Lasche (x 12.9 … 37.5, 0 … 3.2 über F, 18 breit) |
+|---|---|---|
+| Kappe blau (mit Gabel/Anschlag, Schott), Schottkeil, Verguss Schott | 2.20 mm | 3.10 mm |
+| Kragen, Verguss Kragen | 2.20 mm | 3.10 / 4.14 mm |
+| Distanzlehre (Kragenverguss) | 1.64 mm | 11.5 mm |
+| Bauteile der Sensorplatine (KiCad-STEP, ausser Clip/Zelle) | keine Überdeckung | keine Überdeckung |
+| Clip Keystone 3034 (CAD-Hüllquader) | Überdeckung 27.8 mm³ (s. unten) | **1.20 mm** |
+| **Hülse grau** | **Überdeckung 71 mm³** | **Überdeckung 104 mm³** |
+
+- **Ergebnis: passt.** Die Lasche stösst in keinem Zustand vor dem Aufschieben der Hülse an: weder lose Platine noch
+  Platine in der Kappe (Gabel, Schottkeil, Schottverguss) noch mit Kragen. Sie ragt in +x durch die Hülsenkontur
+  (Kopf ± 17 mm) – Weg B ist darum nur **ohne Hülse** möglich; das gilt ohnehin (Zellfach offen).
+- Die Überdeckung mit dem Clip ist ein Artefakt des CAD-Modells (Hüllquader L × W × H des Datenblatts minus Zylinder der
+  Zelle, Zelle 0.1 mm über der Platine): die Scheibe liegt auf der Platine und die Lasche läuft durch das offene
+  Clip-Ende. Massgebend ist der Footprint: Öffnung am offenen Ende ± 6.1 mm (F.Fab, Bogenenden) gegen Lasche ± 4.0 mm →
+  **2.1 mm je Seite**. **PROTOTYP-PRÜFUNG** DC-4: Lasche geht ohne Kontakt zu den Clip-Armen ein und aus.
+- Höhe: Die B2-Bauteile auf der MINUS-Lasche stehen bis **3.55 mm** über der F-Seite (lokal x 24 … 32, d. h. ausserhalb
+  des Gehäuseumrisses x > 21); innerhalb von x ≤ 17 bleibt alles ≤ 3.2 mm. Kein Einfluss.
+- **Montagezustand nach MONTAGE_SENSOR:** Weg B ist Kap. 3b Schritt 1, **vor Kap. 4**. Mit Draht an **R9** (Weg B nach
+  PROGRAMMIEREN Kap. 5) muss die Platine **lose** sein: R9 liegt bei X −0.2 / Y 11.95 (z 41.6), also im Bereich der Kappe
+  (Kappe ab Schott z 30.8) – mit eingesetzter Platine nicht erreichbar. Gabel, Schottkeil und Kappe sind dann noch nicht
+  montiert. Mit **Variante B2** (Prüfspitzen auf TP1/TP2, X −10.6 / z 28.0 und 25.0, unterhalb des Schotts) ginge es
+  auch mit eingesetzter Platine; der Freiraum der Lasche ist auch dort gegeben (Tabelle).
+- **Keine Änderung** der Montagereihenfolge oder der Laschengeometrie nötig.
+- Nachtrag Mechanik ausserhalb DC-1: Die Kontur nach Kap. 2 (Ø 19.8) liegt im Zellraum des CAD (Zelle Ø 20, x −7.0 … 13.0).
+
 ## 7 Werkstatt-Voraussetzungen für Weg B (vollständig)
 
 Für **jeden** Weg-B-Platz. „ANNAHME“ = Spezifikation aus den Anforderungen abgeleitet, kein bestimmtes Gerät geprüft.
@@ -176,7 +209,7 @@ Die Einkaufsliste ändert der Einkauf; diese Liste ist die Vorgabe dafür.
 
 | Nr | Punkt | Wer |
 |---|---|---|
-| DC-1 | Freiraum der Lasche beim Weg-B-Schritt (Kap. 6) | mechanik |
+| DC-1 | Freiraum der Lasche beim Weg-B-Schritt (Kap. 6) – **erledigt** 2026-11-09, passt (Kap. 6a) | mechanik |
 | DC-2 | Prüfung Kap. 6 (PS-K1 bleibt erfüllt, Kennzeichnung ausreichend), Freigabe Variante B2 | sicherheit |
 | DC-3 | JLC-Preis 1.0/2.0 mm, 2 Lagen, Kleinformat am Bestelltag im Rechner ablesen (ersetzt die Spanne Kap. 5) | Auftraggeber/Einkauf |
 | DC-4 | **PROTOTYP-PRÜFUNG**: Sitz im Clip, Kontakt Insel–Minuspad, Dicke nach Kleben, B2 mit 19200 Baud am ersten Muster | Elektronik |

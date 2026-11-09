@@ -350,7 +350,7 @@ def interface_dict(area=None):
             ANTENNA=dict(part='AN043 IFA', footprint=ANT['FP'], zone='Z1_ANTENNE', z=(Z['ANT0'], Z['ANT1']),
                          copper_x=(ANT['X0'], ANT['X1']), copper_z=(ANT['Z0'], ANT['Z1']), feed_x=ANT['FEED_X'],
                          keepout_x=(-2.7, 12.5)),
-            SCREW_NUT=dict(screw='M2x3 A2 Linsenkopf Torx TX6, Kopfhoehe 1.6 (bastelgarage 422191; unverlierbar, Gewindefurch-Lippe Ø1.7 im Huelsenboden)',
+            SCREW_NUT=dict(screw='M2x3 A2 Linsenkopf Torx TX6, Kopfhoehe 1.6 (bastelgarage 422191; Gewindefurch-Lippe Ø1.7 im Huelsenboden haelt beim Loesen, nicht unverlierbar)',
                            nut='ISO 4032 M2 A2 SW4 x 1.6, im Kragen eingegossen',
                            axis_xy=(SCREW['X'], SCREW['Y']), nut_z=(Z['COL_NUT0'], Z['COL_NUT1']),
                            dist_to_pcb_F=round(PCB['Y_F'] - (SCREW['Y'] + SCREW['NUT_S'] / 2), 2),

@@ -30,7 +30,12 @@ ANNAHMEN (Zeichnung enthaelt KEINE Hoehen, keine Lage von ACT-LED und Antenne ->
   PCB 1.0 mm; Bauteilhoehen ueber PCB: HDMI 3.5, Micro-USB 3.0 (Mitte 1.5), microSD-Halter 2.0, SiP 1.4, Haube 1.8,
   Kamerabuchse 2.0, uebrige Bauteile <= 1.2 (Huelle); Unterseite <= 1.2; Karte steht 2.5 ueber die Kante;
   Micro-USB-Steckerumspritzung <= 10.6 x 7.0; GPIO-Header NICHT bestueckt (bestueckt: Stifte 8.5 hoch, Option pruefen);
-  LED-Platine 8 x 8.2 x 1.0 (eigene Mini-Platine, RGB wie Sensor, an GPIO-Pads geloetet, auf Lichtschacht geklebt);
+  Status-LED (Phase 6, R W-7, D-027, BOM G9): bedrahtete 3-mm-LED Kingbright WP710A10GD (docs/datasheets/
+  Kingbright_WP710A10GD_Datasheet_V10B.pdf S. 1 "Package Dimensions": Linse Ø2.8 / Koerper 2.9, Flansch Ø3.2 x 1.0,
+  Spitze bis Flanschrueckseite 4.6 +-0.3, Beine 0.5 Quadrat, RM 2.54, Beine >= 27 lang) + 470 Ohm am Anodenbein, Litzen an
+  J8 Pin 11 (GPIO17) / Pin 14 (GND) (GATEWAY_SETUP Kap. 5.2). Die fruehere LED-Platine 8 x 8.2 wurde nie entworfen (F-6) und
+  ist entfernt. Aufnahme = Rohr an der Wannen-Facette (im Deckel nicht montierbar: liegt unter der Facetten-Ueberhoehung),
+  Flansch liegt an der Rohrstirn an und wird dort geklebt; 2 Kabelhalter am Wannenboden vorne fuehren die Litzen.
   Schraube M2.5 x 8 Linsenkopf ISO 7380 (dk 4.7, k 1.4, Quelle offen G8b).
   Klimamodul SEN0428: Platinendicke und Bauteilhoehen NICHT angegeben -> MT 1.6, Bauteile vorn <= 2.5 (SOT-23/DFN/0402
   laut Bestueckbild, ca. 1.5 + 1.0 Reserve), Rueckseite nur Loetstellen <= 1.0 -> am Muster messen.
@@ -101,8 +106,14 @@ HEADER = dict(X0=7.0, X1=58.9, Y0=24.0, Y1=29.0, H=8.5)
 TUBE = dict(R=3.5, FOOT_R=2.8, FOOT_H=1.5, INS_D=3.9, INS_L=5.2, INS_OD=4.6, INS_H=4.0, INS_REC=0.5, CUT_CLR=0.3,
             HOLE_D=2.8, CB_D=5.4, CB_H=1.6, SCREW_L=8.0, HEAD_D=4.7, HEAD_K=1.4)
 # D-028 (2026-11-08): Gateway ohne RTC -> RTC-Platzhalter und Deckelrahmen (Phase 5, G-R2) entfernt.
-LEDB = dict(S=8.0, V0=-5.0, V1=3.2, T=1.0, DIST=1.6)   # Platine 8 breit, entlang Facette V0..V1 um Fensterachse
+# Status-LED 3 mm (Kopf: Quelle). Achse = Fensterachse (Facettennormale nach innen), Spitze GAP hinter der Fenster-Innenflaeche.
+# Rohr: Bohrung BORE_D (Koerper 2.9 + 0.1 je Seite), Stirn = Flanschanlage (Klebesitz), Rohrlaenge = GAP + Spitze...Flansch.
+LED3 = dict(BODY_D=2.9, LENS_D=2.8, FL_D=3.2, FL_T=1.0, TIP_FL=4.6, TIP_FL_TOL=0.3, LEAD=0.5, PITCH=2.54, STANDOFF=1.0,
+            GAP=0.1, BORE_D=3.1, TUBE_WALL=0.8, FRONT_D=4.0, COLLAR_R=3.6, COLLAR_T=0.8,
+            WIRE_D=1.6,                       # 2 Litzen AWG28 + Schrumpfschlauch nebeneinander (ANNAHME)
+            CLIP_X=(16.0, 8.0), CLIP_Y=(-16.0, -15.0), CLIP_Z=6.0, LIP_Y=-17.2, LIP_T=0.8, WIRE_Y=-17.5, WIRE_Z=3.0)
 LOG = []
+LEDINFO = {}
 
 X_PART = G['W'] / 2 - G['WALL'] - CLIMA['WI'] - CLIMA['WALL']   # Trennwand Klimakammer x X_PART ... X_PART + 2
 XR = X_PART - PI['SD_SPACE']                          # x der Pi-Kante X = 0
@@ -212,19 +223,59 @@ def build():
     S['Fenster_transluzent'] = facet_prism(drop2(0, c_up, D['R'] - D['GLUE'], D['K'] * D['R'] / (D['R'] - D['GLUE'])),
                                            -G['WALL'], 0.0)
     o, u, v, n = facet_frame()
-    # Lichtschacht gehoert zur WANNE (liegt unter der Wannen-Facette; im Deckel waere er nicht montierbar),
-    # Stirnflaeche = Auflage der LED-Platine (geklebt)
-    L = LEDB['DIST']
-    tube_o = Part.makeCylinder(3.1, L, o + v * c_up - n * (G['WALL'] + L), n)
-    tube_i = Part.makeCylinder(2.3, L + 1.0, o + v * c_up - n * (G['WALL'] + L + 0.5), n)
-    shaft = tube_o.cut(tube_i).common(cavity).cut(deckel)
-    wanne = wanne.fuse(shaft).cut(facet_prism(notch, -4.5, 1.0)).removeSplitter()
-    s2 = LEDB['S'] / 2
-    sq = [(-s2, LEDB['V0'] + c_up), (s2, LEDB['V0'] + c_up), (s2, LEDB['V1'] + c_up), (-s2, LEDB['V1'] + c_up)]
-    S['LED_Platine'] = facet_prism(sq, -(G['WALL'] + L + LEDB['T']), -(G['WALL'] + L))
-    S['LED_RGB'] = facet_prism([(-0.8, -0.75 + c_up), (0.8, -0.75 + c_up), (0.8, 0.75 + c_up), (-0.8, 0.75 + c_up)],
-                               -(G['WALL'] + L), -(G['WALL'] + L - 0.6))
-    # Halteklammern LED-Platine (2 Haken am Lichtschacht-Rohr waeren unsicher -> 2 Rippen am Deckel, Platine geklebt)
+    # ---- Status-LED 3 mm (R W-7): Rohr an der WANNE (unter der Facette; im Deckel waere es beim senkrechten Aufsetzen nicht
+    #      montierbar), Achse d = -n durch die Fenstermitte. Spitze GAP hinter der Fenster-Innenflaeche (w = -WALL).
+    E = LED3
+    d_ = n * -1.0
+    m_ = v                                            # senkrecht zu d in der y-z-Ebene
+    A0 = o + v * c_up - n * G['WALL']                 # Fenster-Innenflaeche, Mitte
+    tip = A0 + d_ * E['GAP']
+    fl0 = tip + d_ * (E['TIP_FL'] - E['FL_T'])        # Flansch vorn = Rohrstirn (Anlage)
+    L_tube = E['GAP'] + E['TIP_FL'] - E['FL_T']
+    r_o = E['BORE_D'] / 2 + E['TUBE_WALL']
+    tube_o = Part.makeCylinder(r_o, L_tube + 0.5, A0 - d_ * 0.5, d_).cut(Part.makeCylinder(r_o + 1, 0.5, A0 - d_ * 0.5, d_))
+    tube_i = Part.makeCylinder(E['BORE_D'] / 2, L_tube + 2.0, A0 - d_ * 1.0, d_)
+    tube_f = Part.makeCylinder(E['FRONT_D'] / 2, E['GAP'] + 1.0 + 0.2, A0 - d_ * 1.0, d_)   # Lichtaustritt vor der Spitze
+    # Kragen an der Rohrstirn: verbindet das Rohr ausserhalb der Kerbe (r 2.8) mit der Wannen-Facette (unterhalb der Fuge)
+    collar = Part.makeCylinder(E['COLLAR_R'], E['COLLAR_T'] + 0.5, A0 - d_ * 0.5, d_).common(
+        box(-big, big, -big, big, -1, zf - g2))       # nur unterhalb der Fuge (Deckel senkrecht abnehmbar)
+    shaft = tube_o.fuse(collar).cut(tube_i).cut(tube_f).common(cavity).cut(deckel)
+    # Kerbe nach dem Anfuegen nur durch die Wand schneiden (bis -4.5 wuerde die Rohrstirn abtrennen: Kerbe r 2.8 > Rohr r 2.35)
+    wanne = wanne.fuse(shaft).cut(facet_prism(notch, -G['WALL'] - 0.01, 1.0)).removeSplitter()
+    rl = E['LENS_D'] / 2
+    led = Part.makeSphere(rl, tip + d_ * rl).common(Part.makeCylinder(rl, rl, tip, d_))
+    led = led.fuse(Part.makeCylinder(rl, E['TIP_FL'] - E['FL_T'] - rl, tip + d_ * rl, d_))
+    led = led.fuse(Part.makeCylinder(E['FL_D'] / 2, E['FL_T'], fl0, d_))
+    fl1 = fl0 + d_ * E['FL_T']
+    for s_ in (-1, 1):
+        c_ = fl1 + u * (s_ * E['PITCH'] / 2)          # Beine nebeneinander in x (nicht zur Pi-Kante hin)
+        lb = Part.makeBox(E['LEAD'], E['LEAD'], E['STANDOFF'])
+        # Bein als Quader entlang d (lokales System: x = u, y = m, z = d)
+        pl = App.Placement(c_ - u * (E['LEAD'] / 2) - m_ * (E['LEAD'] / 2), App.Rotation(u, m_, d_, 'ZXY'))
+        lb.Placement = pl
+        led = led.fuse(lb)
+    S['LED_3mm'] = led
+    LEDINFO.update(A0=A0, tip=tip, fl0=fl0, fl1=fl1, L_tube=L_tube, r_o=r_o, d=d_, m=m_)
+    # Kabelhalter: 2 Pfosten am Boden vorne mit Lippe zur Wand (Kanal zwischen Frontwand innen und Pfosten)
+    yw_in = -G['D'] / 2 + G['WALL']
+    for xc in E['CLIP_X']:
+        post = box(xc - 1.0, xc + 1.0, E['CLIP_Y'][0], E['CLIP_Y'][1], G['WALL'] - 0.01, E['CLIP_Z'])
+        lip_ = box(xc - 1.0, xc + 1.0, E['LIP_Y'], E['CLIP_Y'][1], E['CLIP_Z'] - E['LIP_T'], E['CLIP_Z'])
+        wanne = wanne.fuse(post).fuse(lip_)
+    LEDINFO.update(channel=(yw_in, E['CLIP_Y'][0]), opening=(yw_in, E['LIP_Y']), z_lip=E['CLIP_Z'] - E['LIP_T'])
+    # Litzen-Platzhalter (Buendel Ø WIRE_D): Beinende -> etwas nach vorn -> zum Boden -> nach vorn in den Kanal ->
+    # entlang x bis vor Pin 11/14 -> hoch ueber die Platinenkante -> zu den Loetaugen (Pin 11 / Pin 14, J8)
+    rw_ = E['WIRE_D'] / 2
+    pe = fl1 + d_ * E['STANDOFF']
+    xa = px(pin_xy(11)[0])
+    pts = [pe, V(pe.x, pe.y - 1.5, pe.z), V(pe.x, pe.y - 1.5, E['WIRE_Z']), V(pe.x, E['WIRE_Y'], E['WIRE_Z']),
+           V(xa, E['WIRE_Y'], E['WIRE_Z']), V(xa, E['WIRE_Y'], ZP + PI['ENV_TOP'] + rw_ + 0.5),
+           V(xa, py(pin_xy(11)[1]), ZP + PI['ENV_TOP'] + rw_ + 0.5), V(xa, py(pin_xy(11)[1]), ZP)]
+    wl = None
+    for a_, b_ in zip(pts[:-1], pts[1:]):
+        seg = Part.makeCylinder(rw_, (b_ - a_).Length, a_, b_ - a_).fuse(Part.makeSphere(rw_, b_))
+        wl = seg if wl is None else wl.fuse(seg)
+    S['Leitungen_LED'] = wl
     # ---- Logo-Relief Ton in Ton auf der Front
     lg, s_logo = logo_solid(os.path.join(FP.REPO, FP.LOGO['SVG']), 22.0, -16.0, 5.4, -G['D'] / 2, 0.25)
     wanne = wanne.fuse(lg)
@@ -392,6 +443,45 @@ def clima_checks(S):
         'Modul sitzt ohne Klemmen und klappert bei geschlossenem Deckel nicht' % C['PART_F'])
 
 
+def led_checks(S):
+    """15: Status-LED 3 mm WP710A10GD (R W-7): Sitz, Abstand zum Fenster, Toleranz, Freiheit, Litzenfuehrung."""
+    E, I = LED3, LEDINFO
+    w = S['Wanne_grau']
+    log('15 Status-LED Kingbright WP710A10GD 3 mm (Datenblatt S. 1) + 470 Ohm, Litzen an J8 Pin 11 (GPIO17) / Pin 14 (GND):')
+    log('   Rohr an der Wanne: Bohrung Ø%.1f (Koerper %.1f -> %.2f je Seite), Wand %.1f (Rohr Ø%.1f), Laenge ab Fenster-Innenflaeche '
+        '%.2f; Lichtaustritt Ø%.1f vor der Spitze' % (E['BORE_D'], E['BODY_D'], (E['BORE_D'] - E['BODY_D']) / 2, E['TUBE_WALL'],
+                                                    2 * I['r_o'], I['L_tube'], E['FRONT_D']))
+    g0 = E['GAP'] - E['TIP_FL_TOL']
+    log('   Flansch Ø%.1f liegt an der Rohrstirn an (Klebesitz) -> Spitze %.2f mm hinter dem Fenster (Datenblatt 4.6 +-%.1f: '
+        '%.2f ... %.2f; bei %.2f beruehrt die Spitze das Fenster, der Flansch steht dann bis %.2f vor der Stirn -> Klebstoff)'
+        % (E['FL_D'], E['GAP'], E['TIP_FL_TOL'], max(g0, 0.0), E['GAP'] + E['TIP_FL_TOL'], 0.0, max(-g0, 0.0)))
+    log('   Abstand LED - Fenster %.2f, LED - Wanne %.2f (0 = Flanschanlage, gewollt), LED - Deckel %.2f mm'
+        % (S['LED_3mm'].distToShape(S['Fenster_transluzent'])[0], S['LED_3mm'].distToShape(w)[0],
+           S['LED_3mm'].distToShape(S['Deckel_blau'])[0]))
+    w0 = E['COLLAR_T'] + 0.2                          # hinter dem Kragen (Fugenbereich nicht als Rohr werten)
+    rohr = w.common(Part.makeCylinder(I['r_o'] + 0.05, I['L_tube'] - w0 + 0.1, I['A0'] + I['d'] * w0, I['d']))
+    log('   LED-Rohr - Deckel (Niederhalterrohr vorn) %.2f, - Pi_PCB %.2f, - Pi_Bauteile_oben %.2f mm (Soll >= 0.3)'
+        % (rohr.distToShape(S['Deckel_blau'])[0], rohr.distToShape(S['Pi_PCB'])[0], rohr.distToShape(S['Pi_Bauteile_oben'])[0]))
+    # Pi senkrecht einlegen: Platinenkante gegen LED-Rohr (Pi ueber die volle Hoehe extrudiert)
+    pi_col = pi_outline(PI['Z0'], G['H'])
+    log('   Pi senkrecht einlegen: Platinenumriss (z %.1f ... %.1f) zum LED-Rohr %.2f mm, zur LED %.2f mm (Soll >= 0.3)'
+        % (PI['Z0'], G['H'], pi_col.distToShape(rohr)[0], pi_col.distToShape(S['LED_3mm'])[0]))
+    y0, y1 = I['channel']
+    log('   Kabelhalter: 2 Pfosten x %s am Boden, Kanal y %.1f ... %.1f (%.1f breit), Lippe bis y %.1f -> Einfaedeloeffnung %.1f, '
+        'Lippe z %.1f ueber Boden %.1f; Litzenbuendel Ø%.1f (ANNAHME) -> Spiel %.2f / %.2f mm'
+        % ('/'.join('%.0f' % x for x in E['CLIP_X']), y0, y1, y1 - y0, E['LIP_Y'], E['LIP_Y'] - y0, I['z_lip'], G['WALL'],
+           E['WIRE_D'], (y1 - y0 - E['WIRE_D']) / 2, E['LIP_Y'] - y0 - E['WIRE_D']))
+    for k in ('Wanne_grau', 'Deckel_blau', 'Pi_Bauteile_oben', 'Leitungen_Klima'):
+        log('   Leitungen_LED - %-17s %.2f mm' % (k, S['Leitungen_LED'].distToShape(S[k])[0]))
+    x11, y11 = px(pin_xy(11)[0]), py(pin_xy(11)[1])
+    x14, y14 = px(pin_xy(14)[0]), py(pin_xy(14)[1])
+    log('   Loetaugen J8 Pin 11 x %.2f y %.2f, Pin 14 x %.2f y %.2f (Lage aus RP-008358-DS-1, Belegung GATEWAY_SETUP 5.2); '
+        'Litzenlaenge LED -> Pin 11 ca. %.0f mm + 20 mm Reserve (Platzhalter-Pfad)'
+        % (x11, y11, x14, y14, S['Leitungen_LED'].Volume / (math.pi * (E['WIRE_D'] / 2) ** 2)))
+    log('   PROTOTYP-PRUEFUNG: Sitz der LED (Bohrung FDM, 45 Grad geneigt), Leuchtbild durch das Fenster (Polymaker ASA Natural '
+        '2.0 mm), Litzen klemmen beim Deckel-Aufsetzen nicht; zu dunkel -> 330 Ohm (GATEWAY_SETUP 5.2)')
+
+
 def checks(S):
     log('=== fluidi Gateway G1 v4 (Raspberry Pi Zero 2 W) ===')
     log('Aussenmasse %.0f x %.0f x %.0f mm (B x T x H), Wand %.1f, Fuge z %.2f ... %.2f'
@@ -401,8 +491,9 @@ def checks(S):
     allowed = set()
     for i in range(4):
         allowed |= {('Deckel_blau', 'Einsatz_%d' % i), ('Einsatz_%d' % i, 'Schraube_M2p5_%d' % i)}
-    allowed |= {('LED_Platine', 'LED_RGB'), ('Pi_PCB', 'Pi_Bauteile_oben'), ('Pi_PCB', 'Pi_Bauteile_unten'),
+    allowed |= {('LED_3mm', 'Leitungen_LED'), ('Pi_PCB', 'Pi_Bauteile_oben'), ('Pi_PCB', 'Pi_Bauteile_unten'),
                 ('Pi_Bauteile_oben', 'microSD_Karte'),
+                ('Pi_PCB', 'Leitungen_LED'), ('Pi_Bauteile_oben', 'Leitungen_LED'),     # Litzen in die Loetaugen Pin 11/14
                 ('Pi_PCB', 'Leitungen_Klima'), ('Pi_Bauteile_oben', 'Leitungen_Klima')}   # Leitungen in die Loetaugen
     hits = collide(A, allowed)
     for a, b, vol in hits:
@@ -416,14 +507,14 @@ def checks(S):
         return S[a].distToShape(S[b])[0]
     log('2 Mindestabstaende (Spiel, Ziel >= 0.3 FDM bzw. >= 1.0 zu Waenden):')
     inner_wall = shell_solid(0).cut(shell_solid(G['WALL']))
-    for k in ('Pi_PCB', 'Pi_Bauteile_oben', 'Pi_Bauteile_unten', 'microSD_Karte', 'LED_Platine',
+    for k in ('Pi_PCB', 'Pi_Bauteile_oben', 'Pi_Bauteile_unten', 'microSD_Karte', 'LED_3mm', 'Leitungen_LED',
               'Klima_Modul_Option', 'Leitungen_Klima'):
         log('   %-18s - Wanne %.2f   - Deckel %.2f' % (k, d(k, 'Wanne_grau'), d(k, 'Deckel_blau')))
     log('   (Pi_PCB 0.00 = Auflage auf Abstandshaltern / Niederhalterrohren, gewollt; Bauteilhuelle 0.20 nur innerhalb')
     log('    des Freihaltekreises Ø 6 der Zeichnung, dort keine Bauteile)')
     log('   Pi_PCB - Wand (ohne Freistiche) %.2f' % S['Pi_PCB'].distToShape(inner_wall)[0])
-    for k in ('LED_Platine', 'LED_RGB'):
-        log('   %-18s - Pi_Bauteile_oben %.2f  - Pi_PCB %.2f' % (k, d(k, 'Pi_Bauteile_oben'), d(k, 'Pi_PCB')))
+    log('   LED_3mm            - Pi_Bauteile_oben %.2f  - Pi_PCB %.2f' % (d('LED_3mm', 'Pi_Bauteile_oben'), d('LED_3mm', 'Pi_PCB')))
+    led_checks(S)
     # Rohre/Abstandshalter zu den Aussenwaenden (gleichmaessige Wand, kein Masseanhaeufung)
     T = TUBE
     dmin = 99
@@ -469,14 +560,14 @@ def checks(S):
             % (nm, G['D'] / 2 - face, pw, ph, wn, plug.distToShape(S[wn])[0]))
     # Header-Optionen
     hd = pbox(HEADER['X0'], HEADER['X1'], HEADER['Y0'], HEADER['Y1'], ZP, ZP + HEADER['H'])
-    hh = [k for k in ('Deckel_blau', 'LED_Platine', 'Wanne_grau') if hd.common(S[k]).Volume > 1e-3]
+    hh = [k for k in ('Deckel_blau', 'LED_3mm', 'Leitungen_LED', 'Wanne_grau') if hd.common(S[k]).Volume > 1e-3]
     log('5 GPIO: Auftraggeber-Pi ohne Stiftleiste, Leitungen direkt in die Loetaugen (Lage aus Zeichnung, Pin 1 = Quadratpad):')
     for n, x, y in PINS_XY:
         log('   Pin %d  X %.2f Y %.2f  -> x %.2f y %.2f' % (n, pin_xy(n)[0], pin_xy(n)[1], x, y))
     (x1, y1), (x9, y9) = pin_xy(1), pin_xy(9)
     h5 = pbox(x1 - 1.27, x9 + 1.27, y1 - 1.27, y1 + 1.27, ZP, ZP + 2.5).fuse(
         pbox(x1 - 1.27, x9 + 1.27, y1 - 1.27, y1 + 1.27, ZP + 2.5, ZP + 2.5 + 14.0))
-    hk = [k for k in ('Deckel_blau', 'LED_Platine', 'Wanne_grau', 'Leitungen_Klima') if h5.common(S[k]).Volume > 1e-3]
+    hk = [k for k in ('Deckel_blau', 'LED_3mm', 'Wanne_grau', 'Leitungen_Klima') if h5.common(S[k]).Volume > 1e-3]
     log('   Option 1x5-Stiftleiste gerade (Pins 1-3-5-7-9, Pin 7 frei) + Buchsengehaeuse, Huelle 2.5 + 14 mm hoch (ANNAHME):'
         ' Kollision mit %s' % (', '.join(hk) if hk else 'nichts'))
     log('   Option gewinkelte Leiste: Stifte zeigen in Y (zur Front) -> Steckergehaeuse ~14 mm passt nicht (Front %.1f mm)'
@@ -484,8 +575,8 @@ def checks(S):
     log('   volle 40-pol. Leiste (8.5 mm, ANNAHME): Kollision mit %s -> nicht vorgesehen' % (', '.join(hh) if hh else 'nichts'))
     # Antenne/Metall
     log('6 Metall im Gehaeuse: 4 Schrauben/Einsaetze nur in den 4 Befestigungsbohrungen des Pi (Herstellerbohrungen),')
-    log('   LED-Platine (Kupfer) Abstand zur Pi-Platine %.1f mm; keine weiteren Metallteile. Lage der Onboard-Antenne'
-        % d('LED_Platine', 'Pi_PCB'))
+    log('   LED-Beine/Litzen (Status-LED, an Pin 11/14) Abstand LED zur Pi-Platine %.1f mm; keine weiteren Metallteile. Lage der '
+        'Onboard-Antenne' % d('LED_3mm', 'Pi_PCB'))
     log('   ist in den offiziellen Unterlagen nicht angegeben -> RSSI offen/geschlossen messen (PROTOTYP-PRUEFUNG).')
     for k in ('Wanne_grau', 'Wanne_grau_OTG', 'Deckel_blau', 'Fenster_transluzent'):
         log('7 %-20s %.1f cm3 -> %.1f g ASA' % (k, S[k].Volume / 1000, S[k].Volume * 1.07e-3))
@@ -494,7 +585,7 @@ def checks(S):
         log('8 Verlustleistung %.1f W: dT Gehaeuse ~ %.0f K (h = 8 W/m2K, A = %.4f m2, ANNAHME; Leistung Pi nicht im '
             'Product Brief)' % (P, P / (8 * Aa), Aa))
     # Montierbarkeit (senkrechtes Einlegen/Aufsetzen)
-    W_ = S['Wanne_grau'].fuse(S['LED_Platine'])
+    W_ = S['Wanne_grau'].fuse(S['LED_3mm'])        # LED vor dem Pi einsetzen; Litzen sind am Pi angeloetet (bewegen sich mit)
     res = []
     for t in (0.3, 1, 2, 4, 8, 15):
         P_ = S['Pi_PCB'].fuse(S['Pi_Bauteile_oben']).fuse(S['Pi_Bauteile_unten'])
@@ -505,7 +596,7 @@ def checks(S):
         if cD.Volume > 1e-3:
             bb = cD.BoundBox
             log('   Deckel t %.1f: x %.1f..%.1f y %.1f..%.1f z %.1f..%.1f' % (t, bb.XMin, bb.XMax, bb.YMin, bb.YMax, bb.ZMin, bb.ZMax))
-    log('10 Montage senkrecht: Pi in Wanne (mit Lichtschacht/LED-Platine) und Deckel auf Wanne, Ueberschneidung beim '
+    log('10 Montage senkrecht: Pi in Wanne (LED vorher im Rohr; Litzen biegsam, nicht geprueft) und Deckel auf Wanne, Ueberschneidung beim '
         'Anheben um t: ' + ', '.join('t %.1f: Pi %.2f / Deckel %.2f mm3' % r for r in res))
     # Klimakammer
     C = CLIMA
@@ -536,7 +627,7 @@ PRINT = {'Wanne_grau': ('wanne_grau', [], 'ASA Warmgrau hell'),
 
 COLORS = {'Wanne_grau': '#B9B5AC', 'Deckel_blau': '#59ADDD', 'Fenster_transluzent': '#7CFC9A',
           'Pi_PCB': '#1F6B3A', 'Pi_Bauteile_oben': '#8A8F94', 'Pi_Bauteile_unten': '#5E6A60', 'microSD_Karte': '#202020',
-          'LED_Platine': '#2E5E2E', 'LED_RGB': '#F0F0F0',
+          'LED_3mm': '#30C030', 'Leitungen_LED': '#2040D0',
           'Klima_Modul_Option': '#7A3FA0', 'Leitungen_Klima': '#D04020'}
 
 
@@ -612,7 +703,7 @@ def preview(S, path):
     fig, axs = plt.subplots(2, 2, figsize=(13, 9), dpi=130)
     view(axs[0, 0], [(T[k], COLORS[k]) for k in closed], 30, 25, 'G1 v4 vorne (Facette, Tropfen-LED an der Farbfuge, Logo)')
     view(axs[0, 1], [(T[k], COLORS[k]) for k in closed], 150, 25, 'G1 v4 hinten rechts (Micro-USB PWR, Kaminschlitze, Klimakammer-Schlitze)')
-    inside = ['Wanne_grau', 'Pi_PCB', 'Pi_Bauteile_oben', 'microSD_Karte', 'LED_Platine', 'LED_RGB', 'Fenster_transluzent',
+    inside = ['Wanne_grau', 'Pi_PCB', 'Pi_Bauteile_oben', 'microSD_Karte', 'LED_3mm', 'Leitungen_LED', 'Fenster_transluzent',
               'Klima_Modul_Option', 'Leitungen_Klima']
     view(axs[1, 0], [(T[k], COLORS[k]) for k in inside], 25, 50, 'Wanne: Pi Zero 2 W (Huellmodell), rechts Klimakammer mit Modul, Leitungen rot')
     lid = tris(S['Deckel_blau'].copy().rotate(V(0, 0, 0), V(1, 0, 0), 180))

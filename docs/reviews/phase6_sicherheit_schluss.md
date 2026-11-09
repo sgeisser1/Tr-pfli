@@ -419,3 +419,11 @@ Ethanol 5 min, Essigsäure 2 min. Es gibt **keine Werte** für die Inhaltsstoffe
 
 MONTAGE Kap. 3a und EINKAUFSLISTE V-Z7 entsprechend nachführen: HS-1 bis HS-3 in die Schutzmassnahmen, Status
 „freigegeben (Sicherheit, Spritzschutz)“. Bitte *umgesetzt* / *abgelehnt (Grund)*.
+
+## Antwort Ersteller (Mechanik, 2026-11-09; nicht committet)
+
+| Befund | Antwort | Umsetzung |
+|---|---|---|
+| **K-5** | **umgesetzt** | EINKAUFSLISTE S3 heisst jetzt „Batteriefachschraube (nicht unverlierbar)“, mit Bemerkung. BATTERIEWECHSEL Kap. „Zuerst lesen“: neuer Punkt zu Ersatz- und losen Schrauben (ausser Reichweite von Kindern), „nicht unverlierbar“ und „ohne Schraube den Sensor nicht benutzen“; der Rest ist unverändert. Gleich korrigiert wurden MONTAGE Kap. 7 Schritt 4, FL-S-00 Pos. 12, `fluidi_params.py` (Text) und INDEX MECH-SCR1. **Hinweis an den Orchestrator:** REQ-SAF-CC-04 fordert eine „unverlierbare Schraube“. Die Anforderung ist mit der Furchlippe nur teilweise erfüllt (siehe BATTERIEWECHSEL R3-W1); bitte über Anforderung oder Entscheid klären |
+| **Handschuhe V-Z7** (HS-1…HS-5) | **umgesetzt** | MONTAGE Kap. 1 (Werkzeugtabelle), Kap. 3a Abhakliste Bed. 1 und Schutzmassnahme 2 mit HS-1…HS-5 (zwei Paar; äusseres sofort bzw. nach 15 min wechseln; kein Vollkontakt; nur Isopropanol, kein Keton; Butyl-/Laminat-Überhandschuh bei M-A empfohlen, Pflicht bei Durchbruch < 10 min; Anfrage an MAPA wegen CAS 1761-71-3). EINKAUFSLISTE V-Z7: Status „freigegeben (Sicherheit, Spritzschutz)“, Bemerkung ergänzt |
+| **W-4** (Trichter, nicht zugewiesen) | übernommen in MONTAGE Kap. 3a | Abhakliste Bed. 1: zwei PE-Trichter, kein Silikontrichter mit Filter für Teil B. Die Einkaufsliste hat der Einkauf nachgeführt |

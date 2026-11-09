@@ -496,15 +496,15 @@ ASM = [  # (Pos, Schluessel FCStd oder STEP-Gruppe, Menge, Benennung, Sachnummer
     (8, 'Stoessel', '1', 'Stössel', 'FL-S-08', 'ASA', (45, 0.5), 'B'),
     (9, 'Schottkeil', '1', 'Schottkeil', 'FL-S-09', 'ASA', (135, 0.5), 'A'),
     (10, 'Membran_Silikon', '1', 'Tastenmembran Ø6.4 × 0.5', 'INDEX MECH-MEM1', 'Silikon, Shore A 40–60 (ANNAHME, Typ offen)', (0, 0.3), 'B'),
-    (11, 'ORing_Kragen', '2', 'O-Ring AS568-019 (20.35 × 1.78)', 'INDEX MECH-OR1 (Rev B)', 'Silikon/EPDM ohne Russ, Silikonfett', (0, 0.35), 'A'),
-    (12, 'Schraube_M2', '1', 'Linsenschraube M2 × 3 Torx TX6, k 1.6', 'Kaufteil bastelgarage 422191', 'A2, unverlierbar (Furchlippe), V-K D-023', (90, 0.35), 'A'),
+    (11, 'ORing_Kragen', '2', 'O-Ring AS568-019 (20.35 × 1.78)', 'INDEX MECH-OR1 (Rev B)', 'EPDM (nicht Silikon), Silikonfett dünn', (0, 0.35), 'A'),
+    (12, 'Schraube_M2', '1', 'Linsenschraube M2 × 3 Torx TX6, k 1.6', 'Kaufteil bastelgarage 422191', 'A2, Furchlippe hält beim Lösen (nicht unverlierbar)', (90, 0.35), 'A'),
     (13, 'Mutter_M2', '1', 'Sechskantmutter M2', 'ISO 4032, A2', 'im Kragen eingegossen', (0, 0.35), 'A'),
     (14, 'Verguss_Kragen', '-', 'Verguss Kragen', 'INDEX EP-K', 'Epoxid 2K mineral. gefüllt, Tg ≥ 80 °C (Typ offen)', (90, 0.3), 'A'),
     (15, 'Verguss_Schott', '-', 'Verguss Schott', 'INDEX EP-K', 'wie Pos. 14', (90, 0.3), 'A'),
     (16, '_pcb', '1', 'Platine fluidi_sensor Rev C, bestückt', 'hardware/sensor (JLC)', 'FR4 4 L 1.6, inkl. XBT1 Keystone 3034', (45, 0.45), 'A'),
     (17, '_cell', '1', 'Knopfzelle CR2032', 'Panasonic CR2032', 'Panasonic_CR2032_Datasheet_2026-02.pdf', (135, 0.45), 'A'),
 ]
-AIDS = 'Hilfsmittel (nicht im Produkt): Distanzlehre FL-S-10 (2 Stk.), Silikonfett O-Ringe, Fensterkleber UHU plus endfest 300, Kapton-Punkt'
+AIDS = 'Hilfsmittel (nicht im Produkt): Distanzlehre FL-S-10 (2 Stk.), Silikonfett O-Ringe (dünn), Kennungsetikett, Fensterkleber UHU plus endfest 300, Kapton-Punkt'
 
 
 def load_pcb_step():
@@ -593,9 +593,13 @@ def d_wanne(GN, GS):
     w = GS['Wanne_grau']
     G, PI, T, USB = GN['G'], GN['PI'], GN['TUBE'], GN['USB']
     px, py, ZP = GN['px'], GN['py'], GN['ZP']
-    sh = Sheet('A3', 'FL-G-01', 'Gateway G1 v4 – Wanne grau', 'Pi-Abstandshalter, Lichtschacht, Klimakammer mit Schiene SEN0428, Micro-USB-Fenster (_otg: + OTG)',
+    sh = Sheet('A3', 'FL-G-01', 'Gateway G1 v4 – Wanne grau', 'Pi-Abstandshalter, LED-Rohr 3 mm, Kabelhalter, Klimakammer mit Schiene SEN0428, Micro-USB-Fenster (_otg: + OTG)',
                'ASA (PRINT_SETTINGS Kap. 1), Warmgrau hell #B9B5AC', '2:1', 'Boden auf dem Bett, Brim 3 mm; Brücken: USB-Fenster 11.4, Senkungen Ø5.4',
-               STAND, GW_SRC, NOTE_COMMON + GW_NOTES, date=DATE)
+               STAND, GW_SRC, NOTE_COMMON + GW_NOTES + [
+                   '7  LED-Rohr hinter dem Tropfen (Achse = Facettennormale): Bohrung Ø%s für LED 3 mm WP710A10GD, Rohrstirn = Flanschanlage (Klebesitz),'
+                   % fmt(GN['LED3']['BORE_D']),
+                   '   Spitze %s hinter dem Fenster; 2 Kabelhalter vorne am Boden (x %s). Masse im CAD (check_gateway_pi.txt 15), nicht bemasst.'
+                   % (fmt(GN['LED3']['GAP']), ' / '.join(fmt(x) for x in GN['LED3']['CLIP_X']))], date=DATE)
     s = 2.0
     fr = View(sh, w, 'front', s).place(125, 252).draw('Vorderansicht', 12)
     tp = View(sh, w, 'top', s).place(125, 170).draw('Draufsicht', 13)
@@ -706,7 +710,7 @@ def d_deckel(GN, GS):
 def d_fenster_gw(GN, GS):
     f = Part.read(os.path.join(REPO, 'mechanical', 'gateway_pi', 'print', 'fenster_tropfen_gw.step'))
     f = f.Solids[0]
-    sh = Sheet('A4', 'FL-G-03', 'Gateway – Lichtfenster Tropfen', 'Diffusor vor der LED-Platine, auf der 45°-Facette eingeklebt',
+    sh = Sheet('A4', 'FL-G-03', 'Gateway – Lichtfenster Tropfen', 'Diffusor vor der 3-mm-LED (Rohr in der Wanne), auf der 45°-Facette eingeklebt',
                'Polymaker ASA Natural PF01006', '10:1', 'Aussenfläche auf dem Bett (wie exportiert), 0.12 mm', STAND,
                'mechanical/gateway_pi/print/fenster_tropfen_gw.step (Druckausrichtung)  <-  fluidi_gateway_pi.py', NOTE_COMMON, date=DATE)
     tp = View(sh, f, 'top', 10.0).place(80, 140).draw('Draufsicht (Druckausrichtung)', 7)

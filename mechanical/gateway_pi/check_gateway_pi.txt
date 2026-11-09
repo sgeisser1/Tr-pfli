@@ -20,14 +20,27 @@ Pi: X=0 bei x 26.0, Y=0 bei y 18.6, PCB z 5.0 ... 6.0 (ANNAHME T 1.0)
    Pi_Bauteile_oben   - Wanne 0.30   - Deckel 0.20
    Pi_Bauteile_unten  - Wanne 0.20   - Deckel 1.02
    microSD_Karte      - Wanne 0.50   - Deckel 0.80
-   LED_Platine        - Wanne 0.00   - Deckel 0.25
+   LED_3mm            - Wanne 0.00   - Deckel 0.51
+   Leitungen_LED      - Wanne 0.20   - Deckel 0.81
    Klima_Modul_Option - Wanne 0.00   - Deckel 0.15
    Leitungen_Klima    - Wanne 0.20   - Deckel 0.60
    (Pi_PCB 0.00 = Auflage auf Abstandshaltern / Niederhalterrohren, gewollt; Bauteilhuelle 0.20 nur innerhalb
     des Freihaltekreises Ø 6 der Zeichnung, dort keine Bauteile)
    Pi_PCB - Wand (ohne Freistiche) 0.40
-   LED_Platine        - Pi_Bauteile_oben 4.88  - Pi_PCB 5.72
-   LED_RGB            - Pi_Bauteile_oben 5.88  - Pi_PCB 6.77
+   LED_3mm            - Pi_Bauteile_oben 1.78  - Pi_PCB 2.74
+15 Status-LED Kingbright WP710A10GD 3 mm (Datenblatt S. 1) + 470 Ohm, Litzen an J8 Pin 11 (GPIO17) / Pin 14 (GND):
+   Rohr an der Wanne: Bohrung Ø3.1 (Koerper 2.9 -> 0.10 je Seite), Wand 0.8 (Rohr Ø4.7), Laenge ab Fenster-Innenflaeche 3.70; Lichtaustritt Ø4.0 vor der Spitze
+   Flansch Ø3.2 liegt an der Rohrstirn an (Klebesitz) -> Spitze 0.10 mm hinter dem Fenster (Datenblatt 4.6 +-0.3: 0.00 ... 0.40; bei 0.00 beruehrt die Spitze das Fenster, der Flansch steht dann bis 0.20 vor der Stirn -> Klebstoff)
+   Abstand LED - Fenster 0.10, LED - Wanne 0.00 (0 = Flanschanlage, gewollt), LED - Deckel 0.51 mm
+   LED-Rohr - Deckel (Niederhalterrohr vorn) 0.61, - Pi_PCB 4.62, - Pi_Bauteile_oben 3.78 mm (Soll >= 0.3)
+   Pi senkrecht einlegen: Platinenumriss (z 5.0 ... 20.0) zum LED-Rohr 0.58 mm, zur LED 0.42 mm (Soll >= 0.3)
+   Kabelhalter: 2 Pfosten x 16/8 am Boden, Kanal y -19.0 ... -16.0 (3.0 breit), Lippe bis y -17.2 -> Einfaedeloeffnung 1.8, Lippe z 5.2 ueber Boden 2.0; Litzenbuendel Ø1.6 (ANNAHME) -> Spiel 0.70 / 0.20 mm
+   Leitungen_LED - Wanne_grau        0.20 mm
+   Leitungen_LED - Deckel_blau       0.81 mm
+   Leitungen_LED - Pi_Bauteile_oben  0.00 mm
+   Leitungen_LED - Leitungen_Klima   5.52 mm
+   Loetaugen J8 Pin 11 x 4.91 y -6.65, Pin 14 x 2.37 y -9.19 (Lage aus RP-008358-DS-1, Belegung GATEWAY_SETUP 5.2); Litzenlaenge LED -> Pin 11 ca. 49 mm + 20 mm Reserve (Platzhalter-Pfad)
+   PROTOTYP-PRUEFUNG: Sitz der LED (Bohrung FDM, 45 Grad geneigt), Leuchtbild durch das Fenster (Polymaker ASA Natural 2.0 mm), Litzen klemmen beim Deckel-Aufsetzen nicht; zu dunkel -> 330 Ohm (GATEWAY_SETUP 5.2)
 3 Niederhalterrohre (Ø 7.0, Fuss Ø 5.6 x 1.5, Deckel) zur Wanne min. 0.40 mm (keine Anbindung an die Wand, Soll >= 0.3)
    Fuss Ø 5.6 (Auflage auf dem Pi) innerhalb Freihaltekreis Ø 6.0 der Zeichnung: ja; Rohr Ø 7.0 erst ab z 7.5 (Bauteilhuelle bis z 7.2)
    Gewindeeinsatz (bastelgarage 425681): Ø 4.6 x 4.0, Bohrung Ø 3.9 (Haendler 3.9), Bohrtiefe 5.2 ab Rohrende (Haendler min. 4.5; Einsatz 0.5 versenkt -> 0.7 unter dem Einsatz)
@@ -54,18 +67,18 @@ Pi: X=0 bei x 26.0, Y=0 bei y 18.6, PCB z 5.0 ... 6.0 (ANNAHME T 1.0)
    Pin 9  X 18.55 Y 25.25  -> x 7.45 y -6.65
    Option 1x5-Stiftleiste gerade (Pins 1-3-5-7-9, Pin 7 frei) + Buchsengehaeuse, Huelle 2.5 + 14 mm hoch (ANNAHME): Kollision mit Deckel_blau, Leitungen_Klima
    Option gewinkelte Leiste: Stifte zeigen in Y (zur Front) -> Steckergehaeuse ~14 mm passt nicht (Front 7.6 mm)
-   volle 40-pol. Leiste (8.5 mm, ANNAHME): Kollision mit Deckel_blau -> nicht vorgesehen
+   volle 40-pol. Leiste (8.5 mm, ANNAHME): Kollision mit Deckel_blau, Leitungen_LED -> nicht vorgesehen
 6 Metall im Gehaeuse: 4 Schrauben/Einsaetze nur in den 4 Befestigungsbohrungen des Pi (Herstellerbohrungen),
-   LED-Platine (Kupfer) Abstand zur Pi-Platine 5.7 mm; keine weiteren Metallteile. Lage der Onboard-Antenne
+   LED-Beine/Litzen (Status-LED, an Pin 11/14) Abstand LED zur Pi-Platine 2.7 mm; keine weiteren Metallteile. Lage der Onboard-Antenne
    ist in den offiziellen Unterlagen nicht angegeben -> RSSI offen/geschlossen messen (PROTOTYP-PRUEFUNG).
-7 Wanne_grau           12.9 cm3 -> 13.8 g ASA
-7 Wanne_grau_OTG       12.8 cm3 -> 13.7 g ASA
+7 Wanne_grau           13.0 cm3 -> 13.9 g ASA
+7 Wanne_grau_OTG       12.9 cm3 -> 13.8 g ASA
 7 Deckel_blau          9.5 cm3 -> 10.2 g ASA
 7 Fenster_transluzent  0.0 cm3 -> 0.1 g ASA
 8 Verlustleistung 1.0 W: dT Gehaeuse ~ 11 K (h = 8 W/m2K, A = 0.0111 m2, ANNAHME; Leistung Pi nicht im Product Brief)
 8 Verlustleistung 2.0 W: dT Gehaeuse ~ 22 K (h = 8 W/m2K, A = 0.0111 m2, ANNAHME; Leistung Pi nicht im Product Brief)
 8 Verlustleistung 3.0 W: dT Gehaeuse ~ 34 K (h = 8 W/m2K, A = 0.0111 m2, ANNAHME; Leistung Pi nicht im Product Brief)
-10 Montage senkrecht: Pi in Wanne (mit Lichtschacht/LED-Platine) und Deckel auf Wanne, Ueberschneidung beim Anheben um t: t 0.3: Pi 0.00 / Deckel 0.00 mm3, t 1.0: Pi 0.00 / Deckel 0.00 mm3, t 2.0: Pi 0.00 / Deckel 0.00 mm3, t 4.0: Pi 0.00 / Deckel 0.00 mm3, t 8.0: Pi 0.00 / Deckel 0.00 mm3, t 15.0: Pi 0.00 / Deckel 0.00 mm3
+10 Montage senkrecht: Pi in Wanne (LED vorher im Rohr; Litzen biegsam, nicht geprueft) und Deckel auf Wanne, Ueberschneidung beim Anheben um t: t 0.3: Pi 0.00 / Deckel 0.00 mm3, t 1.0: Pi 0.00 / Deckel 0.00 mm3, t 2.0: Pi 0.00 / Deckel 0.00 mm3, t 4.0: Pi 0.00 / Deckel 0.00 mm3, t 8.0: Pi 0.00 / Deckel 0.00 mm3, t 15.0: Pi 0.00 / Deckel 0.00 mm3
 11 Klimakammer rechts: Innenraum x 32.0 ... 40.0 (8.0 mm), Trennwand 2.0 mm + 4.0 mm Luftspalt (SD-Raum) zum Pi;
    Modul (SEN0428 17 x 14 mm, Bodenschiene + Deckelnut, Sensorseite zur Stirnwand): Abstand zu SiP 28.0 mm, zu Micro-USB-PWR (Einspeisung, Regler vermutl. nahe) 58.3 mm, zur Pi-Platine 8.2 mm
    Zuluft 2 Bodenschlitze + 3 Stirnschlitze (Wanne), Abluft 1 Stirnschlitz (Deckel); Kabelkanal Ø 3.0 x 4.5 mm bei y -2.5 z 10.5, vergossen

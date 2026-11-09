@@ -23,6 +23,9 @@ Für alle, die den Sensor benutzen. Dauer etwa 5 Minuten. Bild: `renders/final/f
 - Zellen **nicht laden, nicht erwärmen, nicht öffnen**, nicht auf leitende Unterlagen legen (Renata Safety Guidelines).
 - **Kein Metallwerkzeug** zum Herausdrücken der Zelle (Kurzschluss zwischen Clip und Minuspad, Beschädigung des Clips).
 - Den Sensor nicht in Reichweite von Kleinkindern und Haustieren aufstellen (FMEA F-25).
+- **Ersatz- und lose Schrauben** (M2 × 3, klein genug zum Verschlucken) wie die Zellen **ausser Reichweite von Kindern**
+  aufbewahren. Die Schraube ist **nicht unverlierbar**: zu weit gelöst fällt sie heraus. **Ohne Schraube den Sensor nicht
+  benutzen** (Fach muss verschraubt sein, siehe Warnung oben).
 - Nur **CR2032 der Marke laut Stückliste** verwenden (Panasonic CR2032, REQ-ENE-08), nur neue Zellen.
 - Die Sondenspitze ist spitz: beim Herausziehen und Reinigen nicht gegen die Hand führen.
 - **Beschädigte, verformte oder ausgelaufene Zellen** nicht einsetzen; ausgelaufene Zelle nur mit Handschuhen anfassen,
